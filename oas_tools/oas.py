@@ -3,6 +3,7 @@ import sys
 import typer
 import yaml
 from copy import deepcopy
+from itertools import zip_longest
 from typing import Any, Optional
 from typing_extensions import Annotated
 from rich import print
@@ -55,6 +56,66 @@ def find_list_prop(items: list[Any], prop_name: str) -> set[str]:
     for item in items:
         if isinstance(item, dict):
             result.update(find_dict_prop(item, prop_name))
+
+    return result
+
+
+def shorten_text(text: str, max_len: int = 16) -> str:
+    if len(text) >= max_len:
+        text = text[:max_len - 3] + "..."
+    return text
+
+
+def diff(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
+    result = {}
+    assert isinstance(lhs, dict) and isinstance(rhs, dict)
+    lkeys = set(lhs.keys())
+    rkeys = set(rhs.keys())
+
+    added = rkeys - lkeys
+    for k in added:
+        result[k] = "added"
+
+    removed = lkeys - rkeys
+    for k in removed:
+        result[k] = "removed"
+
+    common = lkeys & rkeys
+    for k in common:
+        left = lhs[k]
+        right = rhs[k]
+        if left is None or right is None:
+            # avoids failures due to trying to treat right as dict/list
+            if left == right:
+                pass
+            elif left is None:
+                result[k] = "original is None"
+            elif right is None:
+                result[k] = "updated is None"
+        elif isinstance(left, dict):
+            # recursive call to find sub-object deltas
+            diffs = diff(left, right)
+            if diffs:
+                result[k] = diffs
+        elif isinstance(left, list) and left and isinstance(left[0], dict):
+            if len(left) != len(right):
+                result[k] = f"different lengths: {len(left)} != {len(right)}"
+            elif left and isinstance(left[0], dict):
+                for index, (lvalue, rvalue) in enumerate(zip_longest(left, right)):
+                    # recursive call to find sub-object deltas
+                    vdiff = diff(lvalue, rvalue)
+                    if vdiff:
+                        item_key = f"{k}[{index}]"
+                        result[item_key] = vdiff
+            else:
+                # simple list items here
+                lvalues = set(left)
+                rvalues = set(right)
+                diffs = lvalues ^ rvalues
+                if diffs:
+                    result[k] = f"contains {len(diffs)} differences"
+        elif left != right:
+            result[k] = f"{shorten_text(str(left))} != {shorten_text(str(right))}"
 
     return result
 
@@ -141,6 +202,22 @@ def summary(
 
     return
 
+
+@app.command("diff", short_help="Compare two OAS files")
+def summary(
+    original: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="Original OpenAPI specification filename")],
+    updated: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="Updated OpenAPI specification filename")],
+) -> None:
+    old_spec = open_oas(original)
+    new_spec = open_oas(updated)
+
+    diffs = diff(old_spec, new_spec)
+    if not diffs:
+        print(f"No differences between {original} and {updated}")
+    else:
+        print(yaml.dump(diffs, indent=len(INDENT)))
+    return
+        
 
 ##########################################
 # Operations
