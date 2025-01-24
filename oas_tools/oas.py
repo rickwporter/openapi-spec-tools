@@ -66,7 +66,7 @@ def shorten_text(text: str, max_len: int = 16) -> str:
     return text
 
 
-def diff(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
+def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
     result = {}
     assert isinstance(lhs, dict) and isinstance(rhs, dict)
     lkeys = set(lhs.keys())
@@ -94,7 +94,7 @@ def diff(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
                 result[k] = "updated is None"
         elif isinstance(left, dict):
             # recursive call to find sub-object deltas
-            diffs = diff(left, right)
+            diffs = find_diffs(left, right)
             if diffs:
                 result[k] = diffs
         elif isinstance(left, list) and left and isinstance(left[0], dict):
@@ -103,7 +103,7 @@ def diff(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
             elif left and isinstance(left[0], dict):
                 for index, (lvalue, rvalue) in enumerate(zip_longest(left, right)):
                     # recursive call to find sub-object deltas
-                    vdiff = diff(lvalue, rvalue)
+                    vdiff = find_diffs(lvalue, rvalue)
                     if vdiff:
                         item_key = f"{k}[{index}]"
                         result[item_key] = vdiff
@@ -204,14 +204,14 @@ def summary(
 
 
 @app.command("diff", short_help="Compare two OAS files")
-def summary(
+def diff(
     original: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="Original OpenAPI specification filename")],
     updated: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="Updated OpenAPI specification filename")],
 ) -> None:
     old_spec = open_oas(original)
     new_spec = open_oas(updated)
 
-    diffs = diff(old_spec, new_spec)
+    diffs = find_diffs(old_spec, new_spec)
     if not diffs:
         print(f"No differences between {original} and {updated}")
     else:
