@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 import sys
-import typer
-import yaml
 from copy import deepcopy
 from itertools import zip_longest
-from typing import Any, Optional
-from typing_extensions import Annotated
+from typing import Any
+from typing import Optional
+
+import typer
+import yaml
 from rich import print
+from typing_extensions import Annotated
 
 INDENT = "    "
 
@@ -155,9 +157,12 @@ def find_paths(paths: dict[str, Any], search: Optional[str] = None, sub_paths: b
 app = typer.Typer(name="oas", no_args_is_help=True, short_help="OpenAPI specification")
 
 
+OasFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification file")]
+
+
 @app.command("info", short_help="Display the 'info' from the OpenAPI specification")
 def info(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
 ) -> None:
     spec = open_oas(filename)
 
@@ -168,7 +173,7 @@ def info(
 
 @app.command("summary", short_help="Display suummary of OAS data")
 def summary(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
 ) -> None:
     spec = open_oas(filename)
     method_count = {
@@ -205,8 +210,14 @@ def summary(
 
 @app.command("diff", short_help="Compare two OAS files")
 def diff(
-    original: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="Original OpenAPI specification filename")],
-    updated: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="Updated OpenAPI specification filename")],
+    original: Annotated[
+        str,
+        typer.Argument(metavar="FILENAME", show_default=False, help="Original OpenAPI specification filename"),
+    ],
+    updated: Annotated[
+        str,
+        typer.Argument(metavar="FILENAME", show_default=False, help="Updated OpenAPI specification filename"),
+    ],
 ) -> None:
     old_spec = open_oas(original)
     new_spec = open_oas(updated)
@@ -217,7 +228,7 @@ def diff(
     else:
         print(yaml.dump(diffs, indent=len(INDENT)))
     return
-        
+
 
 ##########################################
 # Operations
@@ -227,8 +238,11 @@ app.add_typer(op_typer, name="ops")
 
 @op_typer.command(name="list", short_help="List models in OpenAPI spec")
 def op_list(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
-    search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the operation names")] = None,
+    filename: OasFilenameArgument,
+    search: Annotated[
+        Optional[str],
+        typer.Option("--contains", help="Search for this value in the operation names"),
+    ] = None,
 ) -> None:
     spec = open_oas(filename)
 
@@ -251,7 +265,7 @@ def op_list(
 
 @op_typer.command(name="show", short_help="Show the opertions schema")
 def operation_show(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     operation_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
     spec = open_oas(filename)
@@ -280,12 +294,17 @@ def operation_show(
 path_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to paths")
 app.add_typer(path_typer, name="paths")
 
+PathSearchOption = Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the path")]
+PathSubpathObtion = Annotated[
+    bool,
+    typer.Option("--sub-paths/--no-sub-paths", help="Include sub-paths of the search value"),
+]
 
 @path_typer.command(name="list", short_help="List paths in OpenAPI spec")
 def paths_list(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
-    search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the path")] = None,
-    include_subpaths: Annotated[bool, typer.Option("--sub-paths/--no-sub-paths", help="Include sub-paths of the search value")] = False,
+    filename: OasFilenameArgument,
+    search: PathSearchOption = None,
+    include_subpaths: PathSubpathObtion = False,
 ) -> None:
     spec = open_oas(filename)
 
@@ -310,9 +329,9 @@ def paths_list(
 
 @path_typer.command(name="show", short_help="Show the path schema")
 def path_show(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     path_name: Annotated[str, typer.Argument(help="Name of the path to show")],
-    include_subpaths: Annotated[bool, typer.Option("--sub-paths/--no-sub-paths", help="Include sub-paths of the search value")] = False,
+    include_subpaths: PathSubpathObtion = False,
 ) -> None:
     spec = open_oas(filename)
 
@@ -329,9 +348,9 @@ def path_show(
 
 @path_typer.command(name="ops", short_help="Show the operations in the specified path")
 def path_operations(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     path_name: Annotated[str, typer.Option(help="Name of the path to show")],
-    include_subpaths: Annotated[bool, typer.Option("--sub-paths/--no-sub-paths", help="Include sub-paths of the search value")] = False,
+    include_subpaths: PathSubpathObtion = False,
 ) -> None:
     spec = open_oas(filename)
 
@@ -362,8 +381,11 @@ app.add_typer(model_typer, name="models")
 
 @model_typer.command(name="list", short_help="List models in OpenAPI spec")
 def model_list(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
-    search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the model names")] = None,
+    filename: OasFilenameArgument,
+    search: Annotated[
+        Optional[str],
+        typer.Option("--contains", help="Search for this value in the model names"),
+    ] = None,
 ) -> None:
     spec = open_oas(filename)
 
@@ -385,7 +407,7 @@ def model_list(
 
 @model_typer.command(name="show", short_help="Show the model schema")
 def model_show(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
     spec = open_oas(filename)
@@ -401,7 +423,7 @@ def model_show(
 
 @model_typer.command(name="uses", short_help="List sub-models used by the specified model")
 def model_uses(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
     spec = open_oas(filename)
@@ -426,7 +448,7 @@ def model_uses(
 
 @model_typer.command(name="used-by", short_help="List models which reference the specified model")
 def model_used_by(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
     spec = open_oas(filename)
@@ -459,7 +481,7 @@ app.add_typer(tag_typer, name="tags")
 
 @tag_typer.command(name="list", short_help="List tags in OpenAPI spec")
 def tag_list(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the tag names")] = None,
 ) -> None:
     spec = open_oas(filename)
@@ -490,7 +512,7 @@ def tag_list(
 
 @tag_typer.command(name="show", short_help="Show the tag schema")
 def tag_show(
-    filename: Annotated[str, typer.Argument(help="OpenAPI specification filename")],
+    filename: OasFilenameArgument,
     tag_name: Annotated[str, typer.Argument(help="Name of the tag to show")],
 ) -> None:
     spec = open_oas(filename)
