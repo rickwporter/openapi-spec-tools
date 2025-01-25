@@ -25,6 +25,10 @@ from oas_tools.utils import unroll
 INDENT = "    "
 
 
+def error_out(message: str, exit_code: int = 1) -> None:
+    print(f"[red]ERROR:[/red] {message}")
+    sys.exit(exit_code)
+
 
 #################################################
 # CLI stuff
@@ -147,8 +151,7 @@ def operation_show(
     operations = map_operations(spec.get(PATHS, {}))
     operation = operations.get(operation_name)
     if not operation:
-        print(f"[red]ERROR:[/red] failed to find {operation_name}")
-        sys.exit(1)
+        error_out(f"failed to find {operation_name}")
 
     path = operation.pop(X_PATH)
     path_params = operation.pop(X_PATH_PARAMS, None)
@@ -211,9 +214,7 @@ def path_show(
 
     paths = find_paths(spec.get(PATHS, {}), path_name, include_subpaths)
     if not paths:
-        print(f"[red]ERROR:[/red] failed to find {path_name}")
-        sys.exit(1)
-
+        error_out(f"failed to find {path_name}")
 
     print(yaml.dump(paths, indent=len(INDENT)))
     return
@@ -238,11 +239,8 @@ def path_operations(
         items = result.get(path, []) + op_id
         result[path] = items
 
-
     if not result:
-        print(f"[red]ERROR:[/red] failed to find {path_name}")
-        sys.exit(1)
-
+        error_out(f"failed to find {path_name}")
 
     print(yaml.dump(result, indent=len(INDENT)))
     return
@@ -288,8 +286,7 @@ def model_show(
 
     model = spec.get(COMPONENTS, {}).get(SCHEMAS, {}).get(model_name)
     if not model:
-        print(f"[red]ERROR:[/red] failed to find {model_name}")
-        sys.exit(1)
+        error_out(f"failed to find {model_name}")
 
     print(yaml.dump({model_name: model}, indent=len(INDENT)))
     return
@@ -304,8 +301,7 @@ def model_uses(
 
     models = spec.get(COMPONENTS, {}).get(SCHEMAS, {})
     if model_name not in models:
-        print(f"[red]ERROR:[/red] no model '{model_name}' found")
-        sys.exit(1)
+        error_out(f"no model '{model_name}' found")
 
     references = {
         name: find_references(body)
@@ -329,8 +325,7 @@ def model_used_by(
 
     models = spec.get(COMPONENTS, {}).get(SCHEMAS, {})
     if model_name not in models:
-        print(f"[red]ERROR:[/red] no model '{model_name}' found")
-        sys.exit(1)
+        error_out(f"no model '{model_name}' found")
 
     referenced = {}
     for name, body in models.items():
@@ -401,8 +396,7 @@ def tag_show(
                 operations[op_id] = operation
 
     if not operations:
-        print(f"[red]ERROR:[/red] failed to find {tag_name}")
-        sys.exit(1)
+        error_out(f"failed to find {tag_name}")
 
     names = sorted(operations.keys())
     print(f"Tag {tag_name} has {len(names)} operations:")
