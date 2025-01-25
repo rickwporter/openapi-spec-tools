@@ -1,0 +1,11 @@
+COMPONENTS = "components"
+OP_ID = "operationId"
+PARAMS = "parameters"
+PATHS = "paths"
+REFS = "$ref"
+SCHEMAS = "schemas"
+TAGS = "tags"
+
+X_METHOD = "x-method"
+X_PATH = "x-path"
+X_PATH_PARAMS = "x-path-params"
