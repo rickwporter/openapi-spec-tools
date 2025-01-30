@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import sys
 from typing import Optional
 
 import typer
@@ -7,6 +6,8 @@ import yaml
 from rich import print
 from typing_extensions import Annotated
 
+from oas_tools._typer import OasFilenameArgument
+from oas_tools._typer import error_out
 from oas_tools.constants import COMPONENTS
 from oas_tools.constants import OP_ID
 from oas_tools.constants import PATHS
@@ -25,17 +26,9 @@ from oas_tools.utils import unroll
 INDENT = "    "
 
 
-def error_out(message: str, exit_code: int = 1) -> None:
-    print(f"[red]ERROR:[/red] {message}")
-    sys.exit(exit_code)
-
-
 #################################################
 # CLI stuff
 app = typer.Typer(name="oas", no_args_is_help=True, short_help="OpenAPI specification")
-
-
-OasFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification file")]
 
 
 @app.command("info", short_help="Display the 'info' from the OpenAPI specification")
