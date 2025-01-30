@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from copy import deepcopy
+from enum import Enum
 from typing import Optional
 
 import typer
@@ -16,11 +18,15 @@ from oas_tools.constants import TAGS
 from oas_tools.constants import X_METHOD
 from oas_tools.constants import X_PATH
 from oas_tools.constants import X_PATH_PARAMS
+from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 from oas_tools.utils import open_oas
+from oas_tools.utils import remove_schema_tags
+from oas_tools.utils import schema_operations
+from oas_tools.utils import set_nullable_not_required
 from oas_tools.utils import unroll
 
 INDENT = "    "
@@ -98,6 +104,79 @@ def diff(
         print(f"No differences between {original} and {updated}")
     else:
         print(yaml.dump(diffs, indent=len(INDENT)))
+    return
+
+
+class DisplayOption(str, Enum):
+    NONE = "none"
+    SUMMARY = "summary"
+    DIFF = "diff"
+    FINAL = "final"
+
+
+@app.command("update", short_help="Update the OpenAPI spec")
+def update(
+    original_filename: OasFilenameArgument,
+    updated_filename: Annotated[Optional[str], typer.Option(help="Filename for update OpenAPI spec")] = None,
+    nullable_not_required: Annotated[
+        bool,
+        typer.Option(help="Remove 'nullable' properties from required list"),
+    ] = False,
+    remove_all_tags: Annotated[bool, typer.Option(help="Remove all tags")] = False,
+    remove_operations: Annotated[
+        Optional[list[str]],
+        typer.Option("--remove-op", show_default=False, help="List of operations to remove"),
+    ] = None,
+    allowed_operations: Annotated[
+        Optional[list[str]],
+        typer.Option("--allow-op", show_default=False, help="List of operations to keep"),
+    ] = None,
+    display_option: Annotated[
+        DisplayOption,
+        typer.Option("--display", help="Shown on console at conclusion", case_sensitive=False),
+    ] = DisplayOption.DIFF,
+    indent: Annotated[
+        int,
+        typer.Option(min=1, max=10, help="Number of characters to indent on YAML display"),
+    ] = len(INDENT),
+) -> None:
+    old_spec = open_oas(original_filename)
+    updated = deepcopy(old_spec)
+
+    if allowed_operations and remove_operations:
+        error_out("cannot specify both --allow-op and --remove-op")
+
+    if remove_all_tags:
+        updated = remove_schema_tags(updated)
+
+    if nullable_not_required:
+        updated = set_nullable_not_required(updated)
+
+    if remove_operations:
+        updated = schema_operations(updated, remove_ops=set(remove_operations))
+
+    if allowed_operations:
+        updated = schema_operations(updated, allow_ops=set(allowed_operations))
+
+    if updated_filename:
+        with open(updated_filename, "w") as fp:
+            yaml.dump(updated, fp, indent=indent)
+
+    diffs = find_diffs(old_spec, updated)
+    if display_option == DisplayOption.NONE:
+        pass
+    elif display_option == DisplayOption.FINAL:
+        print(yaml.dump(updated, indent=indent))
+    elif not diffs:
+        print(f"No differences between {original_filename} and updated")
+    elif display_option == DisplayOption.DIFF:
+        print(yaml.dump(diffs, indent=indent))
+    elif display_option == DisplayOption.SUMMARY:
+        diff_count = count_values(diffs)
+        print(f"Found {diff_count} differences from {original_filename}")
+    else:
+        print(f"Unhandled disply option: {display_option}")
+
     return
 
 

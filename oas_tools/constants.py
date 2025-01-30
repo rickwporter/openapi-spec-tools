@@ -1,8 +1,12 @@
 COMPONENTS = "components"
+NAME = "name"
+NULLABLE = "nullable"
 OP_ID = "operationId"
 PARAMS = "parameters"
 PATHS = "paths"
+PROPS = "properties"
 REFS = "$ref"
+REQUIRED = "required"
 SCHEMAS = "schemas"
 TAGS = "tags"
 
