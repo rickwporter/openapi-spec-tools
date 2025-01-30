@@ -106,6 +106,18 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
                 diffs = lvalues ^ rvalues
                 if diffs:
                     result[k] = f"contains {len(diffs)} differences"
+        elif isinstance(left, list) and left:
+            lvalues = set(left)
+            rvalues = set(right)
+            deltas = []
+            added = rvalues - lvalues
+            if added:
+                deltas.append(f"added {', '.join(added)}")
+            removed = lvalues - rvalues
+            if removed:
+                deltas.append(f"removed {', '.join(removed)}")
+            if deltas:
+                result[k] = "; ".join(deltas)
         elif left != right:
             result[k] = f"{shorten_text(str(left))} != {shorten_text(str(right))}"
 
