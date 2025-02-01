@@ -25,7 +25,7 @@ from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 from oas_tools.utils import open_oas
 from oas_tools.utils import remove_schema_tags
-from oas_tools.utils import schema_operations
+from oas_tools.utils import schema_operations_filter
 from oas_tools.utils import set_nullable_not_required
 from oas_tools.utils import unroll
 
@@ -153,10 +153,10 @@ def update(
         updated = set_nullable_not_required(updated)
 
     if remove_operations:
-        updated = schema_operations(updated, remove_ops=set(remove_operations))
+        updated = schema_operations_filter(updated, remove_ops=set(remove_operations))
 
     if allowed_operations:
-        updated = schema_operations(updated, allow_ops=set(allowed_operations))
+        updated = schema_operations_filter(updated, allow_ops=set(allowed_operations))
 
     if updated_filename:
         with open(updated_filename, "w") as fp:

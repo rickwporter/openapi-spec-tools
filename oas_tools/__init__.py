@@ -5,6 +5,6 @@ from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 from oas_tools.utils import open_oas
 from oas_tools.utils import remove_schema_tags
-from oas_tools.utils import schema_operations
+from oas_tools.utils import schema_operations_filter
 from oas_tools.utils import set_nullable_not_required
 from oas_tools.utils import unroll
