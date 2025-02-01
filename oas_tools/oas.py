@@ -34,7 +34,12 @@ INDENT = "    "
 
 #################################################
 # CLI stuff
-app = typer.Typer(name="oas", no_args_is_help=True, short_help="OpenAPI specification")
+app = typer.Typer(
+    name="oas",
+    no_args_is_help=True,
+    short_help="OpenAPI specification tools",
+    help="Various utilities for inspecting, analyzing and modifying OpenAPI specifications.",
+)
 
 
 @app.command("info", short_help="Display the 'info' from the OpenAPI specification")
@@ -48,7 +53,7 @@ def info(
     return
 
 
-@app.command("summary", short_help="Display suummary of OAS data")
+@app.command("summary", short_help="Display summary of OAS data")
 def summary(
     filename: OasFilenameArgument,
 ) -> None:
@@ -78,7 +83,7 @@ def summary(
     print(f"{INDENT}Operation methods ({sum(method_count.values())}):")
     for k, v in method_count.items():
         print(f"{INDENT * 2}{k}: {v}")
-    print(f"{INDENT}Tags ({len(tag_count)}):")
+    print(f"{INDENT}Tags ({len(tag_count)}) with operation counts:")
     for k, v in tag_count.items():
         print(f"{INDENT * 2}{k}: {v}")
 
@@ -181,9 +186,15 @@ def update(
 
 
 ##########################################
+# Analyze
+analyze_typer = typer.Typer(no_args_is_help=True, short_help="Tools for analyzing an OAS file")
+app.add_typer(analyze_typer, name="analyze")
+
+
+##########################################
 # Operations
 op_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to operations")
-app.add_typer(op_typer, name="ops")
+analyze_typer.add_typer(op_typer, name="ops")
 
 
 @op_typer.command(name="list", short_help="List models in OpenAPI spec")
@@ -241,7 +252,7 @@ def operation_show(
 ##########################################
 # Paths
 path_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to paths")
-app.add_typer(path_typer, name="paths")
+analyze_typer.add_typer(path_typer, name="paths")
 
 PathSearchOption = Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the path")]
 PathSubpathObtion = Annotated[
@@ -321,7 +332,7 @@ def path_operations(
 ##########################################
 # Models
 model_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to models")
-app.add_typer(model_typer, name="models")
+analyze_typer.add_typer(model_typer, name="models")
 
 @model_typer.command(name="list", short_help="List models in OpenAPI spec")
 def model_list(
@@ -418,7 +429,7 @@ def model_used_by(
 ##########################################
 # Tags
 tag_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to tags")
-app.add_typer(tag_typer, name="tags")
+analyze_typer.add_typer(tag_typer, name="tags")
 
 @tag_typer.command(name="list", short_help="List tags in OpenAPI spec")
 def tag_list(
