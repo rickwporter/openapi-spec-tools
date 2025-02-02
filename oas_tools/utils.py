@@ -251,12 +251,9 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     """
     result = {}
     for path, path_data in paths.items():
-        path_params = path_data.get(PARAMS)
+        path_params = path_data.pop(PARAMS, None)
         for method, op_data in path_data.items():
             op_id = op_data.get(OP_ID)
-            if not op_id:
-                continue
-
             op_data[X_PATH] = path
             op_data[X_PATH_PARAMS] = path_params
             op_data[X_METHOD] = method

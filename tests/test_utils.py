@@ -3,15 +3,25 @@ from enum import Enum
 import pytest
 
 from oas_tools.constants import COMPONENTS
+from oas_tools.constants import DESCRIPTION
+from oas_tools.constants import OP_ID
 from oas_tools.constants import PARAMS
 from oas_tools.constants import PATHS
 from oas_tools.constants import PROPS
 from oas_tools.constants import REQUIRED
+from oas_tools.constants import RESPONSES
+from oas_tools.constants import SCHEMA
 from oas_tools.constants import SCHEMAS
+from oas_tools.constants import SUMMARY
 from oas_tools.constants import TAGS
+from oas_tools.constants import TYPE
+from oas_tools.constants import X_METHOD
+from oas_tools.constants import X_PATH
+from oas_tools.constants import X_PATH_PARAMS
 from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
 from oas_tools.utils import find_references
+from oas_tools.utils import map_operations
 
 from .helpers import open_test_oas
 
@@ -135,6 +145,7 @@ def test_find_diffs_list_dicts_item() -> None:
 def test_count_values_success(obj, count) -> None:
     assert count == count_values(obj)
 
+
 def test_count_values_failure() -> None:
     class MyEnum(Enum):
         A = "a"
@@ -144,3 +155,42 @@ def test_count_values_failure() -> None:
     with pytest.raises(ValueError) as error:
         count_values(obj)
     assert error.match("Unhandled type MyEnum for 'b'")
+
+
+def test_map_operations() -> None:
+    oas = open_test_oas("pet2.yaml")
+    ops = map_operations(oas.get(PATHS))
+    assert set(["listPets", "createPets", "showPetById", "deletePetById"]) == ops.keys()
+    baseline_keys = set([OP_ID, RESPONSES, SUMMARY, TAGS, X_PATH, X_PATH_PARAMS, X_METHOD])
+
+    expected_keys = baseline_keys | set([PARAMS])
+    item = ops["listPets"]
+    assert expected_keys == set(item.keys())
+    assert item[OP_ID] == "listPets"
+    assert item[X_PATH] == "/pets"
+    assert item[X_METHOD] == "get"
+    assert item[X_PATH_PARAMS] == None
+
+    expected_keys = baseline_keys | set(["requestBody"])
+    item = ops["createPets"]
+    assert expected_keys == set(item.keys())
+    assert item[OP_ID] == "createPets"
+    assert item[X_PATH] == "/pets"
+    assert item[X_METHOD] == "post"
+    assert item[X_PATH_PARAMS] == None
+
+    expected_keys = baseline_keys
+    item = ops["deletePetById"]
+    assert expected_keys == set(item.keys())
+    assert item[OP_ID] == "deletePetById"
+    assert item[X_PATH] == "/pets/{petId}"
+    assert item[X_METHOD] == "delete"
+    assert item[X_PATH_PARAMS] == [{"name": "petId", "in": "path", REQUIRED: True, DESCRIPTION: "The id of the pet to retrieve", SCHEMA: {TYPE: "string"}}]
+
+    expected_keys = baseline_keys
+    item = ops["showPetById"]
+    assert expected_keys == set(item.keys())
+    assert item[OP_ID] == "showPetById"
+    assert item[X_PATH] == "/pets/{petId}"
+    assert item[X_METHOD] == "get"
+    assert item[X_PATH_PARAMS] == [{"name": "petId", "in": "path", REQUIRED: True, DESCRIPTION: "The id of the pet to retrieve", SCHEMA: {TYPE: "string"}}]
