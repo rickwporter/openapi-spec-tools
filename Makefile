@@ -13,3 +13,10 @@ lint: ## Check code formatting
 delint: ## Fix formatting issues
 	$(poetry_run) ruff check --fix
 
+test: ## Run unit tests
+	$(poetry_run) pytest -v
+
+cov: ## Run unit tests with code coverage measurments
+	$(poetry_run) coverage run -m pytest -v
+	$(poetry_run) coverage report -m
+	$(poetry_run) coverage html
