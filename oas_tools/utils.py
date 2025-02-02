@@ -142,21 +142,15 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
         elif isinstance(left, list) and left and isinstance(left[0], dict):
             if len(left) != len(right):
                 result[k] = f"different lengths: {len(left)} != {len(right)}"
-            elif left and isinstance(left[0], dict):
+            else:
                 for index, (lvalue, rvalue) in enumerate(zip_longest(left, right)):
                     # recursive call to find sub-object deltas
                     vdiff = find_diffs(lvalue, rvalue)
                     if vdiff:
                         item_key = f"{k}[{index}]"
                         result[item_key] = vdiff
-            else:
-                # simple list items here
-                lvalues = set(left)
-                rvalues = set(right)
-                diffs = lvalues ^ rvalues
-                if diffs:
-                    result[k] = f"contains {len(diffs)} differences"
         elif isinstance(left, list) and left:
+            # simple list items here
             lvalues = set(left)
             rvalues = set(right)
             deltas = []
@@ -181,15 +175,19 @@ def count_values(obj: dict[str, Any]) -> int:
     This is useful for counting the number of differences as determined by 'find_diffs()'.
     """
     total = 0
-    for value in obj.values():
+    for key, value in obj.items():
         if isinstance(value, (str, int, bool, float)):
             total += 1
         elif isinstance(value, dict):
             total += count_values(value)
         elif isinstance(value, (list, set)):
-            total += len(value)
+            for item in value:
+                if isinstance(item, dict):
+                    total += count_values(item)
+                else:
+                    total += 1
         else:
-            raise ValueError(f"Unhandled type {type(value).__name__}")
+            raise ValueError(f"Unhandled type {type(value).__name__} for '{key}'")
 
     return total
 
