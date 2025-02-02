@@ -2,22 +2,7 @@ from enum import Enum
 
 import pytest
 
-from oas_tools.constants import COMPONENTS
-from oas_tools.constants import DESCRIPTION
-from oas_tools.constants import OP_ID
-from oas_tools.constants import PARAMS
-from oas_tools.constants import PATHS
-from oas_tools.constants import PROPS
-from oas_tools.constants import REQUIRED
-from oas_tools.constants import RESPONSES
-from oas_tools.constants import SCHEMA
-from oas_tools.constants import SCHEMAS
-from oas_tools.constants import SUMMARY
-from oas_tools.constants import TAGS
-from oas_tools.constants import TYPE
-from oas_tools.constants import X_METHOD
-from oas_tools.constants import X_PATH
-from oas_tools.constants import X_PATH_PARAMS
+from oas_tools.constants import Fields
 from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
 from oas_tools.utils import find_references
@@ -42,7 +27,7 @@ from .helpers import open_test_oas
 )
 def test_utils_find_path_references(asset, path, references) -> None:
     oas = open_test_oas(asset)
-    path_data = oas.get(PATHS, {}).get(path)
+    path_data = oas.get(Fields.PATHS, {}).get(path)
     found = find_references(path_data)
     assert references == found
 
@@ -51,18 +36,18 @@ def test_find_diffs_pet_forward() -> None:
     orig = open_test_oas("pet.yaml")
     updated = open_test_oas("pet2.yaml")
     diff = find_diffs(orig, updated)
-    assert diff[TAGS] == "added"
-    assert diff[COMPONENTS][SCHEMAS] == {
+    assert diff[Fields.TAGS] == "added"
+    assert diff[Fields.COMPONENTS][Fields.SCHEMAS] == {
         "Pet": {
-            PROPS: {"owner": "added"},
-            REQUIRED: "added owner",
+            Fields.PROPS: {"owner": "added"},
+            Fields.REQUIRED: "added owner",
         },
     }
-    assert diff[PATHS] == {
+    assert diff[Fields.PATHS] == {
         "/pets/{petId}": {
-            PARAMS: "added",
+            Fields.PARAMS: "added",
             "delete": "added",
-            "get": {PARAMS: "removed"},
+            "get": {Fields.PARAMS: "removed"},
         }
     }
 
@@ -72,18 +57,18 @@ def test_find_diffs_pet_reverse() -> None:
     orig = open_test_oas("pet2.yaml")
     updated = open_test_oas("pet.yaml")
     diff = find_diffs(orig, updated)
-    assert diff[TAGS] == "removed"
-    assert diff[COMPONENTS][SCHEMAS] == {
+    assert diff[Fields.TAGS] == "removed"
+    assert diff[Fields.COMPONENTS][Fields.SCHEMAS] == {
         "Pet": {
-            PROPS: {"owner": "removed"},
-            REQUIRED: "removed owner",
+            Fields.PROPS: {"owner": "removed"},
+            Fields.REQUIRED: "removed owner",
         },
     }
-    assert diff[PATHS] == {
+    assert diff[Fields.PATHS] == {
         "/pets/{petId}": {
-            PARAMS: "removed",
+            Fields.PARAMS: "removed",
             "delete": "removed",
-            "get": {PARAMS: "added"},
+            "get": {Fields.PARAMS: "added"},
         }
     }
 
@@ -159,38 +144,62 @@ def test_count_values_failure() -> None:
 
 def test_map_operations() -> None:
     oas = open_test_oas("pet2.yaml")
-    ops = map_operations(oas.get(PATHS))
+    ops = map_operations(oas.get(Fields.PATHS))
     assert set(["listPets", "createPets", "showPetById", "deletePetById"]) == ops.keys()
-    baseline_keys = set([OP_ID, RESPONSES, SUMMARY, TAGS, X_PATH, X_PATH_PARAMS, X_METHOD])
+    baseline_keys = set([
+        Fields.OP_ID,
+        Fields.RESPONSES,
+        Fields.SUMMARY,
+        Fields.TAGS,
+        Fields.X_PATH,
+        Fields.X_PATH_PARAMS,
+        Fields.X_METHOD,
+    ])
 
-    expected_keys = baseline_keys | set([PARAMS])
+    expected_keys = baseline_keys | set([Fields.PARAMS])
     item = ops["listPets"]
     assert expected_keys == set(item.keys())
-    assert item[OP_ID] == "listPets"
-    assert item[X_PATH] == "/pets"
-    assert item[X_METHOD] == "get"
-    assert item[X_PATH_PARAMS] == None
+    assert item[Fields.OP_ID] == "listPets"
+    assert item[Fields.X_PATH] == "/pets"
+    assert item[Fields.X_METHOD] == "get"
+    assert item[Fields.X_PATH_PARAMS] is None
 
     expected_keys = baseline_keys | set(["requestBody"])
     item = ops["createPets"]
     assert expected_keys == set(item.keys())
-    assert item[OP_ID] == "createPets"
-    assert item[X_PATH] == "/pets"
-    assert item[X_METHOD] == "post"
-    assert item[X_PATH_PARAMS] == None
+    assert item[Fields.OP_ID] == "createPets"
+    assert item[Fields.X_PATH] == "/pets"
+    assert item[Fields.X_METHOD] == "post"
+    assert item[Fields.X_PATH_PARAMS] is None
 
     expected_keys = baseline_keys
     item = ops["deletePetById"]
     assert expected_keys == set(item.keys())
-    assert item[OP_ID] == "deletePetById"
-    assert item[X_PATH] == "/pets/{petId}"
-    assert item[X_METHOD] == "delete"
-    assert item[X_PATH_PARAMS] == [{"name": "petId", "in": "path", REQUIRED: True, DESCRIPTION: "The id of the pet to retrieve", SCHEMA: {TYPE: "string"}}]
+    assert item[Fields.OP_ID] == "deletePetById"
+    assert item[Fields.X_PATH] == "/pets/{petId}"
+    assert item[Fields.X_METHOD] == "delete"
+    assert item[Fields.X_PATH_PARAMS] == [
+        {
+            Fields.NAME: "petId",
+            Fields.IN: "path",
+            Fields.REQUIRED: True,
+            Fields.DESCRIPTION: "The id of the pet to retrieve",
+            Fields.SCHEMA: {Fields.TYPE: "string"},
+        },
+    ]
 
     expected_keys = baseline_keys
     item = ops["showPetById"]
     assert expected_keys == set(item.keys())
-    assert item[OP_ID] == "showPetById"
-    assert item[X_PATH] == "/pets/{petId}"
-    assert item[X_METHOD] == "get"
-    assert item[X_PATH_PARAMS] == [{"name": "petId", "in": "path", REQUIRED: True, DESCRIPTION: "The id of the pet to retrieve", SCHEMA: {TYPE: "string"}}]
+    assert item[Fields.OP_ID] == "showPetById"
+    assert item[Fields.X_PATH] == "/pets/{petId}"
+    assert item[Fields.X_METHOD] == "get"
+    assert item[Fields.X_PATH_PARAMS] == [
+        {
+            Fields.NAME: "petId",
+            Fields.IN: "path",
+            Fields.REQUIRED: True,
+            Fields.DESCRIPTION: "The id of the pet to retrieve",
+            Fields.SCHEMA: {Fields.TYPE: "string"},
+        },
+    ]

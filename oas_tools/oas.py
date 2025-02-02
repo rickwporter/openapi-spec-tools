@@ -10,14 +10,7 @@ from typing_extensions import Annotated
 
 from oas_tools._typer import OasFilenameArgument
 from oas_tools._typer import error_out
-from oas_tools.constants import COMPONENTS
-from oas_tools.constants import OP_ID
-from oas_tools.constants import PATHS
-from oas_tools.constants import SCHEMAS
-from oas_tools.constants import TAGS
-from oas_tools.constants import X_METHOD
-from oas_tools.constants import X_PATH
-from oas_tools.constants import X_PATH_PARAMS
+from oas_tools.constants import Fields
 from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
@@ -66,14 +59,14 @@ def summary(
         'post': 0,
     }
     path_count = 0
-    model_count = len(spec.get(COMPONENTS, {}).get(SCHEMAS, {}))
+    model_count = len(spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {}))
     tag_count = {}
 
-    for path_data in spec.get(PATHS, {}).values():
+    for path_data in spec.get(Fields.PATHS, {}).values():
         path_count += 1
         for method, operation in path_data.items():
             method_count[method] += 1
-            for tag in operation.get(TAGS):
+            for tag in operation.get(Fields.TAGS):
                 orig = tag_count.get(tag, 0)
                 tag_count[tag] = orig + 1
 
@@ -207,7 +200,7 @@ def op_list(
 ) -> None:
     spec = open_oas(filename)
 
-    operations = map_operations(spec.get(PATHS, {}))
+    operations = map_operations(spec.get(Fields.PATHS, {}))
     names = sorted(operations.keys())
     if search:
         needle = search.lower()
@@ -231,14 +224,14 @@ def operation_show(
 ) -> None:
     spec = open_oas(filename)
 
-    operations = map_operations(spec.get(PATHS, {}))
+    operations = map_operations(spec.get(Fields.PATHS, {}))
     operation = operations.get(operation_name)
     if not operation:
         error_out(f"failed to find {operation_name}")
 
-    path = operation.pop(X_PATH)
-    path_params = operation.pop(X_PATH_PARAMS, None)
-    method = operation.pop(X_METHOD)
+    path = operation.pop(Fields.X_PATH)
+    path_params = operation.pop(Fields.X_PATH_PARAMS, None)
+    method = operation.pop(Fields.X_METHOD)
     inner = {}
     if path_params:
         inner["params"] = path_params
@@ -268,7 +261,7 @@ def paths_list(
 ) -> None:
     spec = open_oas(filename)
 
-    paths = find_paths(spec.get(PATHS, {}), search, include_subpaths)
+    paths = find_paths(spec.get(Fields.PATHS, {}), search, include_subpaths)
     names = sorted(paths.keys())
 
     match_info = ""
@@ -295,7 +288,7 @@ def path_show(
 ) -> None:
     spec = open_oas(filename)
 
-    paths = find_paths(spec.get(PATHS, {}), path_name, include_subpaths)
+    paths = find_paths(spec.get(Fields.PATHS, {}), path_name, include_subpaths)
     if not paths:
         error_out(f"failed to find {path_name}")
 
@@ -313,13 +306,13 @@ def path_operations(
     spec = open_oas(filename)
 
     result = {}
-    paths = find_paths(spec.get(PATHS, {}), path_name, include_subpaths)
+    paths = find_paths(spec.get(Fields.PATHS, {}), path_name, include_subpaths)
     for path, path_data in paths.items():
         for op_data in path_data.values():
-            op_id = op_data.get(OP_ID)
-            if not op_id:
+            Fields.OP_ID = op_data.get(Fields.OP_ID)
+            if not Fields.OP_ID:
                 continue
-        items = result.get(path, []) + op_id
+        items = result.get(path, []) + Fields.OP_ID
         result[path] = items
 
     if not result:
@@ -344,7 +337,7 @@ def model_list(
 ) -> None:
     spec = open_oas(filename)
 
-    names = sorted(spec.get(COMPONENTS, {}).get(SCHEMAS, {}).keys())
+    names = sorted(spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {}).keys())
     if search:
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
@@ -367,7 +360,7 @@ def model_show(
 ) -> None:
     spec = open_oas(filename)
 
-    model = spec.get(COMPONENTS, {}).get(SCHEMAS, {}).get(model_name)
+    model = spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {}).get(model_name)
     if not model:
         error_out(f"failed to find {model_name}")
 
@@ -382,7 +375,7 @@ def model_uses(
 ) -> None:
     spec = open_oas(filename)
 
-    models = spec.get(COMPONENTS, {}).get(SCHEMAS, {})
+    models = spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
     if model_name not in models:
         error_out(f"no model '{model_name}' found")
 
@@ -406,7 +399,7 @@ def model_used_by(
 ) -> None:
     spec = open_oas(filename)
 
-    models = spec.get(COMPONENTS, {}).get(SCHEMAS, {})
+    models = spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
     if model_name not in models:
         error_out(f"no model '{model_name}' found")
 
@@ -441,9 +434,9 @@ def tag_list(
     # NOTE: not all OAS's include a "tags" section, so walk the operations
 
     tags = set()
-    for path_data in spec.get(PATHS, {}).values():
+    for path_data in spec.get(Fields.PATHS, {}).values():
         for operation in path_data.values():
-            for t in operation.get(TAGS):
+            for t in operation.get(Fields.TAGS):
                 tags.add(t)
 
     names = sorted(tags)
@@ -470,13 +463,13 @@ def tag_show(
     spec = open_oas(filename)
 
     operations = {}
-    for path, path_data in spec.get(PATHS, {}).items():
+    for path, path_data in spec.get(Fields.PATHS, {}).items():
         for method, operation in path_data.items():
-            if tag_name in operation.get(TAGS):
-                op_id = operation.get(OP_ID)
-                operation[X_PATH] = path
-                operation[X_METHOD] = method
-                operations[op_id] = operation
+            if tag_name in operation.get(Fields.TAGS):
+                Fields.OP_ID = operation.get(Fields.OP_ID)
+                operation[Fields.X_PATH] = path
+                operation[Fields.X_METHOD] = method
+                operations[Fields.OP_ID] = operation
 
     if not operations:
         error_out(f"failed to find {tag_name}")
