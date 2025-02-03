@@ -253,12 +253,17 @@ def find_paths(paths: dict[str, Any], search: Optional[str] = None, sub_paths: b
     """
     Searches the 'paths' dictionary for path names including the 'search' string (if provided).
     """
+    def anon(s: str) -> str:
+        return s.lower().rstrip("/")
+
     result = {}
+    needle = None if search is None else anon(search)
     for path, path_data in paths.items():
-        if search:
-            if not sub_paths and path != search:
+        if needle:
+            name = anon(path)
+            if not sub_paths and name != needle:
                 continue
-            if sub_paths and path.startswith(search):
+            if sub_paths and not name.startswith(needle):
                 continue
         result[path] = path_data
 

@@ -5,6 +5,7 @@ import pytest
 from oas_tools.constants import Fields
 from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
+from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 
@@ -203,3 +204,19 @@ def test_map_operations() -> None:
             Fields.SCHEMA: {Fields.TYPE: "string"},
         },
     ]
+
+
+@pytest.mark.parametrize(
+    ["filename", "search", "subpaths", "expected"],
+    [
+        pytest.param("pet2.yaml", "/pets", False, ["/pets"], id="pets"),
+        pytest.param("pet2.yaml", "/pets", True, ["/pets", "/pets/{petId}"], id="pets-subpath"),
+        pytest.param("pet2.yaml", "/pets/{petId}", True, ["/pets/{petId}"], id="petId"),
+        pytest.param("pet2.yaml", "/pets/", False, ["/pets"], id="trailing-slash"),
+        pytest.param("pet2.yaml", "/pETs", True, ["/pets", "/pets/{petId}"], id="case-insensitive"),
+    ],
+)
+def test_find_paths(filename, search, subpaths, expected) -> None:
+    oas = open_test_oas(filename)
+    actual = find_paths(oas.get(Fields.PATHS), search, subpaths)
+    assert set(expected) == set(actual.keys())
