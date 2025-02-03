@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Any
 
 import pytest
 
@@ -8,6 +9,7 @@ from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
+from oas_tools.utils import remove_schema_tags
 
 from .helpers import open_test_oas
 
@@ -220,3 +222,41 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
     oas = open_test_oas(filename)
     actual = find_paths(oas.get(Fields.PATHS), search, subpaths)
     assert set(expected) == set(actual.keys())
+
+
+def path_tag_count(schema: dict[str, Any]) -> int:
+    tag_count = 0
+
+    for path_data in schema.get(Fields.PATHS, {}).values():
+        for op_data in path_data.values():
+            # parameters field is a list, instead of a dict
+            if not isinstance(op_data, dict):
+                continue
+            tags = op_data.get(Fields.TAGS, [])
+            tag_count += len(tags)
+
+    return tag_count
+            
+
+def test_remove_schema_tags_full() -> None:
+    orig = open_test_oas("pet2.yaml")
+    orig_count = path_tag_count(orig)
+    assert 0 != orig_count
+    assert Fields.TAGS in orig
+
+    updated = remove_schema_tags(orig)
+    up_count = path_tag_count(updated)
+    assert 0 == up_count
+    assert Fields.TAGS not in updated
+
+
+def test_remove_schema_tags_no_top() -> None:
+    orig = open_test_oas("ct.yaml")
+    orig_count = path_tag_count(orig)
+    assert 0 != orig_count
+    assert Fields.TAGS not in orig
+
+    updated = remove_schema_tags(orig)
+    up_count = path_tag_count(updated)
+    assert 0 == up_count
+    assert Fields.TAGS not in updated

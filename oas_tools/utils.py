@@ -284,6 +284,9 @@ def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
     paths = result.get(Fields.PATHS, {})
     for path_data in paths.values():
         for op_data in path_data.values():
+            # NOTE: parameters are a list, not a dict
+            if not isinstance(op_data, dict):
+                continue
             op_data.pop(Fields.TAGS, None)
 
     # plus, there may be top-level tags with a description
