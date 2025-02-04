@@ -10,6 +10,7 @@ from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 from oas_tools.utils import remove_schema_tags
+from oas_tools.utils import set_nullable_not_required
 
 from .helpers import open_test_oas
 
@@ -236,7 +237,7 @@ def path_tag_count(schema: dict[str, Any]) -> int:
             tag_count += len(tags)
 
     return tag_count
-            
+
 
 def test_remove_schema_tags_full() -> None:
     orig = open_test_oas("pet2.yaml")
@@ -249,6 +250,21 @@ def test_remove_schema_tags_full() -> None:
     assert 0 == up_count
     assert Fields.TAGS not in updated
 
+    diff = find_diffs(orig, updated)
+    assert diff == {
+        Fields.PATHS.value: {
+            '/pets': {
+                "get": {Fields.TAGS.value: "removed"},
+                "post": {Fields.TAGS.value: "removed"},
+            },
+            "/pets/{petId}": {
+                "delete": {Fields.TAGS.value: "removed"},
+                "get": {Fields.TAGS.value: "removed"}
+            }
+        },
+        Fields.TAGS.value: "removed",
+    }
+
 
 def test_remove_schema_tags_no_top() -> None:
     orig = open_test_oas("ct.yaml")
@@ -260,3 +276,16 @@ def test_remove_schema_tags_no_top() -> None:
     up_count = path_tag_count(updated)
     assert 0 == up_count
     assert Fields.TAGS not in updated
+
+
+def test_set_nullable_not_required() -> None:
+    orig = open_test_oas("pet2.yaml")
+    updated = set_nullable_not_required(orig)
+    diff = find_diffs(orig, updated)
+
+    assert diff == {
+        Fields.COMPONENTS.value: {
+            Fields.SCHEMAS.value: {'Pet' : {Fields.REQUIRED.value: "removed owner"}},
+        }
+    }
+
