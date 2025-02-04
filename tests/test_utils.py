@@ -10,6 +10,7 @@ from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 from oas_tools.utils import remove_schema_tags
+from oas_tools.utils import schema_operations_filter
 from oas_tools.utils import set_nullable_not_required
 
 from .helpers import open_test_oas
@@ -277,6 +278,9 @@ def test_remove_schema_tags_no_top() -> None:
     assert 0 == up_count
     assert Fields.TAGS not in updated
 
+    diff = find_diffs(orig, updated)
+    assert 191 == count_values(diff)
+
 
 def test_set_nullable_not_required() -> None:
     orig = open_test_oas("pet2.yaml")
@@ -289,3 +293,49 @@ def test_set_nullable_not_required() -> None:
         }
     }
 
+
+def test_schema_operations_filter_remove() -> None:
+    original = open_test_oas("pet2.yaml")
+    updated = schema_operations_filter(original, remove=set(["deletePetById"]))
+
+    diff = find_diffs(original, updated)
+    assert diff == {
+        Fields.PATHS.value: {"/pets/{petId}": {"delete": "removed"}},
+        Fields.TAGS.value: "different lengths: 2 != 1"
+    }
+
+    # make sure we throw an exception when operation is not found
+    with pytest.raises(ValueError, match="schema is missing: deletePetById"):
+        schema_operations_filter(updated, remove=set(["deletePetById", "listPets"]))
+
+    third = schema_operations_filter(updated, remove=set(["listPets"]))
+    diff = find_diffs(updated, third)
+    assert diff == {
+        Fields.COMPONENTS.value: {Fields.SCHEMAS: {"Pets": "removed"}},
+        Fields.PATHS.value: {"/pets": {"get": "removed"}},
+    }
+
+
+def test_schema_operations_filter_allow() -> None:
+    original = open_test_oas("pet2.yaml")
+    updated = schema_operations_filter(original, allow=set(["showPetById", "deletePetById"]))
+
+    diff = find_diffs(original, updated)
+    assert diff == {
+        Fields.PATHS.value: {
+            "/pets": "removed",
+        },
+        Fields.COMPONENTS.value: {Fields.SCHEMAS.value: {"Pets": "removed"}},
+    }
+
+    # make sure we throw an exception when operation is not found
+    with pytest.raises(ValueError, match="schema is missing: createPets"):
+        schema_operations_filter(updated, allow=set(["createPets", "showPetById"]))
+
+    third = schema_operations_filter(updated, allow=set(["deletePetById"]))
+    diff = find_diffs(updated, third)
+    assert diff == {
+        Fields.PATHS.value: {"/pets/{petId}": {"get": "removed"}},
+        Fields.TAGS.value: "different lengths: 2 != 1",
+        Fields.COMPONENTS.value: {Fields.SCHEMAS.value: {"Pet": "removed"}},
+    }

@@ -360,8 +360,8 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
 
 def schema_operations_filter(
     schema: dict[str, Any],
-    remove_ops: Optional[set[str]] = None,
-    allow_ops: Optional[set[str]] = None,
+    remove: Optional[set[str]] = None,
+    allow: Optional[set[str]] = None,
 ) -> dict[str, Any]:
     """
     Filters the schema operations to either the 'allow_ops' or those not in the 'remove_ops'.
@@ -375,20 +375,20 @@ def schema_operations_filter(
     op_map = map_operations(result.pop(Fields.PATHS, {}))
 
     # make sure all operation_names are in the OAS
-    if remove_ops:
-        missing_ops = remove_ops - op_map.keys()
+    if remove:
+        missing_ops = remove - op_map.keys()
         if missing_ops:
             raise ValueError(f"schema is missing: {', '.join(missing_ops)}")
     else:
-        missing_ops = allow_ops - op_map.keys()
+        missing_ops = allow - op_map.keys()
         if missing_ops:
             raise ValueError(f"schema is missing: {', '.join(missing_ops)}")
 
         # create the list of operations to remove
-        remove_ops = op_map.keys() - allow_ops
+        remove = op_map.keys() - allow
 
     # remove the specified operations from the operations map
-    for op_name in remove_ops:
+    for op_name in remove:
         op_map.pop(op_name)
 
     # reconstruct the paths

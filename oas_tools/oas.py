@@ -151,10 +151,10 @@ def update(
         updated = set_nullable_not_required(updated)
 
     if remove_operations:
-        updated = schema_operations_filter(updated, remove_ops=set(remove_operations))
+        updated = schema_operations_filter(updated, remove=set(remove_operations))
 
     if allowed_operations:
-        updated = schema_operations_filter(updated, allow_ops=set(allowed_operations))
+        updated = schema_operations_filter(updated, allow=set(allowed_operations))
 
     if updated_filename:
         with open(updated_filename, "w") as fp:
