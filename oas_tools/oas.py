@@ -26,7 +26,7 @@ INDENT = "    "
 
 
 #################################################
-# CLI stuff
+# Top-level stuff
 app = typer.Typer(
     name="oas",
     no_args_is_help=True,
@@ -65,6 +65,9 @@ def summary(
     for path_data in spec.get(Fields.PATHS, {}).values():
         path_count += 1
         for method, operation in path_data.items():
+            if method == Fields.PARAMS:
+                continue
+
             method_count[method] += 1
             for tag in operation.get(Fields.TAGS):
                 orig = tag_count.get(tag, 0)
@@ -169,11 +172,9 @@ def update(
         print(f"No differences between {original_filename} and updated")
     elif display_option == DisplayOption.DIFF:
         print(yaml.dump(diffs, indent=indent))
-    elif display_option == DisplayOption.SUMMARY:
+    else:  # must be DisplayOption.SUMMARY:
         diff_count = count_values(diffs)
         print(f"Found {diff_count} differences from {original_filename}")
-    else:
-        print(f"Unhandled disply option: {display_option}")
 
     return
 
@@ -191,7 +192,7 @@ analyze_typer.add_typer(op_typer, name="ops")
 
 
 @op_typer.command(name="list", short_help="List models in OpenAPI spec")
-def op_list(
+def operation_list(
     filename: OasFilenameArgument,
     search: Annotated[
         Optional[str],
@@ -210,7 +211,7 @@ def op_list(
     if not names:
         print(f"No operations found{match_info}")
     else:
-        print(f"Found {len(names)} operations{match_info}")
+        print(f"Found {len(names)} operations{match_info}:")
         for n in names:
             print(f"{INDENT}{n}")
 
@@ -273,7 +274,7 @@ def paths_list(
     if not names:
         print(f"No paths found{match_info}")
     else:
-        print(f"Found {len(names)} paths{match_info}")
+        print(f"Found {len(names)} paths{match_info}:")
         for n in names:
             print(f"{INDENT}{n}")
 
@@ -281,7 +282,7 @@ def paths_list(
 
 
 @path_typer.command(name="show", short_help="Show the path schema")
-def path_show(
+def paths_show(
     filename: OasFilenameArgument,
     path_name: Annotated[str, typer.Argument(help="Name of the path to show")],
     include_subpaths: PathSubpathObtion = False,
@@ -298,7 +299,7 @@ def path_show(
 
 
 @path_typer.command(name="ops", short_help="Show the operations in the specified path")
-def path_operations(
+def paths_operations(
     filename: OasFilenameArgument,
     path_name: Annotated[str, typer.Option(help="Name of the path to show")],
     include_subpaths: PathSubpathObtion = False,
@@ -308,12 +309,12 @@ def path_operations(
     result = {}
     paths = find_paths(spec.get(Fields.PATHS, {}), path_name, include_subpaths)
     for path, path_data in paths.items():
-        for op_data in path_data.values():
-            Fields.OP_ID = op_data.get(Fields.OP_ID)
-            if not Fields.OP_ID:
+        for method, op_data in path_data.items():
+            if method == Fields.PARAMS:
                 continue
-        items = result.get(path, []) + Fields.OP_ID
-        result[path] = items
+            op_id = op_data.get(Fields.OP_ID)
+            items = result.get(path, []) + [op_id]
+            result[path] = items
 
     if not result:
         error_out(f"failed to find {path_name}")
@@ -324,11 +325,11 @@ def path_operations(
 
 ##########################################
 # Models
-model_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to models")
-analyze_typer.add_typer(model_typer, name="models")
+models_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to models")
+analyze_typer.add_typer(models_typer, name="models")
 
-@model_typer.command(name="list", short_help="List models in OpenAPI spec")
-def model_list(
+@models_typer.command(name="list", short_help="List models in OpenAPI spec")
+def models_list(
     filename: OasFilenameArgument,
     search: Annotated[
         Optional[str],
@@ -346,15 +347,15 @@ def model_list(
     if not names:
         print(f"No models found{match_info}")
     else:
-        print(f"Found {len(names)} models{match_info}")
+        print(f"Found {len(names)} models{match_info}:")
         for n in names:
             print(f"{INDENT}{n}")
 
     return
 
 
-@model_typer.command(name="show", short_help="Show the model schema")
-def model_show(
+@models_typer.command(name="show", short_help="Show the model schema")
+def models_show(
     filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
@@ -368,8 +369,8 @@ def model_show(
     return
 
 
-@model_typer.command(name="uses", short_help="List sub-models used by the specified model")
-def model_uses(
+@models_typer.command(name="uses", short_help="List sub-models used by the specified model")
+def models_uses(
     filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
@@ -385,15 +386,18 @@ def model_uses(
     }
 
     matches = unroll(references, references.get(model_name))
-    print(f"Found {model_name} uses {len(matches)} models:")
-    for n in sorted(matches):
-        print(f"{INDENT}{n}")
+    if not matches:
+        print(f"{model_name} does not use any other models")
+    else:
+        print(f"Found {model_name} uses {len(matches)} models:")
+        for n in sorted(matches):
+            print(f"{INDENT}{n}")
 
     return
 
 
-@model_typer.command(name="used-by", short_help="List models which reference the specified model")
-def model_used_by(
+@models_typer.command(name="used-by", short_help="List models which reference the specified model")
+def models_used_by(
     filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
@@ -411,10 +415,13 @@ def model_used_by(
             curr.add(name)
             referenced[r] = curr
 
-    matches = unroll(referenced, referenced.get(model_name))
-    print(f"Found {model_name} uses {len(matches)} models:")
-    for n in sorted(matches):
-        print(f"{INDENT}{n}")
+    matches = unroll(referenced, referenced.get(model_name) or set())
+    if not matches:
+        print(f"{model_name} is not used by any other models")
+    else:
+        print(f"Found {model_name} is used by {len(matches)} models:")
+        for n in sorted(matches):
+            print(f"{INDENT}{n}")
 
     return
 
@@ -425,7 +432,7 @@ tag_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related
 analyze_typer.add_typer(tag_typer, name="tags")
 
 @tag_typer.command(name="list", short_help="List tags in OpenAPI spec")
-def tag_list(
+def tags_list(
     filename: OasFilenameArgument,
     search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the tag names")] = None,
 ) -> None:
@@ -435,7 +442,10 @@ def tag_list(
 
     tags = set()
     for path_data in spec.get(Fields.PATHS, {}).values():
-        for operation in path_data.values():
+        for method, operation in path_data.items():
+            if method == Fields.PARAMS:
+                continue
+
             for t in operation.get(Fields.TAGS):
                 tags.add(t)
 
@@ -448,7 +458,7 @@ def tag_list(
     if not names:
         print(f"No tags found{match_info}")
     else:
-        print(f"Found {len(names)} tags{match_info}")
+        print(f"Found {len(names)} tags{match_info}:")
         for n in names:
             print(f"{INDENT}{n}")
 
@@ -456,7 +466,7 @@ def tag_list(
 
 
 @tag_typer.command(name="show", short_help="Show the tag schema")
-def tag_show(
+def tags_show(
     filename: OasFilenameArgument,
     tag_name: Annotated[str, typer.Argument(help="Name of the tag to show")],
 ) -> None:
@@ -464,12 +474,17 @@ def tag_show(
 
     operations = {}
     for path, path_data in spec.get(Fields.PATHS, {}).items():
+        params = path_data.get(Fields.PARAMS)
         for method, operation in path_data.items():
+            if method == Fields.PARAMS:
+                continue
+
             if tag_name in operation.get(Fields.TAGS):
-                Fields.OP_ID = operation.get(Fields.OP_ID)
+                op_id = operation.get(Fields.OP_ID)
                 operation[Fields.X_PATH] = path
                 operation[Fields.X_METHOD] = method
-                operations[Fields.OP_ID] = operation
+                operation[Fields.X_PATH_PARAMS] = params
+                operations[op_id] = operation
 
     if not operations:
         error_out(f"failed to find {tag_name}")

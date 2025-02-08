@@ -1,7 +1,6 @@
 """
 This provides some common extensions to Typer.
 """
-import sys
 
 import typer
 from rich import print
@@ -14,6 +13,6 @@ OasFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="Op
 def error_out(message: str, exit_code: int = 1) -> None:
     """Utility to print provided error message (with red ERROR prefix) and exit"""
     print(f"[red]ERROR:[/red] {message}")
-    sys.exit(exit_code)
+    raise typer.Exit(exit_code)
 
 

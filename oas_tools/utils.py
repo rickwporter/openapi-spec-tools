@@ -241,9 +241,9 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
         path_params = path_data.pop(Fields.PARAMS, None)
         for method, op_data in path_data.items():
             op_id = op_data.get(Fields.OP_ID)
-            op_data[Fields.X_PATH] = path
-            op_data[Fields.X_PATH_PARAMS] = path_params
-            op_data[Fields.X_METHOD] = method
+            op_data[Fields.X_PATH.value] = path
+            op_data[Fields.X_PATH_PARAMS.value] = path_params
+            op_data[Fields.X_METHOD.value] = method
             result[op_id] = op_data
 
     return result
@@ -353,7 +353,7 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
             if prop_data.get(Fields.NULLABLE, False) and prop_name in required:
                 required.remove(prop_name)
         if required:
-            schema_value[Fields.REQUIRED] = list(required)
+            schema_value[Fields.REQUIRED.value] = list(required)
 
     return result
 
@@ -399,10 +399,10 @@ def schema_operations_filter(
         method = op_data.pop(Fields.X_METHOD)
         orig = paths.get(path, {})
         if params and Fields.PARAMS not in orig:
-            orig[Fields.PARAMS] = params
+            orig[Fields.PARAMS.value] = params
         orig[method] = op_data
         paths[path] = orig
-    result[Fields.PATHS] = paths
+    result[Fields.PATHS.value] = paths
 
     # figure out all the models that are referenced from the remaining operations
     op_refs = find_references(op_map)
@@ -428,6 +428,6 @@ def schema_operations_filter(
     if tag_defs:
         updated_tags = [t for t in tag_defs if t.get(Fields.NAME) in used_tags]
         if updated_tags:
-            result[Fields.TAGS] = updated_tags
+            result[Fields.TAGS.value] = updated_tags
 
     return result
