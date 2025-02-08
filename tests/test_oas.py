@@ -238,7 +238,7 @@ def test_update_failure() -> None:
             update(PET2_YAML, allowed_operations=["listPets"], remove_operations=["deletePetById"])
         assert err.value.exit_code == 1
         output = mock_stdout.getvalue()
-        assert output == f"ERROR: cannot specify both --allow-op and --remove-op\n"
+        assert output == "ERROR: cannot specify both --allow-op and --remove-op\n"
 
 
 ##########################################
