@@ -9,6 +9,8 @@ from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
+from oas_tools.utils import model_filter
+from oas_tools.utils import model_references
 from oas_tools.utils import remove_schema_tags
 from oas_tools.utils import schema_operations_filter
 from oas_tools.utils import set_nullable_not_required
@@ -145,6 +147,35 @@ def test_count_values_failure() -> None:
     with pytest.raises(ValueError) as error:
         count_values(obj)
     assert error.match("Unhandled type MyEnum for 'b'")
+
+
+def test_model_references() -> None:
+    oas = open_test_oas("pet2.yaml")
+    models = oas.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    expected = {
+        "Pets": set(["Pet"]),
+        "Pet": set(),
+        "Error": set(),
+    }
+    assert expected == model_references(models)
+
+
+@pytest.mark.parametrize(
+    ["asset", "model_name", "keys"],
+    [
+        pytest.param("pet2.yaml", "Pets", ["Pets", "Pet"]),
+        pytest.param("pet2.yaml", "Pet", ["Pet"]),
+    ],
+)
+def test_model_filter(
+    asset: str,
+    model_name: str,
+    keys: list[str],
+) -> None:
+    schema = open_test_oas(asset)
+    models = schema.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    filtered = model_filter(models, set([model_name]))
+    assert set(keys) == set(filtered)
 
 
 def test_map_operations() -> None:

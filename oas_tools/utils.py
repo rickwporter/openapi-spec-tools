@@ -187,6 +187,25 @@ def find_references(obj: dict[str, Any]) -> set[str]:
     return set([_.split("/")[-1] for _ in refs])
 
 
+
+def model_references(models: dict[str, Any]) -> set[str]:
+    """
+    Creates a complete map of model names to their references.
+    """
+    return {name: find_references(body) for name, body in models.items()}
+
+
+def model_filter(models: dict[str, Any], references: set[str]) -> dict[str, Any]:
+    """
+    Filters the models to those which are referenced. This includes direct and
+    indirect references.
+    """
+    model_ref_map = model_references(models)
+    used_models = unroll(model_ref_map, references)
+
+    return {name: models[name] for name in used_models}
+
+
 def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     """
     Takes the 'paths' dictionary and transforms into an dictionary with the 'operationId'
