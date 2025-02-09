@@ -249,16 +249,16 @@ path_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things relate
 analyze_typer.add_typer(path_typer, name="paths")
 
 PathSearchOption = Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the path")]
-PathSubpathObtion = Annotated[
+PathSubpathOption = Annotated[
     bool,
-    typer.Option("--sub-paths/--no-sub-paths", help="Include sub-paths of the search value"),
+    typer.Option("--sub-paths", help="Include sub-paths of the search value"),
 ]
 
 @path_typer.command(name="list", short_help="List paths in OpenAPI spec")
 def paths_list(
     filename: OasFilenameArgument,
     search: PathSearchOption = None,
-    include_subpaths: PathSubpathObtion = False,
+    include_subpaths: PathSubpathOption = False,
 ) -> None:
     spec = open_oas(filename)
 
@@ -285,7 +285,7 @@ def paths_list(
 def paths_show(
     filename: OasFilenameArgument,
     path_name: Annotated[str, typer.Argument(help="Name of the path to show")],
-    include_subpaths: PathSubpathObtion = False,
+    include_subpaths: PathSubpathOption = False,
 ) -> None:
     spec = open_oas(filename)
 
@@ -302,7 +302,7 @@ def paths_show(
 def paths_operations(
     filename: OasFilenameArgument,
     path_name: Annotated[str, typer.Option(help="Name of the path to show")],
-    include_subpaths: PathSubpathObtion = False,
+    include_subpaths: PathSubpathOption = False,
 ) -> None:
     spec = open_oas(filename)
 
