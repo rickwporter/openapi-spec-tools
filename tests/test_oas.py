@@ -457,16 +457,92 @@ PET2_SHOW_PATH = """\
 
 """
 
+PET2_SHOW_PATH_REF = """\
+components:
+    schemas:
+        Error:
+            properties:
+                code:
+                    format: int32
+                    type: integer
+                message:
+                    type: string
+            required:
+            - code
+            - message
+            type: object
+        Pet:
+            properties:
+                id:
+                    format: int64
+                    type: integer
+                name:
+                    type: string
+                owner:
+                    nullable: true
+                    type: string
+                tag:
+                    type: string
+            required:
+            - id
+            - name
+            - owner
+            type: object
+paths:
+    /pets/{petId}:
+        delete:
+            operationId: deletePetById
+            responses:
+                '204':
+                    description: Expected empty response for successful delete
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: unexpected error
+            summary: Delete a pet
+            tags:
+            - admin
+        get:
+            operationId: showPetById
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Pet'
+                    description: Expected response to a valid request
+                default:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: unexpected error
+            summary: Info for a specific pet
+            tags:
+            - pets
+        parameters:
+        -   description: The id of the pet to retrieve
+            in: path
+            name: petId
+            required: true
+            schema:
+                type: string
+
+"""
+
 @pytest.mark.parametrize(
-    ["filename", "path", "expected"],
+    ["filename", "path", "references", "expected"],
     [
-        pytest.param(PET_YAML, "/pets/{petId}", PET_SHOW_PATH, id="found"),
-        pytest.param(PET2_YAML, "/pets/{petId}", PET2_SHOW_PATH, id="params")
+        pytest.param(PET_YAML, "/pets/{petId}", False, PET_SHOW_PATH, id="found"),
+        pytest.param(PET2_YAML, "/pets/{petId}", False, PET2_SHOW_PATH, id="params"),
+        pytest.param(PET2_YAML, "/pets/{petId}", True, PET2_SHOW_PATH_REF, id="references"),
     ]
 )
-def test_paths_show_success(filename, path, expected) -> None:
+def test_paths_show_success(filename: str, path: str, references: bool, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-        paths_show(filename, path)
+        paths_show(filename, path, include_models=references)
 
         output = mock_stdout.getvalue()
         assert output == expected
@@ -554,15 +630,32 @@ Pets:
 
 """
 
+PET_MODEL_PETS_REF_SHOW = f"""\
+Pet:
+    properties:
+        id:
+            format: int64
+            type: integer
+        name:
+            type: string
+        tag:
+            type: string
+    required:
+    - id
+    - name
+    type: object
+{PET_MODEL_PETS_SHOW}\
+"""
 @pytest.mark.parametrize(
-    ["filename", "model", "expected"],
+    ["filename", "model", "references", "expected"],
     [
-        pytest.param(PET_YAML, "Pets", PET_MODEL_PETS_SHOW, id="found"),
+        pytest.param(PET_YAML, "Pets", False, PET_MODEL_PETS_SHOW, id="found"),
+        pytest.param(PET_YAML, "Pets", True, PET_MODEL_PETS_REF_SHOW, id="references"),
     ]
 )
-def test_models_show_success(filename, model, expected) -> None:
+def test_models_show_success(filename, model, references, expected) -> None:
     with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-        models_show(filename, model)
+        models_show(filename, model, references)
 
         output = mock_stdout.getvalue()
         assert output == expected

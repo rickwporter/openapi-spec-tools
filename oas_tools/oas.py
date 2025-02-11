@@ -16,6 +16,8 @@ from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
+from oas_tools.utils import model_filter
+from oas_tools.utils import model_references
 from oas_tools.utils import open_oas
 from oas_tools.utils import remove_schema_tags
 from oas_tools.utils import schema_operations_filter
@@ -253,6 +255,7 @@ PathSubpathOption = Annotated[
     bool,
     typer.Option("--sub-paths", help="Include sub-paths of the search value"),
 ]
+PathModelsOption = Annotated[bool, typer.Option("--models", help="Include the referenced models")]
 
 @path_typer.command(name="list", short_help="List paths in OpenAPI spec")
 def paths_list(
@@ -286,12 +289,23 @@ def paths_show(
     filename: OasFilenameArgument,
     path_name: Annotated[str, typer.Argument(help="Name of the path to show")],
     include_subpaths: PathSubpathOption = False,
+    include_models: PathModelsOption = False,
 ) -> None:
     spec = open_oas(filename)
 
     paths = find_paths(spec.get(Fields.PATHS, {}), path_name, include_subpaths)
     if not paths:
         error_out(f"failed to find {path_name}")
+
+    if include_models:
+        references = find_references(paths)
+        models = spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+        used = model_filter(models, references)
+        results = {
+            Fields.PATHS.value: paths,
+            Fields.COMPONENTS.value: {Fields.SCHEMAS.value: used}
+        }
+        paths = results
 
     print(yaml.dump(paths, indent=len(INDENT)))
     return
@@ -358,6 +372,7 @@ def models_list(
 def models_show(
     filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
+    include_referenced: Annotated[bool, typer.Option("--references", help="Include referenced models")] = False,
 ) -> None:
     spec = open_oas(filename)
 
@@ -365,7 +380,13 @@ def models_show(
     if not model:
         error_out(f"failed to find {model_name}")
 
-    print(yaml.dump({model_name: model}, indent=len(INDENT)))
+    if not include_referenced:
+        models = {model_name: model}
+    else:
+        models = spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+        models = model_filter(models, set([model_name]))
+
+    print(yaml.dump(models, indent=len(INDENT)))
     return
 
 
@@ -380,10 +401,7 @@ def models_uses(
     if model_name not in models:
         error_out(f"no model '{model_name}' found")
 
-    references = {
-        name: find_references(body)
-        for name, body in models.items()
-    }
+    references = model_references(models)
 
     matches = unroll(references, references.get(model_name))
     if not matches:
