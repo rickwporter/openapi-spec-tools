@@ -12,6 +12,7 @@ from oas_tools.oas import DisplayOption
 from oas_tools.oas import diff
 from oas_tools.oas import info
 from oas_tools.oas import models_list
+from oas_tools.oas import models_operations
 from oas_tools.oas import models_show
 from oas_tools.oas import models_used_by
 from oas_tools.oas import models_uses
@@ -716,6 +717,35 @@ def test_models_used_by_failure() -> None:
         search = "Dog"
         with pytest.raises(typer.Exit) as err:
             models_used_by(PET2_YAML, search)
+        assert err.value.exit_code == 1
+        output = mock_stdout.getvalue()
+        assert output == f"ERROR: no model '{search}' found\n"
+
+
+@pytest.mark.parametrize(
+    ["filename", "model", "expected"],
+    [
+        pytest.param(PET2_YAML, "Pets", "Found Pets is used by 1 operations:\n    listPets\n", id="single"),
+        pytest.param(
+            PET2_YAML,
+            "Pet", "Found Pet is used by 3 operations:\n    createPets\n    listPets\n    showPetById\n",
+            id="multiple",
+        ),
+    ]
+)
+def test_models_operations_success(filename: str, model: str, expected: str) -> None:
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        models_operations(filename, model)
+
+        output = mock_stdout.getvalue()
+        assert output == expected
+
+
+def test_models_operations_failures() -> None:
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        search = "Iguana"
+        with pytest.raises(typer.Exit) as err:
+            models_operations(PET2_YAML, search)
         assert err.value.exit_code == 1
         output = mock_stdout.getvalue()
         assert output == f"ERROR: no model '{search}' found\n"

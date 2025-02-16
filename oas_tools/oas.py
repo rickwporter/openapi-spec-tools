@@ -437,6 +437,37 @@ def models_used_by(
     return
 
 
+@models_typer.command(name="ops", short_help="List operations which reference the specified model")
+def models_operations(
+    filename: OasFilenameArgument,
+    model_name: Annotated[str, typer.Argument(help="Name of the model to search for")],
+) -> None:
+    spec = open_oas(filename)
+
+    models = spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    if model_name not in models:
+        error_out(f"no model '{model_name}' found")
+
+    model_refs = models_referenced_by(models, model_name)
+    model_refs.add(model_name)  # include the direct references, too
+
+    matches = []
+    for path_data in spec.get(Fields.PATHS, {}).values():
+        for method, op_data in path_data.items():
+            if method == Fields.PARAMS:
+                continue
+            references = find_references(op_data)
+            if references.intersection(model_refs):
+                op_id = op_data.get(Fields.OP_ID)
+                matches.append(op_id)
+
+    print(f"Found {model_name} is used by {len(matches)} operations:")
+    for n in sorted(matches):
+        print(f"{INDENT}{n}")
+
+    return
+
+
 ##########################################
 # Tags
 tag_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to tags")
