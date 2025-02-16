@@ -17,6 +17,7 @@ from oas_tools.oas import models_show
 from oas_tools.oas import models_used_by
 from oas_tools.oas import models_uses
 from oas_tools.oas import operation_list
+from oas_tools.oas import operation_models
 from oas_tools.oas import operation_show
 from oas_tools.oas import paths_list
 from oas_tools.oas import paths_operations
@@ -31,6 +32,7 @@ from .helpers import asset_filename
 FILENAME = "FILENAME"
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
+PET3_YAML = asset_filename("pet3.yaml")
 
 
 #################################################
@@ -353,6 +355,36 @@ def test_operation_show_failure() -> None:
         search = "missingPets"
         with pytest.raises(typer.Exit) as err:
             operation_show(PET2_YAML, search)
+        assert err.value.exit_code == 1
+        output = mock_stdout.getvalue()
+        assert output == f"ERROR: failed to find {search}\n"
+
+
+@pytest.mark.parametrize(
+    ["filename", "operation", "expected"],
+    [
+        pytest.param(PET2_YAML, "deletePetById", "Found deletePetById uses 1 models:\n    Error\n", id="delete"),
+        pytest.param(
+            PET2_YAML,
+            "listPets", "Found listPets uses 3 models:\n    Error\n    Pet\n    Pets\n",
+            id="list",
+        ),
+        pytest.param(PET3_YAML, "appVersion", "appVersion does not reference any models\n", id="none"),
+    ]
+)
+def test_operation_models_success(filename, operation, expected) -> None:
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        operation_models(filename, operation)
+
+        output = mock_stdout.getvalue()
+        assert output == expected
+
+
+def test_operation_models_failure() -> None:
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        search = "listCoyoteFood"
+        with pytest.raises(typer.Exit) as err:
+            operation_models(PET2_YAML, search)
         assert err.value.exit_code == 1
         output = mock_stdout.getvalue()
         assert output == f"ERROR: failed to find {search}\n"

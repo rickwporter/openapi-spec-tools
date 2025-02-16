@@ -194,7 +194,7 @@ op_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related 
 analyze_typer.add_typer(op_typer, name="ops")
 
 
-@op_typer.command(name="list", short_help="List models in OpenAPI spec")
+@op_typer.command(name="list", short_help="List operations in OpenAPI spec")
 def operation_list(
     filename: OasFilenameArgument,
     search: Annotated[
@@ -224,7 +224,7 @@ def operation_list(
 @op_typer.command(name="show", short_help="Show the opertions schema")
 def operation_show(
     filename: OasFilenameArgument,
-    operation_name: Annotated[str, typer.Argument(help="Name of the model to show")],
+    operation_name: Annotated[str, typer.Argument(help="Name of the operation to show")],
 ) -> None:
     spec = open_oas(filename)
 
@@ -244,6 +244,31 @@ def operation_show(
     print(yaml.dump({path: inner}, indent=len(INDENT)))
     return
 
+
+@op_typer.command(name="models", short_help="List the models referenced by the specified operaton")
+def operation_models(
+    filename: OasFilenameArgument,
+    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
+) -> None:
+    spec = open_oas(filename)
+
+    operations = map_operations(spec.get(Fields.PATHS, {}))
+    operation = operations.get(operation_name)
+    if not operation:
+        error_out(f"failed to find {operation_name}")
+
+    op_references = find_references(operation)
+    models = spec.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    matches = model_filter(models, op_references)
+
+    if not matches:
+        print(f"{operation_name} does not reference any models")
+    else:
+        print(f"Found {operation_name} uses {len(matches)} models:")
+        for n in sorted(matches):
+            print(f"{INDENT}{n}")
+
+    return
 
 
 ##########################################
