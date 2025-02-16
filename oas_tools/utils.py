@@ -206,6 +206,21 @@ def model_filter(models: dict[str, Any], references: set[str]) -> dict[str, Any]
     return {name: models[name] for name in used_models}
 
 
+def models_referenced_by(models: dict[str, Any], model_name: str) -> set[str]:
+    """
+    Finds a list of other models which reference the provided model.
+    """
+    referenced_by = {}
+    for name, body in models.items():
+        refs = find_references(body)
+        for r in refs:
+            curr = referenced_by.get(r, set())
+            curr.add(name)
+            referenced_by[r] = curr
+
+    return unroll(referenced_by, referenced_by.get(model_name, set()))
+
+
 def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     """
     Takes the 'paths' dictionary and transforms into an dictionary with the 'operationId'

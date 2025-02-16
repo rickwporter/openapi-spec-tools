@@ -11,6 +11,7 @@ from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 from oas_tools.utils import model_filter
 from oas_tools.utils import model_references
+from oas_tools.utils import models_referenced_by
 from oas_tools.utils import remove_schema_tags
 from oas_tools.utils import schema_operations_filter
 from oas_tools.utils import set_nullable_not_required
@@ -176,6 +177,25 @@ def test_model_filter(
     models = schema.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
     filtered = model_filter(models, set([model_name]))
     assert set(keys) == set(filtered)
+
+
+@pytest.mark.parametrize(
+    ["asset", "model_name", "keys"],
+    [
+        pytest.param("pet2.yaml", "Pets", []),
+        pytest.param("pet2.yaml", "Pet", ["Pets"]),
+    ]
+)
+def test_models_referenced_by(
+    asset: str,
+    model_name: str,
+    keys: list[str],
+) -> None:
+    schema = open_test_oas(asset)
+    models = schema.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    referenced_by = models_referenced_by(models, model_name)
+    assert set(keys) == set(referenced_by)
+
 
 
 def test_map_operations() -> None:

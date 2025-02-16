@@ -18,6 +18,7 @@ from oas_tools.utils import find_references
 from oas_tools.utils import map_operations
 from oas_tools.utils import model_filter
 from oas_tools.utils import model_references
+from oas_tools.utils import models_referenced_by
 from oas_tools.utils import open_oas
 from oas_tools.utils import remove_schema_tags
 from oas_tools.utils import schema_operations_filter
@@ -425,15 +426,7 @@ def models_used_by(
     if model_name not in models:
         error_out(f"no model '{model_name}' found")
 
-    referenced = {}
-    for name, body in models.items():
-        refs = find_references(body)
-        for r in refs:
-            curr = referenced.get(r, set())
-            curr.add(name)
-            referenced[r] = curr
-
-    matches = unroll(referenced, referenced.get(model_name) or set())
+    matches = models_referenced_by(models, model_name)
     if not matches:
         print(f"{model_name} is not used by any other models")
     else:
