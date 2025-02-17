@@ -101,3 +101,7 @@ It is pretty common to commit generated client code for many reasons. When build
 However, if you generating code for unused operations causes unnecessary churn in the code that provides little value.
 
 All this said, the allow/remove operations provide a means to trim your OpenAPI specification to be targetted for your specific need. When operations are removed, all the models that a no longer needed are also removed.
+
+## client.mk
+
+The `client.mk` file is an example of a `Makefile` to invoke the [OpenAPI generator](https://github.com/OpenAPITools/openapi-generator) via a container. The file can be copied/modified to be invoked with an OpenAPI specfication (other than `openapi.yaml`) and a real package name. For a more complete list of generator options, look at the [OpenAPI generator usage documentation](https://openapi-generator.tech/docs/usage#generate).
