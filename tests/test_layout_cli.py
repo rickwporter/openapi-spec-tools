@@ -44,11 +44,11 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
         "filename": BAD_LAYOUT_FILE,
         "references": False,
         "sub_order": False,
-        "missing_props": False, 
-        "op_dups": False, 
+        "missing_props": False,
+        "op_dups": False,
         "op_order": False,
     }
-    
+
     values = options.copy()
     values.update(updates)
     return values
