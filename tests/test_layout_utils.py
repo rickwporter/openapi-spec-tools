@@ -1,0 +1,350 @@
+import pytest
+
+from oas_tools.cli_gen.layout import CommandNode
+from oas_tools.cli_gen.layout import data_to_node
+from oas_tools.cli_gen.layout import field_to_list
+from oas_tools.cli_gen.layout import operation_duplicates
+from oas_tools.cli_gen.layout import operation_order
+from oas_tools.cli_gen.layout import parse_extras
+from oas_tools.cli_gen.layout import parse_to_tree
+from oas_tools.cli_gen.layout import subcommand_missing_properties
+from oas_tools.cli_gen.layout import subcommand_order
+from oas_tools.cli_gen.layout import subcommand_references
+
+OPS = "operations"
+DESC = "description"
+NAME = "name"
+OP_ID = "operationId"
+SUB_ID = "subcommandId"
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param({"cmd": {}}, {"cmd": f"{DESC}, {OPS}"}, id="all"),
+        pytest.param({"cmd": {DESC: "foo"}}, {"cmd": OPS}, id="operations"),
+        pytest.param({"cmd": {OPS: []}}, {"cmd": DESC}, id="description"),
+        pytest.param(
+            {"cmd": {DESC: "foo", OPS: [{NAME: "sub1"}]}},
+            {"cmd": f"sub1 {OP_ID} or {SUB_ID}"},
+            id="op-sub-or-id",
+        ),
+        pytest.param(
+            {"cmd": {DESC: "foo", OPS: [{OP_ID: "bar"}]}},
+            {"cmd": "operation[0] name"},
+            id="op-name",
+        ),
+        pytest.param(
+            {"cmd": {DESC: "foo", OPS: [{}]}},
+            {"cmd": f"operation[0] name, operation[0] {OP_ID} or {SUB_ID}"},
+            id="op-all",
+        ),
+        pytest.param(
+            {
+                "cmd": {DESC: "sna"},
+                "prov": {DESC: "foo", OPS: [{NAME: "bar"}]},
+                "resp": {DESC: "short", OPS: [{NAME: "blah", OP_ID: "op1"}]},
+            },
+            {"cmd": OPS, "prov": f"bar {OP_ID} or {SUB_ID}"},
+            id="many",
+        )
+    ]
+)
+def test_missing_properties(data, expected) -> None:
+    assert expected == subcommand_missing_properties(data)
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param(
+            {"cmd": {OPS: [{NAME: "foo"}, {NAME: "foo"}]}},
+            {"cmd": "foo at 0, 1"},
+            id="simple",
+        ),
+        pytest.param(
+            {"cmd": {OPS: [
+                {NAME: "sna"},
+                {NAME: "foo"},
+                {NAME: "bar"},
+                {NAME: "bar"},
+                {NAME: "sna"},
+            ]}},
+            {"cmd": "bar at 2, 3; sna at 0, 4"},
+            id="multiple-one-command",
+        ),
+        pytest.param(
+            {"cmd": {OPS: [
+                    {NAME: "sna"},
+                    {NAME: "foo"},
+                    {NAME: "bar"},
+                    {NAME: "bar"},
+                    {NAME: "sna"},
+            ]}},
+            {"cmd": "bar at 2, 3; sna at 0, 4"},
+            id="multiple-commands",
+        ),
+        pytest.param(
+            {"cmd": {OPS: [{OP_ID: "op1"}, {NAME: "sna"}, {OP_ID: "op2"}, {NAME: "sna"}]}},
+            {"cmd": "sna at 1, 3"},
+            id="unnamed",
+        )
+    ]
+)
+def test_shadow_operations(data, expected) -> None:
+    assert expected == operation_duplicates(data)
+
+
+
+@pytest.mark.parametrize(
+    ["data", "expected_unused", "expected_missing"],
+    [
+        pytest.param({}, set(), set(), id="empty"),
+        pytest.param(
+            {"cli": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}},
+            set(),
+            set(["sub1"]),
+            id="missing",
+        ),
+        pytest.param(
+            {"cli": {OPS: [{SUB_ID: "sub1"}]}, "sub1": {}, "sub2": {} },
+            set(["sub2"]),
+            set(),
+            id="unused",
+        ),
+        pytest.param(
+            {"cli": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}, "sub3": {}},
+            set(["sub3"]),
+            set(["sub1"]),
+            id="both",
+        ),
+        pytest.param(
+            {
+                "cli": {
+                    OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}, {SUB_ID: "sub4"}, {SUB_ID: "sub5"}]
+                },
+                "sub2": {},
+                "sub3": {},
+                "sub4": {},
+                "sub6": {},
+            },
+            set(["sub3", "sub6"]),
+            set(["sub1", "sub5"]),
+            id="multiples",
+        ),
+    ]
+)
+def test_subcommand_references(data, expected_unused, expected_missing):
+    unused, missing = subcommand_references(data)
+    assert (unused, missing) == (expected_unused, expected_missing)
+
+
+@pytest.mark.parametrize(
+    ["data", "field", "expected"],
+    [
+        pytest.param({}, "foo", [], id="empty"),
+        pytest.param({"a": None}, "a", [], id="no-body"),
+        pytest.param({"a": []}, "a", [], id="empty-list"),
+        pytest.param({"a": [""]}, "a", [], id="list-empty-str"),
+        pytest.param({"a": ["2 2", "1 "]}, "a", ["2 2", "1"], id="list-stripped"),
+        pytest.param({"a": ""}, "a", [], id="empty-str"),
+        pytest.param({"a": "b"}, "a", ["b"], id="str-simple"),
+        pytest.param({"a": "c d,  b , "}, "a", ["c d", "b"], id="str-stripped"),
+    ]
+)
+def test_field_list(data, field, expected) -> None:
+    assert expected == field_to_list(data, field)
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param({OP_ID: "op1", SUB_ID: "sub1", DESC: "desc"}, {}, id="remove-fields"),
+        pytest.param({"sna": "foo", OP_ID: "op1", "foo": "bar"}, {"sna": "foo", "foo": "bar"}, id="pass"),
+        pytest.param({"sna": {"foo": "bar"}, OP_ID: "a"}, {"sna": {"foo": "bar"}}, id="complex"),
+    ]
+)
+def test_parse_extras(data, expected) -> None:
+    assert expected == parse_extras(data)
+
+
+@pytest.mark.parametrize(
+    [NAME, "item", "expected"],
+    [
+        pytest.param(
+            "sna",
+            {},
+            CommandNode(
+                name="sna",
+            ),
+            id="empty",
+        ),
+        pytest.param(
+            "sna",
+            {
+                DESC: "my desc",
+                "bugIds": "a, b",
+                "summaryFields": ["foo", "bar"],
+                "my-party": {"cry": "if i want to"},
+                OP_ID: "op1",
+                OPS: [],
+            },
+            CommandNode(
+                name="sna",
+                description="my desc",
+                operation_id="op1",
+                bugs=["a", "b"],
+                summary_fields=["foo", "bar"],
+                extra={"my-party": {"cry": "if i want to"}},
+                children=[],
+            ),
+            id="fields",
+        ),
+        pytest.param(
+            "sna",
+            {
+                OPS: [
+                    {NAME: "foo", OP_ID: "op1"}, {NAME: "bar", OP_ID: "op2"}
+                ],
+            },
+            CommandNode(
+                name="sna",
+                children=[
+                    CommandNode(name="foo", description="", operation_id="op1"),
+                    CommandNode(name="bar", description="", operation_id="op2"),
+                ],
+            ),
+            id="sub-ops",
+        ),
+        pytest.param(
+            "sna",
+            {
+                OPS: [
+                    {NAME: "foo", SUB_ID: "sub1"}, {NAME: "bar", SUB_ID: "sub2"}
+                ],
+            },
+            CommandNode(
+                name="sna",
+                children=[
+                    CommandNode(name="foo", description="sub-command desc", children=[
+                        CommandNode(name="dazed", operation_id="confused"),
+                    ]),
+                    CommandNode(name="bar", description="more help", bugs=["a", "bc"]),
+                ],
+            ),
+            id="sub-cmds",
+        ),
+    ],
+)
+def test_data_to_node_basic(name, item, expected) -> None:
+    data = {
+        "sub1": {
+            DESC: "sub-command desc",
+            OPS: [{NAME: "dazed", OP_ID: "confused"}]
+        },
+        "sub2": {
+            DESC: "more help",
+            "bugIds": "a, bc",
+        }
+    }
+    node = data_to_node(data, name, item)
+    assert expected == node
+
+
+@pytest.mark.parametrize(
+    ["start", "expected"],
+    [
+        pytest.param(
+            "foo",
+            CommandNode(name="foo"),
+            id="empty",
+        ),
+        pytest.param(
+            "top",
+            CommandNode(
+                name="top",
+                description="top level item",
+                children=[
+                    CommandNode(
+                        name="blah",
+                        children=[
+                            CommandNode(name="foo", operation_id="op1"),
+                            CommandNode(name="bar", operation_id="op2"),
+                        ],
+                    ),
+                    CommandNode(
+                        name="zey",
+                        description="some help"
+                    )
+                ]
+            ),
+            id="top",
+        ),
+        pytest.param(
+            "command2",
+            CommandNode(name="command2", description="some help"),
+            id="command2",
+        ),
+        pytest.param(
+            "command1",
+            CommandNode(
+                name="command1",
+                children=[
+                    CommandNode(name="foo", operation_id="op1"),
+                    CommandNode(name="bar", operation_id="op2"),
+                ],
+            ),
+            id="command1",
+        )
+    ]
+)
+def test_parse_to_tree(start, expected) -> None:
+    data = {
+        "top": {
+            DESC: "top level item",
+            OPS: [{NAME: "blah", SUB_ID: "command1"}, {NAME: "zey", SUB_ID: "command2"}]
+        },
+        "command1": {
+            OPS: [{NAME: "foo", OP_ID: "op1"}, {NAME: "bar", OP_ID: "op2"}]
+        },
+        "command2": {
+            DESC: "some help"
+        }
+    }
+    node = parse_to_tree(data, start)
+    assert expected == node
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param({"a": None}, {}, id="no-body"),
+        pytest.param({"a": {OPS: [{NAME: "C"}, {NAME: "M"}, {NAME: "P"}]}}, {}, id="ordered"),
+        pytest.param({"a": {OPS: [{NAME: "A"}, {NAME: "Z"}, {NAME: "F"}]}}, {"a": "A, F, Z"}, id="misordered")
+    ]
+)
+def test_operations_order(data, expected) -> None:
+    assert expected == operation_order(data)
+
+
+@pytest.mark.parametrize(
+    ["data", "start", "expected"],
+    [
+        pytest.param({}, "foo", [], id="empty"),
+        pytest.param({"a": {}}, "b", ["First should be b"], id="first"),
+        pytest.param({"a": {}, "d": {}, "c": {}}, "a", ["c < d"], id="simple"),
+        pytest.param({"a": {}, "d": {}, "c": {}}, "d", ["First should be d", "c < d"], id="first-plus"),
+        pytest.param(
+            {"a": {}, "c": {}, "b": {}, "m": {}, "n": {}, "o": {}, "l": {}},
+            "a",
+            ["b < c", "l < o"],
+            id="multiple",
+        )
+    ]
+)
+def test_subcommand_order(data, start, expected) -> None:
+    assert expected == subcommand_order(data, start)

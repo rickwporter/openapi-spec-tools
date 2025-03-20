@@ -1,0 +1,51 @@
+cli:
+  description: Pet store management application
+  operations:
+    - name: pet
+      subcommandId: pets
+    - name: owners
+      subcommandId: owners
+    - name: vets
+      subcommandId: veterinarians
+    - name: shows
+      subcommandId: dog_shows
+
+pets:
+  description: Manage your pets
+  operations:
+    - name: create
+      operationId: createPets
+    - name: update
+      operationId: showPetById
+    - name: delete
+      operationId: deletePetById
+    - name: examine
+      subcommandId: pets_examine
+
+pets_examine:
+  description: Examine your pet
+  operations:
+    - name: blood-pressure
+      operationId: checkPetBloodPressure
+    - name: heart-rate
+      operationId: checkPetHeartRate
+
+owners:
+  # no description, or opertations
+
+shelters:
+  description: Temporary home options
+  operations:
+    - name: list
+      operationId: shelter_list
+    - name: rescue
+      operationId: rescue_animals
+    - name: list
+      operationId: different_op
+
+veterinarians:
+  description: Manage veterinarians
+  operations:
+    - name: add
+    - name: delete
+

@@ -1,0 +1,11 @@
+cli:
+  description: Manage pets
+  operations:
+    - name: add
+      operationId: createPets
+    - name: delete
+      operationId: deletePetById
+    - name: list
+      operationId: listPets
+    - name: show
+      operationId: showPetById
