@@ -1,0 +1,95 @@
+openapi: "3.1.0"
+info:
+  version: 1.0.0
+  title: My OAS 3.1 simple service
+  license:
+    name: MIT
+servers:
+  - url: http://petstore.swagger.io/v1
+paths:
+  /services:
+    get:
+      summary: List all services
+      operationId: serviceList
+      parameters:
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            format: int32
+            default: 100
+        - name: offset
+          in: query
+          description: Starting point
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            format: int32
+            default: 0
+      responses:
+        '200':
+          description: A paged array of services
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Services"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Service:
+      type: object
+      required:
+        - id
+        - name
+        - consumers
+        - websites
+        - anotherProp
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        consumers:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        websites:
+          oneOf:
+            - type: string
+              format: 'uri'
+              maxLength: 255
+            - type: 'null'
+        anotherProp:
+          description: property with list of types, but nothing null
+          type:
+          - integer
+          - string
+
+    Services:
+      type: array
+      maxItems: 100
+      items:
+        $ref: "#/components/schemas/Service"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

@@ -333,16 +333,37 @@ def test_remove_schema_tags_no_top() -> None:
     assert 191 == count_values(diff)
 
 
-def test_set_nullable_not_required() -> None:
-    orig = open_test_oas("pet2.yaml")
+@pytest.mark.parametrize(
+    ["filename", "expected"],
+    [
+        pytest.param(
+            "pet2.yaml",
+            {
+                Fields.COMPONENTS.value: {
+                    Fields.SCHEMAS.value: {'Pet' : {Fields.REQUIRED.value: "removed owner"}},
+                },
+            },
+            id="pet2",
+        ),
+        pytest.param(
+            "oas31.yaml",
+            {
+                Fields.COMPONENTS.value: {
+                    Fields.SCHEMAS.value: {
+                        'Service': {Fields.REQUIRED.value: "removed consumers, websites"},
+                    },
+                },
+            },
+            id="oas31"
+        )
+    ]
+)
+def test_set_nullable_not_required(filename: str, expected: dict[str, Any]) -> None:
+    orig = open_test_oas(filename)
     updated = set_nullable_not_required(orig)
     diff = find_diffs(orig, updated)
 
-    assert diff == {
-        Fields.COMPONENTS.value: {
-            Fields.SCHEMAS.value: {'Pet' : {Fields.REQUIRED.value: "removed owner"}},
-        }
-    }
+    assert diff == expected
 
 
 def test_schema_operations_filter_remove() -> None:

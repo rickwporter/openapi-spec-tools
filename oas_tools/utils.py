@@ -7,6 +7,8 @@ import yaml
 
 from oas_tools.constants import Fields
 
+NULL_TYPES = {'null', '"null"', "'null'"}
+
 
 def open_oas(filename: str) -> Any:
     """
@@ -143,10 +145,10 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
             deltas = []
             added = rvalues - lvalues
             if added:
-                deltas.append(f"added {', '.join(added)}")
+                deltas.append(f"added {', '.join(sorted(added))}")
             removed = lvalues - rvalues
             if removed:
-                deltas.append(f"removed {', '.join(removed)}")
+                deltas.append(f"removed {', '.join(sorted(removed))}")
             if deltas:
                 result[k] = "; ".join(deltas)
         elif left != right:
@@ -329,6 +331,30 @@ def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
+def _is_nullable(prop_data: dict[str, Any]) -> bool:
+    """Determine if a property is nullable"""
+    # this handles the OAS 3.0 style where it is denoted by a `nullabld: true`
+    if prop_data.get(Fields.NULLABLE, False):
+        return True
+
+    def _includes_null(types: str|list[str]) -> bool:
+        if isinstance(types, str) and types in NULL_TYPES:
+            return True
+        return any(x in types for x in NULL_TYPES)
+
+    # this handles the OAS 3.1 style where the `type` field has a `null` value
+    if _includes_null(prop_data.get(Fields.TYPE, [])):
+        return True
+
+    # iterate through all the options in anyOf/oneOf
+    for tag in [Fields.ANY_OF, Fields.ONE_OF]:
+        for item in prop_data.get(tag, []):
+            if _includes_null(item.get(Fields.TYPE)):
+                return True
+
+    return False
+
+
 def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
     """
     Removes any 'nullable: true' property from the 'required' list.
@@ -384,7 +410,7 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
             continue
         required = set(required)
         for prop_name, prop_data in schema_value.get(Fields.PROPS, {}).items():
-            if prop_data.get(Fields.NULLABLE, False) and prop_name in required:
+            if _is_nullable(prop_data) and prop_name in required:
                 required.remove(prop_name)
         if required:
             schema_value[Fields.REQUIRED.value] = list(required)

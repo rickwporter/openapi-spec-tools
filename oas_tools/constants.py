@@ -2,11 +2,13 @@ from enum import Enum
 
 
 class Fields(str, Enum):
+    ANY_OF = "anyOf"
     COMPONENTS = "components"
     DESCRIPTION = "description"
     IN = "in"
     NAME = "name"
     NULLABLE = "nullable"
+    ONE_OF = "oneOf"
     OP_ID = "operationId"
     PARAMS = "parameters"
     PATHS = "paths"
