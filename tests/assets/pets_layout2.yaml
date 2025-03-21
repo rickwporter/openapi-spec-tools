@@ -1,0 +1,50 @@
+cli:
+  description: Pet management application
+  operations:
+    - name: owners
+      subcommandId: owners
+    - name: pet
+      subcommandId: pets
+    - name: vets
+      subcommandId: veterinarians
+
+owners:
+  description: Keepers of the pets
+  operations:
+    - name: create
+      operationId: createOwner
+    - name: delete
+      operationId: deleteOwner
+    - name: pets
+      operationId: listOwnerPets
+    - name: update
+      operationId: updateOwner
+
+pets:
+  description: Manage your pets
+  operations:
+    - name: create
+      operationId: createPets
+    - name: delete
+      operationId: deletePetById
+    - name: examine
+      subcommandId: pets_examine
+    - name: update
+      operationId: showPetById
+
+pets_examine:
+  description: Examine your pet
+  operations:
+    - name: blood-pressure
+      operationId: checkPetBloodPressure
+    - name: heart-rate
+      operationId: checkPetHeartRate
+
+veterinarians:
+  description: Manage veterinarians
+  operations:
+    - name: add
+      operationId: createVet
+    - name: delete
+      operationId: deleteVet
+

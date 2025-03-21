@@ -1,12 +1,16 @@
 import io
 from typing import Any
+from typing import Optional
 from unittest import mock
 
 import pytest
 import typer
 
+from oas_tools.cli_gen.cli import TreeFormat
 from oas_tools.cli_gen.cli import layout_check_format
+from oas_tools.cli_gen.cli import layout_tree
 from tests.helpers import asset_filename
+from tests.helpers import to_ascii
 
 BAD_LAYOUT_FILE = asset_filename("bad_layout.yaml")
 
@@ -100,7 +104,7 @@ def test_layout_check_format_failure(layout_args: dict[str, Any], message: str) 
         assert message == output
 
 
-def test_layour_check_format_success() -> None:
+def test_layout_check_format_success() -> None:
     with (
         mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
     ):
@@ -108,3 +112,96 @@ def test_layour_check_format_success() -> None:
         layout_check_format(filename=filename)
         output = mock_stdout.getvalue()
         assert f"No errors found in {filename}\n" == output
+
+FULL_TEXT = """\
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Command              ┃ Operation             ┃ Help                       ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ cli                  │                       │ Pet management application │
+│   owners             │                       │ Keepers of the pets        │
+│     create           │ createOwner           │                            │
+│     delete           │ deleteOwner           │                            │
+│     pets             │ listOwnerPets         │                            │
+│     update           │ updateOwner           │                            │
+│   pet                │                       │ Manage your pets           │
+│     create           │ createPets            │                            │
+│     delete           │ deletePetById         │                            │
+│     examine          │                       │ Examine your pet           │
+│       blood-pressure │ checkPetBloodPressure │                            │
+│       heart-rate     │ checkPetHeartRate     │                            │
+│     update           │ showPetById           │                            │
+│   vets               │                       │ Manage veterinarians       │
+│     add              │ createVet             │                            │
+│     delete           │ deleteVet             │                            │
+└──────────────────────┴───────────────────────┴────────────────────────────┘
+"""
+
+PET_TEXT = """\
+┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Command            ┃ Operation             ┃ Help             ┃
+┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
+│ pets               │                       │ Manage your pets │
+│   create           │ createPets            │                  │
+│   delete           │ deletePetById         │                  │
+│   examine          │                       │ Examine your pet │
+│     blood-pressure │ checkPetBloodPressure │                  │
+│     heart-rate     │ checkPetHeartRate     │                  │
+│   update           │ showPetById           │                  │
+└────────────────────┴───────────────────────┴──────────────────┘
+"""
+
+EXAMINE_TEXT = """\
+┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Command          ┃ Operation             ┃ Help             ┃
+┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
+│ pets_examine     │                       │ Examine your pet │
+│   blood-pressure │ checkPetBloodPressure │                  │
+│   heart-rate     │ checkPetHeartRate     │                  │
+└──────────────────┴───────────────────────┴──────────────────┘
+"""
+EXAMINE_JSON = """\
+{
+  "name": "pets_examine",
+  "description": "Examine your pet",
+  "children": [
+    {
+      "name": "blood-pressure",
+      "description": "",
+      "operation_id": "checkPetBloodPressure"
+    },
+    {
+      "name": "heart-rate",
+      "description": "",
+      "operation_id": "checkPetHeartRate"
+    }
+  ]
+}
+"""
+EXAMINE_YAML = """\
+name: pets_examine
+description: Examine your pet
+children:
+- name: blood-pressure
+  description: ''
+  operation_id: checkPetBloodPressure
+- name: heart-rate
+  description: ''
+  operation_id: checkPetHeartRate
+"""
+
+@pytest.mark.parametrize(
+    ["start", "style", "expected"],
+    [
+        pytest.param("cli", TreeFormat.TEXT, FULL_TEXT, id="cli"),
+        pytest.param("pets", TreeFormat.TEXT, PET_TEXT, id="pets"),
+        pytest.param("pets_examine", TreeFormat.TEXT, EXAMINE_TEXT, id="examine-text"),
+        pytest.param("pets_examine", TreeFormat.JSON, EXAMINE_JSON, id="examine-json"),
+        pytest.param("pets_examine", TreeFormat.YAML, EXAMINE_YAML, id="examine-yaml"),
+    ]
+)
+def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> None:
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        layout_tree(asset_filename("pets_layout2.yaml"), start=start, style=style)
+
+        output = mock_stdout.getvalue()
+        assert to_ascii(output) == to_ascii(expected)

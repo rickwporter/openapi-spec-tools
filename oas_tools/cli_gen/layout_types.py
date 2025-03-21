@@ -23,4 +23,10 @@ class CommandNode:
     extra: dict[str, Any] = dataclasses.field(default_factory=dict)
     children: list["CommandNode"] = dataclasses.field(default_factory=list)
 
+    def as_dict(self, sparse: bool = True) -> dict[str, Any]:
+        """Convenience method to convert to dictionary"""
+        def filter_empty_or_none(d: list[tuple[str, Any]]) -> dict[str, Any]:
+            """Skips keys whose value is None, or an empty list/dict/set"""
+            return {k: v for (k, v) in d if v is not None and v != [] and v != {}}
 
+        return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
