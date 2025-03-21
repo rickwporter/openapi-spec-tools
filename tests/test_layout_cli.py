@@ -12,7 +12,7 @@ from oas_tools.cli_gen.cli import layout_tree
 from tests.helpers import asset_filename
 from tests.helpers import to_ascii
 
-BAD_LAYOUT_FILE = asset_filename("bad_layout.yaml")
+BAD_LAYOUT_FILE = asset_filename("layout_bad.yaml")
 
 ERR_SUB_MISSIING ="""\
 Missing sub-commands for:
@@ -108,7 +108,7 @@ def test_layout_check_format_success() -> None:
     with (
         mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
     ):
-        filename = asset_filename("pets_layout.yaml")
+        filename = asset_filename("layout_pets.yaml")
         layout_check_format(filename=filename)
         output = mock_stdout.getvalue()
         assert f"No errors found in {filename}\n" == output
@@ -201,7 +201,7 @@ children:
 )
 def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-        layout_tree(asset_filename("pets_layout2.yaml"), start=start, style=style)
+        layout_tree(asset_filename("layout_pets2.yaml"), start=start, style=style)
 
         output = mock_stdout.getvalue()
         assert to_ascii(output) == to_ascii(expected)
