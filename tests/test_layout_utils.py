@@ -103,26 +103,26 @@ def test_shadow_operations(data, expected) -> None:
     [
         pytest.param({}, set(), set(), id="empty"),
         pytest.param(
-            {"cli": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}},
+            {"main": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}},
             set(),
             set(["sub1"]),
             id="missing",
         ),
         pytest.param(
-            {"cli": {OPS: [{SUB_ID: "sub1"}]}, "sub1": {}, "sub2": {} },
+            {"main": {OPS: [{SUB_ID: "sub1"}]}, "sub1": {}, "sub2": {} },
             set(["sub2"]),
             set(),
             id="unused",
         ),
         pytest.param(
-            {"cli": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}, "sub3": {}},
+            {"main": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}, "sub3": {}},
             set(["sub3"]),
             set(["sub1"]),
             id="both",
         ),
         pytest.param(
             {
-                "cli": {
+                "main": {
                     OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}, {SUB_ID: "sub4"}, {SUB_ID: "sub5"}]
                 },
                 "sub2": {},

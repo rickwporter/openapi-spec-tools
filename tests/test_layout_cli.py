@@ -37,7 +37,7 @@ Duplicate operations in sub-commands:
 """
 ERR_OPS_ORDER = """\
 Sub-command operation orders should be:
-    cli: owners, pet, shows, vets
+    main: owners, pet, shows, vets
     pets: create, delete, examine, update
     shelters: list, list, rescue
 """
@@ -117,7 +117,7 @@ FULL_TEXT = """\
 ┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Command              ┃ Identifier            ┃ Help                       ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ cli                  │ cli                   │ Pet management application │
+│ main                 │ main                  │ Pet management application │
 │   owners             │ owners                │ Keepers of the pets        │
 │     create           │ createOwner           │                            │
 │     delete           │ deleteOwner           │                            │
@@ -194,7 +194,7 @@ children:
 @pytest.mark.parametrize(
     ["start", "style", "expected"],
     [
-        pytest.param("cli", TreeFormat.TEXT, FULL_TEXT, id="cli"),
+        pytest.param("main", TreeFormat.TEXT, FULL_TEXT, id="main"),
         pytest.param("pets", TreeFormat.TEXT, PET_TEXT, id="pets"),
         pytest.param("pets_examine", TreeFormat.TEXT, EXAMINE_TEXT, id="examine-text"),
         pytest.param("pets_examine", TreeFormat.JSON, EXAMINE_JSON, id="examine-json"),

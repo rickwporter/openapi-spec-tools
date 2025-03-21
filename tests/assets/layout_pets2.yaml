@@ -1,4 +1,4 @@
-cli:
+main:
   description: Pet management application
   operations:
     - name: owners

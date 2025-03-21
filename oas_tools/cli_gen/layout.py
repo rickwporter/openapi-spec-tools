@@ -5,7 +5,7 @@ import yaml
 from .layout_types import CommandNode
 from .layout_types import LayoutField
 
-DEFAULT_START = "cli"
+DEFAULT_START = "main"
 
 
 def open_layout(filename: str) -> Any:

@@ -1,4 +1,4 @@
-cli:
+main:
   description: Pet store management application
   operations:
     - name: pet
