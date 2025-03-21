@@ -1,7 +1,6 @@
 import dataclasses
 from enum import Enum
 from typing import Any
-from typing import Optional
 
 
 class LayoutField(str, Enum):
@@ -15,9 +14,9 @@ class LayoutField(str, Enum):
 
 @dataclasses.dataclass
 class CommandNode:
-    name: str
+    command: str
+    identifier: str
     description: str = ""
-    operation_id: Optional[str] = None
     bugs: list[str] = dataclasses.field(default_factory=list)
     summary_fields: list[str] = dataclasses.field(default_factory=list)
     extra: dict[str, Any] = dataclasses.field(default_factory=dict)

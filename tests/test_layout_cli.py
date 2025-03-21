@@ -115,22 +115,22 @@ def test_layout_check_format_success() -> None:
 
 FULL_TEXT = """\
 ┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ Command              ┃ Operation             ┃ Help                       ┃
+┃ Command              ┃ Identifier            ┃ Help                       ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ cli                  │                       │ Pet management application │
-│   owners             │                       │ Keepers of the pets        │
+│ cli                  │ cli                   │ Pet management application │
+│   owners             │ owners                │ Keepers of the pets        │
 │     create           │ createOwner           │                            │
 │     delete           │ deleteOwner           │                            │
 │     pets             │ listOwnerPets         │                            │
 │     update           │ updateOwner           │                            │
-│   pet                │                       │ Manage your pets           │
+│   pet                │ pets                  │ Manage your pets           │
 │     create           │ createPets            │                            │
 │     delete           │ deletePetById         │                            │
-│     examine          │                       │ Examine your pet           │
+│     examine          │ pets_examine          │ Examine your pet           │
 │       blood-pressure │ checkPetBloodPressure │                            │
 │       heart-rate     │ checkPetHeartRate     │                            │
 │     update           │ showPetById           │                            │
-│   vets               │                       │ Manage veterinarians       │
+│   vets               │ veterinarians         │ Manage veterinarians       │
 │     add              │ createVet             │                            │
 │     delete           │ deleteVet             │                            │
 └──────────────────────┴───────────────────────┴────────────────────────────┘
@@ -138,12 +138,12 @@ FULL_TEXT = """\
 
 PET_TEXT = """\
 ┏━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Command            ┃ Operation             ┃ Help             ┃
+┃ Command            ┃ Identifier            ┃ Help             ┃
 ┡━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
-│ pets               │                       │ Manage your pets │
+│ pets               │ pets                  │ Manage your pets │
 │   create           │ createPets            │                  │
 │   delete           │ deletePetById         │                  │
-│   examine          │                       │ Examine your pet │
+│   examine          │ pets_examine          │ Examine your pet │
 │     blood-pressure │ checkPetBloodPressure │                  │
 │     heart-rate     │ checkPetHeartRate     │                  │
 │   update           │ showPetById           │                  │
@@ -152,41 +152,43 @@ PET_TEXT = """\
 
 EXAMINE_TEXT = """\
 ┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Command          ┃ Operation             ┃ Help             ┃
+┃ Command          ┃ Identifier            ┃ Help             ┃
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
-│ pets_examine     │                       │ Examine your pet │
+│ pets_examine     │ pets_examine          │ Examine your pet │
 │   blood-pressure │ checkPetBloodPressure │                  │
 │   heart-rate     │ checkPetHeartRate     │                  │
 └──────────────────┴───────────────────────┴──────────────────┘
 """
 EXAMINE_JSON = """\
 {
-  "name": "pets_examine",
+  "command": "pets_examine",
+  "identifier": "pets_examine",
   "description": "Examine your pet",
   "children": [
     {
-      "name": "blood-pressure",
-      "description": "",
-      "operation_id": "checkPetBloodPressure"
+      "command": "blood-pressure",
+      "identifier": "checkPetBloodPressure",
+      "description": ""
     },
     {
-      "name": "heart-rate",
-      "description": "",
-      "operation_id": "checkPetHeartRate"
+      "command": "heart-rate",
+      "identifier": "checkPetHeartRate",
+      "description": ""
     }
   ]
 }
 """
 EXAMINE_YAML = """\
-name: pets_examine
+command: pets_examine
+identifier: pets_examine
 description: Examine your pet
 children:
-- name: blood-pressure
+- command: blood-pressure
+  identifier: checkPetBloodPressure
   description: ''
-  operation_id: checkPetBloodPressure
-- name: heart-rate
+- command: heart-rate
+  identifier: checkPetHeartRate
   description: ''
-  operation_id: checkPetHeartRate
 """
 
 @pytest.mark.parametrize(

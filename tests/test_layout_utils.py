@@ -178,7 +178,8 @@ def test_parse_extras(data, expected) -> None:
             "sna",
             {},
             CommandNode(
-                name="sna",
+                command="sna",
+                identifier="sna",
             ),
             id="empty",
         ),
@@ -193,9 +194,9 @@ def test_parse_extras(data, expected) -> None:
                 OPS: [],
             },
             CommandNode(
-                name="sna",
+                command="sna",
+                identifier="sna",
                 description="my desc",
-                operation_id="op1",
                 bugs=["a", "b"],
                 summary_fields=["foo", "bar"],
                 extra={"my-party": {"cry": "if i want to"}},
@@ -211,10 +212,11 @@ def test_parse_extras(data, expected) -> None:
                 ],
             },
             CommandNode(
-                name="sna",
+                command="sna",
+                identifier="sna",
                 children=[
-                    CommandNode(name="foo", description="", operation_id="op1"),
-                    CommandNode(name="bar", description="", operation_id="op2"),
+                    CommandNode(command="foo", description="", identifier="op1"),
+                    CommandNode(command="bar", description="", identifier="op2"),
                 ],
             ),
             id="sub-ops",
@@ -227,12 +229,13 @@ def test_parse_extras(data, expected) -> None:
                 ],
             },
             CommandNode(
-                name="sna",
+                command="sna",
+                identifier="sna",
                 children=[
-                    CommandNode(name="foo", description="sub-command desc", children=[
-                        CommandNode(name="dazed", operation_id="confused"),
+                    CommandNode(command="foo", identifier="sub1", description="sub-command desc", children=[
+                        CommandNode(command="dazed", identifier="confused"),
                     ]),
-                    CommandNode(name="bar", description="more help", bugs=["a", "bc"]),
+                    CommandNode(command="bar", identifier="sub2", description="more help", bugs=["a", "bc"]),
                 ],
             ),
             id="sub-cmds",
@@ -250,7 +253,7 @@ def test_data_to_node_basic(name, item, expected) -> None:
             "bugIds": "a, bc",
         }
     }
-    node = data_to_node(data, name, item)
+    node = data_to_node(data, name, name, item)
     assert expected == node
 
 
@@ -259,24 +262,27 @@ def test_data_to_node_basic(name, item, expected) -> None:
     [
         pytest.param(
             "foo",
-            CommandNode(name="foo"),
+            CommandNode(command="foo", identifier="foo"),
             id="empty",
         ),
         pytest.param(
             "top",
             CommandNode(
-                name="top",
+                command="top",
+                identifier="top",
                 description="top level item",
                 children=[
                     CommandNode(
-                        name="blah",
+                        command="blah",
+                        identifier="command1",
                         children=[
-                            CommandNode(name="foo", operation_id="op1"),
-                            CommandNode(name="bar", operation_id="op2"),
+                            CommandNode(command="foo", identifier="op1"),
+                            CommandNode(command="bar", identifier="op2"),
                         ],
                     ),
                     CommandNode(
-                        name="zey",
+                        command="zey",
+                        identifier="command2",
                         description="some help"
                     )
                 ]
@@ -285,16 +291,17 @@ def test_data_to_node_basic(name, item, expected) -> None:
         ),
         pytest.param(
             "command2",
-            CommandNode(name="command2", description="some help"),
+            CommandNode(command="command2", identifier="command2", description="some help"),
             id="command2",
         ),
         pytest.param(
             "command1",
             CommandNode(
-                name="command1",
+                command="command1",
+                identifier="command1",
                 children=[
-                    CommandNode(name="foo", operation_id="op1"),
-                    CommandNode(name="bar", operation_id="op2"),
+                    CommandNode(command="foo", identifier="op1"),
+                    CommandNode(command="bar", identifier="op2"),
                 ],
             ),
             id="command1",

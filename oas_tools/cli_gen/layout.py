@@ -41,11 +41,10 @@ def parse_extras(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def data_to_node(data: dict[str, Any], name: str, item: dict[str, Any]) -> CommandNode:
+def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> CommandNode:
     """Recursively converts elements from data to CommandNodes"""
-    name = name
     description = item.get(LayoutField.DESCRIPTION, "")
-    op_id = item.get(LayoutField.OP_ID)
+    # identifier = item.get(LayoutField.OP_ID) or identifier
     # parse bugs and summary fields into a list
     bugs = field_to_list(item, LayoutField.BUG_IDS)
     summary_fields = field_to_list(item, LayoutField.SUMMARY_FIELDS)
@@ -57,16 +56,17 @@ def data_to_node(data: dict[str, Any], name: str, item: dict[str, Any]) -> Comma
         sub_id = op_data.get(LayoutField.SUB_ID)
         if sub_id:
             # recursively go through this
-            children.append(data_to_node(data, op_name, data.get(sub_id, {})))
+            children.append(data_to_node(data, sub_id, op_name, data.get(sub_id, {})))
             continue
 
         # use the current op-data to create a node -- it will be short
-        children.append(data_to_node(data, op_name, op_data))
+        op_id = op_data.get(LayoutField.OP_ID)
+        children.append(data_to_node(data, op_id, op_name, op_data))
 
     return CommandNode(
-        name=name,
+        command=command,
+        identifier=identifier,
         description=description,
-        operation_id=op_id,
         bugs=bugs,
         summary_fields=summary_fields,
         extra=extra,
@@ -78,7 +78,7 @@ def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> CommandNo
     """Puts the data into a tree structure starting at start."""
     top = data.get(start, {})
 
-    return data_to_node(data, start, top)
+    return data_to_node(data, start, start, top)
 
 
 def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:

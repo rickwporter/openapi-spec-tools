@@ -120,8 +120,8 @@ def layout_tree(
         return
 
     def add_node(table: Table, node: CommandNode, level: int) -> None:
-        name = f"{' ' * indent * level}{node.name}"
-        table.add_row(name, node.operation_id or '', node.description)
+        name = f"{' ' * indent * level}{node.command}"
+        table.add_row(name, node.identifier, node.description)
         for child in node.children:
             add_node(table, child, level + 1)
 
@@ -132,7 +132,7 @@ def layout_tree(
         show_header=True,
         show_edge=True,
     )
-    headers = ["Command", "Operation", "Help"]
+    headers = ["Command", "Identifier", "Help"]
     for name in headers:
         table.add_column(name, justify="left", no_wrap=True, overflow="ignore")
 
