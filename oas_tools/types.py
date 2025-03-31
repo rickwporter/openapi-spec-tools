@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Fields(str, Enum):
+class OasField(str, Enum):
     ANY_OF = "anyOf"
     COMPONENTS = "components"
     DESCRIPTION = "description"

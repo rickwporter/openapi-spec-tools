@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from oas_tools.constants import Fields
+from oas_tools.types import OasField
 from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
@@ -35,7 +35,7 @@ from .helpers import open_test_oas
 )
 def test_utils_find_path_references(asset, path, references) -> None:
     oas = open_test_oas(asset)
-    path_data = oas.get(Fields.PATHS, {}).get(path)
+    path_data = oas.get(OasField.PATHS, {}).get(path)
     found = find_references(path_data)
     assert references == found
 
@@ -44,18 +44,18 @@ def test_find_diffs_pet_forward() -> None:
     orig = open_test_oas("pet.yaml")
     updated = open_test_oas("pet2.yaml")
     diff = find_diffs(orig, updated)
-    assert diff[Fields.TAGS] == "added"
-    assert diff[Fields.COMPONENTS][Fields.SCHEMAS] == {
+    assert diff[OasField.TAGS] == "added"
+    assert diff[OasField.COMPONENTS][OasField.SCHEMAS] == {
         "Pet": {
-            Fields.PROPS: {"owner": "added"},
-            Fields.REQUIRED: "added owner",
+            OasField.PROPS: {"owner": "added"},
+            OasField.REQUIRED: "added owner",
         },
     }
-    assert diff[Fields.PATHS] == {
+    assert diff[OasField.PATHS] == {
         "/pets/{petId}": {
-            Fields.PARAMS: "added",
+            OasField.PARAMS: "added",
             "delete": "added",
-            "get": {Fields.PARAMS: "removed"},
+            "get": {OasField.PARAMS: "removed"},
         }
     }
 
@@ -65,18 +65,18 @@ def test_find_diffs_pet_reverse() -> None:
     orig = open_test_oas("pet2.yaml")
     updated = open_test_oas("pet.yaml")
     diff = find_diffs(orig, updated)
-    assert diff[Fields.TAGS] == "removed"
-    assert diff[Fields.COMPONENTS][Fields.SCHEMAS] == {
+    assert diff[OasField.TAGS] == "removed"
+    assert diff[OasField.COMPONENTS][OasField.SCHEMAS] == {
         "Pet": {
-            Fields.PROPS: {"owner": "removed"},
-            Fields.REQUIRED: "removed owner",
+            OasField.PROPS: {"owner": "removed"},
+            OasField.REQUIRED: "removed owner",
         },
     }
-    assert diff[Fields.PATHS] == {
+    assert diff[OasField.PATHS] == {
         "/pets/{petId}": {
-            Fields.PARAMS: "removed",
+            OasField.PARAMS: "removed",
             "delete": "removed",
-            "get": {Fields.PARAMS: "added"},
+            "get": {OasField.PARAMS: "added"},
         }
     }
 
@@ -152,7 +152,7 @@ def test_count_values_failure() -> None:
 
 def test_model_references() -> None:
     oas = open_test_oas("pet2.yaml")
-    models = oas.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    models = oas.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
     expected = {
         "Pets": set(["Pet"]),
         "Pet": set(),
@@ -174,7 +174,7 @@ def test_model_filter(
     keys: list[str],
 ) -> None:
     schema = open_test_oas(asset)
-    models = schema.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    models = schema.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
     filtered = model_filter(models, set([model_name]))
     assert set(keys) == set(filtered)
 
@@ -192,7 +192,7 @@ def test_models_referenced_by(
     keys: list[str],
 ) -> None:
     schema = open_test_oas(asset)
-    models = schema.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    models = schema.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
     referenced_by = models_referenced_by(models, model_name)
     assert set(keys) == set(referenced_by)
 
@@ -200,63 +200,63 @@ def test_models_referenced_by(
 
 def test_map_operations() -> None:
     oas = open_test_oas("pet2.yaml")
-    ops = map_operations(oas.get(Fields.PATHS))
+    ops = map_operations(oas.get(OasField.PATHS))
     assert set(["listPets", "createPets", "showPetById", "deletePetById"]) == ops.keys()
     baseline_keys = set([
-        Fields.OP_ID,
-        Fields.RESPONSES,
-        Fields.SUMMARY,
-        Fields.TAGS,
-        Fields.X_PATH,
-        Fields.X_PATH_PARAMS,
-        Fields.X_METHOD,
+        OasField.OP_ID,
+        OasField.RESPONSES,
+        OasField.SUMMARY,
+        OasField.TAGS,
+        OasField.X_PATH,
+        OasField.X_PATH_PARAMS,
+        OasField.X_METHOD,
     ])
 
-    expected_keys = baseline_keys | set([Fields.PARAMS])
+    expected_keys = baseline_keys | set([OasField.PARAMS])
     item = ops["listPets"]
     assert expected_keys == set(item.keys())
-    assert item[Fields.OP_ID] == "listPets"
-    assert item[Fields.X_PATH] == "/pets"
-    assert item[Fields.X_METHOD] == "get"
-    assert item[Fields.X_PATH_PARAMS] is None
+    assert item[OasField.OP_ID] == "listPets"
+    assert item[OasField.X_PATH] == "/pets"
+    assert item[OasField.X_METHOD] == "get"
+    assert item[OasField.X_PATH_PARAMS] is None
 
     expected_keys = baseline_keys | set(["requestBody"])
     item = ops["createPets"]
     assert expected_keys == set(item.keys())
-    assert item[Fields.OP_ID] == "createPets"
-    assert item[Fields.X_PATH] == "/pets"
-    assert item[Fields.X_METHOD] == "post"
-    assert item[Fields.X_PATH_PARAMS] is None
+    assert item[OasField.OP_ID] == "createPets"
+    assert item[OasField.X_PATH] == "/pets"
+    assert item[OasField.X_METHOD] == "post"
+    assert item[OasField.X_PATH_PARAMS] is None
 
     expected_keys = baseline_keys
     item = ops["deletePetById"]
     assert expected_keys == set(item.keys())
-    assert item[Fields.OP_ID] == "deletePetById"
-    assert item[Fields.X_PATH] == "/pets/{petId}"
-    assert item[Fields.X_METHOD] == "delete"
-    assert item[Fields.X_PATH_PARAMS] == [
+    assert item[OasField.OP_ID] == "deletePetById"
+    assert item[OasField.X_PATH] == "/pets/{petId}"
+    assert item[OasField.X_METHOD] == "delete"
+    assert item[OasField.X_PATH_PARAMS] == [
         {
-            Fields.NAME: "petId",
-            Fields.IN: "path",
-            Fields.REQUIRED: True,
-            Fields.DESCRIPTION: "The id of the pet to retrieve",
-            Fields.SCHEMA: {Fields.TYPE: "string"},
+            OasField.NAME: "petId",
+            OasField.IN: "path",
+            OasField.REQUIRED: True,
+            OasField.DESCRIPTION: "The id of the pet to retrieve",
+            OasField.SCHEMA: {OasField.TYPE: "string"},
         },
     ]
 
     expected_keys = baseline_keys
     item = ops["showPetById"]
     assert expected_keys == set(item.keys())
-    assert item[Fields.OP_ID] == "showPetById"
-    assert item[Fields.X_PATH] == "/pets/{petId}"
-    assert item[Fields.X_METHOD] == "get"
-    assert item[Fields.X_PATH_PARAMS] == [
+    assert item[OasField.OP_ID] == "showPetById"
+    assert item[OasField.X_PATH] == "/pets/{petId}"
+    assert item[OasField.X_METHOD] == "get"
+    assert item[OasField.X_PATH_PARAMS] == [
         {
-            Fields.NAME: "petId",
-            Fields.IN: "path",
-            Fields.REQUIRED: True,
-            Fields.DESCRIPTION: "The id of the pet to retrieve",
-            Fields.SCHEMA: {Fields.TYPE: "string"},
+            OasField.NAME: "petId",
+            OasField.IN: "path",
+            OasField.REQUIRED: True,
+            OasField.DESCRIPTION: "The id of the pet to retrieve",
+            OasField.SCHEMA: {OasField.TYPE: "string"},
         },
     ]
 
@@ -273,19 +273,19 @@ def test_map_operations() -> None:
 )
 def test_find_paths(filename, search, subpaths, expected) -> None:
     oas = open_test_oas(filename)
-    actual = find_paths(oas.get(Fields.PATHS), search, subpaths)
+    actual = find_paths(oas.get(OasField.PATHS), search, subpaths)
     assert set(expected) == set(actual.keys())
 
 
 def path_tag_count(schema: dict[str, Any]) -> int:
     tag_count = 0
 
-    for path_data in schema.get(Fields.PATHS, {}).values():
+    for path_data in schema.get(OasField.PATHS, {}).values():
         for op_data in path_data.values():
             # parameters field is a list, instead of a dict
             if not isinstance(op_data, dict):
                 continue
-            tags = op_data.get(Fields.TAGS, [])
+            tags = op_data.get(OasField.TAGS, [])
             tag_count += len(tags)
 
     return tag_count
@@ -295,26 +295,26 @@ def test_remove_schema_tags_full() -> None:
     orig = open_test_oas("pet2.yaml")
     orig_count = path_tag_count(orig)
     assert 0 != orig_count
-    assert Fields.TAGS in orig
+    assert OasField.TAGS in orig
 
     updated = remove_schema_tags(orig)
     up_count = path_tag_count(updated)
     assert 0 == up_count
-    assert Fields.TAGS not in updated
+    assert OasField.TAGS not in updated
 
     diff = find_diffs(orig, updated)
     assert diff == {
-        Fields.PATHS.value: {
+        OasField.PATHS.value: {
             '/pets': {
-                "get": {Fields.TAGS.value: "removed"},
-                "post": {Fields.TAGS.value: "removed"},
+                "get": {OasField.TAGS.value: "removed"},
+                "post": {OasField.TAGS.value: "removed"},
             },
             "/pets/{petId}": {
-                "delete": {Fields.TAGS.value: "removed"},
-                "get": {Fields.TAGS.value: "removed"}
+                "delete": {OasField.TAGS.value: "removed"},
+                "get": {OasField.TAGS.value: "removed"}
             }
         },
-        Fields.TAGS.value: "removed",
+        OasField.TAGS.value: "removed",
     }
 
 
@@ -322,12 +322,12 @@ def test_remove_schema_tags_no_top() -> None:
     orig = open_test_oas("ct.yaml")
     orig_count = path_tag_count(orig)
     assert 0 != orig_count
-    assert Fields.TAGS not in orig
+    assert OasField.TAGS not in orig
 
     updated = remove_schema_tags(orig)
     up_count = path_tag_count(updated)
     assert 0 == up_count
-    assert Fields.TAGS not in updated
+    assert OasField.TAGS not in updated
 
     diff = find_diffs(orig, updated)
     assert 191 == count_values(diff)
@@ -339,8 +339,8 @@ def test_remove_schema_tags_no_top() -> None:
         pytest.param(
             "pet2.yaml",
             {
-                Fields.COMPONENTS.value: {
-                    Fields.SCHEMAS.value: {'Pet' : {Fields.REQUIRED.value: "removed owner"}},
+                OasField.COMPONENTS.value: {
+                    OasField.SCHEMAS.value: {'Pet' : {OasField.REQUIRED.value: "removed owner"}},
                 },
             },
             id="pet2",
@@ -348,9 +348,9 @@ def test_remove_schema_tags_no_top() -> None:
         pytest.param(
             "oas31.yaml",
             {
-                Fields.COMPONENTS.value: {
-                    Fields.SCHEMAS.value: {
-                        'Service': {Fields.REQUIRED.value: "removed consumers, websites"},
+                OasField.COMPONENTS.value: {
+                    OasField.SCHEMAS.value: {
+                        'Service': {OasField.REQUIRED.value: "removed consumers, websites"},
                     },
                 },
             },
@@ -372,8 +372,8 @@ def test_schema_operations_filter_remove() -> None:
 
     diff = find_diffs(original, updated)
     assert diff == {
-        Fields.PATHS.value: {"/pets/{petId}": {"delete": "removed"}},
-        Fields.TAGS.value: "different lengths: 2 != 1"
+        OasField.PATHS.value: {"/pets/{petId}": {"delete": "removed"}},
+        OasField.TAGS.value: "different lengths: 2 != 1"
     }
 
     # make sure we throw an exception when operation is not found
@@ -383,8 +383,8 @@ def test_schema_operations_filter_remove() -> None:
     third = schema_operations_filter(updated, remove=set(["listPets"]))
     diff = find_diffs(updated, third)
     assert diff == {
-        Fields.COMPONENTS.value: {Fields.SCHEMAS: {"Pets": "removed"}},
-        Fields.PATHS.value: {"/pets": {"get": "removed"}},
+        OasField.COMPONENTS.value: {OasField.SCHEMAS: {"Pets": "removed"}},
+        OasField.PATHS.value: {"/pets": {"get": "removed"}},
     }
 
 
@@ -394,10 +394,10 @@ def test_schema_operations_filter_allow() -> None:
 
     diff = find_diffs(original, updated)
     assert diff == {
-        Fields.PATHS.value: {
+        OasField.PATHS.value: {
             "/pets": "removed",
         },
-        Fields.COMPONENTS.value: {Fields.SCHEMAS.value: {"Pets": "removed"}},
+        OasField.COMPONENTS.value: {OasField.SCHEMAS.value: {"Pets": "removed"}},
     }
 
     # make sure we throw an exception when operation is not found
@@ -407,7 +407,7 @@ def test_schema_operations_filter_allow() -> None:
     third = schema_operations_filter(updated, allow=set(["deletePetById"]))
     diff = find_diffs(updated, third)
     assert diff == {
-        Fields.PATHS.value: {"/pets/{petId}": {"get": "removed"}},
-        Fields.TAGS.value: "different lengths: 2 != 1",
-        Fields.COMPONENTS.value: {Fields.SCHEMAS.value: {"Pet": "removed"}},
+        OasField.PATHS.value: {"/pets/{petId}": {"get": "removed"}},
+        OasField.TAGS.value: "different lengths: 2 != 1",
+        OasField.COMPONENTS.value: {OasField.SCHEMAS.value: {"Pet": "removed"}},
     }

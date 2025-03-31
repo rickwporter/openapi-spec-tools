@@ -5,7 +5,7 @@ from typing import Optional
 
 import yaml
 
-from oas_tools.constants import Fields
+from oas_tools.types import OasField
 
 NULL_TYPES = {'null', '"null"', "'null'"}
 
@@ -185,7 +185,7 @@ def find_references(obj: dict[str, Any]) -> set[str]:
     """
     Walks the 'obj' dictionary to find all the reference values (e.g. "$ref").
     """
-    refs = find_dict_prop(obj, Fields.REFS)
+    refs = find_dict_prop(obj, OasField.REFS)
     return set([_.split("/")[-1] for _ in refs])
 
 
@@ -274,12 +274,12 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     """
     result = {}
     for path, path_data in paths.items():
-        path_params = path_data.pop(Fields.PARAMS, None)
+        path_params = path_data.pop(OasField.PARAMS, None)
         for method, op_data in path_data.items():
-            op_id = op_data.get(Fields.OP_ID)
-            op_data[Fields.X_PATH.value] = path
-            op_data[Fields.X_PATH_PARAMS.value] = path_params
-            op_data[Fields.X_METHOD.value] = method
+            op_id = op_data.get(OasField.OP_ID)
+            op_data[OasField.X_PATH.value] = path
+            op_data[OasField.X_PATH_PARAMS.value] = path_params
+            op_data[OasField.X_METHOD.value] = method
             result[op_id] = op_data
 
     return result
@@ -317,16 +317,16 @@ def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
     result = deepcopy(schema)  # copy to make non-destructive
 
     # "tags" are in the operation data -- using a blind dict could cause properties named "tags" to get removed
-    paths = result.get(Fields.PATHS, {})
+    paths = result.get(OasField.PATHS, {})
     for path_data in paths.values():
         for op_data in path_data.values():
             # NOTE: parameters are a list, not a dict
             if not isinstance(op_data, dict):
                 continue
-            op_data.pop(Fields.TAGS, None)
+            op_data.pop(OasField.TAGS, None)
 
     # plus, there may be top-level tags with a description
-    result.pop(Fields.TAGS, None)
+    result.pop(OasField.TAGS, None)
 
     return result
 
@@ -334,7 +334,7 @@ def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
 def _is_nullable(prop_data: dict[str, Any]) -> bool:
     """Determine if a property is nullable"""
     # this handles the OAS 3.0 style where it is denoted by a `nullabld: true`
-    if prop_data.get(Fields.NULLABLE, False):
+    if prop_data.get(OasField.NULLABLE, False):
         return True
 
     def _includes_null(types: str|list[str]) -> bool:
@@ -343,13 +343,13 @@ def _is_nullable(prop_data: dict[str, Any]) -> bool:
         return any(x in types for x in NULL_TYPES)
 
     # this handles the OAS 3.1 style where the `type` field has a `null` value
-    if _includes_null(prop_data.get(Fields.TYPE, [])):
+    if _includes_null(prop_data.get(OasField.TYPE, [])):
         return True
 
     # iterate through all the options in anyOf/oneOf
-    for tag in [Fields.ANY_OF, Fields.ONE_OF]:
+    for tag in [OasField.ANY_OF, OasField.ONE_OF]:
         for item in prop_data.get(tag, []):
-            if _includes_null(item.get(Fields.TYPE)):
+            if _includes_null(item.get(OasField.TYPE)):
                 return True
 
     return False
@@ -403,17 +403,17 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
     """
     result = deepcopy(schema)
 
-    schemas = result.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    schemas = result.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
     for schema_value in schemas.values():
-        required = schema_value.pop(Fields.REQUIRED, None)
+        required = schema_value.pop(OasField.REQUIRED, None)
         if not required:
             continue
         required = set(required)
-        for prop_name, prop_data in schema_value.get(Fields.PROPS, {}).items():
+        for prop_name, prop_data in schema_value.get(OasField.PROPS, {}).items():
             if _is_nullable(prop_data) and prop_name in required:
                 required.remove(prop_name)
         if required:
-            schema_value[Fields.REQUIRED.value] = list(required)
+            schema_value[OasField.REQUIRED.value] = list(required)
 
     return result
 
@@ -432,7 +432,7 @@ def schema_operations_filter(
     """
     result = deepcopy(schema)
 
-    op_map = map_operations(result.pop(Fields.PATHS, {}))
+    op_map = map_operations(result.pop(OasField.PATHS, {}))
 
     # make sure all operation_names are in the OAS
     if remove:
@@ -454,19 +454,19 @@ def schema_operations_filter(
     # reconstruct the paths
     paths = {}
     for op_name, op_data in op_map.items():
-        path = op_data.pop(Fields.X_PATH)
-        params = op_data.pop(Fields.X_PATH_PARAMS, None)
-        method = op_data.pop(Fields.X_METHOD)
+        path = op_data.pop(OasField.X_PATH)
+        params = op_data.pop(OasField.X_PATH_PARAMS, None)
+        method = op_data.pop(OasField.X_METHOD)
         orig = paths.get(path, {})
-        if params and Fields.PARAMS not in orig:
-            orig[Fields.PARAMS.value] = params
+        if params and OasField.PARAMS not in orig:
+            orig[OasField.PARAMS.value] = params
         orig[method] = op_data
         paths[path] = orig
-    result[Fields.PATHS.value] = paths
+    result[OasField.PATHS.value] = paths
 
     # figure out all the models that are referenced from the remaining operations
     op_refs = find_references(op_map)
-    models = result.get(Fields.COMPONENTS, {}).get(Fields.SCHEMAS, {})
+    models = result.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
     model_refs = {
         name: find_references(model)
         for name, model in models.items()
@@ -481,13 +481,13 @@ def schema_operations_filter(
     # compile a list of tags that are used
     used_tags = set()
     for op_data in op_map.values():
-        used_tags.update(set(op_data.get(Fields.TAGS, [])))
+        used_tags.update(set(op_data.get(OasField.TAGS, [])))
 
     # remove unused tags from top-level schema
-    tag_defs = result.pop(Fields.TAGS, None)
+    tag_defs = result.pop(OasField.TAGS, None)
     if tag_defs:
-        updated_tags = [t for t in tag_defs if t.get(Fields.NAME) in used_tags]
+        updated_tags = [t for t in tag_defs if t.get(OasField.NAME) in used_tags]
         if updated_tags:
-            result[Fields.TAGS.value] = updated_tags
+            result[OasField.TAGS.value] = updated_tags
 
     return result
