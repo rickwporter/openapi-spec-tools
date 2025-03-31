@@ -192,3 +192,9 @@ def subcommand_order(data: dict[str, Any], start: str = DEFAULT_START) -> list[s
         last = sub_name
 
     return misordered
+
+
+def file_to_tree(filename: str, start: str = DEFAULT_START) -> CommandNode:
+    """Utility to open filename and parse to a CommandNode tree."""
+    data = open_layout(filename)
+    return parse_to_tree(data, start)

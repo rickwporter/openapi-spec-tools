@@ -1,8 +1,8 @@
 import pytest
 
-from oas_tools.cli_gen.layout import CommandNode
 from oas_tools.cli_gen.layout import data_to_node
 from oas_tools.cli_gen.layout import field_to_list
+from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.cli_gen.layout import operation_duplicates
 from oas_tools.cli_gen.layout import operation_order
 from oas_tools.cli_gen.layout import parse_extras
@@ -10,6 +10,8 @@ from oas_tools.cli_gen.layout import parse_to_tree
 from oas_tools.cli_gen.layout import subcommand_missing_properties
 from oas_tools.cli_gen.layout import subcommand_order
 from oas_tools.cli_gen.layout import subcommand_references
+from oas_tools.cli_gen.layout_types import CommandNode
+from tests.helpers import asset_filename
 
 OPS = "operations"
 DESC = "description"
@@ -384,3 +386,14 @@ def test_lists() -> None:
     operations = uut.operations()
     assert 1 == len(operations)
     assert "zey" == operations[0].command
+
+
+def test_file_to_tree() -> None:
+    filename = asset_filename("layout_pets2.yaml")
+    tree = file_to_tree(filename)
+    assert "main" == tree.command
+    assert set({"owners", "pet", "vets"}) == set(p.command for p in tree.subcommands())
+
+    tree = file_to_tree(filename, "owners")
+    assert "owners" == tree.command
+    assert set() == set(p.command for p in tree.subcommands())
