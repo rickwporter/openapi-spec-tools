@@ -355,3 +355,32 @@ def test_operations_order(data, expected) -> None:
 )
 def test_subcommand_order(data, start, expected) -> None:
     assert expected == subcommand_order(data, start)
+
+
+def test_lists() -> None:
+    uut = CommandNode(
+        command="top",
+        identifier="top",
+        description="top level item",
+        children=[
+            CommandNode(
+                command="blah",
+                identifier="command1",
+                children=[
+                    CommandNode(command="foo", identifier="op1"),
+                    CommandNode(command="bar", identifier="op2"),
+                ],
+            ),
+            CommandNode(
+                command="zey",
+                identifier="command2",
+                description="some help"
+            )
+        ]
+    )
+    subcommands = uut.subcommands()
+    assert 1 == len(subcommands)
+    assert "blah" == subcommands[0].command
+    operations = uut.operations()
+    assert 1 == len(operations)
+    assert "zey" == operations[0].command

@@ -29,3 +29,11 @@ class CommandNode:
             return {k: v for (k, v) in d if v is not None and v != [] and v != {}}
 
         return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
+
+    def subcommands(self) -> list["CommandNode"]:
+        """Return a list of CommandNodes that have children."""
+        return [n for n in self.children if n.children]
+
+    def operations(self) -> list["CommandNode"]:
+        """Return a list of CommandNodes without any children."""
+        return [n for n in self.children if not n.children]
