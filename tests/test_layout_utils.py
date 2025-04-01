@@ -397,3 +397,16 @@ def test_file_to_tree() -> None:
     tree = file_to_tree(filename, "owners")
     assert "owners" == tree.command
     assert set() == set(p.command for p in tree.subcommands())
+
+
+@pytest.mark.parametrize(
+    ["search_args", "expected"],
+    [
+        pytest.param(("foo"), None, id="not-found"),
+        pytest.param(("pet", "feed"), None, id="child-not-found"),
+        pytest.param(("pet", "create"), CommandNode(command="create", identifier="createPets"), id="child")
+    ]
+)
+def test_node_find(search_args, expected) -> None:
+    tree = file_to_tree(asset_filename("layout_pets2.yaml"))
+    assert expected == tree.find(*search_args)

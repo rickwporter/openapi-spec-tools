@@ -1,6 +1,7 @@
 import dataclasses
 from enum import Enum
 from typing import Any
+from typing import Optional
 
 
 class LayoutField(str, Enum):
@@ -37,3 +38,13 @@ class CommandNode:
     def operations(self) -> list["CommandNode"]:
         """Return a list of CommandNodes without any children."""
         return [n for n in self.children if not n.children]
+
+    def find(self, *args) -> Optional["CommandNode"]:
+        """Search for the provided commands"""
+        for child in self.children:
+            if child.command == args[0]:
+                if len(args) == 1:
+                    return child
+                return child.find(*args[1:])
+
+        return None
