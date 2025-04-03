@@ -53,3 +53,32 @@ app.add_typer({to_snake_case(child.identifier)}, name="{child.command}")
 """
 
         return result
+
+    def op_short_help(self, operation: dict[str, Any]) -> str:
+        """Gets the short help for the operation."""
+        summary = operation.get(OasField.SUMMARY)
+        if summary:
+            return summary
+
+        description = operation.get(OasField.DESCRIPTION, "")
+        return description.split(". ")[0]
+
+    def op_long_help(self, operation: dict[str, Any]) -> str:
+        text = operation.get(OasField.DESCRIPTION) or operation.get(OasField.SUMMARY) or ""
+        # TODO: sanitize  NL's, long text, etc
+        return text
+
+    def function_definition(self, node: CommandNode) -> str:
+        op = self.operations.get(node.identifier)
+        method = op.get(OasField.X_METHOD).upper()
+
+        return f"""
+
+@app.command("{node.command}", help="{self.op_short_help(op)}")
+def {to_snake_case(node.identifier)}() -> None:
+    '''
+    {self.op_long_help(op)}
+    '''
+    # handler for {node.identifier}: {method} {op.get(OasField.X_PATH)}
+    return
+"""
