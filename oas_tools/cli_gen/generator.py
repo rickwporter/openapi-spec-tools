@@ -54,6 +54,13 @@ app.add_typer({to_snake_case(child.identifier)}, name="{child.command}")
 
         return result
 
+    def main(self) -> str:
+        return """
+
+if __name__ == "__main__":
+    app()
+"""
+
     def op_short_help(self, operation: dict[str, Any]) -> str:
         """Gets the short help for the operation."""
         summary = operation.get(OasField.SUMMARY)

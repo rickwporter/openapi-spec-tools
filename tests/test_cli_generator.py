@@ -100,3 +100,10 @@ def test_function_definition():
     assert '@app.command("create", help="Create a pet")' in text
     assert 'def create_pets(' in text
     assert '# handler for createPets: POST /pets' in text
+
+
+def test_main():
+    uut = Generator("cli_package", {})
+    text = uut.main()
+    assert 'if __name__ == "__main__":' in text
+    assert "app()" in text
