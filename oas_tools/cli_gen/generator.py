@@ -45,7 +45,7 @@ import typer
     def app_definition(self, node: CommandNode) -> str:
         result = f"""
 
-app = typer.Typer(help="{node.description}")
+app = typer.Typer(no_args_is_help=True, help="{node.description}")
 """
         for child in node.subcommands():
             result += f"""\

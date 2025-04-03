@@ -49,7 +49,7 @@ def test_app_definition():
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     uut = Generator("cli_package", oas)
     text = uut.app_definition(tree)
-    assert 'app = typer.Typer(help="Pet management application")' in text
+    assert 'app = typer.Typer(no_args_is_help=True, help="Pet management application")' in text
     for name, command in {
         "pets": "pet",
         "owners": "owners",
