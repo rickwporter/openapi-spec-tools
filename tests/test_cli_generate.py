@@ -129,3 +129,48 @@ def test_generate_node_multiple():
         for v in expected:
             assert v in text
 
+
+def test_generate_node_skip_bugged():
+    pkg_name = "cli_pkg"
+    oas = open_oas(asset_filename("pets_and_vets.yaml"))
+    tree = file_to_tree(asset_filename("layout_pets2.yaml"))
+    directory = TemporaryDirectory()
+    generator = Generator(pkg_name, oas)
+
+    # create a sub-command a bug
+    node = tree.find("owners")
+    node.bugs = ["abc"]
+
+    # create an operation with bugs
+    node = tree.find("pet", "delete")
+    node.bugs = ["123", "456"]
+
+    generate_node(generator, tree, directory.name)
+
+    # test differences from above
+    path = Path(directory.name)
+    file = path / "owners.py"
+    assert not file.exists()
+
+    unexpectations = {
+        "main": [
+            'app.add_typer(owners, name="owners")',
+        ],
+        "pets": [
+            '@app.command("delete", help="Delete a pet")',
+        ],
+    }
+
+    for module_name, unexpected in unexpectations.items():
+        file = path / f"{module_name}.py"
+        assert file.exists()
+
+        text = file.read_text()
+        assert "#!/usr/bin/env python3" in text
+        assert f"Copyright {datetime.now().year}" in text
+        assert "from typing_extensions import Annotated" in text
+        assert 'app = typer.Typer(no_args_is_help=True, ' in text
+        assert 'if __main__ == "__main__":'
+
+        for v in unexpected:
+            assert v not in text

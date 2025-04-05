@@ -376,7 +376,7 @@ def test_lists() -> None:
             CommandNode(
                 command="zey",
                 identifier="command2",
-                description="some help"
+                description="some help",
             )
         ]
     )
@@ -386,6 +386,43 @@ def test_lists() -> None:
     operations = uut.operations()
     assert 1 == len(operations)
     assert "zey" == operations[0].command
+
+
+def test_lists_bugged() -> None:
+    uut = CommandNode(
+        command="top",
+        identifier="top",
+        description="top level item",
+        children=[
+            CommandNode(
+                command="blah",
+                identifier="command1",
+                bugs=["456"],
+                children=[
+                    CommandNode(command="foo", identifier="op1"),
+                    CommandNode(command="bar", identifier="op2", bugs=["abc"]),
+                ],
+            ),
+            CommandNode(
+                command="zey",
+                identifier="command2",
+                description="some help",
+                bugs=["123"],
+            )
+        ]
+    )
+
+    # test defaults -- ignore bugged
+    subcommands = uut.subcommands()
+    assert 0 == len(subcommands)
+    operations = uut.operations()
+    assert 0 == len(operations)
+
+    # test including bugged items
+    subcommands = uut.subcommands(include_bugged=True)
+    assert 1 == len(subcommands)
+    operations = uut.operations(include_bugged=True)
+    assert 1 == len(operations)
 
 
 def test_file_to_tree() -> None:

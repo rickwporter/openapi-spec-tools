@@ -31,13 +31,13 @@ class CommandNode:
 
         return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
 
-    def subcommands(self) -> list["CommandNode"]:
+    def subcommands(self, include_bugged: bool = False) -> list["CommandNode"]:
         """Return a list of CommandNodes that have children."""
-        return [n for n in self.children if n.children]
+        return [n for n in self.children if n.children and (include_bugged or not n.bugs)]
 
-    def operations(self) -> list["CommandNode"]:
+    def operations(self, include_bugged: bool = False) -> list["CommandNode"]:
         """Return a list of CommandNodes without any children."""
-        return [n for n in self.children if not n.children]
+        return [n for n in self.children if not n.children and (include_bugged or not n.bugs)]
 
     def find(self, *args) -> Optional["CommandNode"]:
         """Search for the provided commands"""
