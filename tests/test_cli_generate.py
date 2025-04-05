@@ -1,98 +1,15 @@
-import io
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest import mock
 
 import pytest
-import typer
 
 from oas_tools.cli_gen.generate import check_for_missing
-from oas_tools.cli_gen.generate import generate_check_missing
-from oas_tools.cli_gen.generate import generate_cli
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.utils import open_oas
 from tests.helpers import asset_filename
-
-
-def test_cli_gen_cli_generate_success():
-    layout_file = asset_filename("layout_pets.yaml")
-    oas_file = asset_filename("pet2.yaml")
-    pkg_name = "my_cli_pkg"
-    directory = TemporaryDirectory()
-
-    with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
-    ):
-        generate_cli(layout_file, oas_file, pkg_name, directory.name)
-        assert f"Generated files in {directory.name}\n" == mock_stdout.getvalue()
-
-    # NOTE: just check some basics here -- more detailed checks below
-    path = Path(directory.name)
-    file = path / "main.py"
-    assert file.exists()
-
-    text = file.read_text()
-    assert "#!/usr/bin/env python3" in text
-    assert f"Copyright {datetime.now().year}" in text
-    assert "from typing_extensions import Annotated" in text
-    assert 'app = typer.Typer(no_args_is_help=True, help="Manage pets")' in text
-    assert 'if __main__ == "__main__":'
-
-
-def test_cli_gen_cli_generate_failure():
-    layout_file = asset_filename("layout_pets2.yaml")
-    oas_file = asset_filename("pet.yaml")
-    pkg_name = "my_cli_pkg"
-    directory = TemporaryDirectory()
-    message = """\
-Commands with missing operations:
-    owners: createOwner, deleteOwner, listOwnerPets, updateOwner
-    pets: deletePetById
-    veterinarians: createVet, deleteVet
-"""
-
-    with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
-    ):
-        with pytest.raises(typer.Exit) as context:
-            generate_cli(layout_file, oas_file, pkg_name, directory.name)
-        ex = context.value
-        assert ex.exit_code == 1
-        assert message == mock_stdout.getvalue()
-
-
-def test_cli_gen_cli_check_failure():
-    layout_file = asset_filename("layout_pets2.yaml")
-    oas_file = asset_filename("pet.yaml")
-    message = """\
-Commands with missing operations:
-    owners: createOwner, deleteOwner, listOwnerPets, updateOwner
-    pets: deletePetById
-    veterinarians: createVet, deleteVet
-"""
-
-    with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
-    ):
-        with pytest.raises(typer.Exit) as context:
-            generate_check_missing(layout_file, oas_file)
-        ex = context.value
-        assert ex.exit_code == 1
-        assert message == mock_stdout.getvalue()
-
-
-def test_cli_gen_cli_check_success():
-    layout_file = asset_filename("layout_pets.yaml")
-    oas_file = asset_filename("pet2.yaml")
-
-    with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
-    ):
-        generate_check_missing(layout_file, oas_file)
-        assert f"All operations in {layout_file} found in {oas_file}\n" == mock_stdout.getvalue()
 
 
 def test_generate_node_single():

@@ -2,32 +2,11 @@
 import os
 from typing import Any
 
-import typer
-from typing_extensions import Annotated
-
 from oas_tools.cli_gen.generator import Generator
-from oas_tools.cli_gen.layout import DEFAULT_START
-from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import to_snake_case
 from oas_tools.types import OasField
 from oas_tools.utils import map_operations
-from oas_tools.utils import open_oas
-
-#################################################
-# Top-level stuff
-app = typer.Typer(
-    no_args_is_help=True,
-    help="Various utilities for working with OpenAPI specs with the CLI layout file.",
-)
-
-
-def render_missing(missing: dict[str, list[str]]) -> str:
-    sep = "\n    "
-    return (
-        f"Commands with missing operations:{sep}" +
-        sep.join(f"{cmd}: {', '.join(ops)}" for cmd, ops in missing.items())
-    )
 
 
 def generate_node(generator: Generator, node: CommandNode, directory: str) -> None:
@@ -72,47 +51,3 @@ def check_for_missing(node: CommandNode, oas: dict[str, Any]) -> dict[str, list[
         missing.update(_check_missing(command, operations))
 
     return missing
-
-
-@app.command("generate", help="Generate CLI code")
-def generate_cli(
-    layout_file: Annotated[str, typer.Argument(show_default=False, help="Layout file name")],
-    openapi_file: Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification filename")],
-    package_name: Annotated[str, typer.Argument(show_default=False, help="Base package name")],
-    directory: Annotated[str, typer.Argument(show_default=False, help="Directory name")],
-    start: Annotated[str, typer.Option(help="Start point in layout file")] = DEFAULT_START,
-) -> None:
-    commands = file_to_tree(layout_file, start=start)
-    oas = open_oas(openapi_file)
-
-    missing = check_for_missing(commands, oas)
-    if missing:
-        typer.echo(render_missing(missing))
-        raise typer.Exit(1)
-
-    os.makedirs(directory, exist_ok=True)
-
-    generator = Generator(package_name, oas)
-    generate_node(generator, commands, directory)
-    typer.echo(f"Generated files in {directory}")
-
-
-@app.command("check", help="Check OAS contains layout operations")
-def generate_check_missing(
-    layout_file: Annotated[str, typer.Argument(show_default=False, help="Layout file name")],
-    openapi_file: Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification filename")],
-    start: Annotated[str, typer.Option(help="Start point in layout file")] = DEFAULT_START,
-) -> None:
-    commands = file_to_tree(layout_file, start=start)
-    oas = open_oas(openapi_file)
-
-    missing = check_for_missing(commands, oas)
-    if missing:
-        typer.echo(render_missing(missing))
-        raise typer.Exit(1)
-
-    typer.echo(f"All operations in {layout_file} found in {openapi_file}")
-
-
-if __name__ == "__main__":
-    app()

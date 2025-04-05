@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 from enum import Enum
 
 import typer
@@ -8,37 +9,56 @@ from rich.console import Console
 from rich.table import Table
 from typing_extensions import Annotated
 
+from oas_tools.cli_gen.generate import check_for_missing
+from oas_tools.cli_gen.generate import generate_node
+from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import DEFAULT_START
+from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.cli_gen.layout import open_layout
 from oas_tools.cli_gen.layout import operation_duplicates
 from oas_tools.cli_gen.layout import operation_order
-from oas_tools.cli_gen.layout import parse_to_tree
 from oas_tools.cli_gen.layout import subcommand_missing_properties
 from oas_tools.cli_gen.layout import subcommand_order
 from oas_tools.cli_gen.layout import subcommand_references
 from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.utils import open_oas
 
 SEP = "\n    "
 
-LayoutFlienameArgument = Annotated[str, typer.Argument(show_default=False , help="Layout file YAML definition")]
-
+LayoutFilenameArgument = Annotated[str, typer.Argument(show_default=False , help="Layout file YAML definition")]
+OpenApiFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification filename")]
+StartPointOption = Annotated[str, typer.Option(help="Start point for CLI in layout file")]
 
 #################################################
 # Top-level stuff
-app = typer.Typer(
+layout = typer.Typer(
     name="layout",
     no_args_is_help=True,
     help="Various utilities for inspecting, analyzing and modifying CLI layout file.",
 )
+generate = typer.Typer(
+    name="generate",
+    no_args_is_help=True,
+    help="Various utilities for working with OpenAPI specs with the CLI layout file.",
+)
+app = typer.Typer(
+    no_args_is_help=True,
+    help="Various operations for CLI generation."
+)
+app.add_typer(layout)
+app.add_typer(generate)
 
 
-@app.command(
+
+#################################################
+# Layout stuff
+@layout.command(
     "check",
     short_help="Check formatting of layout file"
 )
 def layout_check_format(
-    filename: LayoutFlienameArgument,
-    start: Annotated[str, typer.Option(help="Start point for CLI in layout file")] = DEFAULT_START,
+    filename: LayoutFilenameArgument,
+    start: StartPointOption = DEFAULT_START,
     references: Annotated[bool, typer.Option(help="Check for missing and unused subcommands")] = True,
     sub_order: Annotated[bool, typer.Option(help="Check the sub-command order")] = True,
     missing_props: Annotated[bool, typer.Option(help="Check for missing properties")] = True,
@@ -98,19 +118,17 @@ class TreeFormat(str, Enum):
     YAML = "yaml"
 
 
-@app.command(
+@layout.command(
     "tree",
     short_help="Display the tree of commands"
 )
 def layout_tree(
-    filename: LayoutFlienameArgument,
-    start: Annotated[str, typer.Option(help="Start point for CLI in layout file")] = DEFAULT_START,
+    filename: LayoutFilenameArgument,
+    start: StartPointOption = DEFAULT_START,
     style: Annotated[TreeFormat, typer.Option(case_sensitive=False, help="Output style")] = TreeFormat.TEXT,
     indent: Annotated[int, typer.Option(min=1, max=10, help="Number of characters of indent")] = 2,
 ) -> None:
-    data = open_layout(filename)
-
-    tree = parse_to_tree(data, start)
+    tree = file_to_tree(filename, start=start)
     if style == TreeFormat.JSON:
         print_json(data=tree.as_dict(), indent=indent, sort_keys=False)
         return
@@ -140,6 +158,57 @@ def layout_tree(
     console = Console()
     console.print(table)
     return
+
+
+#################################################
+# Generate stuff
+
+def render_missing(missing: dict[str, list[str]]) -> str:
+    return (
+        f"Commands with missing operations:{SEP}" +
+        SEP.join(f"{cmd}: {', '.join(ops)}" for cmd, ops in missing.items())
+    )
+
+
+@generate.command("generate", help="Generate CLI code")
+def generate_cli(
+    layout_file: LayoutFilenameArgument,
+    openapi_file: OpenApiFilenameArgument,
+    package_name: Annotated[str, typer.Argument(show_default=False, help="Base package name")],
+    directory: Annotated[str, typer.Argument(show_default=False, help="Directory name")],
+    start: StartPointOption = DEFAULT_START,
+) -> None:
+    commands = file_to_tree(layout_file, start=start)
+    oas = open_oas(openapi_file)
+
+    missing = check_for_missing(commands, oas)
+    if missing:
+        typer.echo(render_missing(missing))
+        raise typer.Exit(1)
+
+    os.makedirs(directory, exist_ok=True)
+
+    generator = Generator(package_name, oas)
+    generate_node(generator, commands, directory)
+    typer.echo(f"Generated files in {directory}")
+
+
+@generate.command("check", help="Check OAS contains layout operations")
+def generate_check_missing(
+    layout_file: LayoutFilenameArgument,
+    openapi_file: OpenApiFilenameArgument,
+    start: StartPointOption = DEFAULT_START,
+) -> None:
+    commands = file_to_tree(layout_file, start=start)
+    oas = open_oas(openapi_file)
+
+    missing = check_for_missing(commands, oas)
+    if missing:
+        typer.echo(render_missing(missing))
+        raise typer.Exit(1)
+
+    typer.echo(f"All operations in {layout_file} found in {openapi_file}")
+
 
 if __name__ == "__main__":
     app()
