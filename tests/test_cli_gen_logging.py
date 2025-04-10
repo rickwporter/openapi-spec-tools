@@ -2,10 +2,10 @@ import logging
 
 import pytest
 
-from oas_tools.cli_gen.logging import LOG_CLASS
-from oas_tools.cli_gen.logging import LogLevel
-from oas_tools.cli_gen.logging import get_logger
-from oas_tools.cli_gen.logging import init_logging
+from oas_tools.cli_gen._logging import LOG_CLASS
+from oas_tools.cli_gen._logging import LogLevel
+from oas_tools.cli_gen._logging import get_logger
+from oas_tools.cli_gen._logging import init_logging
 
 
 def test_get_logger() -> None:

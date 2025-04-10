@@ -4,11 +4,11 @@ from unittest import mock
 
 import pytest
 
-from oas_tools.cli_gen.requests import _pretty_params
-from oas_tools.cli_gen.requests import create_url
-from oas_tools.cli_gen.requests import raise_for_error
-from oas_tools.cli_gen.requests import request
-from oas_tools.cli_gen.requests import request_headers
+from oas_tools.cli_gen._requests import _pretty_params
+from oas_tools.cli_gen._requests import create_url
+from oas_tools.cli_gen._requests import raise_for_error
+from oas_tools.cli_gen._requests import request
+from oas_tools.cli_gen._requests import request_headers
 from requests import HTTPError
 from requests import Request
 from requests import Response
@@ -154,10 +154,10 @@ def test_request(method, body, params, expected):
 
     prefix = "oas_tools.cli_gen"
     with (
-        mock.patch(f"{prefix}.requests.requests.request") as mock_request,
-        mock.patch(f"{prefix}.requests.logger.debug") as mock_debug,
-        mock.patch(f"{prefix}.requests.logger.info") as mock_info,
-        mock.patch(f"{prefix}.requests.raise_for_error") as mock_raise,
+        mock.patch(f"{prefix}._requests.requests.request") as mock_request,
+        mock.patch(f"{prefix}._requests.logger.debug") as mock_debug,
+        mock.patch(f"{prefix}._requests.logger.info") as mock_info,
+        mock.patch(f"{prefix}._requests.raise_for_error") as mock_raise,
     ):
         mock_request.return_value = response
 
