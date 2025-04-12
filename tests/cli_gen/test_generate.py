@@ -7,6 +7,7 @@ import pytest
 from oas_tools.cli_gen.generate import COPYRIGHT
 from oas_tools.cli_gen.generate import check_for_missing
 from oas_tools.cli_gen.generate import copy_and_update
+from oas_tools.cli_gen.generate import copy_infrastructure
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
@@ -189,3 +190,14 @@ def test_copy_and_update():
     assert package in text
     assert "oas_tools.cli_gen" not in text
 
+
+def test_copy_infrastructure():
+    tempdir = TemporaryDirectory()
+    dst_path = Path(tempdir.name)
+    package = "another.package"
+
+    copy_infrastructure(dst_path.as_posix(), package)
+
+    filenames = set(i.name for i in dst_path.iterdir())
+    expected = {"_arguments.py", "_display.py", "_logging.py", "_requests.py"}
+    assert filenames == expected

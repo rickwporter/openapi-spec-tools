@@ -190,6 +190,7 @@ def generate_cli(
 
     generator = Generator(package_name, oas)
     generate_node(generator, commands, directory)
+
     typer.echo(f"Generated files in {directory}")
 
 

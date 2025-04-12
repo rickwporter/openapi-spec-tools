@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Any
 
 from oas_tools.cli_gen.generator import COPYRIGHT
@@ -7,6 +8,14 @@ from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import to_snake_case
 from oas_tools.types import OasField
 from oas_tools.utils import map_operations
+
+# Maps the source to destination (currently all the same).
+INFRASTRUCTURE_FILES = {
+    "_arguments.py": "_arguments.py",
+    "_display.py": "_display.py",
+    "_logging.py": "_logging.py",
+    "_requests.py": "_requests.py",
+}
 
 
 def generate_node(generator: Generator, node: CommandNode, directory: str) -> None:
@@ -64,3 +73,13 @@ def copy_and_update(src_filename: str, dst_filename: str, package_name: str):
         dst_fp.write(COPYRIGHT)
         for line in src_fp.readlines():
             dst_fp.write(line.replace(module_name, package_name))
+
+
+def copy_infrastructure(dst_dir: str, package_name: str):
+    """Iterates over the INFRASTRUCTURE_FILES, and copies from local to dst."""
+    spath = Path(__file__).parent
+    dpath = Path(dst_dir)
+    for src, dst in INFRASTRUCTURE_FILES.items():
+        sfile = spath / src
+        dfile = dpath / dst
+        copy_and_update(sfile.as_posix(), dfile.as_posix(), package_name)
