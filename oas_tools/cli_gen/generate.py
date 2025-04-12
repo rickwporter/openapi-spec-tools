@@ -13,6 +13,7 @@ from oas_tools.utils import map_operations
 INFRASTRUCTURE_FILES = {
     "_arguments.py": "_arguments.py",
     "_display.py": "_display.py",
+    "_exceptions.py": "_exceptions.py",
     "_logging.py": "_logging.py",
     "_requests.py": "_requests.py",
 }

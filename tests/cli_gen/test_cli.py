@@ -238,7 +238,7 @@ def test_cli_gen_cli_generate_success():
     assert 'if __main__ == "__main__":'
 
     filenames = set(i.name for i in path.iterdir())
-    expected = {"_arguments.py", "_display.py", "_logging.py", "_requests.py", "main.py"}
+    expected = {"_arguments.py", "_display.py", "_exceptions.py", "_logging.py", "_requests.py", "main.py"}
     assert filenames == expected
 
 

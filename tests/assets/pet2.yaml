@@ -26,7 +26,6 @@ paths:
           schema:
             type: integer
             maximum: 100
-            minimum: 1
             format: int32
       responses:
         '200':

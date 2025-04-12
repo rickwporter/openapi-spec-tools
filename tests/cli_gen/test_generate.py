@@ -199,5 +199,5 @@ def test_copy_infrastructure():
     copy_infrastructure(dst_path.as_posix(), package)
 
     filenames = set(i.name for i in dst_path.iterdir())
-    expected = {"_arguments.py", "_display.py", "_logging.py", "_requests.py"}
+    expected = {"_arguments.py", "_display.py", "_exceptions.py", "_logging.py", "_requests.py"}
     assert filenames == expected
