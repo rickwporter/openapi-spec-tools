@@ -4,7 +4,9 @@ from enum import Enum
 class OasField(str, Enum):
     ANY_OF = "anyOf"
     COMPONENTS = "components"
+    DEFAULT = "default"
     DESCRIPTION = "description"
+    FORMAT = "format"
     IN = "in"
     NAME = "name"
     NULLABLE = "nullable"
