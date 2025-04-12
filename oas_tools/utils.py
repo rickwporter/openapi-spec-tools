@@ -274,8 +274,9 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     """
     result = {}
     for path, path_data in paths.items():
-        path_params = path_data.pop(OasField.PARAMS, None)
-        for method, op_data in path_data.items():
+        local_path = deepcopy(path_data)
+        path_params = local_path.pop(OasField.PARAMS, None)
+        for method, op_data in local_path.items():
             op_id = op_data.get(OasField.OP_ID)
             op_data[OasField.X_PATH.value] = path
             op_data[OasField.X_PATH_PARAMS.value] = path_params

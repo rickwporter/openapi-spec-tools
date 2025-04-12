@@ -260,6 +260,10 @@ def test_map_operations() -> None:
         },
     ]
 
+    # make sure this was non-destructive
+    reread = open_test_oas("pet2.yaml")
+    delta = find_diffs(oas, reread)
+    assert not delta
 
 @pytest.mark.parametrize(
     ["filename", "search", "subpaths", "expected"],
