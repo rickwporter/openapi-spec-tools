@@ -225,7 +225,7 @@ def test_cli_gen_cli_generate_success():
         generate_cli(layout_file, oas_file, pkg_name, directory.name)
         assert f"Generated files in {directory.name}\n" == mock_stdout.getvalue()
 
-    # NOTE: just check some basics here -- more detailed checks below
+    # NOTE: just check some basics here -- more detailed checks elsewhere
     path = Path(directory.name)
     file = path / "main.py"
     assert file.exists()
@@ -236,6 +236,10 @@ def test_cli_gen_cli_generate_success():
     assert "from typing_extensions import Annotated" in text
     assert 'app = typer.Typer(no_args_is_help=True, help="Manage pets")' in text
     assert 'if __main__ == "__main__":'
+
+    filenames = set(i.name for i in path.iterdir())
+    expected = {"_arguments.py", "_display.py", "_logging.py", "_requests.py", "main.py"}
+    assert filenames == expected
 
 
 def test_cli_gen_cli_generate_failure():

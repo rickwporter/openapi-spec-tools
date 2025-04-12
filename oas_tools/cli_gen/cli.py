@@ -10,6 +10,7 @@ from rich.table import Table
 from typing_extensions import Annotated
 
 from oas_tools.cli_gen.generate import check_for_missing
+from oas_tools.cli_gen.generate import copy_infrastructure
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import DEFAULT_START
@@ -187,6 +188,9 @@ def generate_cli(
         raise typer.Exit(1)
 
     os.makedirs(directory, exist_ok=True)
+
+    # start by copying over the basic infrastructure
+    copy_infrastructure(directory, package_name)
 
     generator = Generator(package_name, oas)
     generate_node(generator, commands, directory)
