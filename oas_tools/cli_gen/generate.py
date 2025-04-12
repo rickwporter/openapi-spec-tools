@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+from oas_tools.cli_gen.generator import COPYRIGHT
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import to_snake_case
@@ -50,3 +51,16 @@ def check_for_missing(node: CommandNode, oas: dict[str, Any]) -> dict[str, list[
         missing.update(_check_missing(command, operations))
 
     return missing
+
+
+def copy_and_update(src_filename: str, dst_filename: str, package_name: str):
+    """Copies text from src to dst with replacements of current package name to the supplied value."""
+    module_name = __package__
+    with (
+        open(src_filename, "r") as src_fp,
+        open(dst_filename, "w") as dst_fp,
+    ):
+        # NOTE: ignore the shebangs for now... not used to copy over executable files
+        dst_fp.write(COPYRIGHT)
+        for line in src_fp.readlines():
+            dst_fp.write(line.replace(module_name, package_name))

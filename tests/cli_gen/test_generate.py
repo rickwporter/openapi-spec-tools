@@ -4,7 +4,9 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
+from oas_tools.cli_gen.generate import COPYRIGHT
 from oas_tools.cli_gen.generate import check_for_missing
+from oas_tools.cli_gen.generate import copy_and_update
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
@@ -171,3 +173,19 @@ def test_generate_check_missing(layout_asset: str, oas_asset: str, expected: dic
     tree = file_to_tree(asset_filename(layout_asset))
     oas = open_oas(asset_filename(oas_asset))
     assert expected == check_for_missing(tree, oas)
+
+
+def test_copy_and_update():
+    source = asset_filename("arg_test.py")
+
+    tempdir = TemporaryDirectory()
+    dst_path = Path(tempdir.name) / "my_destination.py"
+    package = "this.is_a.different.package"
+
+    copy_and_update(source, dst_path.as_posix(), package)
+
+    text = dst_path.read_text()
+    assert COPYRIGHT in text
+    assert package in text
+    assert "oas_tools.cli_gen" not in text
+
