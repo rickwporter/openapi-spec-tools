@@ -1,0 +1,120 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Test API definition
+  license:
+    name: MIT
+servers:
+  - url: http://petstore.swagger.io/v1
+paths:
+  /pets/{numFeet}/{species}/{neutered}/{birthday}:
+    parameters:
+      - name: numFeet
+        in: path
+        description: Number of feet
+        required: false
+        schema:
+          type: integer
+      - name: situation
+        in: query
+        description: Query param at path level, likely unused
+        required: true
+        schema:
+          type: string
+          default: anything goes
+    get:
+      summary: List all pets (optionally of specified species)
+      operationId: testPathParams
+      tags:
+        - pets
+      parameters:
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            format: int32
+        - name: species
+          in: path
+          description: Species name in Latin without spaces
+          schema:
+            type: string
+            default: monkey
+        - name: neutered
+          in: path
+          required: false
+          description: Ouch
+          schema:
+            type: boolean
+            default: true
+        - name: birthday
+          description: When is the party?
+          in: path
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: mustHave
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: yourBoat
+          in: path
+          description: Pi is always good
+          required: true
+          schema:
+            type: numeric
+            default: 3.14159
+
+      responses:
+        '200':
+          description: A paged array of pets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Pets"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        tag:
+          type: string
+    Pets:
+      type: array
+      maxItems: 100
+      items:
+        $ref: "#/components/schemas/Pet"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

@@ -5,6 +5,8 @@ import pytest
 
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
+from oas_tools.types import OasField
+from oas_tools.utils import map_operations
 from oas_tools.utils import open_oas
 from tests.helpers import asset_filename
 
@@ -89,6 +91,69 @@ def test_op_short_help(op, expected):
 def test_op_long_help(op, expected):
     uut = Generator("foo", {})
     assert expected == uut.op_long_help(op)
+
+
+@pytest.mark.parametrize(
+    ["schema", "fmt", "expected"],
+    [
+        pytest.param("boolean", None, "bool", id="boolean"),
+        pytest.param("integer", None, "int", id="integer"),
+        pytest.param("numeric", None, "float", id="numeric"),
+        pytest.param("string", None, "str", id="str"),
+        pytest.param("string", "date-time", "datetime", id="datetime"),
+    ]
+)
+def test_schema_to_type_success(schema, fmt, expected):
+    oas = open_oas(asset_filename("misc.yaml"))
+    uut = Generator("cli_package", oas)
+
+    assert expected == uut.schema_to_type(schema, fmt)
+
+
+@pytest.mark.parametrize(
+    ["schema", "fmt"],
+    [
+        pytest.param("bool", "binary", id="non-type"),
+        pytest.param("object", None, id="object"),  # TODO: handle object
+        pytest.param("array", None, id="array"), # TODO: handle list
+    ]
+)
+def test_schema_to_type_failure(schema, fmt):
+    oas = open_oas(asset_filename("misc.yaml"))
+    uut = Generator("cli_package", oas)
+
+    with pytest.raises(ValueError, match=f"Unable to determine type for {schema}"):
+        uut.schema_to_type(schema, fmt)
+
+
+def test_op_arguments():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+
+    text = uut.op_arguments(op)
+
+    # check standard arguments
+    assert "_api_host: _a.ApiHostOption" in text
+    assert "_api_key: _a.ApiKeyOption" in text
+    assert "_api_timeout: _a.ApiTimeoutOption" in text
+    assert "_log_level: _a.LogLevelOption" in text
+    assert "_out_fmt: _a.OutputFormatOption" in text
+    assert "_out_style: _a.OutputStyleOption" in text
+
+    assert 'num_feet: Annotated[Optional[int], typer.Option(show_default=False, help="Number of feet")] = None' in text
+    assert 'species: Annotated[str, typer.Option(help="Species name in Latin without spaces")] = "monkey"' in text
+    assert 'neutered: Annotated[bool, typer.Option(help="Ouch")] = True' in text
+    assert (
+        'birthday: Annotated[Optional[datetime], typer.Option(show_default=False, help="When is the party?")] = None'
+        in text
+    )
+    assert 'must_have: Annotated[str, typer.Argument(show_default=False, help="")]' in text
+    assert 'your_boat: Annotated[float, typer.Option(help="Pi is always good")] = 3.14159' in text
+
+    # make sure we ignore the query param at the path level
+    assert 'situation: Annotated' not in text
 
 
 def test_function_definition():
