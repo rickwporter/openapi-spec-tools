@@ -159,9 +159,19 @@ def test_op_query_arguments():
     lines = uut.op_query_arguments(op)
     text = "\n".join(lines)
 
-    assert 'situation: Annotated[str, typer.Option(help="Query param at path level, likely unused")] = "anything goes"' in text
-    assert 'limit: Annotated[Optional[int], typer.Option(show_default=False, help="How many items to return at one time (max 100)")] = None' in text
-    assert 'another_qparam: Annotated[Optional[str], typer.Option(show_default=False, help="Query parameter")] = None' in text
+    assert (
+        'situation: Annotated[str, typer.Option(help="Query param at path level, likely unused")] = "anything goes"'
+        in text
+    )
+    assert (
+        'limit: Annotated[Optional[int], typer.Option(min=1, max=100, '
+        'show_default=False, help="How many items to return at one time (max 100)")] = None'
+        in text
+    )
+    assert (
+        'another_qparam: Annotated[Optional[str], typer.Option(show_default=False, help="Query parameter")] = None'
+        in text
+    )
     assert 'more: Annotated[bool, typer.Option(help="")] = False' in text
 
     # make sure path params not include

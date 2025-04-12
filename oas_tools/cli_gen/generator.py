@@ -149,6 +149,13 @@ if __name__ == "__main__":
         arg_type = self.schema_to_type(schema_type, schema_format)
 
         typer_args = []
+        if arg_type in ("int", "float"):
+            schema_min = schema.get(OasField.MIN)
+            if schema_min is not None:
+                typer_args.append(f"min={schema_min}")
+            schema_max = schema.get(OasField.MAX)
+            if schema_max is not None:
+                typer_args.append(f"max={schema_max}")
         if allow_required and required and schema_default is None:
             typer_type = 'typer.Argument'
             typer_args.append('show_default=False')

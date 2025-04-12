@@ -8,6 +8,8 @@ class OasField(str, Enum):
     DESCRIPTION = "description"
     FORMAT = "format"
     IN = "in"
+    MAX = "maximum"
+    MIN = "minimum"
     NAME = "name"
     NULLABLE = "nullable"
     ONE_OF = "oneOf"
