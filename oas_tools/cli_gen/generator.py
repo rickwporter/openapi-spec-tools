@@ -21,6 +21,7 @@ class Generator:
         self.package_name = package_name
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.models = oas.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+        self.default_host = "http://acme.com"
 
     def shebang(self) -> str:
         """Returns the shebang line that goes at the top of each file."""
@@ -31,12 +32,13 @@ class Generator:
         return COPYRIGHT
 
     def standard_imports(self) -> str:
-        return """
+        return f"""
 from enum import Enum
 from typing_extensions import Annotated
 
 import typer
 
+from {self.package_name} import _arguments as _a
 """
 
     def subcommand_imports(self, subcommands: list[CommandNode]) -> str:
@@ -78,6 +80,27 @@ if __name__ == "__main__":
         # TODO: sanitize  NL's, long text, etc
         return text
 
+    def op_infra_arguments(self, operation: dict[str, Any]) -> list[str]:
+        # NOTE: other args may be appended later, so keeping as list
+        args = [
+            f'_api_host: _a.ApiHostOption = "{self.default_host}"',
+            '_api_key: _a.ApiKeyOption = None',
+            '_api_timeout: _a.ApiTimeoutOption = 5',
+            '_log_level: _a.LogLevelOption = _a.LogLevel.WARN',
+            '_out_fmt: _a.OutputFormatOption = _a.OutputFormat.TABLE',
+            '_out_style: _a.OutputStyleOption = _a.OutputStyle.ALL',
+        ]
+        return args
+
+    def op_arguments(self, operation: dict[str, Any]) -> str:
+        args = []
+        # TODO: path params
+        # TODO: query params
+        # TODO: body params
+        args.extend(self.op_infra_arguments(operation))
+
+        return f"{NL}    " + f",{NL}    ".join(args) + f",{NL}"
+
     def function_definition(self, node: CommandNode) -> str:
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
@@ -85,7 +108,7 @@ if __name__ == "__main__":
         return f"""
 
 @app.command("{node.command}", help="{self.op_short_help(op)}")
-def {to_snake_case(node.identifier)}() -> None:
+def {to_snake_case(node.identifier)}({self.op_arguments(op)}) -> None:
     '''
     {self.op_long_help(op)}
     '''

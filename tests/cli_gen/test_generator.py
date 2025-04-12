@@ -101,6 +101,14 @@ def test_function_definition():
     assert 'def create_pets(' in text
     assert '# handler for createPets: POST /pets' in text
 
+    # check standard arguments
+    assert "_api_host: _a.ApiHostOption" in text
+    assert "_api_key: _a.ApiKeyOption" in text
+    assert "_api_timeout: _a.ApiTimeoutOption" in text
+    assert "_log_level: _a.LogLevelOption" in text
+    assert "_out_fmt: _a.OutputFormatOption" in text
+    assert "_out_style: _a.OutputStyleOption" in text
+
 
 def test_main():
     uut = Generator("cli_package", {})
