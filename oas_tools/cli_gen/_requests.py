@@ -5,6 +5,7 @@ from typing import Any
 from typing import Optional
 
 import requests
+
 from oas_tools.cli_gen._logging import get_logger
 
 GET = "GET"

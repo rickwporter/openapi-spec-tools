@@ -3,15 +3,15 @@ from typing import Any
 from unittest import mock
 
 import pytest
+from requests import HTTPError
+from requests import Request
+from requests import Response
 
 from oas_tools.cli_gen._requests import _pretty_params
 from oas_tools.cli_gen._requests import create_url
 from oas_tools.cli_gen._requests import raise_for_error
 from oas_tools.cli_gen._requests import request
 from oas_tools.cli_gen._requests import request_headers
-from requests import HTTPError
-from requests import Request
-from requests import Response
 
 
 @pytest.mark.parametrize(
