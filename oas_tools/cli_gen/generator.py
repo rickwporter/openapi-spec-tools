@@ -37,6 +37,7 @@ class Generator:
     def standard_imports(self) -> str:
         return f"""
 from enum import Enum
+from typing import Optional
 from typing_extensions import Annotated
 
 import typer
@@ -134,7 +135,7 @@ if __name__ == "__main__":
             params.append(item)
         return params
 
-    def op_param_to_argument(self, param: dict[str, Any]) -> str:
+    def op_param_to_argument(self, param: dict[str, Any], allow_required: bool) -> str:
         """
         Converts a parameter into a typer argument.
         """
@@ -148,7 +149,7 @@ if __name__ == "__main__":
         arg_type = self.schema_to_type(schema_type, schema_format)
 
         typer_args = []
-        if required and schema_default is None:
+        if allow_required and required and schema_default is None:
             typer_type = 'typer.Argument'
             typer_args.append('show_default=False')
             arg_default = ""
@@ -175,7 +176,19 @@ if __name__ == "__main__":
         args = []
         path_params = self.op_params(operation, "path")
         for param in path_params:
-            arg = self.op_param_to_argument(param)
+            arg = self.op_param_to_argument(param, allow_required=True)
+            args.append(arg)
+
+        return args
+
+    def op_query_arguments(self, operation: dict[str, Any]) -> str:
+        """
+        Converts query parameters to typer arguments
+        """
+        args = []
+        path_params = self.op_params(operation, "query")
+        for param in path_params:
+            arg = self.op_param_to_argument(param, allow_required=False)
             args.append(arg)
 
         return args
@@ -183,7 +196,7 @@ if __name__ == "__main__":
     def op_arguments(self, operation: dict[str, Any]) -> str:
         args = []
         args.extend(self.op_path_arguments(operation))
-        # TODO: query params
+        args.extend(self.op_query_arguments(operation))
         # TODO: body params
         args.extend(self.op_infra_arguments(operation))
 

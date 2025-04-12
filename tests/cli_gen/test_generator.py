@@ -126,21 +126,14 @@ def test_schema_to_type_failure(schema, fmt):
         uut.schema_to_type(schema, fmt)
 
 
-def test_op_arguments():
+def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
 
-    text = uut.op_arguments(op)
-
-    # check standard arguments
-    assert "_api_host: _a.ApiHostOption" in text
-    assert "_api_key: _a.ApiKeyOption" in text
-    assert "_api_timeout: _a.ApiTimeoutOption" in text
-    assert "_log_level: _a.LogLevelOption" in text
-    assert "_out_fmt: _a.OutputFormatOption" in text
-    assert "_out_style: _a.OutputStyleOption" in text
+    lines = uut.op_path_arguments(op)
+    text = "\n".join(lines)
 
     assert 'num_feet: Annotated[Optional[int], typer.Option(show_default=False, help="Number of feet")] = None' in text
     assert 'species: Annotated[str, typer.Option(help="Species name in Latin without spaces")] = "monkey"' in text
@@ -152,8 +145,66 @@ def test_op_arguments():
     assert 'must_have: Annotated[str, typer.Argument(show_default=False, help="")]' in text
     assert 'your_boat: Annotated[float, typer.Option(help="Pi is always good")] = 3.14159' in text
 
-    # make sure we ignore the query param at the path level
+    # make sure we ignore the query params
     assert 'situation: Annotated' not in text
+    assert 'more: Annotated' not in text
+
+
+def test_op_query_arguments():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+
+    lines = uut.op_query_arguments(op)
+    text = "\n".join(lines)
+
+    assert 'situation: Annotated[str, typer.Option(help="Query param at path level, likely unused")] = "anything goes"' in text
+    assert 'limit: Annotated[Optional[int], typer.Option(show_default=False, help="How many items to return at one time (max 100)")] = None' in text
+    assert 'another_qparam: Annotated[Optional[str], typer.Option(show_default=False, help="Query parameter")] = None' in text
+    assert 'more: Annotated[bool, typer.Option(help="")] = False' in text
+
+    # make sure path params not include
+    assert 'num_feet: Annotated' not in text
+    assert 'must_have: Annotated' not in text
+
+
+def test_op_infra_arguments():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+
+    lines = uut.op_infra_arguments(op)
+    text = "\n".join(lines)
+
+    # check standard arguments
+    assert "_api_host: _a.ApiHostOption" in text
+    assert "_api_key: _a.ApiKeyOption" in text
+    assert "_api_timeout: _a.ApiTimeoutOption" in text
+    assert "_log_level: _a.LogLevelOption" in text
+    assert "_out_fmt: _a.OutputFormatOption" in text
+    assert "_out_style: _a.OutputStyleOption" in text
+
+
+def test_op_arguments():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+
+    text = uut.op_arguments(op)
+    # check a couple infra arguments
+    assert "_api_host: _a.ApiHostOption" in text
+    assert "_api_key: _a.ApiKeyOption" in text
+
+    # check a couple path parameter arguments
+    assert 'num_feet: Annotated' in text
+    assert 'your_boat: Annotated' in text
+
+    # check a couple query parameter arguments
+    assert 'situation: Annotated' in text
+    assert 'more: Annotated' in text
 
 
 def test_function_definition():

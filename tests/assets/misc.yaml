@@ -68,7 +68,18 @@ paths:
           schema:
             type: numeric
             default: 3.14159
-
+        - name: anotherQparam
+          description: Query parameter
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: more
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         '200':
           description: A paged array of pets
