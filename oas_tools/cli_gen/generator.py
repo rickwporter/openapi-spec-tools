@@ -24,7 +24,10 @@ class Generator:
         self.package_name = package_name
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.models = oas.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
-        self.default_host = "http://acme.com"
+        self.default_host = ""
+        servers = oas.get(OasField.SERVERS)
+        if servers:
+            self.default_host = servers[0].get(OasField.URL, "")
 
     def shebang(self) -> str:
         """Returns the shebang line that goes at the top of each file."""

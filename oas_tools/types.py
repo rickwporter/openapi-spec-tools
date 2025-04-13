@@ -22,9 +22,11 @@ class OasField(str, Enum):
     RESPONSES = "responses"
     SCHEMA = "schema"
     SCHEMAS = "schemas"
+    SERVERS = "servers"
     SUMMARY = "summary"
     TAGS = "tags"
     TYPE = "type"
+    URL = "url"
 
     X_METHOD = "x-method"
     X_PATH = "x-path"

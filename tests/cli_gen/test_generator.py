@@ -230,6 +230,8 @@ def test_op_infra_arguments():
     assert "_out_fmt: _a.OutputFormatOption" in text
     assert "_out_style: _a.OutputStyleOption" in text
 
+    # check that we got the correct default server
+    assert '= "http://petstore.swagger.io/v1"' in text
 
 def test_op_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
