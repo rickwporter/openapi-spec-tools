@@ -43,6 +43,10 @@ from typing_extensions import Annotated
 import typer
 
 from {self.package_name} import _arguments as _a
+from {self.package_name} import _display as _d
+from {self.package_name} import _exceptions as _e
+from {self.package_name} import _logging as _l
+from {self.package_name} import _requests as _r
 """
 
     def subcommand_imports(self, subcommands: list[CommandNode]) -> str:
@@ -209,9 +213,47 @@ if __name__ == "__main__":
 
         return f"{NL}    " + f",{NL}    ".join(args) + f",{NL}"
 
+    def op_url_params(self, path: str) -> str:
+        """Parse the X-PATH to list the parameters that go into the URL formation."""
+        parts = path.split("/")
+        items = []
+        last = None
+        for p in parts:
+            if "{" in p:
+                if last:
+                    items.append(f'"{last}"')
+                items.append(to_snake_case(p.replace("{", "").replace("}", "")))
+                last = None
+            elif not last:
+                last = p
+            else:
+                last += "/" + p
+        if last:
+            items.append(f'"{last}"')
+
+        return f"_api_host, {', '.join(items)}"
+
+    def op_param_formation(self, operation: dict[str, Any]) -> str:
+        """Create the query parameters that go into the request"""
+        total_params = self.op_params(operation, "query")
+        result = "{}"
+        for param in total_params:
+            name = param.get(OasField.NAME)
+            if param.get(OasField.REQUIRED, False):
+                result += f"""
+    params["{name}"] = {to_snake_case(name)}\
+"""
+            else:
+                result += f"""
+    if {to_snake_case(name)} is not None:
+        params["{name}"] = {to_snake_case(name)}\
+"""
+        return result
+
     def function_definition(self, node: CommandNode) -> str:
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
+        path = op.get(OasField.X_PATH)
 
         return f"""
 
@@ -220,6 +262,17 @@ def {to_snake_case(node.identifier)}({self.op_arguments(op)}) -> None:
     '''
     {self.op_long_help(op)}
     '''
-    # handler for {node.identifier}: {method} {op.get(OasField.X_PATH)}
+    # handler for {node.identifier}: {method} {path}
+    _l.init_logging(_log_level)
+    headers = _r.request_headers(_api_key)
+    url = _r.create_url({self.op_url_params(path)})
+    params = {self.op_param_formation(op)}
+
+    try:
+        data = _r.request("{method}", url, headers=headers, params=params, timemout=_api_timeout)
+        _d.display(data, _out_fmt, _out_style)
+    except Exception as ex:
+        _e.handle_exceptions(ex)
+
     return
 """

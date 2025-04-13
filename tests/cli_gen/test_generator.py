@@ -94,6 +94,40 @@ def test_op_long_help(op, expected):
 
 
 @pytest.mark.parametrize(
+    ["path", "expected"],
+    [
+        pytest.param('foo', '_api_host, "foo"', id="foo"),
+        pytest.param('foo/bar', '_api_host, "foo/bar"', id="foo/bar"),
+        pytest.param('foo/{bar}', '_api_host, "foo", bar', id="foo/{bar}"),
+        pytest.param('sna/foo/bar', '_api_host, "sna/foo/bar"', id="sna/foo/bar"),
+        pytest.param('sna/{foo}/bar', '_api_host, "sna", foo, "bar"', id="sna/{foo}/bar"),
+    ]
+)
+def test_op_url_params(path, expected):
+    uut = Generator("cli_package", {})
+    assert expected == uut.op_url_params(path)
+
+
+def test_op_param_formation():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+
+    expected = """\
+{}
+    params["situation"] = situation
+    if limit is not None:
+        params["limit"] = limit
+    params["anotherQparam"] = another_qparam
+    if more is not None:
+        params["more"] = more\
+"""
+    text = uut.op_param_formation(op)
+    assert expected == text
+
+
+@pytest.mark.parametrize(
     ["schema", "fmt", "expected"],
     [
         pytest.param("boolean", None, "bool", id="boolean"),
@@ -234,6 +268,15 @@ def test_function_definition():
     assert "_log_level: _a.LogLevelOption" in text
     assert "_out_fmt: _a.OutputFormatOption" in text
     assert "_out_style: _a.OutputStyleOption" in text
+
+    # check the body of the function
+    assert "_l.init_logging(_log_level)" in text
+    assert "headers = _r.request_headers(_api_key)" in text
+    assert 'url = _r.create_url(_api_host, "pets")' in text
+    assert 'params = {}' in text
+    assert 'data = _r.request("POST", url, headers=headers, params=params, timemout=_api_timeout)' in text
+    assert '_d.display(data, _out_fmt, _out_style)' in text
+    assert '_e.handle_exceptions(ex)' in text
 
 
 def test_main():
