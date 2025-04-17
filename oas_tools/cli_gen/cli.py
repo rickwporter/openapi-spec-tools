@@ -37,17 +37,11 @@ layout = typer.Typer(
     no_args_is_help=True,
     help="Various utilities for inspecting, analyzing and modifying CLI layout file.",
 )
-generate = typer.Typer(
-    name="generate",
-    no_args_is_help=True,
-    help="Various utilities for working with OpenAPI specs with the CLI layout file.",
-)
 app = typer.Typer(
     no_args_is_help=True,
     help="Various operations for CLI generation."
 )
 app.add_typer(layout)
-app.add_typer(generate)
 
 
 
@@ -171,7 +165,7 @@ def render_missing(missing: dict[str, list[str]]) -> str:
     )
 
 
-@generate.command("generate", help="Generate CLI code")
+@app.command("generate", help="Generate CLI code")
 def generate_cli(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
@@ -198,7 +192,7 @@ def generate_cli(
     typer.echo(f"Generated files in {directory}")
 
 
-@generate.command("check", help="Check OAS contains layout operations")
+@app.command("check", help="Check OAS contains layout operations")
 def generate_check_missing(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
