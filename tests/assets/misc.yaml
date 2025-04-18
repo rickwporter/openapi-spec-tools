@@ -105,6 +105,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    delete:
+      summary: List all pets (optionally of specified species)
+      operationId: deleteSomething
+      tags:
+        - pets
+      responses:
+        '204':
+          description: A paged array of pets
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Pet:

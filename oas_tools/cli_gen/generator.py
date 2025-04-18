@@ -101,8 +101,16 @@ if __name__ == "__main__":
         """Get the `content` (if any) from the `requestBody`."""
         return operation.get(OasField.REQ_BODY, {}).get(OasField.CONTENT, {})
 
+    def op_get_content_type(self, operation: dict[str, Any]) -> Optional[str]:
+        """Get the first content-type matching a supported type."""
+        content = self.op_request_content(operation)
+        for ct in self.supported:
+            if ct.value in content:
+                return ct.value
+        return None
+
     def op_get_body(self, operation: dict[str, Any]) -> Optional[dict[str, Any]]:
-        """Get the first body matchign a supported type."""
+        """Get the first body matching a supported type."""
         content = self.op_request_content(operation)
         for ct in self.supported:
             body = content.get(ct.value)
@@ -313,6 +321,40 @@ if __name__ == "__main__":
 """
         return result
 
+    def op_content_header(self, operation: dict[str, Any]) -> str:
+        content_type = self.op_get_content_type(operation)
+        if not content_type:
+            return ""
+        return f', content_type="{content_type}"'
+
+    def op_body_formation(self, operation: dict[str, Any]) -> str:
+        body = self.op_get_body(operation)
+        if not body:
+            return ""
+
+        # current, just support
+        schema = body.get(OasField.SCHEMA, {})
+        ref = schema.get(OasField.REFS)
+        if ref:
+            schema = self.get_reference_model(ref)
+        req_props = schema.get(OasField.REQUIRED, [])
+
+        lines = ["body = {}"]
+        for prop_name, prop_data in schema.get(OasField.PROPS, {}).items():
+            # do not let user set read-only properties
+            if prop_data.get(OasField.READ_ONLY, False):
+                continue
+
+            var_name = to_snake_case(prop_name)
+            if prop_name in req_props:
+                lines.append(f'body["{prop_name}"] = {var_name}')
+            else:
+                lines.append(f'if {var_name} is not None:')
+                lines.append(f'    body["{prop_name}"] = {var_name}')
+
+        sep = "\n    "
+        return sep + sep.join(lines)
+
     def function_definition(self, node: CommandNode) -> str:
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
@@ -327,9 +369,9 @@ def {to_snake_case(node.identifier)}({self.op_arguments(op)}) -> None:
     '''
     # handler for {node.identifier}: {method} {path}
     _l.init_logging(_log_level)
-    headers = _r.request_headers(_api_key)
+    headers = _r.request_headers(_api_key{self.op_content_header(op)})
     url = _r.create_url({self.op_url_params(path)})
-    params = {self.op_param_formation(op)}
+    params = {self.op_param_formation(op)}{self.op_body_formation(op)}
 
     try:
         data = _r.request("{method}", url, headers=headers, params=params, timemout=_api_timeout)

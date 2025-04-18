@@ -160,6 +160,34 @@ def test_schema_to_type_failure(schema, fmt):
         uut.schema_to_type(schema, fmt)
 
 
+@pytest.mark.parametrize(
+    ["op_id", "expected"],
+    [
+        pytest.param("deleteSomething", '', id="None"),
+        pytest.param("testPathParams", ', content_type="application/json"', id="JSON"),
+    ],
+)
+def test_op_content_type(op_id, expected):
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get(op_id)
+    uut = Generator("cli_package", oas)
+
+    assert expected == uut.op_content_header(op)
+
+
+def test_op_body_formation():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+    text = uut.op_body_formation(op)
+    assert "body = {}" in text
+    assert 'body["id"]' not in text  # ignore read-only
+    assert 'body["name"] = name' in text  # required
+    assert 'if another_value is not None:' in text  # not required, so check if not None
+    assert 'body["anotherValue"] = another_value'  # check prop vs variable name
+
 def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
@@ -298,7 +326,7 @@ def test_function_definition():
 
     # check the body of the function
     assert "_l.init_logging(_log_level)" in text
-    assert "headers = _r.request_headers(_api_key)" in text
+    assert 'headers = _r.request_headers(_api_key, content_type="application/json")' in text
     assert 'url = _r.create_url(_api_host, "pets")' in text
     assert 'params = {}' in text
     assert 'data = _r.request("POST", url, headers=headers, params=params, timemout=_api_timeout)' in text
