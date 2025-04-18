@@ -208,9 +208,29 @@ def test_op_query_arguments():
     )
     assert 'more: Annotated[bool, typer.Option(help="")] = False' in text
 
-    # make sure path params not include
+    # make sure path params not included
     assert 'num_feet: Annotated' not in text
     assert 'must_have: Annotated' not in text
+
+
+def test_op_body_arguments():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+
+    lines = uut.op_body_arguments(op)
+    text = "\n".join(lines)
+    assert 'name: Annotated[str, typer.Option(show_default=False, help="Pet name")] = None' in text
+    assert 'tag: Annotated[Optional[str], typer.Option(show_default=False, help="Pet classification")] = None' in text
+    assert (
+        'another_value: Annotated[Optional[str], typer.Option(show_default=False, '
+        'help="A string with a default")] = "Anything goes"'
+        in text
+    )
+
+    # make sure read-only not included
+    assert 'id: Annotated' not in text
 
 
 def test_op_infra_arguments():
@@ -233,6 +253,7 @@ def test_op_infra_arguments():
     # check that we got the correct default server
     assert '= "http://petstore.swagger.io/v1"' in text
 
+
 def test_op_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
@@ -251,6 +272,10 @@ def test_op_arguments():
     # check a couple query parameter arguments
     assert 'situation: Annotated' in text
     assert 'more: Annotated' in text
+
+    # check a couple body params
+    assert 'name: Annotated[str,' in text
+    assert 'tag: Annotated[Optional[str]' in text
 
 
 def test_function_definition():

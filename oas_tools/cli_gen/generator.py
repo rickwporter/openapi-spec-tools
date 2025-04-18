@@ -3,7 +3,9 @@ from typing import Any
 from typing import Optional
 
 from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.utils import maybe_quoted
 from oas_tools.cli_gen.utils import to_snake_case
+from oas_tools.types import ContentType
 from oas_tools.types import OasField
 from oas_tools.utils import map_operations
 
@@ -28,6 +30,10 @@ class Generator:
         servers = oas.get(OasField.SERVERS)
         if servers:
             self.default_host = servers[0].get(OasField.URL, "")
+        # ordered list of supported types
+        self.supported = [
+            ContentType.APP_JSON,
+        ]
 
     def shebang(self) -> str:
         """Returns the shebang line that goes at the top of each file."""
@@ -90,6 +96,25 @@ if __name__ == "__main__":
         text = operation.get(OasField.DESCRIPTION) or operation.get(OasField.SUMMARY) or ""
         # TODO: sanitize  NL's, long text, etc
         return text
+
+    def op_request_content(self, operation: dict[str, Any]) -> dict[str, Any]:
+        """Get the `content` (if any) from the `requestBody`."""
+        return operation.get(OasField.REQ_BODY, {}).get(OasField.CONTENT, {})
+
+    def op_get_body(self, operation: dict[str, Any]) -> Optional[dict[str, Any]]:
+        """Get the first body matchign a supported type."""
+        content = self.op_request_content(operation)
+        for ct in self.supported:
+            body = content.get(ct.value)
+            if body:
+                return body
+
+        return None
+
+    def get_reference_model(self, full_name: str) -> dict[str, Any]:
+        """Returns the reference"""
+        short_name = full_name.split('/')[-1]
+        return self.models.get(short_name)
 
     def op_infra_arguments(self, operation: dict[str, Any]) -> list[str]:
         # NOTE: other args may be appended later, so keeping as list
@@ -195,7 +220,7 @@ if __name__ == "__main__":
 
         return args
 
-    def op_query_arguments(self, operation: dict[str, Any]) -> str:
+    def op_query_arguments(self, operation: dict[str, Any]) -> list[str]:
         """
         Converts query parameters to typer arguments
         """
@@ -207,11 +232,46 @@ if __name__ == "__main__":
 
         return args
 
+    def op_body_arguments(self, operation: dict[str, Any]) -> list[str]:
+        args = []
+        body = self.op_get_body(operation)
+        if not body:
+            return args
+
+        # current, just support
+        schema = body.get(OasField.SCHEMA, {})
+        ref = schema.get(OasField.REFS)
+        if ref:
+            schema = self.get_reference_model(ref)
+        req_props = schema.get(OasField.REQUIRED, [])
+
+        for prop_name, prop_data in schema.get(OasField.PROPS, {}).items():
+            # do not let user set read-only properties
+            if prop_data.get(OasField.READ_ONLY, False):
+                continue
+
+            py_type = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+            if prop_name not in req_props:
+                py_type = f"Optional[{py_type}]"
+
+            def_val = maybe_quoted(prop_data.get(OasField.DEFAULT))
+            t_args = {}
+            if def_val is not None:
+                t_args["show_default"] = False
+            help = prop_data.get(OasField.DESCRIPTION)
+            if help:
+                t_args['help'] = f'"{help}"'
+            t_decl = f"typer.Option({', '.join([f'{k}={v}' for k, v in t_args.items()])})"
+            arg = f"{to_snake_case(prop_name)}: Annotated[{py_type}, {t_decl}] = {def_val}"
+            args.append(arg)
+
+        return args
+
     def op_arguments(self, operation: dict[str, Any]) -> str:
         args = []
         args.extend(self.op_path_arguments(operation))
         args.extend(self.op_query_arguments(operation))
-        # TODO: body params
+        args.extend(self.op_body_arguments(operation))
         args.extend(self.op_infra_arguments(operation))
 
         return f"{NL}    " + f",{NL}    ".join(args) + f",{NL}"

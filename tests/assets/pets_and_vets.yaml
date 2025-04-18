@@ -366,3 +366,10 @@ components:
           format: int32
         message:
           type: string
+    Vet:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string

@@ -81,6 +81,12 @@ paths:
           schema:
             type: boolean
             default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+        required: true
       responses:
         '200':
           description: A paged array of pets
@@ -110,10 +116,17 @@ components:
         id:
           type: integer
           format: int64
+          readOnly: true
         name:
+          description: Pet name
           type: string
         tag:
+          description: Pet classification
           type: string
+        anotherValue:
+          description: A string with a default
+          type: string
+          default: Anything goes
     Pets:
       type: array
       maxItems: 100

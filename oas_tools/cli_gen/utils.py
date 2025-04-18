@@ -1,4 +1,5 @@
 import re
+from typing import Any
 
 
 def to_snake_case(text: str) -> str:
@@ -9,3 +10,10 @@ def to_snake_case(text: str) -> str:
 
 def to_camel_case(text: str) -> str:
     return re.sub(r'_([a-z])', lambda match: match.group(1).upper(), text)
+
+
+def maybe_quoted(item: Any) -> str:
+    if isinstance(item, str):
+        return f'"{item}"'
+
+    return str(item)
