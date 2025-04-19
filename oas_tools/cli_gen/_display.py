@@ -273,6 +273,18 @@ class OutputStyle(str, Enum):
     ALL = "all"
 
 
+def summary(obj: Any, properties: list[str]) -> Any:
+    """Gets the item with just the specified properties."""
+    if obj is None:
+        return None
+
+    if isinstance(obj, list):
+        # recursively call for each object in list
+        return [summary(item, properties) for item in obj]
+
+    return {prop: obj.get(prop) for prop in properties}
+
+
 def display(obj: Any, fmt: OutputFormat, style: OutputStyle, indent: int = 2) -> None:
     """
     This function handles display of the data provided in obj, according to the formating arguments.

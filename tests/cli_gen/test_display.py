@@ -14,6 +14,7 @@ from oas_tools.cli_gen._display import RichTable
 from oas_tools.cli_gen._display import TableConfig
 from oas_tools.cli_gen._display import display
 from oas_tools.cli_gen._display import rich_table_factory
+from oas_tools.cli_gen._display import summary
 from tests.helpers import to_ascii
 
 SIMPLE_DICT = {
@@ -467,3 +468,23 @@ def test_display(data, fmt, expected):
         display(data, fmt, OutputStyle.NONE)
         output = mock_stdout.getvalue()
         assert to_ascii(expected) == to_ascii(output)
+
+
+@pytest.mark.parametrize(
+    ["data", "properties", "expected"],
+    [
+        pytest.param(None, ["foo"], None, id="None"),
+        pytest.param({"foo": "bar"}, ["foo"], {"foo": "bar"}, id="all-exist"),
+        pytest.param({"north": 1, "south": 2, "east": 3}, ["south"], {"south": 2}, id="filtered"),
+        pytest.param({"north": 1, "south": 2, "east": 3}, ["west"], {"west": None}, id="missing"),
+        pytest.param({"north": 1, "south": 2, "east": 3}, ["south", "north"], {"south": 2, "north": 1}, id="multiple"),
+        pytest.param(
+            [{"north": 1, "south": 2}, {"west": 1, "north": 3}, {"east": 1}],
+            ["north"],
+            [{"north": 1}, {"north": 3}, {"north": None}],
+            id="list",
+        ),
+    ]
+)
+def test_summary(data, properties, expected):
+    assert expected == summary(data, properties)
