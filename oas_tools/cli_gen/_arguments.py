@@ -38,6 +38,14 @@ ApiTimeoutOption = Annotated[
         help="API request timeout in seconds for a single request",
     ),
 ]
+DetailsOption = Annotated[
+    bool,
+    typer.Option(
+        "--details/--summary",
+        "-v",
+        help="Display the full details or a summary."
+    ),
+]
 LogLevelOption = Annotated[
     LogLevel,
     typer.Option(

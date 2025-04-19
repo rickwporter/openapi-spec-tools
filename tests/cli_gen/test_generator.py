@@ -5,6 +5,7 @@ import pytest
 
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
+from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.types import OasField
 from oas_tools.utils import map_operations
 from oas_tools.utils import open_oas
@@ -261,13 +262,20 @@ def test_op_body_arguments():
     assert 'id: Annotated' not in text
 
 
-def test_op_infra_arguments():
+@pytest.mark.parametrize(
+    ["command", "has_details"],
+    [
+        pytest.param(CommandNode("foo", "foo"), False, id="no-summary"),
+        pytest.param(CommandNode("foo", "foo", summary_fields=["abc"]), True, id="summary"),
+    ],
+)
+def test_op_infra_arguments(command, has_details):
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
 
-    lines = uut.op_infra_arguments(op)
+    lines = uut.op_infra_arguments(op, command)
     text = "\n".join(lines)
 
     # check standard arguments
@@ -277,21 +285,28 @@ def test_op_infra_arguments():
     assert "_log_level: _a.LogLevelOption" in text
     assert "_out_fmt: _a.OutputFormatOption" in text
     assert "_out_style: _a.OutputStyleOption" in text
+    details_option = '_details: _a.DetailsOption'
+    if has_details:
+        assert details_option in text
+    else:
+        assert details_option not in text
 
     # check that we got the correct default server
     assert '= "http://petstore.swagger.io/v1"' in text
 
 
 def test_op_arguments():
+    command = CommandNode(command="foo", identifier="bar", summary_fields=["123"])
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
 
-    text = uut.op_arguments(op)
+    text = uut.op_arguments(op, command)
     # check a couple infra arguments
     assert "_api_host: _a.ApiHostOption" in text
     assert "_api_key: _a.ApiKeyOption" in text
+    assert "_details: _a.DetailsOption" in text
 
     # check a couple path parameter arguments
     assert 'num_feet: Annotated' in text

@@ -146,8 +146,7 @@ if __name__ == "__main__":
         short_name = full_name.split('/')[-1]
         return self.models.get(short_name)
 
-    def op_infra_arguments(self, operation: dict[str, Any]) -> list[str]:
-        # NOTE: other args may be appended later, so keeping as list
+    def op_infra_arguments(self, operation: dict[str, Any], command: CommandNode) -> list[str]:
         args = [
             f'_api_host: _a.ApiHostOption = "{self.default_host}"',
             '_api_key: _a.ApiKeyOption = None',
@@ -156,6 +155,8 @@ if __name__ == "__main__":
             '_out_fmt: _a.OutputFormatOption = _a.OutputFormat.TABLE',
             '_out_style: _a.OutputStyleOption = _a.OutputStyle.ALL',
         ]
+        if command.summary_fields:
+            args.append('_details: _a.DetailsOption = False')
         return args
 
     def schema_to_type(self, schema: str, fmt: Optional[str]) -> str:
@@ -286,12 +287,12 @@ if __name__ == "__main__":
 
         return args
 
-    def op_arguments(self, operation: dict[str, Any]) -> str:
+    def op_arguments(self, operation: dict[str, Any], command: CommandNode) -> str:
         args = []
         args.extend(self.op_path_arguments(operation))
         args.extend(self.op_query_arguments(operation))
         args.extend(self.op_body_arguments(operation))
-        args.extend(self.op_infra_arguments(operation))
+        args.extend(self.op_infra_arguments(operation, command))
 
         return f"{NL}    " + f",{NL}    ".join(args) + f",{NL}"
 
@@ -397,7 +398,7 @@ if __name__ == "__main__":
         return f"""
 
 @app.command("{node.command}", help="{self.op_short_help(op)}")
-def {to_snake_case(node.identifier)}({self.op_arguments(op)}) -> None:
+def {to_snake_case(node.identifier)}({self.op_arguments(op, node)}) -> None:
     '''
     {self.op_long_help(op)}
     '''

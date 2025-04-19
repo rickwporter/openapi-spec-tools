@@ -13,6 +13,7 @@ def get_pet(
     _log_level: _a.LogLevelOption = _a.LogLevel.INFO,
     _out_fmt: _a.OutputFormatOption = _a.OutputFormat.TABLE,
     _out_style: _a.OutputStyle = _a.OutputStyle.ALL,
+    _details: _a.DetailsOption = False,
 ):
     """
     This is to show that oas_tools.cli_gen is obliterated.
@@ -24,6 +25,7 @@ _api_timeout={_api_timeout}
 _log_level={_log_level}
 _out_fmt={_out_fmt}
 _out_style={_out_style}
+_details={_details}
 """)
 
 
