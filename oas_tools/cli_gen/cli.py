@@ -183,7 +183,12 @@ def generate_cli(
 
     os.makedirs(directory, exist_ok=True)
 
-    # start by copying over the basic infrastructure
+    # create the init file
+    init_file = os.path.join(directory, '__init__.py')
+    with open(init_file, "w"):
+        pass
+
+    # copy over the basic infrastructure
     copy_infrastructure(directory, package_name)
 
     generator = Generator(package_name, oas)

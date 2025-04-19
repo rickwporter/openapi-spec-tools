@@ -213,7 +213,7 @@ def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> 
         output = mock_stdout.getvalue()
         assert to_ascii(output) == to_ascii(expected)
 
-def test_cli_gen_cli_generate_success():
+def test_cli_generate_success():
     layout_file = asset_filename("layout_pets.yaml")
     oas_file = asset_filename("pet2.yaml")
     pkg_name = "my_cli_pkg"
@@ -238,11 +238,19 @@ def test_cli_gen_cli_generate_success():
     assert 'if __main__ == "__main__":'
 
     filenames = set(i.name for i in path.iterdir())
-    expected = {"_arguments.py", "_display.py", "_exceptions.py", "_logging.py", "_requests.py", "main.py"}
+    expected = {
+        "__init__.py",
+        "_arguments.py",
+        "_display.py",
+        "_exceptions.py",
+        "_logging.py",
+        "_requests.py",
+        "main.py",
+    }
     assert filenames == expected
 
 
-def test_cli_gen_cli_generate_failure():
+def test_cli_generate_failure():
     layout_file = asset_filename("layout_pets2.yaml")
     oas_file = asset_filename("pet.yaml")
     pkg_name = "my_cli_pkg"
@@ -264,7 +272,7 @@ Commands with missing operations:
         assert message == mock_stdout.getvalue()
 
 
-def test_cli_gen_cli_check_failure():
+def test_cli_check_failure():
     layout_file = asset_filename("layout_pets2.yaml")
     oas_file = asset_filename("pet.yaml")
     message = """\
@@ -284,7 +292,7 @@ Commands with missing operations:
         assert message == mock_stdout.getvalue()
 
 
-def test_cli_gen_cli_check_success():
+def test_cli_check_success():
     layout_file = asset_filename("layout_pets.yaml")
     oas_file = asset_filename("pet2.yaml")
 
