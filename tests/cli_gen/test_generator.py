@@ -306,6 +306,29 @@ def test_op_arguments():
     assert 'tag: Annotated[Optional[str]' in text
 
 
+def test_op_check_missing():
+    oas = open_oas(asset_filename("misc.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("testPathParams")
+    uut = Generator("cli_package", oas)
+
+    text = uut.op_check_missing(op)
+
+    # infra
+    assert 'if _api_key is None:' in text
+    assert 'missing.append("--api-key")' in text
+
+    # query parameters
+    assert 'if another_qparam is None:' in text
+    assert 'missing.append("--another-qparam")' in text
+    assert 'if more is None' not in text  # only required
+
+    # body params
+    assert 'missing.append("--name")' in text
+    assert 'missing.append("--id")' not in text  # not read-only
+    assert 'missing.append("--tag")' not in text  # only required
+
+
 def test_function_definition():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
@@ -332,6 +355,11 @@ def test_function_definition():
     assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timemout=_api_timeout)' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
+
+    # make sure the missing parameter checks are present
+    assert 'missing.append("--api-key")'
+    assert 'missing.append("--name")'
+    assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
 
 
 def test_main():

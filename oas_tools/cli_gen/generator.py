@@ -11,6 +11,7 @@ from oas_tools.types import OasField
 from oas_tools.utils import map_operations
 
 NL = "\n"
+SEP1 = "\n    "
 SHEBANG = """\
 #!/usr/bin/env python3
 """
@@ -353,8 +354,31 @@ if __name__ == "__main__":
                 lines.append(f'if {var_name} is not None:')
                 lines.append(f'    body["{prop_name}"] = {var_name}')
 
-        sep = "\n    "
-        return sep + sep.join(lines)
+        return SEP1 + SEP1.join(lines)
+
+    def op_check_missing(self, operation: dict[str, Any]) -> str:
+        """Checks for missing required parameters"""
+        lines = ["[]"]
+        lines.append("if _api_key is None:")
+        lines.append('    missing.append("--api-key")')
+
+        path_params = self.op_params(operation, "query")
+        for param in path_params:
+            if param.get(OasField.REQUIRED, False):
+                var_name = to_snake_case(param.get(OasField.NAME))
+                option = '--' + var_name.replace('_', '-')
+                lines.append(f'if {var_name} is None:')
+                lines.append(f'    missing.append("{option}")')
+
+        properties = self.op_get_settable_body_properties(operation)
+        for prop_name, prop_data in properties.items():
+            if prop_data.get(OasField.REQUIRED):
+                var_name = to_snake_case(prop_name)
+                option = '--' + var_name.replace('_', '-')
+                lines.append(f'if {var_name} is None:')
+                lines.append(f'    missing.append("{option}")')
+
+        return SEP1.join(lines)
 
     def function_definition(self, node: CommandNode) -> str:
         op = self.operations.get(node.identifier)
@@ -381,6 +405,10 @@ def {to_snake_case(node.identifier)}({self.op_arguments(op)}) -> None:
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key{self.op_content_header(op)})
     url = _r.create_url({self.op_url_params(path)})
+    missing = {self.op_check_missing(op)}
+    if missing:
+        _e.handle_exceptions(_e.MissingRequiredError(missing))
+
     params = {self.op_param_formation(op)}{self.op_body_formation(op)}
 
     try:
