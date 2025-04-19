@@ -1,7 +1,7 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Any
 from typing import Optional
-from typing import Tuple
 
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import maybe_quoted
@@ -120,24 +120,25 @@ if __name__ == "__main__":
 
         return None
 
-    def op_get_body_reqs_and_props(self, operation: dict[str, Any]) -> Tuple[list[str], list[dict[str, Any]]]:
-        """Get a list of required properties, and property data dictionary"""
+    def op_get_settable_body_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
+        """Get a dictionary of settable body propertiess"""
         body = self.op_get_body(operation)
         if not body:
-            return ([], {})
+            return {}
 
         schema = body.get(OasField.SCHEMA, {})
         ref = schema.get(OasField.REFS)
         if ref:
             schema = self.get_reference_model(ref)
         required = schema.get(OasField.REQUIRED, [])
-        properties = {
-            name: data
-            for name, data in schema.get(OasField.PROPS, {}).items()
-            if not data.get(OasField.READ_ONLY, False)
-        }
+        properties = {}
+        for name, data in schema.get(OasField.PROPS, {}).items():
+            if not data.get(OasField.READ_ONLY, False):
+                updated = deepcopy(data)
+                updated[OasField.REQUIRED] = name in required
+                properties[name] = updated
 
-        return (required, properties)
+        return properties
 
     def get_reference_model(self, full_name: str) -> dict[str, Any]:
         """Returns the reference"""
@@ -262,13 +263,13 @@ if __name__ == "__main__":
 
     def op_body_arguments(self, operation: dict[str, Any]) -> list[str]:
         args = []
-        req_props, properties = self.op_get_body_reqs_and_props(operation)
+        properties = self.op_get_settable_body_properties(operation)
         if not properties:
             return args
 
         for prop_name, prop_data in properties.items():
             py_type = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
-            if prop_name not in req_props:
+            if not prop_data.get(OasField.REQUIRED):
                 py_type = f"Optional[{py_type}]"
 
             def_val = maybe_quoted(prop_data.get(OasField.DEFAULT))
@@ -339,14 +340,14 @@ if __name__ == "__main__":
 
     def op_body_formation(self, operation: dict[str, Any]) -> str:
         """Creates a body parameter and poulates it when there are body paramters."""
-        req_props, properties = self.op_get_body_reqs_and_props(operation)
+        properties = self.op_get_settable_body_properties(operation)
         if not properties:
             return ""
 
         lines = ["body = {}"]
-        for prop_name in properties.keys():
+        for prop_name, prop_data in properties.items():
             var_name = to_snake_case(prop_name)
-            if prop_name in req_props:
+            if prop_data.get(OasField.REQUIRED):
                 lines.append(f'body["{prop_name}"] = {var_name}')
             else:
                 lines.append(f'if {var_name} is not None:')
