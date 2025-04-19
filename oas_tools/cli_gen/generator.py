@@ -322,12 +322,14 @@ if __name__ == "__main__":
         return result
 
     def op_content_header(self, operation: dict[str, Any]) -> str:
+        """Returns the content-type with variable name prefix (when appropriate)"""
         content_type = self.op_get_content_type(operation)
         if not content_type:
             return ""
         return f', content_type="{content_type}"'
 
     def op_body_formation(self, operation: dict[str, Any]) -> str:
+        """Creates a body parameter and poulates it when there are body paramters."""
         body = self.op_get_body(operation)
         if not body:
             return ""
@@ -359,6 +361,15 @@ if __name__ == "__main__":
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
         path = op.get(OasField.X_PATH)
+        req_args = [
+            f'"{method}"',
+            "url",
+            "headers=headers",
+            "params=params",
+        ]
+        if self.op_get_content_type(op):
+            req_args.append("body=body")
+        req_args.append("timemout=_api_timeout")
 
         return f"""
 
@@ -374,7 +385,7 @@ def {to_snake_case(node.identifier)}({self.op_arguments(op)}) -> None:
     params = {self.op_param_formation(op)}{self.op_body_formation(op)}
 
     try:
-        data = _r.request("{method}", url, headers=headers, params=params, timemout=_api_timeout)
+        data = _r.request({', '.join(req_args)})
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)

@@ -329,7 +329,7 @@ def test_function_definition():
     assert 'headers = _r.request_headers(_api_key, content_type="application/json")' in text
     assert 'url = _r.create_url(_api_host, "pets")' in text
     assert 'params = {}' in text
-    assert 'data = _r.request("POST", url, headers=headers, params=params, timemout=_api_timeout)' in text
+    assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timemout=_api_timeout)' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
 
