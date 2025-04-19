@@ -441,7 +441,11 @@ def test_file_to_tree() -> None:
     [
         pytest.param(("foo"), None, id="not-found"),
         pytest.param(("pet", "feed"), None, id="child-not-found"),
-        pytest.param(("pet", "create"), CommandNode(command="create", identifier="createPets"), id="child")
+        pytest.param(
+            ("pet", "create"),
+            CommandNode(command="create", identifier="createPets", summary_fields=["name"]),
+            id="child",
+        ),
     ]
 )
 def test_node_find(search_args, expected) -> None:

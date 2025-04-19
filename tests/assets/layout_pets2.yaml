@@ -25,6 +25,7 @@ pets:
   operations:
     - name: create
       operationId: createPets
+      summaryFields: name
     - name: delete
       operationId: deletePetById
     - name: examine

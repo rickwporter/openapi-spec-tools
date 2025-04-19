@@ -344,6 +344,18 @@ def test_op_check_missing():
     assert 'missing.append("--tag")' not in text  # only required
 
 
+def test_summary_display():
+    uut = Generator("foo", {})
+
+    command = CommandNode("foo", "foo", summary_fields=["abc", "defGhi"])
+    text = uut.summary_display(command)
+    assert 'if not _details:' in text
+    assert 'data = summary(data, ["abc", "defGhi"])' in text
+
+    command = CommandNode("foo", "foo")
+    text = uut.summary_display(command)
+    assert '' == text
+
 def test_function_definition():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
@@ -361,6 +373,7 @@ def test_function_definition():
     assert "_log_level: _a.LogLevelOption" in text
     assert "_out_fmt: _a.OutputFormatOption" in text
     assert "_out_style: _a.OutputStyleOption" in text
+    assert "_details: _a.DetailsOption" in text
 
     # check the body of the function
     assert "_l.init_logging(_log_level)" in text
@@ -370,6 +383,7 @@ def test_function_definition():
     assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timemout=_api_timeout)' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
+    assert 'data = _d.summary(data, "name")'
 
     # make sure the missing parameter checks are present
     assert 'missing.append("--api-key")'

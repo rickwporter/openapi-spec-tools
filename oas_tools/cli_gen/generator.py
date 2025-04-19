@@ -12,6 +12,7 @@ from oas_tools.utils import map_operations
 
 NL = "\n"
 SEP1 = "\n    "
+SEP2 = "\n        "
 SHEBANG = """\
 #!/usr/bin/env python3
 """
@@ -381,6 +382,15 @@ if __name__ == "__main__":
 
         return SEP1.join(lines)
 
+    def summary_display(self, node: CommandNode) -> str:
+        if not node.summary_fields:
+            return ""
+
+        lines = ["if not _details:"]
+        args = [maybe_quoted(v) for v in node.summary_fields]
+        lines.append(f'    data = summary(data, [{', '.join(args)}])')
+        return SEP2 + SEP2.join(lines)
+
     def function_definition(self, node: CommandNode) -> str:
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
@@ -413,7 +423,7 @@ def {to_snake_case(node.identifier)}({self.op_arguments(op, node)}) -> None:
     params = {self.op_param_formation(op)}{self.op_body_formation(op)}
 
     try:
-        data = _r.request({', '.join(req_args)})
+        data = _r.request({', '.join(req_args)}){self.summary_display(node)}
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
