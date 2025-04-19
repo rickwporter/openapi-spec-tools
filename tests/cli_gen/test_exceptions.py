@@ -5,6 +5,7 @@ import pytest
 import typer
 from requests import HTTPError
 
+from oas_tools.cli_gen._exceptions import MissingRequiredError
 from oas_tools.cli_gen._exceptions import handle_exceptions
 
 
@@ -21,3 +22,10 @@ def test_handle_exceptions(exception, message):
             handle_exceptions(exception)
         assert ex.value.exit_code == 1
         assert message in mock_stdout.getvalue()
+
+
+def test_missing_required():
+    items = ["abc", "123"]
+    ex = MissingRequiredError(items)
+    msg = str(ex)
+    assert "Missing required parameters, please provide: abc, 123" == msg
