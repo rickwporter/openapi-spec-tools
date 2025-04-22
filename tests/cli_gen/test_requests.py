@@ -7,8 +7,10 @@ from requests import HTTPError
 from requests import Request
 from requests import Response
 
+from oas_tools.cli_gen._requests import PageParams
 from oas_tools.cli_gen._requests import _pretty_params
 from oas_tools.cli_gen._requests import create_url
+from oas_tools.cli_gen._requests import depaginate
 from oas_tools.cli_gen._requests import raise_for_error
 from oas_tools.cli_gen._requests import request
 from oas_tools.cli_gen._requests import request_headers
@@ -115,6 +117,25 @@ def test_raise_for_error_errors(status_code, reason, body, expected) -> None:
         raise_for_error(response)
 
 
+def success_response(
+    method: str = "GET",
+    url: str = "http://localhost",
+    status_code: int = 200,
+    body: Any = None,
+    headers: Any = None,
+) -> Response:
+    """Convenience method to set some fields."""
+    response = Response()
+    response.url = url
+    response.status_code = status_code
+    response.request = Request(method, url).prepare()
+    response._content = convert_body(body)
+    if headers:
+        response.headers.update(headers)
+
+    return response
+
+
 @pytest.mark.parametrize(
     ["status_code"],
     [
@@ -127,9 +148,7 @@ def test_raise_for_error_errors(status_code, reason, body, expected) -> None:
     ],
 )
 def test_raise_for_error_success(status_code) -> None:
-    response = Response()
-    response.status_code = status_code
-    response.request = Request("GET", "http://dr.com/abc").prepare()
+    response = success_response(status_code=status_code)
 
     # NOTE: not need to check anything, it just raises an exception
     raise_for_error(response)
@@ -145,12 +164,7 @@ def test_raise_for_error_success(status_code) -> None:
 )
 def test_request(method, body, params, expected):
     url = "https://foo/path"
-    response = Response()
-    response.status_code = 200
-    response.reason = "OK"
-    response._content = convert_body(body)
-    response.request = Request(method, url).prepare()
-    response.url = url
+    response = success_response(url=url, body=body)
 
     prefix = "oas_tools.cli_gen"
     with (
@@ -186,3 +200,149 @@ def test_request(method, body, params, expected):
         assert f"Got {response.status_code} response from {method} {url}{_pretty_params(params)}" in message
 
         assert expected == actual
+
+ITEMS = [
+    {"a": 1, "b": True, "c": "some str", "d": None},
+    {"a": 2, "b": False, "c": "", "d": False},
+    {"a": 3, "b": True, "c": "anoterh", "d": 3},
+]
+
+@pytest.mark.parametrize(
+    ["page_params", "resp_body", "expected"],
+    [
+        pytest.param(PageParams(), {}, [], id="empty-dict"),
+        pytest.param(PageParams(), [], [], id="empty-list"),
+        pytest.param(PageParams(page_size_value=10), ITEMS, ITEMS, id="page-size"),
+        pytest.param(PageParams(max_count=3), ITEMS, ITEMS, id="max-count"),
+        pytest.param(PageParams(next_header_name="foo"), ITEMS, ITEMS, id="next-header"),
+        pytest.param(
+            PageParams(next_property_name="foo", items_property_name="bar"),
+            {"bar": ITEMS},
+            ITEMS,
+            id="next-prop",
+        ),
+        pytest.param(
+            PageParams(page_size_name="foo", page_size_value=5),
+            ITEMS,
+            ITEMS,
+            id="page-name",
+        ),
+        pytest.param(
+            PageParams(item_start_name="foo", item_start_value=7, max_count=2),
+            ITEMS,
+            ITEMS,
+            id="item-start",
+        ),
+        pytest.param(
+            PageParams(page_start_name="foo", page_start_value=7, max_count=2),
+            ITEMS,
+            ITEMS,
+            id="page-start",
+            ),
+    ]
+)
+def test_depaginate_single_success(page_params, resp_body, expected):
+    url = "http://localhost/foo/bar"
+    response = success_response(method="GET", url=url, body=resp_body)
+
+    with (
+        mock.patch("oas_tools.cli_gen._requests.requests.get", return_value=response) as mock_get,
+        mock.patch("oas_tools.cli_gen._requests.logger.info") as mock_info,
+        mock.patch("oas_tools.cli_gen._requests.logger.debug") as mock_debug,
+    ):
+        # start with the results
+        items = depaginate(page_params, url)
+        assert expected == items
+
+        # check the requests call
+        assert 1 == mock_get.call_count
+        assert url == mock_get.call_args[0][0]
+
+        # look at info logging
+        assert 1 == mock_info.call_count
+        imsg = mock_info.call_args[0][0]
+        assert f"Got {len(items)} items using" in imsg
+
+        # look at debug logging
+        assert 2 == mock_debug.call_count
+        dmsg = mock_debug.call_args_list[0][0][0]
+        assert f"Requesting GET {url}" in dmsg
+        dmsg = mock_debug.call_args_list[1][0][0]
+        assert "items in" in dmsg
+
+
+def test_depagination_next_header():
+    url = "http://localhost/foo/bar"
+    next_url = "http://localhost/items/"
+    next_header = "next-response-location"
+    resp1 = success_response(body=ITEMS, headers={next_header: next_url})
+    resp2 = success_response(body=ITEMS)
+
+    page_params = PageParams(next_header_name=next_header)
+
+    with (
+        mock.patch("oas_tools.cli_gen._requests.requests.get") as mock_get,
+        mock.patch("oas_tools.cli_gen._requests.logger.info") as mock_info,
+        mock.patch("oas_tools.cli_gen._requests.logger.debug") as mock_debug,
+    ):
+        mock_get.side_effect = [resp1, resp2]
+
+        # start with the results
+        items = depaginate(page_params, url)
+        assert ITEMS + ITEMS == items
+
+        # check the requests calls
+        assert 2 == mock_get.call_count
+        assert url == mock_get.call_args_list[0][0][0]
+        assert next_url == mock_get.call_args_list[1][0][0]
+
+        # look at info logging
+        assert 1 == mock_info.call_count
+        imsg = mock_info.call_args[0][0]
+        assert f"Got {len(items)} items using" in imsg
+
+        # look at debug logging
+        assert 4 == mock_debug.call_count
+        dmsg = mock_debug.call_args_list[0][0][0]
+        assert f"Requesting GET {url}" in dmsg
+        dmsg = mock_debug.call_args_list[2][0][0]
+        assert f"Requesting GET {next_url}" in dmsg
+
+
+def test_depagination_next_property():
+    url = "http://localhost/sna/foo"
+    next_url = "http://localhost/foo/bar/"
+    item_prop = "items"
+    next_prop = "some-prop"
+    resp1 = success_response(body={item_prop: ITEMS, next_prop: next_url})
+    resp2 = success_response(body={item_prop: ITEMS})
+
+    page_params = PageParams(items_property_name=item_prop, next_property_name=next_prop)
+
+    with (
+        mock.patch("oas_tools.cli_gen._requests.requests.get") as mock_get,
+        mock.patch("oas_tools.cli_gen._requests.logger.info") as mock_info,
+        mock.patch("oas_tools.cli_gen._requests.logger.debug") as mock_debug,
+    ):
+        mock_get.side_effect = [resp1, resp2]
+
+        # start with the results
+        items = depaginate(page_params, url)
+        assert ITEMS + ITEMS == items
+
+        # check the requests calls
+        assert 2 == mock_get.call_count
+        assert url == mock_get.call_args_list[0][0][0]
+        assert next_url == mock_get.call_args_list[1][0][0]
+
+        # look at info logging
+        assert 1 == mock_info.call_count
+        imsg = mock_info.call_args[0][0]
+        assert f"Got {len(items)} items using" in imsg
+
+        # look at debug logging
+        assert 4 == mock_debug.call_count
+        dmsg = mock_debug.call_args_list[0][0][0]
+        assert f"Requesting GET {url}" in dmsg
+        dmsg = mock_debug.call_args_list[2][0][0]
+        assert f"Requesting GET {next_url}" in dmsg

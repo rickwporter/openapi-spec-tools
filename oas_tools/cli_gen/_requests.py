@@ -1,6 +1,9 @@
 import importlib.metadata
 import json
+from copy import deepcopy
+from dataclasses import dataclass
 from datetime import datetime
+from datetime import timedelta
 from typing import Any
 from typing import Optional
 
@@ -11,6 +14,31 @@ from oas_tools.cli_gen._logging import get_logger
 GET = "GET"
 
 logger = get_logger()
+
+
+@dataclass
+class PageParams:
+    # page_size_* dictate the limit per request
+    page_size_value: Optional[int] = None
+    page_size_name: Optional[str] = None
+
+    # page_start_* dictate the starting point when it is in page increments
+    page_start_value: Optional[int] = None
+    page_start_name: Optional[str] = None
+
+    # offset_start_* dictate the starting point when it is specified in item increments
+    item_start_value: Optional[int] = None
+    item_start_name: Optional[str] = None
+
+    # max_count specifies the maximim number of items to fetch
+    max_count: Optional[int] = None
+
+    # items property specifies the property name to pull out the data from
+    items_property_name: Optional[str] = None
+
+    # locations for next url
+    next_header_name: Optional[str] = None
+    next_property_name: Optional[str] = None
 
 
 def create_url(host_or_base_url: str, *args) -> str:
@@ -106,3 +134,87 @@ def request(
             logger.error(f"Failed to decode {method} {pretty_url} response")
 
     return result
+
+
+def depaginate(
+    page_params: PageParams,
+    url: str,
+    headers: Optional[dict[str, Any]] = None,
+    params: Optional[dict[str, Any]] = None,
+    timeout: Optional[int] = None,
+) -> Any:
+    """
+    Gets a list of items that may be chunked across several pages.
+    """
+    items = []
+    total_time = timedelta()
+    _url = url
+    _params = deepcopy(params or {})
+    _headers = deepcopy(headers or {})
+    pretty_url = None
+
+    page_count = 0
+    item_count = 0
+    page_size = page_params.page_size_value or 0
+    max_count = page_params.max_count
+    if max_count:
+        page_size = min(page_size, max_count)
+
+    if page_params.page_size_name and page_params.page_size_value is not None:
+        _params[page_params.page_size_name] = page_size
+
+    if page_params.item_start_name and page_params.item_start_value is not None:
+        offset = page_params.item_start_value
+        _params[page_params.item_start_name] = page_params.item_start_value
+
+    while _url:
+        if page_params.page_start_name:
+            _params[page_params.page_start_name] = page_count
+        if page_params.item_start_name:
+            _params[page_params.item_start_name] = offset
+
+        if pretty_url != _url:
+            pretty_url = _url + _pretty_params(_params)
+
+        logger.debug(f"Requesting {GET} {pretty_url} count={page_count + 1}")
+        start = datetime.now()
+        response = requests.get(_url, params=deepcopy(_params), headers=_headers, timeout=timeout)
+        delta = datetime.now() - start
+
+        raise_for_error(response)
+
+        # update list with current items from the response
+        current = response.json()
+        if page_params.items_property_name:
+            current = current.get(page_params.items_property_name)
+        items.extend(current)
+
+        # update the URL from the provided info
+        if page_params.next_header_name:
+            _url = response.headers.get(page_params.next_header_name)
+            pretty_url = _url
+        elif page_params.next_property_name:
+            _url = response.json().get(page_params.next_property_name)
+            pretty_url = _url
+        else:
+            pretty_url = None
+
+        # some book-keeping
+        curr_len = len(current)
+        total_time += delta
+        page_count += 1
+        item_count += curr_len
+        logger.debug(f"Got {curr_len} items in {delta.total_seconds()}")
+
+        if curr_len == 0:
+            # no items provided (even when no page size or max count)
+            break
+        if page_size and curr_len < page_size:
+            # did not get a full page
+            break
+        if max_count and item_count >= max_count:
+            # reached max items
+            break
+
+    logger.info(f"Got {len(items)} items using {page_count} requests in {total_time.total_seconds()}")
+    return items
