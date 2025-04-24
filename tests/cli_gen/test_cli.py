@@ -46,6 +46,10 @@ Sub-command operation orders should be:
     pets: create, delete, examine, update
     shelters: list, list, rescue
 """
+ERR_PAGINATION = """\
+Pagination parameter errors:
+    shelters.list: cannot have next URL in both header and body property
+"""
 
 
 def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
@@ -56,6 +60,7 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
         "missing_props": False,
         "op_dups": False,
         "op_order": False,
+        "pagination": False,
     }
 
     values = options.copy()
@@ -68,7 +73,15 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
     [
         pytest.param(
             {"filename":BAD_LAYOUT_FILE},
-            "".join([ERR_SUB_MISSIING, ERR_SUB_UNUSED, ERR_SUB_ORDER, ERR_OPS_PROPS, ERR_OPS_DUPES, ERR_OPS_ORDER]),
+            "".join([
+                ERR_SUB_MISSIING,
+                ERR_SUB_UNUSED,
+                ERR_SUB_ORDER,
+                ERR_OPS_PROPS,
+                ERR_OPS_DUPES,
+                ERR_OPS_ORDER,
+                ERR_PAGINATION,
+            ]),
             id="all"
         ),
         pytest.param(
@@ -95,6 +108,11 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
             args_disabled({"op_order": True}),
             ERR_OPS_ORDER,
             id="ops-order",
+        ),
+        pytest.param(
+            args_disabled({"pagination": True}),
+            ERR_PAGINATION,
+            id="pagination",
         ),
     ]
 )

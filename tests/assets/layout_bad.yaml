@@ -38,6 +38,9 @@ shelters:
   operations:
     - name: list
       operationId: shelter_list
+      pagination:
+        nextHeader: Location
+        nextProperty: next
     - name: rescue
       operationId: rescue_animals
     - name: list

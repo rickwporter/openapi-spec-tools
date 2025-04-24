@@ -1,9 +1,12 @@
 from typing import Any
+from typing import Optional
 
 import yaml
 
 from .layout_types import CommandNode
 from .layout_types import LayoutField
+from .layout_types import PaginationField
+from .layout_types import PaginationNames
 
 DEFAULT_START = "main"
 
@@ -41,6 +44,21 @@ def parse_extras(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames]:
+    """Parses the data into pagination parameters"""
+    if not data:
+        return None
+
+    return PaginationNames(
+        page_size=data.get(PaginationField.PAGE_SIZE),
+        page_start=data.get(PaginationField.PAGE_START),
+        item_start=data.get(PaginationField.ITEM_START),
+        items_property=data.get(PaginationField.ITEM_PROP),
+        next_header=data.get(PaginationField.NEXT_HEADER),
+        next_property=data.get(PaginationField.NEXT_PROP)
+    )
+
+
 def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> CommandNode:
     """Recursively converts elements from data to CommandNodes"""
     description = item.get(LayoutField.DESCRIPTION, "")
@@ -49,6 +67,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     bugs = field_to_list(item, LayoutField.BUG_IDS)
     summary_fields = field_to_list(item, LayoutField.SUMMARY_FIELDS)
     extra = parse_extras(item)
+    pagination = parse_pagination(item.get(LayoutField.PAGINATION))
 
     children = []
     for op_data in item.get(LayoutField.OPERATIONS, []):
@@ -71,6 +90,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         summary_fields=summary_fields,
         extra=extra,
         children=children,
+        pagination=pagination,
     )
 
 
@@ -193,6 +213,33 @@ def subcommand_order(data: dict[str, Any], start: str = DEFAULT_START) -> list[s
 
     return misordered
 
+
+def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
+    """Checks for issues with the pagnination parameters that would potentially cause confusion."""
+    errors = {}
+
+    for sub_name, sub_data in data.items():
+        sub_data = sub_data or {}
+        for op in sub_data.get(LayoutField.OPERATIONS, []):
+            page_params = op.get(LayoutField.PAGINATION)
+            if not page_params:
+                continue
+
+            reasons = []
+
+            extra_keys = [k for k in page_params.keys() if k not in PaginationField]
+            if extra_keys:
+                reasons.append(f"unsupported parameters: {', '.join(extra_keys)}")
+            if page_params.get(PaginationField.NEXT_HEADER) and page_params.get(PaginationField.NEXT_PROP):
+                reasons.append("cannot have next URL in both header and body property")
+            if page_params.get(PaginationField.ITEM_START) and page_params.get(PaginationField.PAGE_START):
+                reasons.append("start can only be specified with page or item paramter")
+
+            if reasons:
+                full_name = f"{sub_name}.{op.get(LayoutField.NAME)}"
+                errors[full_name] = '; '.join(reasons)
+
+    return errors
 
 def file_to_tree(filename: str, start: str = DEFAULT_START) -> CommandNode:
     """Utility to open filename and parse to a CommandNode tree."""

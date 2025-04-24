@@ -14,6 +14,7 @@ from oas_tools.cli_gen.generate import copy_infrastructure
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import DEFAULT_START
+from oas_tools.cli_gen.layout import check_pagination_definitions
 from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.cli_gen.layout import open_layout
 from oas_tools.cli_gen.layout import operation_duplicates
@@ -59,6 +60,7 @@ def layout_check_format(
     missing_props: Annotated[bool, typer.Option(help="Check for missing properties")] = True,
     op_dups: Annotated[bool, typer.Option(help="Check for duplicate names in sub-commands")] = True,
     op_order: Annotated[bool, typer.Option(help="Check the operations order within each sub-command")] = True,
+    pagination: Annotated[bool, typer.Option(help="Check the pagination parameters for issues")] = True,
 ) -> None:
     data = open_layout(filename)
 
@@ -98,6 +100,12 @@ def layout_check_format(
         errors = operation_order(data)
         if errors:
             typer.echo(f"Sub-command operation orders should be:{_dict_to_str(errors)}")
+            result = 1
+
+    if pagination:
+        errors = check_pagination_definitions(data)
+        if errors:
+            typer.echo(f"Pagination parameter errors:{_dict_to_str(errors)}")
             result = 1
 
     if result:

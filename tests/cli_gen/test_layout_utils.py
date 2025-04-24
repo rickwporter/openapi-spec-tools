@@ -1,22 +1,26 @@
 import pytest
 
+from oas_tools.cli_gen.layout import check_pagination_definitions
 from oas_tools.cli_gen.layout import data_to_node
 from oas_tools.cli_gen.layout import field_to_list
 from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.cli_gen.layout import operation_duplicates
 from oas_tools.cli_gen.layout import operation_order
 from oas_tools.cli_gen.layout import parse_extras
+from oas_tools.cli_gen.layout import parse_pagination
 from oas_tools.cli_gen.layout import parse_to_tree
 from oas_tools.cli_gen.layout import subcommand_missing_properties
 from oas_tools.cli_gen.layout import subcommand_order
 from oas_tools.cli_gen.layout import subcommand_references
 from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.layout_types import PaginationNames
 from tests.helpers import asset_filename
 
 OPS = "operations"
 DESC = "description"
 NAME = "name"
 OP_ID = "operationId"
+PAGE = "pagination"
 SUB_ID = "subcommandId"
 
 
@@ -99,7 +103,6 @@ def test_shadow_operations(data, expected) -> None:
     assert expected == operation_duplicates(data)
 
 
-
 @pytest.mark.parametrize(
     ["data", "expected_unused", "expected_missing"],
     [
@@ -172,6 +175,36 @@ def test_field_list(data, field, expected) -> None:
 def test_parse_extras(data, expected) -> None:
     assert expected == parse_extras(data)
 
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param(None, None, id="none"),
+        pytest.param({}, None, id="empty"),
+        pytest.param({"foo": "bar"}, PaginationNames(), id="no-props"),
+        pytest.param(
+            {
+                "itemProperty": "north",
+                "itemStart": "south",
+                "nextHeader": "east",
+                "nextProperty": "west",
+                "pageSize": "up",
+                "pageStart": "down",
+            },
+            PaginationNames(
+                page_size="up",
+                page_start="down",
+                item_start="south",
+                items_property="north",
+                next_header="east",
+                next_property="west",
+            ),
+            id="all",
+        )
+    ]
+)
+def test_parse_pagination(data, expected) -> None:
+    assert expected == parse_pagination(data)
 
 @pytest.mark.parametrize(
     [NAME, "item", "expected"],
@@ -357,6 +390,30 @@ def test_operations_order(data, expected) -> None:
 )
 def test_subcommand_order(data, start, expected) -> None:
     assert expected == subcommand_order(data, start)
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param(
+            {"a": {OPS: [{NAME: "foo", PAGE: {"bar": 1}}]}},
+            {"a.foo": "unsupported parameters: bar"},
+            id="unsuppoted",
+        ),
+        pytest.param(
+            {"a": {OPS: [{NAME: "foobar", PAGE: {"nextHeader": "Location", "nextProperty": "nextUrl"}}]}},
+            {"a.foobar": "cannot have next URL in both header and body property"},
+            id="next",
+        ),
+        pytest.param(
+            {"b": {OPS: [{NAME: "snafoo", PAGE: {"itemStart": "offset", "pageStart": "page"}}]}},
+            {"b.snafoo": "start can only be specified with page or item paramter"},
+            id="page",
+        ),
+    ]
+)
+def test_pagination_definitions(data, expected) -> None:
+    assert expected == check_pagination_definitions(data)
 
 
 def test_lists() -> None:
