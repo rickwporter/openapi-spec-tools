@@ -158,6 +158,8 @@ if __name__ == "__main__":
         ]
         if command.summary_fields:
             args.append('_details: _a.DetailsOption = False')
+        if command.pagination:
+            args.append('_max_count: _a.MaxCountOption = None')
         return args
 
     def schema_to_type(self, schema: str, fmt: Optional[str]) -> str:
@@ -391,16 +393,47 @@ if __name__ == "__main__":
         lines.append(f'    data = summary(data, [{', '.join(args)}])')
         return SEP2 + SEP2.join(lines)
 
+    def pagination_creation(self, command: CommandNode) -> str:
+        if not command.pagination:
+            return ''
+        args = {"max_count": "_max_count"}
+        names = command.pagination
+        if names.page_size:
+            args["page_size_name"] = maybe_quoted(names.page_size)
+            args["page_size_value"] = to_snake_case(names.page_size)
+        if names.page_start:
+            args["page_start_name"] = maybe_quoted(names.page_start)
+            args["page_start_value"] = to_snake_case(names.page_start)
+        if names.item_start:
+            args["item_start_name"] = maybe_quoted(names.item_start)
+            args["item_start_value"] = to_snake_case(names.item_start)
+        if names.items_property:
+            args["item_property_name"] = maybe_quoted(names.items_property)
+        if names.next_header:
+            args["next_header_name"] = maybe_quoted(names.next_header)
+        if names.next_property:
+            args["next_property_name"] = maybe_quoted(names.next_property)
+
+        arg_text = ', '.join([f"{k}={v}" for k, v in args.items()])
+        return f"{SEP1}page_info = _r.PageParams({arg_text})"
+
     def function_definition(self, node: CommandNode) -> str:
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
         path = op.get(OasField.X_PATH)
-        req_args = [
-            f'"{method}"',
+
+        req_args = []
+        if node.pagination:
+            req_func = "depaginate"
+            req_args.append("page_info")
+        else:
+            req_func = "request"
+            req_args.append(maybe_quoted(method))
+        req_args.extend([
             "url",
             "headers=headers",
             "params=params",
-        ]
+        ])
         if self.op_get_content_type(op):
             req_args.append("body=body")
         req_args.append("timemout=_api_timeout")
@@ -415,7 +448,7 @@ def {to_snake_case(node.identifier)}({self.op_arguments(op, node)}) -> None:
     # handler for {node.identifier}: {method} {path}
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key{self.op_content_header(op)})
-    url = _r.create_url({self.op_url_params(path)})
+    url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}
     missing = {self.op_check_missing(op)}
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
@@ -423,7 +456,7 @@ def {to_snake_case(node.identifier)}({self.op_arguments(op, node)}) -> None:
     params = {self.op_param_formation(op)}{self.op_body_formation(op)}
 
     try:
-        data = _r.request({', '.join(req_args)}){self.summary_display(node)}
+        data = _r.{req_func}({', '.join(req_args)}){self.summary_display(node)}
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)

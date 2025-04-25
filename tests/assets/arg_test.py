@@ -14,6 +14,7 @@ def get_pet(
     _out_fmt: _a.OutputFormatOption = _a.OutputFormat.TABLE,
     _out_style: _a.OutputStyle = _a.OutputStyle.ALL,
     _details: _a.DetailsOption = False,
+    _max_count: _a.MaxCountOption = None,
 ):
     """
     This is to show that oas_tools.cli_gen is obliterated.
@@ -26,6 +27,7 @@ _log_level={_log_level}
 _out_fmt={_out_fmt}
 _out_style={_out_style}
 _details={_details}
+_max_count={_max_count}
 """)
 
 

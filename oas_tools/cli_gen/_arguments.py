@@ -1,3 +1,5 @@
+from typing import Optional
+
 import typer
 from typing_extensions import Annotated
 
@@ -54,6 +56,14 @@ LogLevelOption = Annotated[
         envvar=ENV_LOG_LEVEL,
         help="Log level",
     ),
+]
+MaxCountOption = Annotated[
+    Optional[int],
+    typer.Option(
+        "--max",
+        "--max-count",
+        help="Maximum number of items to get (if any)."
+    )
 ]
 OutputFormatOption = Annotated[
     OutputFormat,

@@ -6,6 +6,7 @@ import pytest
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.layout_types import PaginationNames
 from oas_tools.types import OasField
 from oas_tools.utils import map_operations
 from oas_tools.utils import open_oas
@@ -263,6 +264,49 @@ def test_op_body_arguments():
 
 
 @pytest.mark.parametrize(
+    ["names", "expected"],
+    [
+        pytest.param(None, "", id="None"),
+        pytest.param(PaginationNames(), "page_info = _r.PageParams(max_count=_max_count)", id="empty"),
+        pytest.param(
+            PaginationNames(page_size="fooBar"),
+            'page_info = _r.PageParams(max_count=_max_count, page_size_name="fooBar", page_size_value=foo_bar)',
+            id="page_size",
+        ),
+        pytest.param(
+            PaginationNames(page_start="snaFoo"),
+            'page_info = _r.PageParams(max_count=_max_count, page_start_name="snaFoo", page_start_value=sna_foo)',
+            id="page_start",
+        ),
+        pytest.param(
+            PaginationNames(item_start="eastWest"),
+            'page_info = _r.PageParams(max_count=_max_count, item_start_name="eastWest", item_start_value=east_west)',
+            id="item_start",
+        ),
+        pytest.param(
+            PaginationNames(items_property="northSouth"),
+            'page_info = _r.PageParams(max_count=_max_count, item_property_name="northSouth")',
+            id="items_property",
+        ),
+        pytest.param(
+            PaginationNames(next_header="upDown"),
+            'page_info = _r.PageParams(max_count=_max_count, next_header_name="upDown")',
+            id="next_header",
+        ),
+        pytest.param(
+            PaginationNames(next_property="leftRight"),
+            'page_info = _r.PageParams(max_count=_max_count, next_property_name="leftRight")',
+            id="next_property",
+        ),
+    ]
+)
+def test_pagination_creation(names, expected) -> None:
+    node = CommandNode(command="foo", identifier="bar", pagination=names)
+    uut = Generator("foo", {})
+    result = uut.pagination_creation(node)
+    assert expected == result.strip()
+
+@pytest.mark.parametrize(
     ["command", "has_details"],
     [
         pytest.param(CommandNode("foo", "foo"), False, id="no-summary"),
@@ -356,7 +400,8 @@ def test_summary_display():
     text = uut.summary_display(command)
     assert '' == text
 
-def test_function_definition():
+
+def test_function_definition_item():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     item = tree.find("pet", "create")
@@ -389,6 +434,31 @@ def test_function_definition():
     assert 'missing.append("--api-key")'
     assert 'missing.append("--name")'
     assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
+
+
+def test_function_definition_paged():
+    oas = open_oas(asset_filename("pet2.yaml"))
+    tree = file_to_tree(asset_filename("layout_pets.yaml"))
+    item = tree.find("list")
+    uut = Generator("cli_package", oas)
+    text = uut.function_definition(item)
+
+    assert '@app.command("list", help="List all pets")' in text
+    assert 'def list_pets(' in text
+
+    # check arguments
+    assert (
+        'limit: Annotated[Optional[int], typer.Option(max=100, show_default=False, '
+        'help="How many items to return at one time (max 100)")]'
+        in text
+    )
+    assert '_api_host: _a.ApiHostOption' in text
+    assert '_log_level: _a.LogLevelOption' in text
+    assert '_max_count: _a.MaxCountOption' in text
+
+    # double check a few important body differences
+    assert 'page_info = _r.PageParams(max_count=_max_count, page_size_name="limit", page_size_value=limit)' in text
+    assert 'data = _r.depaginate(page_info, url, headers=headers, params=params, timemout=_api_timeout)' in text
 
 
 def test_main():
