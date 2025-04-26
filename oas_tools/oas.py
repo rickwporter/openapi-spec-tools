@@ -15,6 +15,7 @@ from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
+from oas_tools.utils import map_content_types
 from oas_tools.utils import map_operations
 from oas_tools.utils import model_filter
 from oas_tools.utils import model_references
@@ -562,6 +563,35 @@ def tags_show(
         print(f"{INDENT}{n}")
     return
 
+
+##########################################
+# Content-type
+content_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to content-types")
+analyze_typer.add_typer(content_typer, name="content")
+
+@content_typer.command("list", short_help="List operations by response content-type")
+def content_type_list(
+    filename: OasFilenameArgument,
+    max_size: Annotated[int, typer.Option(help="Maximum number of operations to show")] = 10,
+    content_type: Annotated[Optional[str], typer.Option(help="Only display for specified content type")] = None,
+) -> None:
+    spec = open_oas(filename)
+    content = map_content_types(spec)
+
+    if content_type:
+        content = {k: v for k, v in content.items() if k == content_type}
+
+    if not content:
+        print("No content-types found")
+        return
+
+    for name, operations in content.items():
+        print(name)
+        for op_id in sorted(list(operations))[:max_size]:
+            print(f"    {op_id}")
+        if len(operations) > max_size:
+            print("    ...")
+            print(f"    + {len(operations) - max_size} more")
 
 
 if __name__ == "__main__":

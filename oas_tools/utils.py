@@ -492,3 +492,21 @@ def schema_operations_filter(
             result[OasField.TAGS.value] = updated_tags
 
     return result
+
+
+def map_content_types(schema: dict[str, Any]) -> dict[str, set]:
+    """Gets map of content-types to operation-id's."""
+    content = {}
+    for path_data in schema.get(OasField.PATHS, {}).values():
+        for method, op_data in path_data.items():
+            if method == OasField.PARAMS:
+                continue
+
+            op_id = op_data.get(OasField.OP_ID)
+            for resp_data in op_data.get(OasField.RESPONSES, {}).values():
+                for content_type in resp_data.get(OasField.CONTENT, {}).keys():
+                    items = content.get(content_type, set())
+                    items.add(op_id)
+                    content[content_type] = items
+
+    return content

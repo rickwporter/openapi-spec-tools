@@ -9,6 +9,7 @@ import pytest
 import typer
 
 from oas_tools.oas import DisplayOption
+from oas_tools.oas import content_type_list
 from oas_tools.oas import diff
 from oas_tools.oas import info
 from oas_tools.oas import models_list
@@ -822,3 +823,42 @@ def test_tags_show_failure() -> None:
         assert err.value.exit_code == 1
         output = mock_stdout.getvalue()
         assert output == f"ERROR: failed to find {search}\n"
+
+
+##########################################
+# Content
+@pytest.mark.parametrize(
+    ["filename", "max_size", "content_type", "expected"],
+    [
+        pytest.param(
+            PET2_YAML,
+            None,
+            None,
+            "application/json\n    createPets\n    deletePetById\n"
+            "    listPets\n    showPetById\n",
+            id="basic",
+        ),
+        pytest.param(
+            PET2_YAML,
+            2,
+            None,
+            "application/json\n    createPets\n    deletePetById\n"
+            "    ...\n    + 2 more\n",
+            id="max-size",
+        ),
+        pytest.param(PET2_YAML, None, "application/yaml", "No content-types found\n", id="not-found"),
+    ]
+)
+def test_content_type_list(filename, max_size, content_type, expected) -> None:
+    args = {
+        "filename": filename,
+        "content_type": content_type,
+    }
+    if max_size is not None:
+        args["max_size"] = max_size
+
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        content_type_list(**args)
+
+        output = mock_stdout.getvalue()
+        assert output == expected

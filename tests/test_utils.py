@@ -8,6 +8,7 @@ from oas_tools.utils import count_values
 from oas_tools.utils import find_diffs
 from oas_tools.utils import find_paths
 from oas_tools.utils import find_references
+from oas_tools.utils import map_content_types
 from oas_tools.utils import map_operations
 from oas_tools.utils import model_filter
 from oas_tools.utils import model_references
@@ -415,3 +416,10 @@ def test_schema_operations_filter_allow() -> None:
         OasField.TAGS.value: "different lengths: 2 != 1",
         OasField.COMPONENTS.value: {OasField.SCHEMAS.value: {"Pet": "removed"}},
     }
+
+
+def test_map_content_types():
+    schema = open_test_oas("pet2.yaml")
+    result = map_content_types(schema)
+    expected = {'createPets', 'deletePetById', 'showPetById', 'listPets'}
+    assert expected == result['application/json']
