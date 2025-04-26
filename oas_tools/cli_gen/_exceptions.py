@@ -1,5 +1,6 @@
 import typer
 from requests import HTTPError
+from rich import print
 
 
 class MissingRequiredError(Exception):
@@ -15,5 +16,5 @@ def handle_exceptions(ex: Exception) -> None:
         message = str(ex.args[0])
     else:
         message = str(ex)
-    typer.echo(f"[red]ERROR:[/red] {message}")
+    print(f"[red]ERROR:[/red] {message}")
     raise typer.Exit(1)
