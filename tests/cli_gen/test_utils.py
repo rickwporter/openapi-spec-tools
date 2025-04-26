@@ -40,7 +40,7 @@ def test_camel_case(text, expected):
 @pytest.mark.parametrize(
     ["item", "expected"],
     [
-        pytest.param("", "", id="empty"),
+        pytest.param("", '""', id="empty"),
         pytest.param("foo", '"foo"', id="string"),
         pytest.param(1, "1", id="int"),
         pytest.param(None, "None", id="none"),
