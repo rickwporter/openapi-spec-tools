@@ -1,0 +1,13 @@
+main:
+  description: Manage pets
+  operations:
+    - name: add
+      operationId: createPets
+    - name: delete
+      operationId: deletePetById
+    - name: list
+      operationId: listPets
+      pagination:
+        pageSize: limit
+    - name: show
+      operationId: showPetById
