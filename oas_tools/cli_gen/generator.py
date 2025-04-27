@@ -145,9 +145,13 @@ if __name__ == "__main__":
 
         return properties
 
+    def short_reference_name(self, full_name: str) -> str:
+        """Transforms the '#/components/schemas/Xxx' to 'Xxx'"""
+        return full_name.split('/')[-1]
+
     def get_reference_model(self, full_name: str) -> dict[str, Any]:
         """Returns the reference"""
-        short_name = full_name.split('/')[-1]
+        short_name = self.short_reference_name(full_name)
         return self.models.get(short_name)
 
     def op_infra_arguments(self, operation: dict[str, Any], command: CommandNode) -> list[str]:
@@ -188,6 +192,23 @@ if __name__ == "__main__":
             message += f" ({fmt})"
         raise ValueError(message)
 
+    def get_parameter_pytype(self, param_data: dict[str, Any]) -> str:
+        """
+        Gets the "basic" Python type from a parameter object.
+
+        Parameters have a schema sub-object that contains the 'type' and 'format' fields.
+        """
+        schema = param_data.get(OasField.SCHEMA, {})
+        return self.schema_to_type(schema.get(OasField.TYPE), schema.get(OasField.FORMAT))
+
+    def get_property_pytype(self, prop_data: dict[str, Any]) -> str:
+        """
+        Gets the "basic" Python type from a property object.
+        
+        Each property potentially has 'type' and 'format' fields.
+        """
+        return self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+
     def op_params(self, operation: dict[str, Any], location: str) -> list[dict[str, Any]]:
         """
         Gets a complete list of operation parameters matching location.
@@ -213,9 +234,7 @@ if __name__ == "__main__":
         required = param.get(OasField.REQUIRED, False)
         schema = param.get(OasField.SCHEMA, {})
         schema_default = schema.get(OasField.DEFAULT)
-        schema_type = schema.get(OasField.TYPE)
-        schema_format = schema.get(OasField.FORMAT)
-        arg_type = self.schema_to_type(schema_type, schema_format)
+        arg_type = self.get_parameter_pytype(param)
 
         typer_args = []
         if arg_type in ("int", "float"):
@@ -276,7 +295,7 @@ if __name__ == "__main__":
             return args
 
         for prop_name, prop_data in properties.items():
-            py_type = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+            py_type = self.get_property_pytype(prop_data)
             if not prop_data.get(OasField.REQUIRED):
                 py_type = f"Optional[{py_type}]"
 
