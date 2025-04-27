@@ -84,10 +84,26 @@ def test_op_short_help(op, expected):
     ["op", "expected"],
     [
         pytest.param({}, "", id="empty"),
-        pytest.param({SUM: "Short summary"}, "Short summary", id="summary-only"),
-        pytest.param({SUM: "Short summary", DESC: "Short description"}, "Short description", id="desc-preferred"),
-        pytest.param({DESC: "Short"}, "Short", id="short-desc"),
-        pytest.param({DESC: "First.sentence ends. here"}, "First.sentence ends. here", id="long-desc"),
+        pytest.param(
+            {SUM: "Short summary"},
+            "'''\n    Short summary\n    '''\n    ",
+            id="summary-only",
+        ),
+        pytest.param(
+            {SUM: "Short summary", DESC: "Short description"},
+            "'''\n    Short description\n    '''\n    ",
+            id="desc-preferred",
+        ),
+        pytest.param(
+            {DESC: "Short"},
+            "'''\n    Short\n    '''\n    ",
+            id="short-desc",
+        ),
+        pytest.param(
+            {DESC: "First.sentence ends. here"},
+            "'''\n    First.sentence ends. here\n    '''\n    ",
+            id="long-desc",
+        ),
     ]
 )
 def test_op_long_help(op, expected):

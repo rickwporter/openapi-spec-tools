@@ -97,8 +97,11 @@ if __name__ == "__main__":
 
     def op_long_help(self, operation: dict[str, Any]) -> str:
         text = operation.get(OasField.DESCRIPTION) or operation.get(OasField.SUMMARY) or ""
+        if not text:
+            return text
+
         # TODO: sanitize  NL's, long text, etc
-        return text
+        return f"'''{SEP1}{text}{SEP1}'''{SEP1}"
 
     def op_request_content(self, operation: dict[str, Any]) -> dict[str, Any]:
         """Get the `content` (if any) from the `requestBody`."""
@@ -442,10 +445,7 @@ if __name__ == "__main__":
 
 @app.command("{node.command}", help="{self.op_short_help(op)}")
 def {to_snake_case(node.identifier)}({self.op_arguments(op, node)}) -> None:
-    '''
-    {self.op_long_help(op)}
-    '''
-    # handler for {node.identifier}: {method} {path}
+    {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key{self.op_content_header(op)})
     url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}
