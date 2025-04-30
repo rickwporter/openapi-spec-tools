@@ -258,6 +258,64 @@ def test_op_query_arguments():
     assert 'num_feet: Annotated' not in text
     assert 'must_have: Annotated' not in text
 
+@pytest.mark.parametrize(
+    ["model_name", "expected"],
+    [
+        pytest.param(
+            "Owner",
+            {
+                'name': {
+                    'descrption': 'Name of the pet owner',
+                    'type': 'string',
+                    'required': True,
+                    'x-reference': 'Person',
+                    'x-field': 'name',
+                },
+                'home.street': {
+                    'description': 'Street address (e.g. 123 Main Street, POBox 507)',
+                    'type': 'string',
+                    'required': False,
+                    'x-reference': 'Address',
+                    'x-parent': 'home',
+                    'x-field': 'street',
+                },
+                'home.city': {
+                    'type': 'string',
+                    'required': False,
+                    'x-reference': 'Address',
+                    'x-parent': 'home',
+                    'x-field': 'city',
+                },
+                'home.state': {
+                    'type': 'string',
+                    'required': False,
+                    'x-reference': 'Address',
+                    'x-field': 'state',
+                    'x-parent': 'home',
+                },
+                'home.zipCode': {
+                    'type': 'string',
+                    'required': False,
+                    'x-reference': 'Address',
+                    'x-field': 'zipCode',
+                    'x-parent': 'home',
+                },
+                'iceCream': {
+                    'type': 'string',
+                    'description': 'Favorite ice cream flavor',
+                    'required': False,
+                }
+            },
+            id="Owner")
+    ]
+)
+def test_expand_settable_properties(model_name, expected):
+    oas = open_oas(asset_filename("misc.yaml"))
+    uut = Generator("cli_package", oas)
+    model = uut.get_reference_model(model_name)
+    properties = uut.expand_settable_properties(model)
+    assert expected == properties
+
 
 def test_op_body_arguments():
     oas = open_oas(asset_filename("misc.yaml"))

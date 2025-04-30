@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class OasField(str, Enum):
+    ALL_OF = "allOf"
     ANY_OF = "anyOf"
     COMPONENTS = "components"
     CONTENT = "content"
@@ -31,9 +32,12 @@ class OasField(str, Enum):
     TYPE = "type"
     URL = "url"
 
+    X_FIELD = "x-field"
     X_METHOD = "x-method"
+    X_PARENT = "x-parent"
     X_PATH = "x-path"
     X_PATH_PARAMS = "x-path-params"
+    X_REF = 'x-reference'
 
 
 class ContentType(str, Enum):

@@ -125,6 +125,57 @@ if __name__ == "__main__":
 
         return None
 
+    def expand_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
+        """Expand the model into a dictionary of properties"""
+        properties = {}
+
+        # start with the base-classes in allOf
+        for parent in model.get(OasField.ALL_OF, []):
+            reference = parent.get(OasField.REFS, "")
+            # TODO: handle non-reference allOf items??
+            submodel = self.get_reference_model(reference)
+            required_sub = submodel.get(OasField.REQUIRED, [])
+            for sub_name, sub_data in submodel.get(OasField.PROPS, {}).items():
+                # NOTE: no "name mangling" since using inheritance
+                if sub_data.get(OasField.READ_ONLY, False):
+                    continue
+
+                updated = deepcopy(sub_data)
+                updated[OasField.REQUIRED.value] = sub_name in required_sub
+                updated[OasField.X_REF.value] = self.short_reference_name(reference)
+                updated[OasField.X_FIELD.value] = sub_name
+                properties[sub_name] = updated
+
+        required_props = model.get(OasField.REQUIRED, [])
+        # then, copy the individual properties
+        for prop_name, prop_data in model.get(OasField.PROPS, {}).items():
+            if prop_data.get(OasField.READ_ONLY, False):
+                continue
+
+            reference = prop_data.get(OasField.REFS)
+            if not reference:
+                updated = deepcopy(prop_data)
+                updated[OasField.REQUIRED.value] = prop_name in required_props
+                properties[prop_name] = updated
+                continue
+
+            submodel = self.get_reference_model(reference)
+            required_sub = submodel.get(OasField.REQUIRED, [])
+            for sub_name, sub_data in submodel.get(OasField.PROPS, {}).items():
+                if sub_data.get(OasField.READ_ONLY):
+                    continue
+
+                # these properties are "name mangled" to include the parent property name
+                full_name = f"{prop_name}.{sub_name}"
+                updated = deepcopy(sub_data)
+                updated[OasField.REQUIRED.value] = prop_name in required_props and sub_name in required_sub
+                updated[OasField.X_REF.value] = self.short_reference_name(reference)
+                updated[OasField.X_FIELD.value] = sub_name
+                updated[OasField.X_PARENT.value] = prop_name
+                properties[full_name] = updated
+
+        return properties
+
     def op_get_settable_body_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
         """Get a dictionary of settable body propertiess"""
         body = self.op_get_body(operation)
@@ -204,7 +255,7 @@ if __name__ == "__main__":
     def get_property_pytype(self, prop_data: dict[str, Any]) -> str:
         """
         Gets the "basic" Python type from a property object.
-        
+
         Each property potentially has 'type' and 'format' fields.
         """
         return self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
