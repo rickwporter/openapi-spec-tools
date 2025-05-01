@@ -306,7 +306,47 @@ def test_op_query_arguments():
                     'required': False,
                 }
             },
-            id="Owner")
+            id="Owner",
+        ),
+        pytest.param(
+            "ObservationStationCollectionGeoJson",
+            {
+                '@context': {
+                    '$ref': '#/components/schemas/JsonLdContext',
+                    'required': False,
+                    'x-reference': 'GeoJsonFeatureCollection',
+                    'x-field': '@context',
+                },
+                'type': {
+                    'enum': ['FeatureCollection'],
+                    'type': 'string',
+                    'required': True,
+                    'x-reference': 'GeoJsonFeatureCollection',
+                    'x-field': 'type',
+                },
+                # NOTE: this come from the later properties tha overrides the GeoJsonFeatureCollection
+                'features': {
+                    'items': {
+                        'properties': {
+                            'properties': {'$ref': '#/components/schemas/ObservationStation'}
+                        },
+                        'type': 'object',
+                    },
+                    'required': False,
+                     'type': 'array',
+                },
+                'pagination': {
+                    '$ref': '#/components/schemas/PaginationInfo',
+                    'required': False,
+                },
+                'observationStations': {
+                    'items': {'format': 'uri', 'type': 'string'},
+                    'required': False,
+                    'type': 'array',
+                },
+            },
+            id="allOf-properties"
+        ),
     ]
 )
 def test_expand_settable_properties(model_name, expected):

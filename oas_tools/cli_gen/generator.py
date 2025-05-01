@@ -132,7 +132,19 @@ if __name__ == "__main__":
         # start with the base-classes in allOf
         for parent in model.get(OasField.ALL_OF, []):
             reference = parent.get(OasField.REFS, "")
-            # TODO: handle non-reference allOf items??
+            if not reference:
+                # handle "anonymous" properties in the allOf list
+                inner_props = parent.get(OasField.PROPS, {})
+                inner_req = parent.get(OasField.REQUIRED, [])
+                for inner_name, inner_data in inner_props.items():
+                    if inner_data.get(OasField.READ_ONLY, False):
+                        continue
+
+                    updated = deepcopy(inner_data)
+                    updated[OasField.REQUIRED.value] = inner_name in inner_req
+                    properties[inner_name] = updated
+
+                continue
             submodel = self.get_reference_model(reference)
             required_sub = submodel.get(OasField.REQUIRED, [])
             for sub_name, sub_data in submodel.get(OasField.PROPS, {}).items():

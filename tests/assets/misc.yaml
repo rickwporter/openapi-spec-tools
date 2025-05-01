@@ -201,3 +201,59 @@ components:
         birthday:
           type: string
           readOnly: true
+    ObservationStationCollectionGeoJson:
+      allOf:
+      - "$ref": "#/components/schemas/GeoJsonFeatureCollection"
+      - type: object
+        properties:
+          features:
+            type: array
+            items:
+              type: object
+              properties:
+                properties:
+                  "$ref": "#/components/schemas/ObservationStation"
+          observationStations:
+            type: array
+            items:
+              type: string
+              format: uri
+          pagination:
+            "$ref": "#/components/schemas/PaginationInfo"
+          standalone:
+            type: boolean
+            readOnly: true
+    GeoJsonFeatureCollection:
+      required:
+      - type
+      - features
+      type: object
+      properties:
+        "@context":
+          "$ref": "#/components/schemas/JsonLdContext"
+        type:
+          enum:
+          - FeatureCollection
+          type: string
+        features:
+          type: array
+          items:
+            "$ref": "#/components/schemas/GeoJsonFeature"
+      description: A GeoJSON feature collection. Please refer to IETF RFC 7946 for
+        information on the GeoJSON format.
+    PaginationInfo:
+      required:
+      - next
+      type: object
+      properties:
+        next:
+          type: string
+          description: A link to the next page of records
+          format: uri
+      description: Links for retrieving more data from paged data sets
+      additionalProperties: false
+    JsonLdContext:
+      anyOf:
+      - type: array
+        items: {}
+      - type: object
