@@ -5,6 +5,7 @@ from typing import Optional
 
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import maybe_quoted
+from oas_tools.cli_gen.utils import set_missing
 from oas_tools.cli_gen.utils import to_snake_case
 from oas_tools.types import ContentType
 from oas_tools.types import OasField
@@ -147,15 +148,13 @@ if __name__ == "__main__":
                 continue
             submodel = self.get_reference_model(reference)
             required_sub = submodel.get(OasField.REQUIRED, [])
-            for sub_name, sub_data in submodel.get(OasField.PROPS, {}).items():
+            sub_properties = self.expand_settable_properties(submodel)
+            for sub_name, sub_data in sub_properties.items():
                 # NOTE: no "name mangling" since using inheritance
-                if sub_data.get(OasField.READ_ONLY, False):
-                    continue
-
                 updated = deepcopy(sub_data)
-                updated[OasField.REQUIRED.value] = sub_name in required_sub
-                updated[OasField.X_REF.value] = self.short_reference_name(reference)
-                updated[OasField.X_FIELD.value] = sub_name
+                set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
+                set_missing(updated, OasField.X_FIELD.value, sub_name)
+                updated[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED.value) and sub_name in required_sub
                 properties[sub_name] = updated
 
         required_props = model.get(OasField.REQUIRED, [])
@@ -173,17 +172,21 @@ if __name__ == "__main__":
 
             submodel = self.get_reference_model(reference)
             required_sub = submodel.get(OasField.REQUIRED, [])
-            for sub_name, sub_data in submodel.get(OasField.PROPS, {}).items():
-                if sub_data.get(OasField.READ_ONLY):
-                    continue
+            sub_properties = self.expand_settable_properties(submodel)
+            if not sub_properties:
+                updated = deepcopy(prop_data)
+                updated[OasField.REQUIRED.value] = prop_name in required_props
+                properties[prop_name] = updated
+                continue
 
+            for sub_name, sub_data in sub_properties.items():
                 # these properties are "name mangled" to include the parent property name
                 full_name = f"{prop_name}.{sub_name}"
                 updated = deepcopy(sub_data)
                 updated[OasField.REQUIRED.value] = prop_name in required_props and sub_name in required_sub
-                updated[OasField.X_REF.value] = self.short_reference_name(reference)
-                updated[OasField.X_FIELD.value] = sub_name
-                updated[OasField.X_PARENT.value] = prop_name
+                set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
+                set_missing(updated, OasField.X_FIELD.value, sub_name)
+                set_missing(updated, OasField.X_PARENT.value, prop_name)
                 properties[full_name] = updated
 
         return properties

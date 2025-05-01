@@ -17,3 +17,8 @@ def maybe_quoted(item: Any) -> str:
         return f'"{item}"'
 
     return str(item)
+
+
+def set_missing(obj: dict[str, Any], key: str, value: Any) -> None:
+    if key not in obj:
+        obj[key] = value

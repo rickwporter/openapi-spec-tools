@@ -324,7 +324,7 @@ def test_op_query_arguments():
                     'x-reference': 'GeoJsonFeatureCollection',
                     'x-field': 'type',
                 },
-                # NOTE: this come from the later properties tha overrides the GeoJsonFeatureCollection
+                # NOTE: this come from the later properties that overrides the GeoJsonFeatureCollection
                 'features': {
                     'items': {
                         'properties': {
@@ -345,7 +345,116 @@ def test_op_query_arguments():
                     'type': 'array',
                 },
             },
-            id="allOf-properties"
+            id="allOf-multi"
+        ),
+        pytest.param(
+            "GeoJsonFeatureCollection",
+            {
+                '@context': {
+                    '$ref': '#/components/schemas/JsonLdContext',
+                    'required': False,
+                },
+                'type': {
+                    'enum': ['FeatureCollection'],
+                    'type': 'string',
+                    'required': True,
+                },
+                'features': {
+                    'items': {
+                        '$ref': '#/components/schemas/GeoJsonFeature',
+                    },
+                    'required': True,
+                    'type': 'array',
+                },
+            },
+            id="unnested",
+        ),
+        pytest.param(
+            "DeeperNesting",
+            {
+                '@context': {
+                    '$ref': '#/components/schemas/JsonLdContext',
+                    'required': False,
+                    'x-field': '@context',
+                    'x-reference': 'GeoJsonFeatureCollection',
+                },
+                'features': {
+                    'items': {
+                        'properties': {'properties': {'$ref': '#/components/schemas/ObservationStation'}},
+                        'type': 'object'
+                    },
+                    'required': False,
+                    'type': 'array',
+                    'x-field': 'features',
+                    'x-reference': 'ObservationStationCollectionGeoJson',
+                },
+                'observationStations': {
+                    'items': {'format': 'uri', 'type': 'string'},
+                    'required': False,
+                    'type': 'array',
+                    'x-field': 'observationStations',
+                    'x-reference': 'ObservationStationCollectionGeoJson',
+                },
+                'owner.home.city': {
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'city',
+                    'x-parent': 'home',
+                    'x-reference': 'Address',
+                },
+                'owner.home.state': {
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'state',
+                    'x-parent': 'home',
+                    'x-reference': 'Address',
+                },
+                'owner.home.street': {
+                    'description': 'Street address (e.g. 123 Main Street, POBox 507)',
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'street',
+                    'x-parent': 'home',
+                    'x-reference': 'Address',
+                },
+                'owner.home.zipCode': {
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'zipCode',
+                    'x-parent': 'home',
+                    'x-reference': 'Address',
+                },
+                'owner.iceCream': {
+                    'description': 'Favorite ice cream flavor',
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'iceCream',
+                    'x-parent': 'owner',
+                    'x-reference': 'Owner',
+                },
+                'owner.name': {
+                    'descrption': 'Name of the pet owner',
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'name',
+                    'x-parent': 'owner',
+                    'x-reference': 'Person',
+                },
+                'pagination': {
+                    '$ref': '#/components/schemas/PaginationInfo',
+                    'required': False,
+                    'x-field': 'pagination',
+                    'x-reference': 'ObservationStationCollectionGeoJson',
+                },
+                'type': {
+                    'enum': ['FeatureCollection'],
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'type',
+                    'x-reference': 'GeoJsonFeatureCollection',
+                },
+            },
+            id="nesting",
         ),
     ]
 )
