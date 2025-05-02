@@ -220,7 +220,7 @@ if __name__ == "__main__":
         short_name = self.short_reference_name(full_name)
         return self.models.get(short_name)
 
-    def op_infra_arguments(self, operation: dict[str, Any], command: CommandNode) -> list[str]:
+    def command_infra_arguments(self, command: CommandNode) -> list[str]:
         args = [
             f'_api_host: _a.ApiHostOption = "{self.default_host}"',
             '_api_key: _a.ApiKeyOption = None',
@@ -330,37 +330,31 @@ if __name__ == "__main__":
 
         return f'{var_name}: Annotated[{arg_type}, {typer_type}({comma.join(typer_args)})]{arg_default}'
 
-    def op_path_arguments(self, operation: dict[str, Any]) -> list[str]:
+    def op_path_arguments(self, path_params: list[dict[str, Any]]) -> list[str]:
         """
         Converts all path parameters into typer arguments.
         """
         args = []
-        path_params = self.op_params(operation, "path")
         for param in path_params:
             arg = self.op_param_to_argument(param, allow_required=True)
             args.append(arg)
 
         return args
 
-    def op_query_arguments(self, operation: dict[str, Any]) -> list[str]:
+    def op_query_arguments(self, query_params: list[dict[str, Any]]) -> list[str]:
         """
         Converts query parameters to typer arguments
         """
         args = []
-        path_params = self.op_params(operation, "query")
-        for param in path_params:
+        for param in query_params:
             arg = self.op_param_to_argument(param, allow_required=False)
             args.append(arg)
 
         return args
 
-    def op_body_arguments(self, operation: dict[str, Any]) -> list[str]:
+    def op_body_arguments(self, body_params: list[dict[str, Any]]) -> list[str]:
         args = []
-        properties = self.op_get_settable_body_properties(operation)
-        if not properties:
-            return args
-
-        for prop_name, prop_data in properties.items():
+        for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_data)
             if not prop_data.get(OasField.REQUIRED):
                 py_type = f"Optional[{py_type}]"
@@ -377,15 +371,6 @@ if __name__ == "__main__":
             args.append(arg)
 
         return args
-
-    def op_arguments(self, operation: dict[str, Any], command: CommandNode) -> str:
-        args = []
-        args.extend(self.op_path_arguments(operation))
-        args.extend(self.op_query_arguments(operation))
-        args.extend(self.op_body_arguments(operation))
-        args.extend(self.op_infra_arguments(operation, command))
-
-        return f"{NL}    " + f",{NL}    ".join(args) + f",{NL}"
 
     def op_url_params(self, path: str) -> str:
         """Parse the X-PATH to list the parameters that go into the URL formation."""
@@ -407,11 +392,10 @@ if __name__ == "__main__":
 
         return f"_api_host, {', '.join(items)}"
 
-    def op_param_formation(self, operation: dict[str, Any]) -> str:
+    def op_param_formation(self, query_params: list[dict[str, Any]]) -> str:
         """Create the query parameters that go into the request"""
-        total_params = self.op_params(operation, "query")
         result = "{}"
-        for param in total_params:
+        for param in query_params:
             name = param.get(OasField.NAME)
             if param.get(OasField.REQUIRED, False):
                 result += f"""
@@ -431,14 +415,13 @@ if __name__ == "__main__":
             return ""
         return f', content_type="{content_type}"'
 
-    def op_body_formation(self, operation: dict[str, Any]) -> str:
+    def op_body_formation(self, body_params: dict[str, Any]) -> str:
         """Creates a body parameter and poulates it when there are body paramters."""
-        properties = self.op_get_settable_body_properties(operation)
-        if not properties:
+        if not body_params:
             return ""
 
         lines = ["body = {}"]
-        for prop_name, prop_data in properties.items():
+        for prop_name, prop_data in body_params.items():
             var_name = to_snake_case(prop_name)
             if prop_data.get(OasField.REQUIRED):
                 lines.append(f'body["{prop_name}"] = {var_name}')
@@ -448,22 +431,20 @@ if __name__ == "__main__":
 
         return SEP1 + SEP1.join(lines)
 
-    def op_check_missing(self, operation: dict[str, Any]) -> str:
+    def op_check_missing(self, query_params: list[dict[str, Any]], body_params: dict[str, Any]) -> str:
         """Checks for missing required parameters"""
         lines = ["[]"]
         lines.append("if _api_key is None:")
         lines.append('    missing.append("--api-key")')
 
-        path_params = self.op_params(operation, "query")
-        for param in path_params:
+        for param in query_params:
             if param.get(OasField.REQUIRED, False):
                 var_name = to_snake_case(param.get(OasField.NAME))
                 option = '--' + var_name.replace('_', '-')
                 lines.append(f'if {var_name} is None:')
                 lines.append(f'    missing.append("{option}")')
 
-        properties = self.op_get_settable_body_properties(operation)
-        for prop_name, prop_data in properties.items():
+        for prop_name, prop_data in body_params.items():
             if prop_data.get(OasField.REQUIRED):
                 var_name = to_snake_case(prop_name)
                 option = '--' + var_name.replace('_', '-')
@@ -509,6 +490,9 @@ if __name__ == "__main__":
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
         path = op.get(OasField.X_PATH)
+        path_params = self.op_params(op, "path")
+        query_params = self.op_params(op, "query")
+        body_params = self.op_get_settable_body_properties(op)
 
         req_args = []
         if node.pagination:
@@ -526,19 +510,26 @@ if __name__ == "__main__":
             req_args.append("body=body")
         req_args.append("timemout=_api_timeout")
 
+        func_args = []
+        func_args.extend(self.op_path_arguments(path_params))
+        func_args.extend(self.op_query_arguments(query_params))
+        func_args.extend(self.op_body_arguments(body_params))
+        func_args.extend(self.command_infra_arguments(node))
+        args_str = SEP1 + f",{SEP1}".join(func_args) + "," + NL
+
         return f"""
 
 @app.command("{node.command}", help="{self.op_short_help(op)}")
-def {to_snake_case(node.identifier)}({self.op_arguments(op, node)}) -> None:
+def {to_snake_case(node.identifier)}({args_str}) -> None:
     {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key{self.op_content_header(op)})
     url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}
-    missing = {self.op_check_missing(op)}
+    missing = {self.op_check_missing(query_params, body_params)}
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 
-    params = {self.op_param_formation(op)}{self.op_body_formation(op)}
+    params = {self.op_param_formation(query_params)}{self.op_body_formation(body_params)}
 
     try:
         data = _r.{req_func}({', '.join(req_args)}){self.summary_display(node)}

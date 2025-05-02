@@ -131,6 +131,7 @@ def test_op_param_formation():
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
+    query_params = uut.op_params(op, "query")
 
     expected = """\
 {}
@@ -141,7 +142,7 @@ def test_op_param_formation():
     if more is not None:
         params["more"] = more\
 """
-    text = uut.op_param_formation(op)
+    text = uut.op_param_formation(query_params)
     assert expected == text
 
 
@@ -199,7 +200,8 @@ def test_op_body_formation():
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
-    text = uut.op_body_formation(op)
+    body_params = uut.op_get_settable_body_properties(op)
+    text = uut.op_body_formation(body_params)
     assert "body = {}" in text
     assert 'body["id"]' not in text  # ignore read-only
     assert 'body["name"] = name' in text  # required
@@ -211,8 +213,9 @@ def test_op_path_arguments():
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
+    path_params = uut.op_params(op, "path")
 
-    lines = uut.op_path_arguments(op)
+    lines = uut.op_path_arguments(path_params)
     text = "\n".join(lines)
 
     assert 'num_feet: Annotated[Optional[int], typer.Option(show_default=False, help="Number of feet")] = None' in text
@@ -235,8 +238,9 @@ def test_op_query_arguments():
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
+    query_params = uut.op_params(op, "query")
 
-    lines = uut.op_query_arguments(op)
+    lines = uut.op_query_arguments(query_params)
     text = "\n".join(lines)
 
     assert (
@@ -471,8 +475,9 @@ def test_op_body_arguments():
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
+    body_params = uut.op_get_settable_body_properties(op)
 
-    lines = uut.op_body_arguments(op)
+    lines = uut.op_body_arguments(body_params)
     text = "\n".join(lines)
     assert 'name: Annotated[str, typer.Option(show_default=False, help="Pet name")] = None' in text
     assert 'tag: Annotated[Optional[str], typer.Option(show_default=False, help="Pet classification")] = None' in text
@@ -538,11 +543,9 @@ def test_pagination_creation(names, expected) -> None:
 )
 def test_op_infra_arguments(command, has_details):
     oas = open_oas(asset_filename("misc.yaml"))
-    operations = map_operations(oas.get(OasField.PATHS))
-    op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
 
-    lines = uut.op_infra_arguments(op, command)
+    lines = uut.command_infra_arguments(command)
     text = "\n".join(lines)
 
     # check standard arguments
@@ -562,39 +565,15 @@ def test_op_infra_arguments(command, has_details):
     assert '= "http://petstore.swagger.io/v1"' in text
 
 
-def test_op_arguments():
-    command = CommandNode(command="foo", identifier="bar", summary_fields=["123"])
-    oas = open_oas(asset_filename("misc.yaml"))
-    operations = map_operations(oas.get(OasField.PATHS))
-    op = operations.get("testPathParams")
-    uut = Generator("cli_package", oas)
-
-    text = uut.op_arguments(op, command)
-    # check a couple infra arguments
-    assert "_api_host: _a.ApiHostOption" in text
-    assert "_api_key: _a.ApiKeyOption" in text
-    assert "_details: _a.DetailsOption" in text
-
-    # check a couple path parameter arguments
-    assert 'num_feet: Annotated' in text
-    assert 'your_boat: Annotated' in text
-
-    # check a couple query parameter arguments
-    assert 'situation: Annotated' in text
-    assert 'more: Annotated' in text
-
-    # check a couple body params
-    assert 'name: Annotated[str,' in text
-    assert 'tag: Annotated[Optional[str]' in text
-
-
 def test_op_check_missing():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
+    query_params = uut.op_params(op, "query")
+    body_params = uut.op_get_settable_body_properties(op)
 
-    text = uut.op_check_missing(op)
+    text = uut.op_check_missing(query_params, body_params)
 
     # infra
     assert 'if _api_key is None:' in text
