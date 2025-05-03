@@ -304,7 +304,11 @@ if __name__ == "__main__":
 
         Each property potentially has 'type' and 'format' fields.
         """
-        return self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+        pytype = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+        if not prop_data.get(OasField.REQUIRED):
+            pytype = f"Optional[{pytype}]"
+
+        return pytype
 
     def op_params(self, operation: dict[str, Any], location: str) -> list[dict[str, Any]]:
         """
@@ -387,8 +391,6 @@ if __name__ == "__main__":
         args = []
         for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_data)
-            if not prop_data.get(OasField.REQUIRED):
-                py_type = f"Optional[{py_type}]"
 
             def_val = maybe_quoted(prop_data.get(OasField.DEFAULT))
             t_args = {}

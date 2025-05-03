@@ -14,6 +14,9 @@ from tests.helpers import asset_filename
 
 SUM = "summary"
 DESC = "description"
+TYPE = "type"
+FORMAT = "format"
+REQUIRED = "required"
 
 
 def test_shebang():
@@ -177,6 +180,20 @@ def test_schema_to_type_failure(schema, fmt):
 
     with pytest.raises(ValueError, match=f"Unable to determine type for {schema}"):
         uut.schema_to_type(schema, fmt)
+
+
+@pytest.mark.parametrize(
+    ["prop_data", "expected"],
+    [
+        pytest.param({TYPE: "string", REQUIRED: True}, "str", id="str"),
+        pytest.param({TYPE: "string", FORMAT: "date-time", REQUIRED: True}, "datetime", id="datetime"),
+        pytest.param({TYPE: "string", FORMAT: "unknown", REQUIRED: False}, "Optional[str]", id="optional-str"),
+        pytest.param({TYPE: "integer"}, "Optional[int]", id="optional-int"),
+    ],
+)
+def test_get_property_pytype(prop_data, expected):
+    uut = Generator("cli_package", {})
+    assert expected == uut.get_property_pytype(prop_data)
 
 
 @pytest.mark.parametrize(
