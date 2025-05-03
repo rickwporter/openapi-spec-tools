@@ -201,6 +201,33 @@ components:
         birthday:
           type: string
           readOnly: true
+    Species:
+      type: string
+      enum:
+      - cat
+      - dog
+      - bunny
+      - frog
+    AllOfSpecies:
+      allOf:
+      - $ref: "#/components/schemas/Species"
+    RefToSpecies:
+      $ref: "#/components/schemas/Species"
+    SpeciesProp:
+      properties:
+        species:
+          $ref: "#/components/schemas/Species"
+    PetReference:
+      allOf:
+      - $ref: "#/components/schemas/Pet"
+    PetInherited:
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
     ObservationStationCollectionGeoJson:
       allOf:
       - "$ref": "#/components/schemas/GeoJsonFeatureCollection"

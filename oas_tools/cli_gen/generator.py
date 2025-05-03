@@ -129,6 +129,32 @@ if __name__ == "__main__":
 
         return None
 
+    def model_is_complex(self, model: dict[str, Any]) -> bool:
+        """Determines if the model is complex, such that it would not work well with a list.
+
+        Basically, anything with more than one property is considered complex. This logic is
+        not perfect -- it does not expand everything (or wait for "final" answers), but is
+        good enough in most cases.
+        """
+        total_prop_count = len(model.get(OasField.PROPS, {}))
+        if total_prop_count > 1:
+            return True
+
+        for inherited in model.get(OasField.ALL_OF, []):
+            properties = inherited.get(OasField.PROPS, {})
+            total_prop_count += len(properties)
+            if total_prop_count > 1:
+                return True
+
+            reference = inherited.get(OasField.REFS)
+            submodel = self.get_reference_model(reference)
+            properties = submodel.get(OasField.PROPS, {})
+            total_prop_count += len(properties)
+            if total_prop_count > 1:
+                return True
+
+        return False
+
     def expand_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties"""
         properties = {}

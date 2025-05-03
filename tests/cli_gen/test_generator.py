@@ -262,6 +262,26 @@ def test_op_query_arguments():
     assert 'num_feet: Annotated' not in text
     assert 'must_have: Annotated' not in text
 
+
+@pytest.mark.parametrize(
+    ["reference", "expected"],
+    [
+        pytest.param("Species", False, id="enum"),
+        pytest.param("AllOfSpecies", False, id="all-of-enum"),
+        pytest.param("RefToSpecies", False, id="ref-to-enum"),
+        pytest.param("SpeciesProp", False, id="single-enum-prop"),
+        pytest.param("Pet", True, id="obj"),
+        pytest.param("PetInherited", True, id="obj-inherted"),
+        pytest.param("PetReference", True, id="obj-reference"),
+    ]
+)
+def test_model_is_complex(reference, expected):
+    oas = open_oas(asset_filename("misc.yaml"))
+    uut = Generator("cli_package", oas)
+    model = uut.get_reference_model(reference)
+    assert expected == uut.model_is_complex(model)
+
+
 @pytest.mark.parametrize(
     ["model_name", "expected"],
     [
