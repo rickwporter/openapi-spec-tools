@@ -52,7 +52,7 @@ class Generator:
 
     def standard_imports(self) -> str:
         return f"""
-from enum import Enum
+from enum import Enum  # noqa: F401
 from typing import Optional
 from typing_extensions import Annotated
 
