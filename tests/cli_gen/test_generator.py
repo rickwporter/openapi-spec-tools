@@ -157,6 +157,7 @@ def test_op_param_formation():
         pytest.param("numeric", None, "float", id="numeric"),
         pytest.param("string", None, "str", id="str"),
         pytest.param("string", "date-time", "datetime", id="datetime"),
+        pytest.param("string", "date", "date", id="date"),
     ]
 )
 def test_schema_to_type_success(schema, fmt, expected):

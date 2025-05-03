@@ -52,6 +52,8 @@ class Generator:
 
     def standard_imports(self) -> str:
         return f"""
+from datetime import date  # noqa: F401
+from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Optional
 from typing_extensions import Annotated
@@ -279,6 +281,8 @@ if __name__ == "__main__":
         if schema == "string":
             if fmt == "date-time":
                 return "datetime"
+            if fmt == "date":
+                return "date"
             # TODO: uuid
             return "str"
 
