@@ -21,3 +21,10 @@ cov: ## Run unit tests with code coverage measurments
 	$(poetry_run) coverage run -m pytest -v $(TEST_TARGET)
 	$(poetry_run) coverage report -m
 	$(poetry_run) coverage html
+
+###########
+##@ Examples
+examples: pets-cli ## Generate all examples
+
+pets-cli: ## Generate pets-cli
+	make -C examples/pets-cli gen
