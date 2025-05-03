@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Any
 from typing import Optional
 
+from oas_tools.cli_gen._logging import get_logger
+from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import maybe_quoted
 from oas_tools.cli_gen.utils import set_missing
@@ -38,6 +40,7 @@ class Generator:
         self.supported = [
             ContentType.APP_JSON,
         ]
+        self.logger = get_logger(GENERATOR_LOG_CLASS)
 
     def shebang(self) -> str:
         """Returns the shebang line that goes at the top of each file."""
@@ -256,6 +259,8 @@ if __name__ == "__main__":
         message = f"Unable to determine type for {schema}"
         if fmt:
             message += f" ({fmt})"
+
+        self.logger.error(message)
         raise ValueError(message)
 
     def get_parameter_pytype(self, param_data: dict[str, Any]) -> str:
@@ -510,6 +515,7 @@ if __name__ == "__main__":
             req_args.append("body=body")
         req_args.append("timemout=_api_timeout")
 
+        func_name = to_snake_case(node.identifier)
         func_args = []
         func_args.extend(self.op_path_arguments(path_params))
         func_args.extend(self.op_query_arguments(query_params))
@@ -517,10 +523,12 @@ if __name__ == "__main__":
         func_args.extend(self.command_infra_arguments(node))
         args_str = SEP1 + f",{SEP1}".join(func_args) + "," + NL
 
+        self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
+
         return f"""
 
 @app.command("{node.command}", help="{self.op_short_help(op)}")
-def {to_snake_case(node.identifier)}({args_str}) -> None:
+def {func_name}({args_str}) -> None:
     {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key{self.op_content_header(op)})

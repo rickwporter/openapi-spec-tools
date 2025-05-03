@@ -1,0 +1,2 @@
+
+GENERATOR_LOG_CLASS = "cli-gen"

@@ -9,6 +9,9 @@ from rich.console import Console
 from rich.table import Table
 from typing_extensions import Annotated
 
+from oas_tools.cli_gen._arguments import LogLevelOption
+from oas_tools.cli_gen._logging import init_logging
+from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generate import check_for_missing
 from oas_tools.cli_gen.generate import copy_infrastructure
 from oas_tools.cli_gen.generate import generate_node
@@ -180,7 +183,9 @@ def generate_cli(
     package_name: Annotated[str, typer.Argument(show_default=False, help="Base package name")],
     directory: Annotated[str, typer.Argument(show_default=False, help="Directory name")],
     start: StartPointOption = DEFAULT_START,
+    log_level: LogLevelOption = "DEBUG",
 ) -> None:
+    init_logging(log_level, GENERATOR_LOG_CLASS)
     commands = file_to_tree(layout_file, start=start)
     oas = open_oas(openapi_file)
 

@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+from oas_tools.cli_gen._logging import get_logger
+from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generator import COPYRIGHT
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout_types import CommandNode
@@ -18,9 +20,13 @@ INFRASTRUCTURE_FILES = {
     "_requests.py": "_requests.py",
 }
 
+logger = get_logger(GENERATOR_LOG_CLASS)
+
 
 def generate_node(generator: Generator, node: CommandNode, directory: str) -> None:
     """Creates a file/module for the current node, and recursively goes through sub-commands."""
+    module_name = to_snake_case(node.identifier)
+    logger.info(f"Generating {module_name} module")
     text = generator.shebang()
     text += generator.copyright()
     text += generator.standard_imports()
@@ -30,7 +36,7 @@ def generate_node(generator: Generator, node: CommandNode, directory: str) -> No
         text += generator.function_definition(command)
     text += generator.main()
 
-    filename = os.path.join(directory, to_snake_case(node.identifier) + ".py")
+    filename = os.path.join(directory, module_name + ".py")
     with open(filename, "w") as fp:
         fp.write(text)
     os.chmod(filename, 0o755)
