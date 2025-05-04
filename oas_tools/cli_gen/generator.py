@@ -202,6 +202,22 @@ if __name__ == "__main__":
 
         return None
 
+    def prop_find_reference(self, prop_data: dict[str, Any]) -> str:
+        """Properties may have a reference buried inside an anyOf, allOf, or oneOf."""
+        reference = prop_data.get(OasField.REFS)
+        if reference:
+            return reference
+
+        parents = prop_data.get(OasField.ALL_OF, [])
+        parents.extend(prop_data.get(OasField.ANY_OF, []))
+        parents.extend(prop_data.get(OasField.ONE_OF, []))
+        for parent in parents:
+            reference = parent.get(OasField.REFS)
+            if reference:
+                return reference
+
+        return ""
+
     def model_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties"""
         properties = {}
@@ -237,7 +253,7 @@ if __name__ == "__main__":
             if prop_data.get(OasField.READ_ONLY, False):
                 continue
 
-            reference = prop_data.get(OasField.REFS, "")
+            reference = self.prop_find_reference(prop_data)
             short_refname = self.short_reference_name(reference)
             if not reference:
                 submodel = deepcopy(prop_data)

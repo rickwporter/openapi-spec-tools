@@ -453,4 +453,38 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NoSuchModel"
-        
+    RoleEnum:
+      enum:
+      - OWNER
+      - ADMIN
+      - CONTRIB
+      - VIEWER
+      type: string
+    MembershipCreate:
+      type: object
+      properties:
+        user:
+          type: string
+          format: uri
+          description: The user of the membership.
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the user has in the organization.
+      required:
+      - role
+      - user
+    MembershipCreateAnyOf:
+      type: object
+      properties:
+        role:
+          anyOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the user has in the organization.
+    MembershipCreateOneOf:
+      type: object
+      properties:
+        role:
+          oneOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the user has in the organization.

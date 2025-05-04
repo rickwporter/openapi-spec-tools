@@ -538,6 +538,48 @@ def test_model_is_complex(reference, expected):
             {'foo': {'type': 'integer', 'required': False}},
             id="missing-items",
         ),
+        pytest.param(
+            "MembershipCreate",
+            {
+                'role': {
+                    'enum': ['OWNER', 'ADMIN', 'CONTRIB', 'VIEWER'],
+                    'required': True,
+                    'type': 'string',
+                    'x-reference': 'RoleEnum',
+                },
+                'user': {
+                    'description': 'The user of the membership.',
+                    'format': 'uri',
+                    'required': True,
+                    'type': 'string',
+                },
+            },
+            id="enum-all-of"
+        ),
+        pytest.param(
+            "MembershipCreateAnyOf",
+            {
+                'role': {
+                    'enum': ['OWNER', 'ADMIN', 'CONTRIB', 'VIEWER'],
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'RoleEnum',
+                },
+            },
+            id="enum-any-of"
+        ),
+        pytest.param(
+            "MembershipCreateOneOf",
+            {
+                'role': {
+                    'enum': ['OWNER', 'ADMIN', 'CONTRIB', 'VIEWER'],
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'RoleEnum',
+                },
+            },
+            id="enum-one-of"
+        ),
     ]
 )
 def test_model_settable_properties(model_name, expected):
