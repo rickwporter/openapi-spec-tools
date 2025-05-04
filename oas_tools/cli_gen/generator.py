@@ -138,9 +138,23 @@ if __name__ == "__main__":
         not perfect -- it does not expand everything (or wait for "final" answers), but is
         good enough in most cases.
         """
-        total_prop_count = len(model.get(OasField.PROPS, {}))
-        if total_prop_count > 1:
-            return True
+        total_prop_count = 0
+        for prop_data in model.get(OasField.PROPS, {}).values():
+            if prop_data.get(OasField.READ_ONLY):
+                continue
+
+            reference = prop_data.get(OasField.REFS)
+            if not reference:
+                total_prop_count += 1
+            if reference:
+                submodel = self.get_reference_model(reference)
+                if self.model_is_complex(submodel):
+                    return True
+                sub_props = submodel.get(OasField.PROPS, {})
+                total_prop_count += len(sub_props)
+
+            if total_prop_count > 1:
+                return True
 
         for inherited in model.get(OasField.ALL_OF, []):
             properties = inherited.get(OasField.PROPS, {})
@@ -157,6 +171,18 @@ if __name__ == "__main__":
 
         return False
 
+    def get_items_model(self, prop_data: dict[str, Any]) -> tuple[bool, str]:
+        """Determines if the property data references complex items"""
+        items = prop_data.get(OasField.ITEMS, {})
+        item_ref = items.get(OasField.REFS, "")
+        if item_ref:
+            item_model = deepcopy(self.get_reference_model(item_ref))
+        else:
+            item_model = deepcopy(items)
+
+        return item_model
+
+
     def expand_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties"""
         properties = {}
@@ -164,11 +190,16 @@ if __name__ == "__main__":
         # start with the base-classes in allOf
         for parent in model.get(OasField.ALL_OF, []):
             reference = parent.get(OasField.REFS, "")
+            short_refname = self.short_reference_name(reference)
             if not reference:
                 # this is an unnamed sub-reference
                 submodel = deepcopy(parent)
             else:
-                submodel = self.get_reference_model(reference)
+                submodel = deepcopy(self.get_reference_model(reference))
+
+            if not submodel:
+                self.logger.warning(f"Failed to find {short_refname} model")
+                continue
 
             required_sub = submodel.get(OasField.REQUIRED, [])
             sub_properties = self.expand_settable_properties(submodel)
@@ -187,11 +218,28 @@ if __name__ == "__main__":
             if prop_data.get(OasField.READ_ONLY, False):
                 continue
 
-            reference = prop_data.get(OasField.REFS)
+            reference = prop_data.get(OasField.REFS, "")
+            short_refname = self.short_reference_name(reference)
             if not reference:
                 submodel = deepcopy(prop_data)
             else:
-                submodel = self.get_reference_model(reference)
+                submodel = deepcopy(self.get_reference_model(reference))
+
+            if not submodel:
+                self.logger.warning(f"Failed to find {short_refname} model")
+                continue
+
+            is_list = prop_data.get(OasField.TYPE) == "array"
+            if is_list:
+                item_model = self.get_items_model(submodel)
+                if not item_model:
+                    self.logger.error(f"Could not find {short_refname}.{prop_name} item model")
+                    continue
+                if self.model_is_complex(item_model):
+                    self.logger.error(f"Ignoring {short_refname}.{prop_name} -- cannot handle lists of complex")
+                    continue
+                submodel.pop(OasField.ITEMS, None)
+                submodel.update(item_model)
 
             required_sub = submodel.get(OasField.REQUIRED, [])
             sub_properties = self.expand_settable_properties(submodel)

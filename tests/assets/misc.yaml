@@ -228,6 +228,46 @@ components:
             type: string
           name:
             type: string
+    GeometryString:
+      type: string
+      description: A geometry represented in Well-Known Text (WKT) format.
+      format: wkt
+      nullable: true
+    ObservationStation:
+      type: object
+      properties:
+        "@context":
+          "$ref": "#/components/schemas/JsonLdContext"
+        geometry:
+          "$ref": "#/components/schemas/GeometryString"
+        "@id":
+          type: string
+          format: uri
+        "@type":
+          enum:
+          - wx:ObservationStation
+          type: string
+        stationIdentifier:
+          type: string
+        name:
+          type: string
+        timeZone:
+          type: string
+          format: iana-time-zone-identifier
+        forecast:
+          type: string
+          description: A link to the NWS public forecast zone containing this station.
+          format: uri
+        county:
+          type: string
+          description: A link to the NWS county zone containing this station.
+          format: uri
+        fireWeatherZone:
+          type: string
+          description: A link to the NWS fire weather forecast zone containing this
+            station.
+          format: uri
+      additionalProperties: false
     ObservationStationCollectionGeoJson:
       allOf:
       - "$ref": "#/components/schemas/GeoJsonFeatureCollection"
@@ -290,4 +330,115 @@ components:
       properties:
         owner:
           "$ref": "#/components/schemas/Owner"
-
+    GeoJsonFeature:
+      required:
+      - type
+      - geometry
+      - properties
+      type: object
+      properties:
+        "@context":
+          "$ref": "#/components/schemas/JsonLdContext"
+        id:
+          type: string
+          format: uri
+        type:
+          enum:
+          - Feature
+          type: string
+        geometry:
+          "$ref": "#/components/schemas/GeoJsonGeometry"
+        properties:
+          type: object
+      description: A GeoJSON feature. Please refer to IETF RFC 7946 for information
+        on the GeoJSON format.
+      additionalProperties: false
+    TrelloID:
+      type: string
+      pattern: "^[0-9a-fA-F]{24}$"
+    Color:
+      type: string
+      enum:
+      - yellow
+      - purple
+      - blue
+      - red
+      - green
+      - orange
+      - black
+      - sky
+      - pink
+      - lime
+      nullable: true
+    Attachment:
+      type: object
+      properties:
+        id:
+          "$ref": "#/components/schemas/TrelloID"
+        bytes:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date
+        edgeColor:
+          type: string
+          "$ref": "#/components/schemas/Color"
+          nullable: true
+        idMember:
+          type: string
+        isUpload:
+          type: boolean
+        mimeType:
+          type: string
+        name:
+          type: string
+        previews:
+          type: array
+          items:
+            type: string
+        url:
+          type: string
+          format: url
+        pos:
+          type: number
+          format: float
+    MultiAttachmentProperties:
+      allOf:
+      - properties:
+          files:
+            type: array
+            items:
+              $ref: "#/components/schemas/Attachment"
+          color:
+            $ref: "#/components/schemas/Color"
+    MultiAttachmentList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Attachment"
+    MissingInheritedSubmodel:
+      allOf:
+        - $ref: "#/components/schemas/NoSuchModel"
+      type: object
+      required:
+      - sna
+      properties:
+        sna:
+          type: string
+    MissingSubmodelProperty:
+      type: object
+      properties:
+        foo:
+          $ref: "#/components/schemas/NoSuchModel"
+        bar:
+          type: string
+    MissingItemsModel:
+      type: object
+      properties:
+        foo:
+          type: integer
+        bar:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoSuchModel"
+        

@@ -366,18 +366,6 @@ def test_model_is_complex(reference, expected):
                     'x-reference': 'GeoJsonFeatureCollection',
                     'x-field': 'type',
                 },
-                # NOTE: this come from the later properties that overrides the GeoJsonFeatureCollection
-                'features': {
-                    'items': {
-                        'properties': {
-                            'properties': {'$ref': '#/components/schemas/ObservationStation'}
-                        },
-                        'type': 'object',
-                    },
-                    'required': False,
-                     'type': 'array',
-                     'x-field': 'features',
-                },
                 'pagination.next':
                 {
                     'description': 'A link to the next page of records',
@@ -409,13 +397,6 @@ def test_model_is_complex(reference, expected):
                     'type': 'string',
                     'required': True,
                 },
-                'features': {
-                    'items': {
-                        '$ref': '#/components/schemas/GeoJsonFeature',
-                    },
-                    'required': True,
-                    'type': 'array',
-                },
             },
             id="unnested",
         ),
@@ -427,16 +408,6 @@ def test_model_is_complex(reference, expected):
                     'required': False,
                     'x-field': '@context',
                     'x-reference': 'GeoJsonFeatureCollection',
-                },
-                'features': {
-                    'items': {
-                        'properties': {'properties': {'$ref': '#/components/schemas/ObservationStation'}},
-                        'type': 'object'
-                    },
-                    'required': False,
-                    'type': 'array',
-                    'x-field': 'features',
-                    'x-reference': 'ObservationStationCollectionGeoJson',
                 },
                 'observationStations': {
                     'items': {'format': 'uri', 'type': 'string'},
@@ -508,6 +479,59 @@ def test_model_is_complex(reference, expected):
                 },
             },
             id="nesting",
+        ),
+        pytest.param(
+            "Attachment",
+            {
+                'bytes': {'nullable': True, 'required': False, 'type': 'string'},
+                'date': {'format': 'date', 'required': False, 'type': 'string'},
+                'edgeColor': {
+                    '$ref': '#/components/schemas/Color',
+                    'nullable': True,
+                    'required': False,
+                    'type': 'string',
+                },
+                'id': {'$ref': '#/components/schemas/TrelloID', 'required': False},
+                'idMember': {'required': False, 'type': 'string'},
+                'isUpload': {'required': False, 'type': 'boolean'},
+                'mimeType': {'required': False, 'type': 'string'},
+                'name': {'required': False, 'type': 'string'},
+                'pos': {'format': 'float', 'required': False, 'type': 'number'},
+                'previews': {'items': {'type': 'string'}, 'required': False, 'type': 'array'},
+                'url': {'format': 'url', 'required': False, 'type': 'string'}
+            },
+            id="item"
+        ),
+        pytest.param(
+            "MultiAttachmentProperties",
+            {
+                'color': {
+                    '$ref': '#/components/schemas/Color',
+                    'required': False,
+                    'x-field': 'color',
+                },
+            },
+            id="list-all-of"
+        ),
+        pytest.param(
+            "MultiAttachmentList",
+            {},
+            id="list-ref",
+        ),
+        pytest.param(
+            "MissingInheritedSubmodel",
+            {'sna': {'type': 'string', 'required': True}},
+            id="missing-submodel",
+        ),
+        pytest.param(
+            "MissingSubmodelProperty",
+            {'bar': {'type': 'string', 'required': False}},
+            id="missing-submodel",
+        ),
+        pytest.param(
+            "MissingItemsModel",
+            {'foo': {'type': 'integer', 'required': False}},
+            id="missing-items",
         ),
     ]
 )

@@ -10,6 +10,7 @@ class OasField(str, Enum):
     DESCRIPTION = "description"
     FORMAT = "format"
     IN = "in"
+    ITEMS = "items"
     MAX = "maximum"
     MIN = "minimum"
     NAME = "name"
@@ -33,6 +34,7 @@ class OasField(str, Enum):
     URL = "url"
 
     X_FIELD = "x-field"
+    X_LIST = "x-list"
     X_METHOD = "x-method"
     X_PARENT = "x-parent"
     X_PATH = "x-path"
