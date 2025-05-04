@@ -8,6 +8,7 @@ class OasField(str, Enum):
     CONTENT = "content"
     DEFAULT = "default"
     DESCRIPTION = "description"
+    ENUM = "enum"
     FORMAT = "format"
     IN = "in"
     ITEMS = "items"

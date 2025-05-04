@@ -18,7 +18,8 @@ TYPE = "type"
 FORMAT = "format"
 REQUIRED = "required"
 COLLECT = "x-collection"
-
+ENUM = "enum"
+SCHEMA = "schema"
 
 def test_shebang():
     uut = Generator("cli_package", {})
@@ -172,24 +173,76 @@ def test_schema_to_type(schema, fmt, expected):
 
 
 @pytest.mark.parametrize(
-    ["prop_data", "expected"],
+    ["proposed", "expected"],
     [
-        pytest.param({TYPE: "string", REQUIRED: True}, "str", id="str"),
-        pytest.param({TYPE: "string", FORMAT: "date-time", REQUIRED: True}, "datetime", id="datetime"),
-        pytest.param({TYPE: "string", FORMAT: "unknown", REQUIRED: False}, "Optional[str]", id="optional-str"),
-        pytest.param({TYPE: "integer"}, "Optional[int]", id="optional-int"),
-        pytest.param({TYPE: "string", FORMAT: "date", COLLECT: "array", REQUIRED: True}, "list[date]", id="list-date"),
+        pytest.param("simple", "Simple", id="simple"),
+        pytest.param("snake_case_value", "SnakeCaseValue", id="snake"),
+        pytest.param("camelCaseValue", "CamelCaseValue", id="camel"),
+        pytest.param("decimal.dot.value", "DecimalDotValue", id="dotted"),
+        pytest.param("AlreadyClassName", "AlreadyClassName", id="class"),
+    ]
+)
+def test_class_name(proposed, expected):
+    uut = Generator("cli_package", {})
+    assert expected == uut.class_name(proposed)
+
+@pytest.mark.parametrize(
+    ["param_data", "expected"],
+    [
+        pytest.param({}, None, id="unknown"),
+        pytest.param({SCHEMA: {TYPE: "string"}}, "str", id="str"),
+        pytest.param({SCHEMA: {TYPE: "integer"}}, "int", id="int"),
+        pytest.param({SCHEMA: {TYPE: "numeric"}}, "float", id="float"),
+        pytest.param({SCHEMA: {TYPE: "string", ENUM: ["a", "b"]}, "name": "sna_foo"}, "SnaFoo", id="unref-enum"),
         pytest.param(
+            {SCHEMA: {TYPE: "string", ENUM: ["a", "b"], "$ref": "#/comp/Schema/FooBar"}, "name": "sna_foo"},
+            "FooBar",
+            id="ref-enum",
+        ),
+    ],
+)
+def test_get_parameter_pytype(param_data, expected):
+    uut = Generator("cli_package", {})
+    assert expected == uut.get_parameter_pytype(param_data)
+
+
+@pytest.mark.parametrize(
+    ["prop_name", "prop_data", "expected"],
+    [
+        pytest.param("foo", {TYPE: "string", REQUIRED: True}, "str", id="str"),
+        pytest.param("foo", {TYPE: "string", FORMAT: "date-time", REQUIRED: True}, "datetime", id="datetime"),
+        pytest.param("foo", {TYPE: "string", FORMAT: "unknown", REQUIRED: False}, "Optional[str]", id="optional-str"),
+        pytest.param("foo", {TYPE: "integer"}, "Optional[int]", id="optional-int"),
+        pytest.param(
+            "foo",
+            {TYPE: "string", FORMAT: "date", COLLECT: "array", REQUIRED: True},
+            "list[date]",
+            id="list-date",
+        ),
+        pytest.param(
+            "foo",
             {TYPE: "numeric", COLLECT: "array", REQUIRED: False},
             "Optional[list[float]]",
             id="optional-list-float",
         ),
-        pytest.param({TYPE: "foo"}, None, id="unknown"),
+        pytest.param("foo", {TYPE: "foo"}, None, id="unknown"),
+        pytest.param(
+            "foo",
+            {TYPE: "string", REQUIRED: True, ENUM: ["a", "b"], "x-reference": "east_west"},
+            "EastWest",
+            id="named-enum",
+        ),
+        pytest.param(
+            "foo",
+            {TYPE: "string", REQUIRED: True, ENUM: ["a", "b"]},
+            "Foo",
+            id="unnamed-enum"
+        ),
     ],
 )
-def test_get_property_pytype(prop_data, expected):
+def test_get_property_pytype(prop_name, prop_data, expected):
     uut = Generator("cli_package", {})
-    assert expected == uut.get_property_pytype(prop_data)
+    assert expected == uut.get_property_pytype(prop_name, prop_data)
 
 
 @pytest.mark.parametrize(
@@ -294,6 +347,120 @@ def test_model_is_complex(reference, expected):
     uut = Generator("cli_package", oas)
     model = uut.get_reference_model(reference)
     assert expected == uut.model_is_complex(model)
+
+
+SIMPLE_ENUM = """\
+class Simple(str, Enum):  # noqa: F811
+    A_OR_B = "aOrB"
+    B_OR_C = "b_or_C"
+
+"""
+
+FOOBAR_ENUM = SIMPLE_ENUM.replace("Simple", "FooBar")
+
+NON_STR_ENUM = """\
+class anyThing_goes(int, Enum):  # noqa: F811
+    VALUE_1 = 1
+    VALUE_NONE = None
+    VALUE_TRUE = True
+
+"""
+
+SIMPLE_PARAM = {
+    SCHEMA: {
+        TYPE: "string", ENUM: ["aOrB", "b_or_C"], "$ref": "#/components/schemas/Simple"
+    },
+    "name": "fooBar",
+}
+
+FOOBAR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}, "name": "fooBar"}
+
+@pytest.mark.parametrize(
+    ["name", "enum_type", "values", "expected"],
+    [
+        pytest.param("Simple", "str", ["aOrB", "b_or_C"], SIMPLE_ENUM, id="str"),
+        pytest.param("anyThing_goes", "int", [1, None, True], NON_STR_ENUM, id="non-str"),
+    ]
+)
+def test_enum_declaration(name, enum_type, values, expected):
+    uut = Generator("", {})
+    declaration = uut.enum_declaration(name, enum_type, values)
+    assert expected == declaration
+
+
+@pytest.mark.parametrize(
+    ["path_params", "query_params", "body_params", "expected"],
+    [
+        pytest.param([], [], {}, "", id="empty"),
+        pytest.param(
+            [SIMPLE_PARAM],
+            [],
+            {},
+            f"\n{SIMPLE_ENUM}",
+            id="ref-path",
+        ),
+        pytest.param(
+            [],
+            [SIMPLE_PARAM],
+            {},
+            f"\n{SIMPLE_ENUM}",
+            id="ref-query",
+        ),
+        pytest.param(
+            [],
+            [],
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"], "x-reference": "Simple"}},
+            f"\n{SIMPLE_ENUM}",
+            id="ref-body",
+        ),
+        pytest.param(
+            [FOOBAR_PARAM],
+            [],
+            {},
+            f"\n{FOOBAR_ENUM}",
+            id="unref-path",
+        ),
+        pytest.param(
+            [],
+            [FOOBAR_PARAM],
+            {},
+            f"\n{FOOBAR_ENUM}",
+            id="unref-query",
+        ),
+        pytest.param(
+            [],
+            [],
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}},
+            f"\n{FOOBAR_ENUM}",
+            id="unref-body",
+        ),
+        pytest.param(
+            [],
+            [],
+            {"foo.bar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}},
+            f"\n{FOOBAR_ENUM}",
+            id="subprop-body",
+        ),
+        pytest.param(
+            [SIMPLE_PARAM],
+            [SIMPLE_PARAM],
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"], "x-reference": "Simple"}},
+            f"\n{SIMPLE_ENUM}",
+            id="de-dup",
+        ),
+        pytest.param(
+            [SIMPLE_PARAM],
+            [FOOBAR_PARAM],
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}},
+            f"\n{SIMPLE_ENUM}\n{FOOBAR_ENUM}",
+            id="multiple",
+        )
+    ],
+)
+def test_enum_definitions(path_params, query_params, body_params, expected):
+    uut = Generator("", {})
+    definitions = uut.enum_definitions(path_params, query_params, body_params)
+    assert expected == definitions
 
 
 @pytest.mark.parametrize(

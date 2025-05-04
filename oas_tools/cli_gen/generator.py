@@ -8,6 +8,7 @@ from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import maybe_quoted
 from oas_tools.cli_gen.utils import set_missing
+from oas_tools.cli_gen.utils import to_camel_case
 from oas_tools.cli_gen.utils import to_snake_case
 from oas_tools.types import ContentType
 from oas_tools.types import OasField
@@ -130,6 +131,11 @@ if __name__ == "__main__":
                 return body
 
         return None
+
+    def class_name(self, s: str) -> str:
+        """Returns the class name for provided string"""
+        value = to_camel_case(s.replace('.', '_'))
+        return value[0].upper() + value[1:]
 
     def model_is_complex(self, model: dict[str, Any]) -> bool:
         """Determines if the model is complex, such that it would not work well with a list.
@@ -367,17 +373,25 @@ if __name__ == "__main__":
         Parameters have a schema sub-object that contains the 'type' and 'format' fields.
         """
         schema = param_data.get(OasField.SCHEMA, {})
+        values = schema.get(OasField.ENUM)
+        if values:
+            name = self.short_reference_name(schema.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
+            return self.class_name(name)
+
         return self.schema_to_type(schema.get(OasField.TYPE), schema.get(OasField.FORMAT))
 
-    def get_property_pytype(self, prop_data: dict[str, Any]) -> Optional[str]:
+    def get_property_pytype(self, prop_name: str, prop_data: dict[str, Any]) -> Optional[str]:
         """
         Gets the "basic" Python type from a property object.
 
         Each property potentially has 'type' and 'format' fields.
         """
-        pytype = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
-        if not pytype:
-            return pytype
+        if prop_data.get(OasField.ENUM):
+            pytype = self.class_name(prop_data.get(OasField.X_REF) or prop_name)
+        else:
+            pytype = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+            if not pytype:
+                return pytype
 
         if prop_data.get(OasField.X_COLLECT) == "array":
             pytype = f"list[{pytype}]"
@@ -470,7 +484,7 @@ if __name__ == "__main__":
     def op_body_arguments(self, body_params: list[dict[str, Any]]) -> list[str]:
         args = []
         for prop_name, prop_data in body_params.items():
-            py_type = self.get_property_pytype(prop_data)
+            py_type = self.get_property_pytype(prop_name, prop_data)
             if not py_type:
                 # log an error and use 'Any'
                 self.logger.error(f"Unable to determine Python type for {prop_name}={prop_data}")
@@ -603,6 +617,54 @@ if __name__ == "__main__":
         arg_text = ', '.join([f"{k}={v}" for k, v in args.items()])
         return f"{SEP1}page_info = _r.PageParams({arg_text})"
 
+    def enum_declaration(self, name: str, enum_type: str, values: list[Any]) -> str:
+        """Turns data into an enum declation"""
+        prefix = "" if enum_type == "str" else "VALUE_"
+        declarations = [
+            f"{prefix}{to_snake_case(str(v)).upper()} = {maybe_quoted(v)}"
+            for v in values
+        ]
+        # NOTE: the noqa is due to potentially same definition ahead of multiple functions
+        return f"class {name}({enum_type}, Enum):  # noqa: F811{SEP1}{SEP1.join(declarations)}{NL * 2}"
+
+    def enum_definitions(
+        self,
+        path_params: list[dict[str, Any]],
+        query_params: list[dict[str, Any]],
+        body_params: dict[str, Any],
+    ) -> str:
+        """Creates enum class definitions need to support the provided"""
+
+        # collect all the enum types (mapped by name to avoid duplicates)
+        enums = {}
+        for param_data in path_params + query_params:
+            schema = param_data.get(OasField.SCHEMA, {})
+            values = schema.get(OasField.ENUM)
+            if not values:
+                continue
+
+            e_name = self.short_reference_name(schema.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
+            e_type = self.schema_to_type(param_data.get(OasField.TYPE), param_data.get(OasField.FORMAT)) or 'str'
+            enums[self.class_name(e_name)] = (e_type, values)
+
+        for name, prop in body_params.items():
+            values = prop.get(OasField.ENUM)
+            if not values:
+                continue
+            e_name = prop.get(OasField.X_REF) or name
+            e_type = self.schema_to_type(prop.get(OasField.TYPE), prop.get(OasField.FORMAT)) or 'str'
+            enums[self.class_name(e_name)] = (e_type, values)
+
+        if not enums:
+            return ""
+
+        # declare all the types
+        declarations = []
+        for e_name, (e_type, e_values) in enums.items():
+            declarations.append(self.enum_declaration(e_name, e_type, e_values))
+
+        return NL + NL.join(declarations)
+
     def function_definition(self, node: CommandNode) -> str:
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
@@ -638,7 +700,7 @@ if __name__ == "__main__":
         self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
 
         return f"""
-
+{self.enum_definitions(path_params, query_params, body_params)}
 @app.command("{node.command}", help="{self.op_short_help(op)}")
 def {func_name}({args_str}) -> None:
     {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
