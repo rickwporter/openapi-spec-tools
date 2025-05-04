@@ -362,14 +362,16 @@ components:
       - yellow
       - purple
       - blue
-      - red
-      - green
-      - orange
-      - black
-      - sky
-      - pink
-      - lime
       nullable: true
+    EnumListProperty:
+      type: object
+      required:
+      - rainbow
+      properties:
+        rainbow:
+          type: array
+          items:
+            $ref: "#/components/schemas/Color"
     Attachment:
       type: object
       properties:

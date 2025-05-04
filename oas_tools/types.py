@@ -33,8 +33,8 @@ class OasField(str, Enum):
     TYPE = "type"
     URL = "url"
 
+    X_COLLECT = "x-collection"
     X_FIELD = "x-field"
-    X_LIST = "x-list"
     X_METHOD = "x-method"
     X_PARENT = "x-parent"
     X_PATH = "x-path"

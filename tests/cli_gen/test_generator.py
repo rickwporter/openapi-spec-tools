@@ -353,12 +353,6 @@ def test_model_is_complex(reference, expected):
         pytest.param(
             "ObservationStationCollectionGeoJson",
             {
-                '@context': {
-                    '$ref': '#/components/schemas/JsonLdContext',
-                    'required': False,
-                    'x-reference': 'GeoJsonFeatureCollection',
-                    'x-field': '@context',
-                },
                 'type': {
                     'enum': ['FeatureCollection'],
                     'type': 'string',
@@ -377,9 +371,10 @@ def test_model_is_complex(reference, expected):
                     'x-reference': 'PaginationInfo',
                 },
                 'observationStations': {
-                    'items': {'format': 'uri', 'type': 'string'},
+                    'type': 'string',
+                    'format': 'uri',
                     'required': False,
-                    'type': 'array',
+                    'x-collection': 'array',
                     'x-field': 'observationStations'
                 },
             },
@@ -388,10 +383,6 @@ def test_model_is_complex(reference, expected):
         pytest.param(
             "GeoJsonFeatureCollection",
             {
-                '@context': {
-                    '$ref': '#/components/schemas/JsonLdContext',
-                    'required': False,
-                },
                 'type': {
                     'enum': ['FeatureCollection'],
                     'type': 'string',
@@ -403,18 +394,13 @@ def test_model_is_complex(reference, expected):
         pytest.param(
             "DeeperNesting",
             {
-                '@context': {
-                    '$ref': '#/components/schemas/JsonLdContext',
-                    'required': False,
-                    'x-field': '@context',
-                    'x-reference': 'GeoJsonFeatureCollection',
-                },
                 'observationStations': {
-                    'items': {'format': 'uri', 'type': 'string'},
+                    'type': 'string',
+                    'format': 'uri',
                     'required': False,
-                    'type': 'array',
                     'x-field': 'observationStations',
                     'x-reference': 'ObservationStationCollectionGeoJson',
+                    'x-collection': 'array',
                 },
                 'owner.home.city': {
                     'required': False,
@@ -486,18 +472,24 @@ def test_model_is_complex(reference, expected):
                 'bytes': {'nullable': True, 'required': False, 'type': 'string'},
                 'date': {'format': 'date', 'required': False, 'type': 'string'},
                 'edgeColor': {
-                    '$ref': '#/components/schemas/Color',
+                    'enum': ['yellow', 'purple', 'blue'],
                     'nullable': True,
                     'required': False,
                     'type': 'string',
+                    'x-reference': 'Color',
                 },
-                'id': {'$ref': '#/components/schemas/TrelloID', 'required': False},
+                'id': {
+                    'pattern': '^[0-9a-fA-F]{24}$',
+                    'type': 'string',
+                    'required': False,
+                    'x-reference': 'TrelloID',
+                },
                 'idMember': {'required': False, 'type': 'string'},
                 'isUpload': {'required': False, 'type': 'boolean'},
                 'mimeType': {'required': False, 'type': 'string'},
                 'name': {'required': False, 'type': 'string'},
                 'pos': {'format': 'float', 'required': False, 'type': 'number'},
-                'previews': {'items': {'type': 'string'}, 'required': False, 'type': 'array'},
+                'previews': {'type': 'string', 'required': False, 'x-collection': 'array'},
                 'url': {'format': 'url', 'required': False, 'type': 'string'}
             },
             id="item"
@@ -506,9 +498,12 @@ def test_model_is_complex(reference, expected):
             "MultiAttachmentProperties",
             {
                 'color': {
-                    '$ref': '#/components/schemas/Color',
+                    'type': 'string',
+                    'enum': ['yellow', 'purple', 'blue'],
                     'required': False,
+                    'nullable': True,
                     'x-field': 'color',
+                    'x-reference': 'Color',
                 },
             },
             id="list-all-of"
@@ -517,6 +512,20 @@ def test_model_is_complex(reference, expected):
             "MultiAttachmentList",
             {},
             id="list-ref",
+        ),
+        pytest.param(
+            "EnumListProperty",
+            {
+                'rainbow': {
+                    'type': 'string',
+                    'enum': ['yellow', 'purple', 'blue'],
+                    'required': True,
+                    'nullable': True,
+                    'x-reference': 'Color',
+                    'x-collection': 'array',
+                }
+            },
+            id="list-enum",
         ),
         pytest.param(
             "MissingInheritedSubmodel",

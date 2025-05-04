@@ -171,17 +171,36 @@ if __name__ == "__main__":
 
         return False
 
-    def get_items_model(self, prop_data: dict[str, Any]) -> tuple[bool, str]:
+    def get_items_model(self, prop_data: dict[str, Any]) -> tuple[str, dict]:
         """Determines if the property data references complex items"""
         items = prop_data.get(OasField.ITEMS, {})
         item_ref = items.get(OasField.REFS, "")
+        item_short = self.short_reference_name(item_ref)
         if item_ref:
             item_model = deepcopy(self.get_reference_model(item_ref))
         else:
             item_model = deepcopy(items)
 
-        return item_model
+        return item_short, item_model
 
+    def model_collection_type(self, model: str) -> Optional[str]:
+        """Determines the collection type (current just an array)"""
+        model_type = model.get(OasField.TYPE)
+        if model_type == "array":
+            return model_type
+
+        for parent in model.get(OasField.ALL_OF) or model.get(OasField.ANY_OF) or []:
+            reference = parent.get(OasField.REFS, "")
+            if not reference:
+                submodel = parent
+            else:
+                submodel = self.get_reference_model(reference)
+            # recursively search through submodels
+            sub_collection = self.model_collection_type(submodel)
+            if sub_collection:
+                return sub_collection
+
+        return None
 
     def expand_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties"""
@@ -206,8 +225,8 @@ if __name__ == "__main__":
             for sub_name, sub_data in sub_properties.items():
                 # NOTE: no "name mangling" since using inheritance
                 updated = deepcopy(sub_data)
-                if reference:
-                    set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
+                if short_refname:
+                    set_missing(updated, OasField.X_REF.value, short_refname)
                 set_missing(updated, OasField.X_FIELD.value, sub_name)
                 updated[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED.value) and sub_name in required_sub
                 properties[sub_name] = updated
@@ -229,22 +248,27 @@ if __name__ == "__main__":
                 self.logger.warning(f"Failed to find {short_refname} model")
                 continue
 
-            is_list = prop_data.get(OasField.TYPE) == "array"
-            if is_list:
-                item_model = self.get_items_model(submodel)
+            collection_type = self.model_collection_type(submodel)
+            if collection_type:
+                item_name, item_model = self.get_items_model(submodel)
                 if not item_model:
                     self.logger.error(f"Could not find {short_refname}.{prop_name} item model")
                     continue
                 if self.model_is_complex(item_model):
                     self.logger.error(f"Ignoring {short_refname}.{prop_name} -- cannot handle lists of complex")
                     continue
-                submodel.pop(OasField.ITEMS, None)
+                if item_name:
+                    set_missing(submodel, OasField.X_REF.value, item_name)
+                submodel.pop(OasField.ITEMS.value, None)
+                submodel[OasField.X_COLLECT.value] = collection_type
                 submodel.update(item_model)
 
             required_sub = submodel.get(OasField.REQUIRED, [])
             sub_properties = self.expand_settable_properties(submodel)
             if not sub_properties:
-                updated = deepcopy(prop_data)
+                updated = deepcopy(submodel)
+                if short_refname:
+                    set_missing(updated, OasField.X_REF.value, short_refname)
                 updated[OasField.REQUIRED.value] = prop_name in required_props
                 properties[prop_name] = updated
                 continue
