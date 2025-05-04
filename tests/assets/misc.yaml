@@ -81,11 +81,14 @@ paths:
           schema:
             type: boolean
             default: false
+        - name: foobar
+          type: bogus
+          in: path
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Pet'
+              $ref: '#/components/schemas/PetExt'
         required: true
       responses:
         '200':
@@ -141,6 +144,13 @@ components:
           description: A string with a default
           type: string
           default: Anything goes
+    PetExt:
+      allOf:
+      - $ref: "#/components/schemas/Pet"
+      - properties:
+          bogus:
+            description: "Misleading help"
+            type: imaginary
     Pets:
       type: array
       maxItems: 100

@@ -322,7 +322,7 @@ if __name__ == "__main__":
             args.append('_max_count: _a.MaxCountOption = None')
         return args
 
-    def schema_to_type(self, schema: str, fmt: Optional[str]) -> str:
+    def schema_to_type(self, schema: str, fmt: Optional[str]) -> Optional[str]:
         """
         Gets the base Python type for simple schema types.
 
@@ -342,12 +342,7 @@ if __name__ == "__main__":
             # TODO: uuid
             return "str"
 
-        message = f"Unable to determine type for {schema}"
-        if fmt:
-            message += f" ({fmt})"
-
-        self.logger.error(message)
-        raise ValueError(message)
+        return None
 
     def get_parameter_pytype(self, param_data: dict[str, Any]) -> str:
         """
@@ -358,15 +353,18 @@ if __name__ == "__main__":
         schema = param_data.get(OasField.SCHEMA, {})
         return self.schema_to_type(schema.get(OasField.TYPE), schema.get(OasField.FORMAT))
 
-    def get_property_pytype(self, prop_data: dict[str, Any]) -> str:
+    def get_property_pytype(self, prop_data: dict[str, Any]) -> Optional[str]:
         """
         Gets the "basic" Python type from a property object.
 
         Each property potentially has 'type' and 'format' fields.
         """
         pytype = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+        if not pytype:
+            return pytype
+
         if prop_data.get(OasField.X_COLLECT) == "array":
-            pytype = f"List[{pytype}]"
+            pytype = f"list[{pytype}]"
         if not prop_data.get(OasField.REQUIRED):
             pytype = f"Optional[{pytype}]"
 
@@ -398,6 +396,10 @@ if __name__ == "__main__":
         schema = param.get(OasField.SCHEMA, {})
         schema_default = schema.get(OasField.DEFAULT)
         arg_type = self.get_parameter_pytype(param)
+        if not arg_type:
+            # log an error and use 'Any'
+            self.logger.error(f"Unable to determine Python type for {param}")
+            arg_type = 'Any'
 
         typer_args = []
         if arg_type in ("int", "float"):
@@ -453,6 +455,10 @@ if __name__ == "__main__":
         args = []
         for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_data)
+            if not py_type:
+                # log an error and use 'Any'
+                self.logger.error(f"Unable to determine Python type for {prop_name}={prop_data}")
+                py_type = 'Any'
 
             def_val = maybe_quoted(prop_data.get(OasField.DEFAULT))
             t_args = {}

@@ -159,29 +159,16 @@ def test_op_param_formation():
         pytest.param("string", None, "str", id="str"),
         pytest.param("string", "date-time", "datetime", id="datetime"),
         pytest.param("string", "date", "date", id="date"),
+        pytest.param("bool", "binary", None, id="non-type"),
+        pytest.param("object", None, None, id="object"),
+        pytest.param("array", None, None, id="array"),
     ]
 )
-def test_schema_to_type_success(schema, fmt, expected):
+def test_schema_to_type(schema, fmt, expected):
     oas = open_oas(asset_filename("misc.yaml"))
     uut = Generator("cli_package", oas)
 
     assert expected == uut.schema_to_type(schema, fmt)
-
-
-@pytest.mark.parametrize(
-    ["schema", "fmt"],
-    [
-        pytest.param("bool", "binary", id="non-type"),
-        pytest.param("object", None, id="object"),  # TODO: handle object
-        pytest.param("array", None, id="array"), # TODO: handle list
-    ]
-)
-def test_schema_to_type_failure(schema, fmt):
-    oas = open_oas(asset_filename("misc.yaml"))
-    uut = Generator("cli_package", oas)
-
-    with pytest.raises(ValueError, match=f"Unable to determine type for {schema}"):
-        uut.schema_to_type(schema, fmt)
 
 
 @pytest.mark.parametrize(
@@ -191,12 +178,13 @@ def test_schema_to_type_failure(schema, fmt):
         pytest.param({TYPE: "string", FORMAT: "date-time", REQUIRED: True}, "datetime", id="datetime"),
         pytest.param({TYPE: "string", FORMAT: "unknown", REQUIRED: False}, "Optional[str]", id="optional-str"),
         pytest.param({TYPE: "integer"}, "Optional[int]", id="optional-int"),
-        pytest.param({TYPE: "string", FORMAT: "date", COLLECT: "array", REQUIRED: True}, "List[date]", id="list-date"),
+        pytest.param({TYPE: "string", FORMAT: "date", COLLECT: "array", REQUIRED: True}, "list[date]", id="list-date"),
         pytest.param(
             {TYPE: "numeric", COLLECT: "array", REQUIRED: False},
-            "Optional[List[float]]",
+            "Optional[list[float]]",
             id="optional-list-float",
         ),
+        pytest.param({TYPE: "foo"}, None, id="unknown"),
     ],
 )
 def test_get_property_pytype(prop_data, expected):
@@ -252,6 +240,7 @@ def test_op_path_arguments():
     )
     assert 'must_have: Annotated[str, typer.Argument(show_default=False, help="")]' in text
     assert 'your_boat: Annotated[float, typer.Option(help="Pi is always good")] = 3.14159' in text
+    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, help="")] = None' in text
 
     # make sure we ignore the query params
     assert 'situation: Annotated' not in text
@@ -575,6 +564,7 @@ def test_op_body_arguments():
         'help="A string with a default")] = "Anything goes"'
         in text
     )
+    assert 'bogus: Annotated[Any, typer.Option(show_default=False, help="Misleading help")] = None' in text
 
     # make sure read-only not included
     assert 'id: Annotated' not in text
