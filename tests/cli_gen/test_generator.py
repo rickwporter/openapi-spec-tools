@@ -17,6 +17,7 @@ DESC = "description"
 TYPE = "type"
 FORMAT = "format"
 REQUIRED = "required"
+COLLECT = "x-collection"
 
 
 def test_shebang():
@@ -190,6 +191,12 @@ def test_schema_to_type_failure(schema, fmt):
         pytest.param({TYPE: "string", FORMAT: "date-time", REQUIRED: True}, "datetime", id="datetime"),
         pytest.param({TYPE: "string", FORMAT: "unknown", REQUIRED: False}, "Optional[str]", id="optional-str"),
         pytest.param({TYPE: "integer"}, "Optional[int]", id="optional-int"),
+        pytest.param({TYPE: "string", FORMAT: "date", COLLECT: "array", REQUIRED: True}, "List[date]", id="list-date"),
+        pytest.param(
+            {TYPE: "numeric", COLLECT: "array", REQUIRED: False},
+            "Optional[List[float]]",
+            id="optional-list-float",
+        ),
     ],
 )
 def test_get_property_pytype(prop_data, expected):
@@ -218,7 +225,7 @@ def test_op_body_formation():
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
-    body_params = uut.op_get_settable_body_properties(op)
+    body_params = uut.op_body_settable_properties(op)
     text = uut.op_body_formation(body_params)
     assert "body = {}" in text
     assert 'body["id"]' not in text  # ignore read-only
@@ -544,11 +551,11 @@ def test_model_is_complex(reference, expected):
         ),
     ]
 )
-def test_expand_settable_properties(model_name, expected):
+def test_model_settable_properties(model_name, expected):
     oas = open_oas(asset_filename("misc.yaml"))
     uut = Generator("cli_package", oas)
     model = uut.get_reference_model(model_name)
-    properties = uut.expand_settable_properties(model)
+    properties = uut.model_settable_properties(model)
     assert expected == properties
 
 
@@ -557,7 +564,7 @@ def test_op_body_arguments():
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
-    body_params = uut.op_get_settable_body_properties(op)
+    body_params = uut.op_body_settable_properties(op)
 
     lines = uut.op_body_arguments(body_params)
     text = "\n".join(lines)
@@ -653,7 +660,7 @@ def test_op_check_missing():
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
     query_params = uut.op_params(op, "query")
-    body_params = uut.op_get_settable_body_properties(op)
+    body_params = uut.op_body_settable_properties(op)
 
     text = uut.op_check_missing(query_params, body_params)
 

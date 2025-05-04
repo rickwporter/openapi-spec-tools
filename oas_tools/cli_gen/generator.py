@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
         return None
 
-    def expand_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
+    def model_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties"""
         properties = {}
 
@@ -221,7 +221,7 @@ if __name__ == "__main__":
                 continue
 
             required_sub = submodel.get(OasField.REQUIRED, [])
-            sub_properties = self.expand_settable_properties(submodel)
+            sub_properties = self.model_settable_properties(submodel)
             for sub_name, sub_data in sub_properties.items():
                 # NOTE: no "name mangling" since using inheritance
                 updated = deepcopy(sub_data)
@@ -264,7 +264,7 @@ if __name__ == "__main__":
                 submodel.update(item_model)
 
             required_sub = submodel.get(OasField.REQUIRED, [])
-            sub_properties = self.expand_settable_properties(submodel)
+            sub_properties = self.model_settable_properties(submodel)
             if not sub_properties:
                 updated = deepcopy(submodel)
                 if short_refname:
@@ -286,8 +286,8 @@ if __name__ == "__main__":
 
         return properties
 
-    def op_get_settable_body_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
-        """Get a dictionary of settable body propertiess"""
+    def op_body_settable_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
+        """Get a dictionary of settable body properties"""
         body = self.op_get_body(operation)
         if not body:
             return {}
@@ -296,15 +296,7 @@ if __name__ == "__main__":
         ref = schema.get(OasField.REFS)
         if ref:
             schema = self.get_reference_model(ref)
-        required = schema.get(OasField.REQUIRED, [])
-        properties = {}
-        for name, data in schema.get(OasField.PROPS, {}).items():
-            if not data.get(OasField.READ_ONLY, False):
-                updated = deepcopy(data)
-                updated[OasField.REQUIRED] = name in required
-                properties[name] = updated
-
-        return properties
+        return self.model_settable_properties(schema)
 
     def short_reference_name(self, full_name: str) -> str:
         """Transforms the '#/components/schemas/Xxx' to 'Xxx'"""
@@ -373,6 +365,8 @@ if __name__ == "__main__":
         Each property potentially has 'type' and 'format' fields.
         """
         pytype = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+        if prop_data.get(OasField.X_COLLECT) == "array":
+            pytype = f"List[{pytype}]"
         if not prop_data.get(OasField.REQUIRED):
             pytype = f"Optional[{pytype}]"
 
@@ -593,7 +587,7 @@ if __name__ == "__main__":
         path = op.get(OasField.X_PATH)
         path_params = self.op_params(op, "path")
         query_params = self.op_params(op, "query")
-        body_params = self.op_get_settable_body_properties(op)
+        body_params = self.op_body_settable_properties(op)
 
         req_args = []
         if node.pagination:
