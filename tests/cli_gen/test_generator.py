@@ -376,15 +376,23 @@ def test_model_is_complex(reference, expected):
                     },
                     'required': False,
                      'type': 'array',
+                     'x-field': 'features',
                 },
-                'pagination': {
-                    '$ref': '#/components/schemas/PaginationInfo',
+                'pagination.next':
+                {
+                    'description': 'A link to the next page of records',
+                    'format': 'uri',
                     'required': False,
+                    'type': 'string',
+                    'x-field': 'next',
+                    'x-parent': 'pagination',
+                    'x-reference': 'PaginationInfo',
                 },
                 'observationStations': {
                     'items': {'format': 'uri', 'type': 'string'},
                     'required': False,
                     'type': 'array',
+                    'x-field': 'observationStations'
                 },
             },
             id="allOf-multi"
@@ -482,11 +490,14 @@ def test_model_is_complex(reference, expected):
                     'x-parent': 'owner',
                     'x-reference': 'Person',
                 },
-                'pagination': {
-                    '$ref': '#/components/schemas/PaginationInfo',
+                'pagination.next': {
+                    'description': 'A link to the next page of records',
+                    'format': 'uri',
                     'required': False,
-                    'x-field': 'pagination',
-                    'x-reference': 'ObservationStationCollectionGeoJson',
+                    'type': 'string',
+                    'x-field': 'next',
+                    'x-parent': 'pagination',
+                    'x-reference': 'PaginationInfo',
                 },
                 'type': {
                     'enum': ['FeatureCollection'],

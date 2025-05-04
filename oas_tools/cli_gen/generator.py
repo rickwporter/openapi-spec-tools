@@ -165,25 +165,18 @@ if __name__ == "__main__":
         for parent in model.get(OasField.ALL_OF, []):
             reference = parent.get(OasField.REFS, "")
             if not reference:
-                # handle "anonymous" properties in the allOf list
-                inner_props = parent.get(OasField.PROPS, {})
-                inner_req = parent.get(OasField.REQUIRED, [])
-                for inner_name, inner_data in inner_props.items():
-                    if inner_data.get(OasField.READ_ONLY, False):
-                        continue
+                # this is an unnamed sub-reference
+                submodel = deepcopy(parent)
+            else:
+                submodel = self.get_reference_model(reference)
 
-                    updated = deepcopy(inner_data)
-                    updated[OasField.REQUIRED.value] = inner_name in inner_req
-                    properties[inner_name] = updated
-
-                continue
-            submodel = self.get_reference_model(reference)
             required_sub = submodel.get(OasField.REQUIRED, [])
             sub_properties = self.expand_settable_properties(submodel)
             for sub_name, sub_data in sub_properties.items():
                 # NOTE: no "name mangling" since using inheritance
                 updated = deepcopy(sub_data)
-                set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
+                if reference:
+                    set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
                 set_missing(updated, OasField.X_FIELD.value, sub_name)
                 updated[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED.value) and sub_name in required_sub
                 properties[sub_name] = updated
@@ -196,12 +189,10 @@ if __name__ == "__main__":
 
             reference = prop_data.get(OasField.REFS)
             if not reference:
-                updated = deepcopy(prop_data)
-                updated[OasField.REQUIRED.value] = prop_name in required_props
-                properties[prop_name] = updated
-                continue
+                submodel = deepcopy(prop_data)
+            else:
+                submodel = self.get_reference_model(reference)
 
-            submodel = self.get_reference_model(reference)
             required_sub = submodel.get(OasField.REQUIRED, [])
             sub_properties = self.expand_settable_properties(submodel)
             if not sub_properties:
@@ -215,7 +206,8 @@ if __name__ == "__main__":
                 full_name = f"{prop_name}.{sub_name}"
                 updated = deepcopy(sub_data)
                 updated[OasField.REQUIRED.value] = prop_name in required_props and sub_name in required_sub
-                set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
+                if reference:
+                    set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
                 set_missing(updated, OasField.X_FIELD.value, sub_name)
                 set_missing(updated, OasField.X_PARENT.value, prop_name)
                 properties[full_name] = updated
