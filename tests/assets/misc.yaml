@@ -84,6 +84,14 @@ paths:
         - name: foobar
           type: bogus
           in: path
+        - name: dayValue
+          in: query
+          schema:
+            type: str
+            enum:
+            - Mon
+            - Tue
+            - Wed
       requestBody:
         content:
           application/json:
@@ -151,6 +159,8 @@ components:
           bogus:
             description: "Misleading help"
             type: imaginary
+          flavor:
+            $ref: Species
     Pets:
       type: array
       maxItems: 100
@@ -212,6 +222,7 @@ components:
           type: string
           readOnly: true
     Species:
+      description: Species type
       type: string
       enum:
       - cat

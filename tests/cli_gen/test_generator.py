@@ -145,7 +145,9 @@ def test_op_param_formation():
         params["limit"] = limit
     params["anotherQparam"] = another_qparam
     if more is not None:
-        params["more"] = more\
+        params["more"] = more
+    if day_value is not None:
+        params["dayValue"] = day_value\
 """
     text = uut.op_param_formation(query_params)
     assert expected == text
@@ -324,6 +326,11 @@ def test_op_query_arguments():
         in text
     )
     assert 'more: Annotated[bool, typer.Option(help="")] = False' in text
+    assert (
+        'day_value: Annotated[Optional[DayValue], '
+        'typer.Option(show_default=False, case_sensitive=False, help="")] = None'
+        in text
+    )
 
     # make sure path params not included
     assert 'num_feet: Annotated' not in text
@@ -774,6 +781,11 @@ def test_op_body_arguments():
         in text
     )
     assert 'bogus: Annotated[Any, typer.Option(show_default=False, help="Misleading help")] = None' in text
+    assert (
+        'flavor: Annotated[Optional[Species], '
+        'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'
+        in text
+    )
 
     # make sure read-only not included
     assert 'id: Annotated' not in text

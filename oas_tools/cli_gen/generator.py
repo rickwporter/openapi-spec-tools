@@ -454,6 +454,9 @@ if __name__ == "__main__":
                     arg_default = f' = "{schema_default}"'
                 else:
                     arg_default = f" = {schema_default}"
+        is_enum = bool(schema.get(OasField.ENUM))
+        if is_enum:
+            typer_args.append("case_sensitive=False")
         typer_args.append(f'help="{description}"')
         comma = ', '
 
@@ -490,10 +493,13 @@ if __name__ == "__main__":
                 self.logger.error(f"Unable to determine Python type for {prop_name}={prop_data}")
                 py_type = 'Any'
 
-            def_val = maybe_quoted(prop_data.get(OasField.DEFAULT))
             t_args = {}
+            def_val = maybe_quoted(prop_data.get(OasField.DEFAULT))
             if def_val is not None:
                 t_args["show_default"] = False
+            is_enum = bool(prop_data.get(OasField.ENUM))
+            if is_enum:
+                t_args["case_sensitive"] = False
             help = prop_data.get(OasField.DESCRIPTION)
             if help:
                 t_args['help'] = f'"{help}"'
