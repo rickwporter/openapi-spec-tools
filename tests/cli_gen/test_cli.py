@@ -12,6 +12,7 @@ import typer
 from oas_tools.cli_gen.cli import TreeFormat
 from oas_tools.cli_gen.cli import generate_check_missing
 from oas_tools.cli_gen.cli import generate_cli
+from oas_tools.cli_gen.cli import generate_unreferenced
 from oas_tools.cli_gen.cli import layout_check_format
 from oas_tools.cli_gen.cli import layout_tree
 from tests.helpers import asset_filename
@@ -319,3 +320,64 @@ def test_cli_check_success():
     ):
         generate_check_missing(layout_file, oas_file)
         assert f"All operations in {layout_file} found in {oas_file}\n" == mock_stdout.getvalue()
+
+
+UNREF_PETS_VETS_NORMAL = """\
+owners
+  createOwner
+  deleteOwner
+  updateOwner
+owners/pets
+  listOwnerPets
+examine/bloodPressure
+  checkPetBloodPressure
+examine/heartRate
+  checkPetHeartRate
+version
+  appVersion
+vets
+  createVet
+  deleteVet
+
+Found 9 operations in 6 paths
+"""
+
+UNREF_PETS_VETS_FULL = """\
+/owners
+  createOwner
+/owners/{ownerId}
+  deleteOwner
+  updateOwner
+/owners/{ownerId}/pets
+  listOwnerPets
+/examine/bloodPressure
+  checkPetBloodPressure
+/examine/heartRate
+  checkPetHeartRate
+/version/
+  appVersion
+/vets
+  createVet
+/vets/{vetId}
+  deleteVet
+
+Found 9 operations in 8 paths
+"""
+
+
+@pytest.mark.parametrize(
+    ["layout_file", "oas_file", "full", "expected"],
+    [
+        pytest.param("layout_pets.yaml", "pet.yaml", True, "No unreferenced operations found\n", id="empty"),
+        pytest.param("layout_pets.yaml", "pets_and_vets.yaml", False, UNREF_PETS_VETS_NORMAL, id="normal"),
+        pytest.param("layout_pets.yaml", "pets_and_vets.yaml", True, UNREF_PETS_VETS_FULL, id="full"),
+    ]
+)
+def test_unreferenced(layout_file, oas_file, full, expected):
+    with (
+        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+    ):
+        lf_name = asset_filename(layout_file)
+        generate_unreferenced(lf_name, asset_filename(oas_file), full_path=full)
+        result = mock_stdout.getvalue()
+        assert expected == result

@@ -14,6 +14,7 @@ from oas_tools.cli_gen._logging import init_logging
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generate import check_for_missing
 from oas_tools.cli_gen.generate import copy_infrastructure
+from oas_tools.cli_gen.generate import find_unreferenced
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import DEFAULT_START
@@ -26,6 +27,7 @@ from oas_tools.cli_gen.layout import subcommand_missing_properties
 from oas_tools.cli_gen.layout import subcommand_order
 from oas_tools.cli_gen.layout import subcommand_references
 from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.types import OasField
 from oas_tools.utils import open_oas
 
 SEP = "\n    "
@@ -225,6 +227,43 @@ def generate_check_missing(
         raise typer.Exit(1)
 
     typer.echo(f"All operations in {layout_file} found in {openapi_file}")
+
+
+@app.command("unreferenced", help="Look for operation in OAS not referenced byt layout")
+def generate_unreferenced(
+    layout_file: LayoutFilenameArgument,
+    openapi_file: OpenApiFilenameArgument,
+    start: StartPointOption = DEFAULT_START,
+    full_path: Annotated[bool, typer.Option(help="Use full URL path that included variables")] = False,
+) -> None:
+    commands = file_to_tree(layout_file, start=start)
+    oas = open_oas(openapi_file)
+
+    unreferenced = find_unreferenced(commands, oas)
+    if not unreferenced:
+        typer.echo("No unreferenced operations found")
+        return
+
+    # group by path
+    paths = {}
+    for op in unreferenced.values():
+        path = op.get(OasField.X_PATH)
+        if not full_path:
+            # remove the variable elements from the path
+            parts = path.split("/")
+            path = "/".join([p for p in parts if p and '{' not in p])
+
+        operations = paths.get(path, [])
+        operations.append(op)
+        paths[path] = operations
+
+    # display each operations below the path
+    for path, ops in paths.items():
+        typer.echo(path)
+        for op in ops:
+            typer.echo(f"  {op.get(OasField.OP_ID)}")
+
+    typer.echo(f"\nFound {len(unreferenced)} operations in {len(paths)} paths")
 
 
 if __name__ == "__main__":

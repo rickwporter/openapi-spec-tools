@@ -69,6 +69,28 @@ def check_for_missing(node: CommandNode, oas: dict[str, Any]) -> dict[str, list[
     return missing
 
 
+def find_unreferenced(node: CommandNode, oas: dict[str, Any]) -> dict[str, Any]:
+    """Finds the operations in the OAS that are unrerenced by the commands."""
+    def _find_operations(_node: CommandNode) -> set[str]:
+        """Recursively finds all the operations for this node and it's children"""
+        current = set()
+        for op in _node.operations():
+            current.add(op.identifier)
+        for child in _node.subcommands():
+            current.update(_find_operations(child))
+        return current
+
+    referenced = _find_operations(node)
+    ops = map_operations(oas.get(OasField.PATHS))
+    unreferenced = {
+        op_id: op_data
+        for op_id, op_data in ops.items()
+        if op_id not in referenced
+    }
+
+    return unreferenced
+
+
 def copy_and_update(src_filename: str, dst_filename: str, package_name: str):
     """Copies text from src to dst with replacements of current package name to the supplied value."""
     module_name = __package__
