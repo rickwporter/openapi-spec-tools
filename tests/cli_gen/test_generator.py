@@ -76,11 +76,13 @@ def test_app_definition():
         pytest.param({SUM: "Short summary"}, "Short summary", id="summary-only"),
         pytest.param({SUM: "Short summary", DESC: "Short description"}, "Short summary", id="summary-preferred"),
         pytest.param({SUM: "Summary does NOT. Get truncated."}, "Summary does NOT. Get truncated.", id="long-summary"),
+        pytest.param({SUM: "Summary has new  \nlines."}, "Summary has new", id="newline-summary"),
         pytest.param({SUM: "This has 'quotes'."}, r'This has \'quotes\'.', id="quotes-summary"),
         pytest.param({DESC: "Short"}, "Short", id="short-desc"),
         pytest.param({DESC: "First.sentence ends. here"}, "First.sentence ends", id="desc-sentence"),
         pytest.param({DESC: 'This has "quotes".'}, r'This has \"quotes\".', id="quotes-desc"),
-        pytest.param({DESC: r"Contains \] slash"}, r"Contains \\] slash", id="slash")
+        pytest.param({DESC: r"Contains \] slash"}, r"Contains \\] slash", id="slash"),
+        pytest.param({DESC: "Description with\nin it."}, "Description with", id="newline-desc"),
     ]
 )
 def test_op_short_help(op, expected):

@@ -29,7 +29,10 @@ def maybe_quoted(item: Any) -> str:
 
 def simple_escape(text: str) -> str:
     """Replaces characters that are problematic in simple quoted strings"""
-    return text.translate(SIMPLE_TRANSLATIONS)
+    lines = [_.strip() for _ in text.splitlines() if _.strip()]
+    if not lines:
+        return ""
+    return lines[0].translate(SIMPLE_TRANSLATIONS)
 
 
 def set_missing(obj: dict[str, Any], key: str, value: Any) -> None:

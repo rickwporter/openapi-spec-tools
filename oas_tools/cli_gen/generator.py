@@ -98,10 +98,10 @@ if __name__ == "__main__":
         """Gets the short help for the operation."""
         summary = operation.get(OasField.SUMMARY)
         if summary:
-            return simple_escape(summary)
+            return simple_escape(summary.strip())
 
         description = operation.get(OasField.DESCRIPTION, "")
-        return simple_escape(description.split(". ")[0])
+        return simple_escape(description.strip().split(". ")[0])
 
     def op_long_help(self, operation: dict[str, Any]) -> str:
         text = operation.get(OasField.DESCRIPTION) or operation.get(OasField.SUMMARY) or ""
@@ -510,7 +510,7 @@ if __name__ == "__main__":
                 t_args["case_sensitive"] = False
             help = prop_data.get(OasField.DESCRIPTION)
             if help:
-                t_args['help'] = f'"{help}"'
+                t_args['help'] = f'"{simple_escape(help)}"'
             t_decl = f"typer.Option({', '.join([f'{k}={v}' for k, v in t_args.items()])})"
             arg = f"{to_snake_case(prop_name)}: Annotated[{py_type}, {t_decl}] = {def_val}"
             args.append(arg)
