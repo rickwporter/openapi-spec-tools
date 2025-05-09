@@ -76,8 +76,11 @@ def test_app_definition():
         pytest.param({SUM: "Short summary"}, "Short summary", id="summary-only"),
         pytest.param({SUM: "Short summary", DESC: "Short description"}, "Short summary", id="summary-preferred"),
         pytest.param({SUM: "Summary does NOT. Get truncated."}, "Summary does NOT. Get truncated.", id="long-summary"),
+        pytest.param({SUM: "This has 'quotes'."}, r'This has \'quotes\'.', id="quotes-summary"),
         pytest.param({DESC: "Short"}, "Short", id="short-desc"),
         pytest.param({DESC: "First.sentence ends. here"}, "First.sentence ends", id="desc-sentence"),
+        pytest.param({DESC: 'This has "quotes".'}, r'This has \"quotes\".', id="quotes-desc"),
+        pytest.param({DESC: r"Contains \] slash"}, r"Contains \\] slash", id="slash")
     ]
 )
 def test_op_short_help(op, expected):
@@ -108,6 +111,21 @@ def test_op_short_help(op, expected):
             {DESC: "First.sentence ends. here"},
             "'''\n    First.sentence ends. here\n    '''\n    ",
             id="long-desc",
+        ),
+        pytest.param(
+            {DESC: 'Trailing whitespace  \t\nNext "line" with quotes'},
+            """'''\n    Trailing whitespace\n    Next "line" with quotes\n    '''\n    """,
+            id='multi-line',
+        ),
+        pytest.param(
+            {DESC: 'First\n  Leading whitespace'},
+            """'''\n    First\n      Leading whitespace\n    '''\n    """,
+            id='multi-line',
+        ),
+        pytest.param(
+            {DESC: 'First\n\n  \n  After blanks'},
+            """'''\n    First\n\n\n      After blanks\n    '''\n    """,
+            id='multi-line',
         ),
     ]
 )

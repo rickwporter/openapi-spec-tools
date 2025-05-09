@@ -8,6 +8,7 @@ from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import maybe_quoted
 from oas_tools.cli_gen.utils import set_missing
+from oas_tools.cli_gen.utils import simple_escape
 from oas_tools.cli_gen.utils import to_camel_case
 from oas_tools.cli_gen.utils import to_snake_case
 from oas_tools.types import ContentType
@@ -77,7 +78,7 @@ from {self.package_name} import _requests as _r
     def app_definition(self, node: CommandNode) -> str:
         result = f"""
 
-app = typer.Typer(no_args_is_help=True, help="{node.description}")
+app = typer.Typer(no_args_is_help=True, help="{simple_escape(node.description)}")
 """
         for child in node.subcommands():
             result += f"""\
@@ -97,18 +98,25 @@ if __name__ == "__main__":
         """Gets the short help for the operation."""
         summary = operation.get(OasField.SUMMARY)
         if summary:
-            return summary
+            return simple_escape(summary)
 
         description = operation.get(OasField.DESCRIPTION, "")
-        return description.split(". ")[0]
+        return simple_escape(description.split(". ")[0])
 
     def op_long_help(self, operation: dict[str, Any]) -> str:
         text = operation.get(OasField.DESCRIPTION) or operation.get(OasField.SUMMARY) or ""
         if not text:
             return text
 
-        # TODO: sanitize  NL's, long text, etc
-        return f"'''{SEP1}{text}{SEP1}'''{SEP1}"
+        lines = [_.rstrip() for _ in text.splitlines()]
+        result = "'''"
+        for line in lines:
+            if not line:
+                result += NL
+            else:
+                result += SEP1 + line
+        result += f"{SEP1}'''{SEP1}"
+        return result
 
     def op_request_content(self, operation: dict[str, Any]) -> dict[str, Any]:
         """Get the `content` (if any) from the `requestBody`."""
@@ -457,7 +465,7 @@ if __name__ == "__main__":
         is_enum = bool(schema.get(OasField.ENUM))
         if is_enum:
             typer_args.append("case_sensitive=False")
-        typer_args.append(f'help="{description}"')
+        typer_args.append(f'help="{simple_escape(description)}"')
         comma = ', '
 
         return f'{var_name}: Annotated[{arg_type}, {typer_type}({comma.join(typer_args)})]{arg_default}'
