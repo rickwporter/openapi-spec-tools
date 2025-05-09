@@ -324,42 +324,42 @@ def test_cli_check_success():
 
 UNREF_PETS_VETS_NORMAL = """\
 owners
-  createOwner
-  deleteOwner
-  updateOwner
+  - createOwner
+  - deleteOwner
+  - updateOwner
 owners/pets
-  listOwnerPets
+  - listOwnerPets
 examine/bloodPressure
-  checkPetBloodPressure
+  - checkPetBloodPressure
 examine/heartRate
-  checkPetHeartRate
+  - checkPetHeartRate
 version
-  appVersion
+  - appVersion
 vets
-  createVet
-  deleteVet
+  - createVet
+  - deleteVet
 
 Found 9 operations in 6 paths
 """
 
 UNREF_PETS_VETS_FULL = """\
 /owners
-  createOwner
+  - createOwner
 /owners/{ownerId}
-  deleteOwner
-  updateOwner
+  - deleteOwner
+  - updateOwner
 /owners/{ownerId}/pets
-  listOwnerPets
+  - listOwnerPets
 /examine/bloodPressure
-  checkPetBloodPressure
+  - checkPetBloodPressure
 /examine/heartRate
-  checkPetHeartRate
+  - checkPetHeartRate
 /version/
-  appVersion
+  - appVersion
 /vets
-  createVet
+  - createVet
 /vets/{vetId}
-  deleteVet
+  - deleteVet
 
 Found 9 operations in 8 paths
 """

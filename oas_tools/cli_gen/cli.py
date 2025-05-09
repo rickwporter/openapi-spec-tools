@@ -261,7 +261,7 @@ def generate_unreferenced(
     for path, ops in paths.items():
         typer.echo(path)
         for op in ops:
-            typer.echo(f"  {op.get(OasField.OP_ID)}")
+            typer.echo(f"  - {op.get(OasField.OP_ID)}")
 
     typer.echo(f"\nFound {len(unreferenced)} operations in {len(paths)} paths")
 
