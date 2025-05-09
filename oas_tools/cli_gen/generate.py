@@ -74,9 +74,9 @@ def find_unreferenced(node: CommandNode, oas: dict[str, Any]) -> dict[str, Any]:
     def _find_operations(_node: CommandNode) -> set[str]:
         """Recursively finds all the operations for this node and it's children"""
         current = set()
-        for op in _node.operations():
+        for op in _node.operations(include_bugged=True):
             current.add(op.identifier)
-        for child in _node.subcommands():
+        for child in _node.subcommands(include_bugged=True):
             current.update(_find_operations(child))
         return current
 

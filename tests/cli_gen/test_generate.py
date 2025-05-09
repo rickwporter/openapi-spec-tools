@@ -218,6 +218,12 @@ def test_copy_and_update():
             ['listPets', 'appVersion'],
             id="deeper",
         ),
+        pytest.param(
+            "layout_pets3.yaml",
+            "pets_and_vets.yaml",
+            ['listPets', 'appVersion'],
+            id="bugged",
+        )
     ]
 )
 def test_find_unreferenced(layout_file, oas_file, expected_keys):
