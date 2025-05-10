@@ -232,7 +232,8 @@ def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> 
         output = mock_stdout.getvalue()
         assert to_ascii(output) == to_ascii(expected)
 
-def test_cli_generate_success():
+@pytest.mark.parametrize("include_tests", [True, False])
+def test_cli_generate_success(include_tests):
     layout_file = asset_filename("layout_pets.yaml")
     oas_file = asset_filename("pet2.yaml")
     pkg_name = "my_cli_pkg"
@@ -241,11 +242,11 @@ def test_cli_generate_success():
     with (
         mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
     ):
-        generate_cli(layout_file, oas_file, pkg_name, directory.name)
+        generate_cli(layout_file, oas_file, pkg_name, directory.name, include_tests=include_tests)
         assert f"Generated files in {directory.name}\n" == mock_stdout.getvalue()
 
     # NOTE: just check some basics here -- more detailed checks elsewhere
-    path = Path(directory.name)
+    path = Path(directory.name) / pkg_name
     file = path / "main.py"
     assert file.exists()
 
@@ -267,6 +268,20 @@ def test_cli_generate_success():
         "main.py",
     }
     assert filenames == expected
+
+    path = Path(directory.name) / "tests"
+    if not include_tests:
+        assert not path.exists()
+    else:
+        filenames = set(i.name for i in path.iterdir())
+        expected = {
+            "helpers.py",
+            "test_display.py",
+            "test_exceptions.py",
+            "test_logging.py",
+            "test_requests.py",
+        }
+        assert filenames == expected
 
 
 def test_cli_generate_failure():

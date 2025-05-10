@@ -8,6 +8,7 @@ from oas_tools.cli_gen.generate import COPYRIGHT
 from oas_tools.cli_gen.generate import check_for_missing
 from oas_tools.cli_gen.generate import copy_and_update
 from oas_tools.cli_gen.generate import copy_infrastructure
+from oas_tools.cli_gen.generate import copy_tests
 from oas_tools.cli_gen.generate import find_unreferenced
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
@@ -242,4 +243,15 @@ def test_copy_infrastructure():
 
     filenames = set(i.name for i in dst_path.iterdir())
     expected = {"_arguments.py", "_display.py", "_exceptions.py", "_logging.py", "_requests.py"}
+    assert filenames == expected
+
+def test_copy_tests():
+    tempdir = TemporaryDirectory()
+    dst_path = Path(tempdir.name)
+    package = "my.package"
+
+    copy_tests(dst_path.as_posix(), package)
+
+    filenames = set(i.name for i in dst_path.iterdir())
+    expected = {"helpers.py", "test_display.py", "test_exceptions.py", "test_logging.py", "test_requests.py"}
     assert filenames == expected

@@ -14,6 +14,7 @@ from oas_tools.cli_gen._logging import init_logging
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generate import check_for_missing
 from oas_tools.cli_gen.generate import copy_infrastructure
+from oas_tools.cli_gen.generate import copy_tests
 from oas_tools.cli_gen.generate import find_unreferenced
 from oas_tools.cli_gen.generate import generate_node
 from oas_tools.cli_gen.generator import Generator
@@ -183,7 +184,8 @@ def generate_cli(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
     package_name: Annotated[str, typer.Argument(show_default=False, help="Base package name")],
-    directory: Annotated[str, typer.Argument(show_default=False, help="Directory name")],
+    directory: Annotated[str, typer.Argument(show_default=False, help="Project directory name")],
+    include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "DEBUG",
 ) -> None:
@@ -198,16 +200,24 @@ def generate_cli(
 
     os.makedirs(directory, exist_ok=True)
 
+    code_dir = os.path.join(directory, package_name)
+    os.makedirs(code_dir, exist_ok=True)
+
     # create the init file
-    init_file = os.path.join(directory, '__init__.py')
+    init_file = os.path.join(code_dir, '__init__.py')
     with open(init_file, "w"):
         pass
 
     # copy over the basic infrastructure
-    copy_infrastructure(directory, package_name)
+    copy_infrastructure(code_dir, package_name)
 
     generator = Generator(package_name, oas)
-    generate_node(generator, commands, directory)
+    generate_node(generator, commands, code_dir)
+
+    if include_tests:
+        test_dir = os.path.join(directory, "tests")
+        os.makedirs(test_dir, exist_ok=True)
+        copy_tests(test_dir,  package_name)
 
     typer.echo(f"Generated files in {directory}")
 

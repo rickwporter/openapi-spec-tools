@@ -20,6 +20,13 @@ INFRASTRUCTURE_FILES = {
     "_requests.py": "_requests.py",
 }
 
+TEST_FILES = {
+    "test_display.py": "test_display.py",
+    "test_exceptions.py": "test_exceptions.py",
+    "test_logging.py": "test_logging.py",
+    "test_requests.py": "test_requests.py",
+}
+
 logger = get_logger(GENERATOR_LOG_CLASS)
 
 
@@ -109,6 +116,24 @@ def copy_infrastructure(dst_dir: str, package_name: str):
     spath = Path(__file__).parent
     dpath = Path(dst_dir)
     for src, dst in INFRASTRUCTURE_FILES.items():
+        sfile = spath / src
+        dfile = dpath / dst
+        copy_and_update(sfile.as_posix(), dfile.as_posix(), package_name)
+
+
+def copy_tests(dst_dir: str, package_name: str):
+    """Iterates over the TEST_FILES, and copies from local to dst."""
+    spath = Path(__file__).parent.parent.parent / "tests"
+    dpath = Path(dst_dir)
+
+    # start with the helpers in the top test dir
+    src_file = spath / "helpers.py"
+    dst_file = dpath / "helpers.py"
+    copy_and_update(src_file.as_posix(), dst_file.as_posix(), package_name)
+
+    # update the source path to be where most of the test files live
+    spath = spath / "cli_gen"
+    for src, dst in TEST_FILES.items():
         sfile = spath / src
         dfile = dpath / dst
         copy_and_update(sfile.as_posix(), dfile.as_posix(), package_name)
