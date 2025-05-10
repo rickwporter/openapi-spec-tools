@@ -33,7 +33,7 @@ cov: ## Run unit tests with code coverage measurments (use TEST_TARGET to scope)
 examples: pets-cli ct-cli ## Generate all examples
 
 pets-cli: ## Generate pets-cli
-	make -C examples/pets-cli gen
+	make -C examples/pets-cli all
 
 ct-cli: ## Generate the cloudtruth-cli
 	make -C examples/cloudtruth-gen-cli all
