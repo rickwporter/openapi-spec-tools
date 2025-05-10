@@ -1,3 +1,4 @@
+import importlib.metadata
 import json
 from typing import Any
 from unittest import mock
@@ -42,10 +43,17 @@ def test_create_url_error(args: list[str]) -> None:
         create_url(*args)
 
 
+def _find_version() -> str:
+    """Leverage one of the objects to get the module name"""
+    module_name = PageParams.__module__.split(".")[0]
+    module_version = importlib.metadata.version(module_name)
+    return f"{module_name}/{module_version}"
+
+
 UA = "User-Agent"
 CT = "Content-Type"
 AUTH = "Authorization"
-VER = "oas_tools/0.1.0"
+VER = _find_version()
 
 @pytest.mark.parametrize(
     ["api_key", "content_type", "kwargs", "expected"],
