@@ -7,7 +7,7 @@ help: ## This message
 
 LAYOUT_FILE := layout.yaml
 OPENAPI_SPEC := ct.yaml
-CODE_DIRECTORY := cloudtruth_gen_cli
+CODE_DIRECTORY := .
 PACKAGE_NAME := cloudtruth_gen_cli
 
 TEST_TARGET ?= tests
@@ -32,7 +32,7 @@ layout-lint:  ## Check the layout file format
 	cli-gen layout check $(LAYOUT_FILE)
 
 gen: layout-lint ## Generate CLI code
-	cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) $(CODE_DIRECTORY)
+	cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) $(CODE_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)

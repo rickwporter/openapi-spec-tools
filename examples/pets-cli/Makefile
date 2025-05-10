@@ -7,7 +7,7 @@ help: ## This message
 
 LAYOUT_FILE := layout.yaml
 OPENAPI_SPEC := pet.yaml
-CODE_DIRECTORY := pets_cli
+CODE_DIRECTORY := .
 PACKAGE_NAME := pets_cli
 
 TEST_TARGET ?= tests
