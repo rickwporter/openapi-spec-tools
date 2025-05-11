@@ -15,8 +15,8 @@ from oas_tools.cli_gen.cli import generate_cli
 from oas_tools.cli_gen.cli import generate_unreferenced
 from oas_tools.cli_gen.cli import layout_check_format
 from oas_tools.cli_gen.cli import layout_tree
+from tests.cli_gen.helpers import to_ascii
 from tests.helpers import asset_filename
-from tests.helpers import to_ascii
 
 BAD_LAYOUT_FILE = asset_filename("layout_bad.yaml")
 

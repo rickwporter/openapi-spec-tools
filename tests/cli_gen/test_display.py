@@ -15,7 +15,7 @@ from oas_tools.cli_gen._display import TableConfig
 from oas_tools.cli_gen._display import display
 from oas_tools.cli_gen._display import rich_table_factory
 from oas_tools.cli_gen._display import summary
-from tests.helpers import to_ascii
+from tests.cli_gen.helpers import to_ascii
 
 SIMPLE_DICT = {
     "abc": "def",

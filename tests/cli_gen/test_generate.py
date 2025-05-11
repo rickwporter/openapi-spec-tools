@@ -184,8 +184,11 @@ def test_copy_and_update():
     tempdir = TemporaryDirectory()
     dst_path = Path(tempdir.name) / "my_destination.py"
     package = "this.is_a.different.package"
+    replacements = {
+        "oas_tools.cli_gen": package,
+    }
 
-    copy_and_update(source, dst_path.as_posix(), package)
+    copy_and_update(source, dst_path.as_posix(), replacements)
 
     text = dst_path.read_text()
     assert COPYRIGHT in text

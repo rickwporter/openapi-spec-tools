@@ -21,6 +21,7 @@ INFRASTRUCTURE_FILES = {
 }
 
 TEST_FILES = {
+    "helpers.py": "helpers.py",
     "test_display.py": "test_display.py",
     "test_exceptions.py": "test_exceptions.py",
     "test_logging.py": "test_logging.py",
@@ -98,9 +99,8 @@ def find_unreferenced(node: CommandNode, oas: dict[str, Any]) -> dict[str, Any]:
     return unreferenced
 
 
-def copy_and_update(src_filename: str, dst_filename: str, package_name: str):
+def copy_and_update(src_filename: str, dst_filename: str, replacements: dict[str, str]):
     """Copies text from src to dst with replacements of current package name to the supplied value."""
-    module_name = __package__
     with (
         open(src_filename, "r") as src_fp,
         open(dst_filename, "w") as dst_fp,
@@ -108,32 +108,33 @@ def copy_and_update(src_filename: str, dst_filename: str, package_name: str):
         # NOTE: ignore the shebangs for now... not used to copy over executable files
         dst_fp.write(COPYRIGHT)
         for line in src_fp.readlines():
-            dst_fp.write(line.replace(module_name, package_name))
+            for old, new in replacements.items():
+                line = line.replace(old, new)
+            dst_fp.write(line)
 
 
 def copy_infrastructure(dst_dir: str, package_name: str):
     """Iterates over the INFRASTRUCTURE_FILES, and copies from local to dst."""
     spath = Path(__file__).parent
     dpath = Path(dst_dir)
+    replacements = {
+        __package__: package_name,
+    }
     for src, dst in INFRASTRUCTURE_FILES.items():
         sfile = spath / src
         dfile = dpath / dst
-        copy_and_update(sfile.as_posix(), dfile.as_posix(), package_name)
+        copy_and_update(sfile.as_posix(), dfile.as_posix(), replacements)
 
 
 def copy_tests(dst_dir: str, package_name: str):
     """Iterates over the TEST_FILES, and copies from local to dst."""
-    spath = Path(__file__).parent.parent.parent / "tests"
+    spath = Path(__file__).parent.parent.parent / "tests" / "cli_gen"
     dpath = Path(dst_dir)
-
-    # start with the helpers in the top test dir
-    src_file = spath / "helpers.py"
-    dst_file = dpath / "helpers.py"
-    copy_and_update(src_file.as_posix(), dst_file.as_posix(), package_name)
-
-    # update the source path to be where most of the test files live
-    spath = spath / "cli_gen"
+    replacements = {
+        __package__: package_name,
+        "tests.cli_gen": "tests",
+    }
     for src, dst in TEST_FILES.items():
         sfile = spath / src
         dfile = dpath / dst
-        copy_and_update(sfile.as_posix(), dfile.as_posix(), package_name)
+        copy_and_update(sfile.as_posix(), dfile.as_posix(), replacements)
