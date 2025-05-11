@@ -145,6 +145,13 @@ if __name__ == "__main__":
         value = to_camel_case(s.replace('.', '_'))
         return value[0].upper() + value[1:]
 
+    def function_name(self, s: str) -> str:
+        """Returns the function name for the provided string"""
+        value = to_snake_case(s)
+        for v in ['/', '*', '.', '-', '@']:
+            value = value.replace(v, '_')
+        return value
+
     def model_is_complex(self, model: dict[str, Any]) -> bool:
         """Determines if the model is complex, such that it would not work well with a list.
 
@@ -703,7 +710,7 @@ if __name__ == "__main__":
             req_args.append("body=body")
         req_args.append("timemout=_api_timeout")
 
-        func_name = to_snake_case(node.identifier)
+        func_name = self.function_name(node.identifier)
         func_args = []
         func_args.extend(self.op_path_arguments(path_params))
         func_args.extend(self.op_query_arguments(query_params))
