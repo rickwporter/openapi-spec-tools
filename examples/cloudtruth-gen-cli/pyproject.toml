@@ -6,7 +6,7 @@ authors = [
     {name = "Rick Porter",email = "rickwporter@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.9"
 dependencies = [
     "typer (>=0.15.2,<0.16.0)",
     "rich (>=14.0.0,<15.0.0)",
