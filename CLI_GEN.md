@@ -73,4 +73,28 @@ This puts all the generated code into `widgets/`, and test code into `tests/`.
 
 The generation tool overwites existing files with new content, so it is expected that you will need to run this many times to get a complete CLI for your service. However, it does NOT delete previously generated files, so just be aware that you will need to manually delete files associated with an old sub-command.
 
+## Background
 
+A CLI is something that many seasoned developers utilize (yeah, old guys like Rick). A CLI is a common tool to use when trying to determine whether there's an issue with the API or the GUI. This tool is leverages learning from a couple jobs where CLI development was being done various ways. This documents some of the design decisions.
+
+### Use of Python
+
+Python is relatively easy to read, write, understand, and debug. It has good frameworks for a CLI, and is Rick's most frequently used language (at the time of writing).
+
+### Use of Typer
+
+The [typer project](https://github.com/fastapi/typer) provides a user friendly product. It also provides a developer friendly interface that makes code generation relatively easy (e.g. help is colocated with the variables).
+
+### Layout File
+
+It is difficult to get a good CLI structure through inference from the OAS. Rather than get it wrong, let the user tell you what the CLI should look like. Hopefully, the layout structure is easy to extend over time. 
+
+### No OpenAPI Models
+
+There were a couple reasons that drove development in the direction of not using output from the [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator):
+1. Runtime performance
+1. Service Non-Conformance
+
+The runtime performance suffered when using OpenAPI generated apis/models. The models were loaded from each module which took a lot of time on each user command. As there got to be 500+ operations/models, the load time just to get help from the CLI took upwards of 4 seconds.
+
+Not all services do a good job of adhering to their OpenAPI specification. For example, some provide an integer in cases when the OAS says they will return a string. Failures to parse server responses due to non-conformant data caused a bad users experience (leading users to blame the CLI). The CLI is not the tool to test adherence to the OAS.
