@@ -1,6 +1,6 @@
 # CLI Generation
 
-The CLI generation tool helps users create a CLI that talks to their service. The CLI structure is provided in a YAML file, referred to as the layout file. The layout file links the CLI structure into the OpenAPI specification.
+The CLI generation tool helps users create a CLI that talks to their service. The CLI structure is provided in a YAML file, referred to as the layout file. The layout file links the CLI structure into the OpenAPI specification. More details on layout file format are available in [LAYOUT.md](LAYOUT.md).
 
 ## Getting Started
 
@@ -10,7 +10,7 @@ Here's an overview of the steps:
 1. Create CLI layout file
 1. Run code generation tool
 
-The sections below walks through a "widget" service. The `examples/pets-cli` is provided as a more concrete example.
+The sections below walks through a "widget" service. The `examples/pets-cli` is provided as a more concrete, complete example.
 
 ### Creating virtual environment
 
@@ -50,10 +50,6 @@ main:
     operationId: widget_delete
   - name: list
     operationId: widget_list
-    pagination:
-      pageSize: limit
-      nextProperty: next
-      itemsProperty: results
   - name: update
     operationId: widget_patch
   - name: set
@@ -64,66 +60,17 @@ main:
 
 The `name` fields are the commands that the CLI user will type. The `operationId` tells the generation tool what that command does -- it pulls information about the request body (if any), parameters, and help based on the `operationId`.
 
-More details are provided in the Layout Format section.
+More details are provided in [LAYOUT.md](LAYOUT.md).
 
 ### Run the CLI generation tool
 
 The CLI generation tools are installed as `cli-gen`. The command to generate the CLI code looks like:
 ```terminal
-cli-gen generate layout.yaml openapi.yaml widgets widgets
+cli-gen generate layout.yaml openapi.yaml widgets .
 ```
 
-This puts all the generated code into `widgets/`.
+This puts all the generated code into `widgets/`, and test code into `tests/`.
 
-The generation tool overwites existing files with new content, so it is expected that you will need to run this many times to get a complete CLI for your service.
-
-
-## Layout Format
-
-The layout file contains the structure for your command line interface (CLI). The `operationId` fields provide the link to the OAS that allows for code generation using the latest OAS information.
-
-```yaml
-cli:
-  description: My program does this!
-  operations:
-  # The operations are a reference to the OAS
-  - name: version
-    operationId: getAppVersion
-  - name: info
-    operationId: getInfo
-  subcommands:
-  - name: resources
-    subcommandId: resources_subcommand
-
-resources_subcommand:
-  description: Manage your resources
-  operations:
-  - name: list
-    operationId: listResources
-    pagination:
-      pageSize: pageSize
-      itemStart: offset
-  subcommands:
-  - name: containers
-    subcommandId: resources_containers
-  - name: memory
-    subcommandId: resources_memory
+The generation tool overwites existing files with new content, so it is expected that you will need to run this many times to get a complete CLI for your service. However, it does NOT delete previously generated files, so just be aware that you will need to manually delete files associated with an old sub-command.
 
 
-resources_containers:
-  description: Manager your containers
-  operations:
-  - name: list
-    operationId: containers_list
-    pagination:
-      pageSize: size
-      pageStart: page
-
-resources_memory:
-  description: Managed the cluster memory
-  oprations:
-  - name: by-container
-    operatonId: memory_by_container
-  - name: total
-    operationId: memory_summary
-```
