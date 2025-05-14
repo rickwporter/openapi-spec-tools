@@ -611,7 +611,7 @@ if __name__ == "__main__":
 
         lines = ["if not _details:"]
         args = [maybe_quoted(v) for v in node.summary_fields]
-        lines.append(f'    data = summary(data, [{', '.join(args)}])')
+        lines.append(f"    data = summary(data, [{', '.join(args)}])")
         return SEP2 + SEP2.join(lines)
 
     def pagination_creation(self, command: CommandNode) -> str:

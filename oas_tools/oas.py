@@ -73,7 +73,7 @@ def summary(
                 continue
 
             method_count[method] += 1
-            for tag in operation.get(OasField.TAGS):
+            for tag in operation.get(OasField.TAGS, []):
                 orig = tag_count.get(tag, 0)
                 tag_count[tag] = orig + 1
 
