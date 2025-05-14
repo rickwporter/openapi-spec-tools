@@ -5,8 +5,6 @@
 from enum import Enum
 from gettext import gettext
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
 
 import yaml
@@ -60,12 +58,12 @@ class TableConfig:
         values_label: str = VALUES,
         unknown_label: str = UNKNOWN,
         items_caption: str = FOUND_ITEMS,
-        url_prefixes: List[str] = URL_PREFIXES,
+        url_prefixes: list[str] = URL_PREFIXES,
         url_max_len: int = URL_MAX_LEN,
-        key_fields: List[str] = KEY_FIELDS,
+        key_fields: list[str] = KEY_FIELDS,
         key_max_len: int = KEY_MAX_LEN,
         value_max_len: int = VALUE_MAX_LEN,
-        row_properties: Dict[str, Any] = DEFAULT_ROW_PROPS,
+        row_properties: dict[str, Any] = DEFAULT_ROW_PROPS,
     ):
         self.items_label = items_label
         self.property_label = property_label
@@ -91,7 +89,7 @@ class RichTable(Table):
         self,
         *args: Any,
         outer: bool = True,
-        row_props: Dict[str, Any] = DEFAULT_ROW_PROPS,
+        row_props: dict[str, Any] = DEFAULT_ROW_PROPS,
         **kwargs: Any,
     ):
         super().__init__(
@@ -121,7 +119,7 @@ def _truncate(s: str, max_length: int) -> str:
     return s[: max_length - 3] + ELLIPSIS
 
 
-def _get_name_key(item: Dict[Any, Any], key_fields: List[str]) -> Optional[str]:
+def _get_name_key(item: dict[Any, Any], key_fields: list[str]) -> Optional[str]:
     """Attempts to find an identifying value."""
     for k in key_fields:
         key = str(k)
@@ -131,7 +129,7 @@ def _get_name_key(item: Dict[Any, Any], key_fields: List[str]) -> Optional[str]:
     return None
 
 
-def _is_url(s: str, url_prefixes: List[str]) -> bool:
+def _is_url(s: str, url_prefixes: list[str]) -> bool:
     """Rudimentary check for somethingt starting with URL prefix"""
     return any(s.startswith(p) for p in url_prefixes)
 
@@ -142,7 +140,7 @@ def _safe(v: Any) -> str:
 
 
 def _create_list_table(
-    items: List[Dict[Any, Any]], outer: bool, config: TableConfig
+    items: list[dict[Any, Any]], outer: bool, config: TableConfig
 ) -> RichTable:
     """Creates a table from a list of dictionary items.
 
@@ -186,7 +184,7 @@ def _create_list_table(
 
 
 def _create_object_table(
-    obj: Dict[Any, Any], outer: bool, config: TableConfig
+    obj: dict[Any, Any], outer: bool, config: TableConfig
 ) -> RichTable:
     """Creates a table of a dictionary object.
 
