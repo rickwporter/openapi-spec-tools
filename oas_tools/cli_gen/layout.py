@@ -227,7 +227,7 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
 
             reasons = []
 
-            extra_keys = [k for k in page_params.keys() if k not in PaginationField]
+            extra_keys = [k for k in page_params.keys() if not PaginationField.contains(k)]
             if extra_keys:
                 reasons.append(f"unsupported parameters: {', '.join(extra_keys)}")
             if page_params.get(PaginationField.NEXT_HEADER) and page_params.get(PaginationField.NEXT_PROP):

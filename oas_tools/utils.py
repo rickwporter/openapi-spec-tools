@@ -2,6 +2,7 @@ from copy import deepcopy
 from itertools import zip_longest
 from typing import Any
 from typing import Optional
+from typing import Union
 
 import yaml
 
@@ -334,11 +335,11 @@ def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
 
 def _is_nullable(prop_data: dict[str, Any]) -> bool:
     """Determine if a property is nullable"""
-    # this handles the OAS 3.0 style where it is denoted by a `nullabld: true`
+    # this handles the OAS 3.0 style where it is denoted by a `nullable: true`
     if prop_data.get(OasField.NULLABLE, False):
         return True
 
-    def _includes_null(types: str|list[str]) -> bool:
+    def _includes_null(types: Union[str, list[str]]) -> bool:
         if isinstance(types, str) and types in NULL_TYPES:
             return True
         return any(x in types for x in NULL_TYPES)

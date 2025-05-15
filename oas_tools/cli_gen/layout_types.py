@@ -23,6 +23,15 @@ class PaginationField(str, Enum):
     PAGE_SIZE = "pageSize"
     PAGE_START = "pageStart"
 
+    @classmethod
+    def contains(cls, value: str) -> bool:
+        """This is a fix because `x in PaginationField` is not supported in Python 3.9."""
+        try:
+            cls(value)
+            return True
+        except ValueError:
+            return False
+
 
 @dataclasses.dataclass
 class PaginationNames:
