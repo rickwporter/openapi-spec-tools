@@ -223,6 +223,22 @@ def test_function_name(proposed, expected):
     uut = Generator("", {})
     assert expected == uut.function_name(proposed)
 
+
+@pytest.mark.parametrize(
+    ["proposed", "expected"],
+    [
+        pytest.param("simple", "simple", id="simple"),
+        pytest.param("snake_case_value", "snake_case_value", id="snake"),
+        pytest.param("camelCaseValue", "camel_case_value", id="camel"),
+        pytest.param("decimal.dot.value", "decimal_dot_value", id="dotted"),
+        pytest.param("users/list", "users_list", id="slash"),
+        pytest.param("page-name", "page_name", id="dash"),
+    ],
+)
+def test_variable_name(proposed, expected):
+    uut = Generator("", {})
+    assert expected == uut.variable_name(proposed)
+
 @pytest.mark.parametrize(
     ["param_data", "expected"],
     [

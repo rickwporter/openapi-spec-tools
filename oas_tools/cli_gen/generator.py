@@ -152,6 +152,14 @@ if __name__ == "__main__":
             value = value.replace(v, '_')
         return value
 
+    def variable_name(self, s: str) -> str:
+        """Returns the variable name for the provided string"""
+        value = to_snake_case(s)
+        for v in ['/', '*', '.', '-', '@']:
+            value = value.replace(v, '_')
+        return value
+
+
     def model_is_complex(self, model: dict[str, Any]) -> bool:
         """Determines if the model is complex, such that it would not work well with a list.
 
@@ -435,7 +443,7 @@ if __name__ == "__main__":
         """
         Converts a parameter into a typer argument.
         """
-        var_name = to_snake_case(param.get(OasField.NAME))
+        var_name = self.variable_name(param.get(OasField.NAME))
         description = param.get(OasField.DESCRIPTION) or ""
         required = param.get(OasField.REQUIRED, False)
         schema = param.get(OasField.SCHEMA, {})
@@ -519,7 +527,7 @@ if __name__ == "__main__":
             if help:
                 t_args['help'] = f'"{simple_escape(help)}"'
             t_decl = f"typer.Option({', '.join([f'{k}={v}' for k, v in t_args.items()])})"
-            arg = f"{to_snake_case(prop_name)}: Annotated[{py_type}, {t_decl}] = {def_val}"
+            arg = f"{self.variable_name(prop_name)}: Annotated[{py_type}, {t_decl}] = {def_val}"
             args.append(arg)
 
         return args
@@ -533,7 +541,7 @@ if __name__ == "__main__":
             if "{" in p:
                 if last:
                     items.append(f'"{last}"')
-                items.append(to_snake_case(p.replace("{", "").replace("}", "")))
+                items.append(self.variable_name(p.replace("{", "").replace("}", "")))
                 last = None
             elif not last:
                 last = p
@@ -548,15 +556,16 @@ if __name__ == "__main__":
         """Create the query parameters that go into the request"""
         result = "{}"
         for param in query_params:
-            name = param.get(OasField.NAME)
+            param_name = param.get(OasField.NAME)
+            var_name = self.variable_name(param_name)
             if param.get(OasField.REQUIRED, False):
                 result += f"""
-    params["{name}"] = {to_snake_case(name)}\
+    params["{param_name}"] = {var_name}\
 """
             else:
                 result += f"""
-    if {to_snake_case(name)} is not None:
-        params["{name}"] = {to_snake_case(name)}\
+    if {var_name} is not None:
+        params["{param_name}"] = {var_name}\
 """
         return result
 
@@ -574,7 +583,7 @@ if __name__ == "__main__":
 
         lines = ["body = {}"]
         for prop_name, prop_data in body_params.items():
-            var_name = to_snake_case(prop_name)
+            var_name = self.variable_name(prop_name)
             if prop_data.get(OasField.REQUIRED):
                 lines.append(f'body["{prop_name}"] = {var_name}')
             else:
@@ -591,14 +600,14 @@ if __name__ == "__main__":
 
         for param in query_params:
             if param.get(OasField.REQUIRED, False):
-                var_name = to_snake_case(param.get(OasField.NAME))
+                var_name = self.variable_name(param.get(OasField.NAME))
                 option = '--' + var_name.replace('_', '-')
                 lines.append(f'if {var_name} is None:')
                 lines.append(f'    missing.append("{option}")')
 
         for prop_name, prop_data in body_params.items():
             if prop_data.get(OasField.REQUIRED):
-                var_name = to_snake_case(prop_name)
+                var_name = self.variable_name(prop_name)
                 option = '--' + var_name.replace('_', '-')
                 lines.append(f'if {var_name} is None:')
                 lines.append(f'    missing.append("{option}")')
@@ -621,13 +630,13 @@ if __name__ == "__main__":
         names = command.pagination
         if names.page_size:
             args["page_size_name"] = maybe_quoted(names.page_size)
-            args["page_size_value"] = to_snake_case(names.page_size)
+            args["page_size_value"] = self.variable_name(names.page_size)
         if names.page_start:
             args["page_start_name"] = maybe_quoted(names.page_start)
-            args["page_start_value"] = to_snake_case(names.page_start)
+            args["page_start_value"] = self.variable_name(names.page_start)
         if names.item_start:
             args["item_start_name"] = maybe_quoted(names.item_start)
-            args["item_start_value"] = to_snake_case(names.item_start)
+            args["item_start_value"] = self.variable_name(names.item_start)
         if names.items_property:
             args["item_property_name"] = maybe_quoted(names.items_property)
         if names.next_header:
