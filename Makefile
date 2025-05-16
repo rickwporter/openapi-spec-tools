@@ -11,6 +11,28 @@ poetry_run ?= poetry run
 default: help
 
 ###########
+##@ General
+all: example-gen lint cov wheel ## Complete cycle: generate/lint/test everything
+
+# NOTE: due to example sub-projects, clean up all occurrances of these files/directories
+clean: ## Remove build/test artifacts
+	rm -rf `find . -name __pycache__`
+	rm -rf `find . -name .pytest_cache`
+	rm -rf `find . -name .ruff_cache`
+	rm -rf `find . -name .coverage`
+	rm -rf `find . -name htmlcov`
+	rm -rf `find . -name dist`
+
+###########
+##@ Build
+build: wheel
+wheel: ## Build the wheel file
+	poetry build
+
+install: ## Install package(s) and development tools
+	poetry install --with dev
+
+###########
 ##@ Lint
 lint: ## Check code formatting
 	$(poetry_run) ruff check
@@ -30,7 +52,11 @@ cov: ## Run unit tests with code coverage measurments (use TEST_TARGET to scope)
 
 ###########
 ##@ Examples
-examples: pets-cli ct-cli ## Generate all examples
+examples: pets-cli ct-cli ## Complete cycle on all examples
+
+example-gen: ## Generate example code (no tests)
+	make -C examples/pets-cli gen
+	make -C examples/cloudtruth-gen-cli gen
 
 pets-cli: ## Generate pets-cli
 	make -C examples/pets-cli all
