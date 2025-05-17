@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "oas-tools"
 version = "0.1.0"
-description = ""
+description = "OpenAPI specification tools for analyzing, updating, and generating a CLI."
 authors = ["Rick Porter <rickwporter@gmail.com>"]
 readme = "README.md"
 
