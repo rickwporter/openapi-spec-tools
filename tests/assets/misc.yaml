@@ -43,6 +43,7 @@ paths:
           schema:
             type: string
             default: monkey
+        - $ref: "#/components/parameters/PageSize"
         - name: neutered
           in: path
           required: false
@@ -131,6 +132,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 components:
+  parameters:
+    PageSize:
+      name: page-size
+      description: Maximum items per page
+      in: query
+      schema:
+        type: integer
+        default: 100
   schemas:
     Pet:
       type: object

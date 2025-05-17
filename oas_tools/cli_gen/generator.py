@@ -353,6 +353,9 @@ if __name__ == "__main__":
             item for item in full_name.split('/')
             if item and item not in ['#', OasField.COMPONENTS.value]
         ]
+        if not keys:
+            return None
+
         value = self.components
         for k in keys:
             value = value.get(k)
@@ -438,11 +441,13 @@ if __name__ == "__main__":
         """
         params = []
         # NOTE: start with "higher level" path params, since they're more likely to be required
-        for item in operation.get(OasField.X_PATH_PARAMS) or []:
-            if item.get(OasField.IN) != location:
-                continue
-            params.append(item)
-        for item in operation.get(OasField.PARAMS) or []:
+        total_params = (operation.get(OasField.X_PATH_PARAMS) or []) + (operation.get(OasField.PARAMS) or [])
+        for item in total_params:
+            ref = item.get(OasField.REFS, "")
+            model = self.get_model(ref)
+            if model:
+                item = deepcopy(model)
+                item[OasField.X_REF] = self.short_reference_name(ref)
             if item.get(OasField.IN) != location:
                 continue
             params.append(item)

@@ -163,6 +163,8 @@ def test_op_param_formation():
     params["situation"] = situation
     if limit is not None:
         params["limit"] = limit
+    if page_size is not None:
+        params["page-size"] = page_size
     params["anotherQparam"] = another_qparam
     if more is not None:
         params["more"] = more
@@ -380,6 +382,10 @@ def test_op_query_arguments():
     assert (
         'day_value: Annotated[Optional[DayValue], '
         'typer.Option(show_default=False, case_sensitive=False, help="")] = None'
+        in text
+    )
+    assert (
+        'page_size: Annotated[int, typer.Option(help="Maximum items per page")] = 100'
         in text
     )
 
