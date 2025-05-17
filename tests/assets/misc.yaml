@@ -160,7 +160,7 @@ components:
             description: "Misleading help"
             type: imaginary
           flavor:
-            $ref: Species
+            $ref: "#/components/schemas/Species"
     Pets:
       type: array
       maxItems: 100

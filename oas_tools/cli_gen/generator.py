@@ -33,7 +33,7 @@ class Generator:
     def __init__(self, package_name: str, oas: dict[str, Any]):
         self.package_name = package_name
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
-        self.models = oas.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+        self.components = oas.get(OasField.COMPONENTS, {})
         self.default_host = ""
         servers = oas.get(OasField.SERVERS)
         if servers:
@@ -176,7 +176,7 @@ if __name__ == "__main__":
             if not reference:
                 total_prop_count += 1
             if reference:
-                submodel = self.get_reference_model(reference)
+                submodel = self.get_model(reference)
                 if self.model_is_complex(submodel):
                     return True
                 sub_props = submodel.get(OasField.PROPS, {})
@@ -192,7 +192,7 @@ if __name__ == "__main__":
                 return True
 
             reference = inherited.get(OasField.REFS)
-            submodel = self.get_reference_model(reference)
+            submodel = self.get_model(reference)
             properties = submodel.get(OasField.PROPS, {})
             total_prop_count += len(properties)
             if total_prop_count > 1:
@@ -206,7 +206,7 @@ if __name__ == "__main__":
         item_ref = items.get(OasField.REFS, "")
         item_short = self.short_reference_name(item_ref)
         if item_ref:
-            item_model = deepcopy(self.get_reference_model(item_ref))
+            item_model = deepcopy(self.get_model(item_ref))
         else:
             item_model = deepcopy(items)
 
@@ -223,7 +223,7 @@ if __name__ == "__main__":
             if not reference:
                 submodel = parent
             else:
-                submodel = self.get_reference_model(reference)
+                submodel = self.get_model(reference)
             # recursively search through submodels
             sub_collection = self.model_collection_type(submodel)
             if sub_collection:
@@ -259,7 +259,7 @@ if __name__ == "__main__":
                 # this is an unnamed sub-reference
                 submodel = deepcopy(parent)
             else:
-                submodel = deepcopy(self.get_reference_model(reference))
+                submodel = deepcopy(self.get_model(reference))
 
             if not submodel:
                 self.logger.warning(f"Failed to find {short_refname} model")
@@ -287,7 +287,7 @@ if __name__ == "__main__":
             if not reference:
                 submodel = deepcopy(prop_data)
             else:
-                submodel = deepcopy(self.get_reference_model(reference))
+                submodel = deepcopy(self.get_model(reference))
 
             if not submodel:
                 self.logger.warning(f"Failed to find {short_refname} model")
@@ -340,17 +340,26 @@ if __name__ == "__main__":
         schema = body.get(OasField.SCHEMA, {})
         ref = schema.get(OasField.REFS)
         if ref:
-            schema = self.get_reference_model(ref)
+            schema = self.get_model(ref)
         return self.model_settable_properties(schema)
 
     def short_reference_name(self, full_name: str) -> str:
         """Transforms the '#/components/schemas/Xxx' to 'Xxx'"""
         return full_name.split('/')[-1]
 
-    def get_reference_model(self, full_name: str) -> dict[str, Any]:
+    def get_model(self, full_name: str) -> dict[str, Any]:
         """Returns the reference"""
-        short_name = self.short_reference_name(full_name)
-        return self.models.get(short_name)
+        keys = [
+            item for item in full_name.split('/')
+            if item and item not in ['#', OasField.COMPONENTS.value]
+        ]
+        value = self.components
+        for k in keys:
+            value = value.get(k)
+            if not value:
+                return None
+
+        return value
 
     def command_infra_arguments(self, command: CommandNode) -> list[str]:
         args = [

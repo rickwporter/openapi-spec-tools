@@ -403,7 +403,7 @@ def test_op_query_arguments():
 def test_model_is_complex(reference, expected):
     oas = open_oas(asset_filename("misc.yaml"))
     uut = Generator("cli_package", oas)
-    model = uut.get_reference_model(reference)
+    model = uut.get_model(f"#/components/schemas/{reference}")
     assert expected == uut.model_is_complex(model)
 
 
@@ -810,7 +810,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
 def test_model_settable_properties(model_name, expected):
     oas = open_oas(asset_filename("misc.yaml"))
     uut = Generator("cli_package", oas)
-    model = uut.get_reference_model(model_name)
+    model = uut.get_model(f"#/components/schemas/{model_name}")
     properties = uut.model_settable_properties(model)
     assert expected == properties
 
