@@ -131,7 +131,10 @@ def test_op_short_help(op, expected):
         ),
         pytest.param(
             {DESC: 'First\n  This is more than the alloted 30 characters so will be wrapped\nnext line'},
-            "'''\n    First\n      This is more than the\n    alloted 30 characters so will\n    be wrapped\n    next line\n    '''\n    ",
+            (
+                "'''\n    First\n      This is more than the\n    alloted 30 characters "
+                "so will\n    be wrapped\n    next line\n    '''\n    "
+            ),
             id='wrapped-line',
         ),
     ]

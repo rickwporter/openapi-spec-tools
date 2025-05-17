@@ -74,7 +74,8 @@ def users_destroy(
 
     - The user cannot be the only owner of any Organization.
     - The bearer token must belong to the user being deleted.
-    - All of the memberships related to the User will be deleted, so all the membership deletion pre-conditions must also be met.
+    - All of the memberships related to the User will be deleted, so all the membership deletion pre-conditions must also be
+    met.
     '''
     # handler for users_destroy: DELETE /api/v1/users/{id}/
     _l.init_logging(_log_level)
