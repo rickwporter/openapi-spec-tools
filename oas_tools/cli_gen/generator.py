@@ -1,3 +1,4 @@
+import textwrap
 from copy import deepcopy
 from datetime import datetime
 from typing import Any
@@ -42,6 +43,7 @@ class Generator:
         self.supported = [
             ContentType.APP_JSON,
         ]
+        self.max_help_length = 120
         self.logger = get_logger(GENERATOR_LOG_CLASS)
 
     def shebang(self) -> str:
@@ -114,7 +116,8 @@ if __name__ == "__main__":
             if not line:
                 result += NL
             else:
-                result += SEP1 + line
+                inner = textwrap.wrap(line, width=self.max_help_length, replace_whitespace=False)
+                result += SEP1 + SEP1.join(inner)
         result += f"{SEP1}'''{SEP1}"
         return result
 

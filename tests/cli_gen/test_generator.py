@@ -129,10 +129,16 @@ def test_op_short_help(op, expected):
             """'''\n    First\n\n\n      After blanks\n    '''\n    """,
             id='multi-line',
         ),
+        pytest.param(
+            {DESC: 'First\n  This is more than the alloted 30 characters so will be wrapped\nnext line'},
+            "'''\n    First\n      This is more than the\n    alloted 30 characters so will\n    be wrapped\n    next line\n    '''\n    ",
+            id='wrapped-line',
+        ),
     ]
 )
 def test_op_long_help(op, expected):
     uut = Generator("foo", {})
+    uut.max_help_length = 30
     assert expected == uut.op_long_help(op)
 
 
