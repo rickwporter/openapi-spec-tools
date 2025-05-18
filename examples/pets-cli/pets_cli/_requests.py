@@ -13,11 +13,11 @@ from typing import Optional
 
 import requests
 
-from pets_cli._logging import get_logger
+from pets_cli._logging import logger
 
 GET = "GET"
 
-logger = get_logger()
+logger = logger()
 
 
 @dataclass

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 from typing import Optional
 
-from oas_tools.cli_gen._logging import get_logger
+from oas_tools.cli_gen._logging import logger
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import maybe_quoted
@@ -45,7 +45,7 @@ class Generator:
             ContentType.APP_JSON,
         ]
         self.max_help_length = 120
-        self.logger = get_logger(GENERATOR_LOG_CLASS)
+        self.logger = logger(GENERATOR_LOG_CLASS)
 
     def shebang(self) -> str:
         """Returns the shebang line that goes at the top of each file."""

@@ -8,15 +8,15 @@ import pytest
 
 from pets_cli._logging import LOG_CLASS
 from pets_cli._logging import LogLevel
-from pets_cli._logging import get_logger
 from pets_cli._logging import init_logging
+from pets_cli._logging import logger
 
 
 def test_get_logger() -> None:
-    logger = get_logger()
-    assert logger.name == LOG_CLASS
+    log = logger()
+    assert log.name == LOG_CLASS
 
-    req_logger = get_logger("requests")
+    req_logger = logger("requests")
     assert req_logger.name == "requests"
 
 @pytest.mark.parametrize(
@@ -31,6 +31,6 @@ def test_get_logger() -> None:
 )
 def test_init_logging(level: LogLevel, expected: int) -> None:
     init_logging(level)
-    logger = get_logger()
-    assert LOG_CLASS == logger.name
-    assert expected == logger.level
+    log = logger()
+    assert LOG_CLASS == log.name
+    assert expected == log.level

@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from oas_tools.cli_gen._logging import get_logger
+from oas_tools.cli_gen._logging import logger
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generator import COPYRIGHT
 from oas_tools.cli_gen.generator import Generator
@@ -28,7 +28,7 @@ TEST_FILES = {
     "test_requests.py": "test_requests.py",
 }
 
-logger = get_logger(GENERATOR_LOG_CLASS)
+logger = logger(GENERATOR_LOG_CLASS)
 
 
 def generate_node(generator: Generator, node: CommandNode, directory: str) -> None:

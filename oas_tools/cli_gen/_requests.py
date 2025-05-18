@@ -9,11 +9,11 @@ from typing import Optional
 
 import requests
 
-from oas_tools.cli_gen._logging import get_logger
+from oas_tools.cli_gen._logging import logger
 
 GET = "GET"
 
-logger = get_logger()
+logger = logger()
 
 
 @dataclass
