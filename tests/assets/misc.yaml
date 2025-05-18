@@ -131,6 +131,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /sna/foo:
+    get:
+      operationId: snafooCheck
+      summary: Check on how messed up things are
+      deprecated: true
+      responses:
+        '202':
+          description: This is an empty response
 components:
   parameters:
     PageSize:

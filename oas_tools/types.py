@@ -7,6 +7,7 @@ class OasField(str, Enum):
     COMPONENTS = "components"
     CONTENT = "content"
     DEFAULT = "default"
+    DEPRECATED = "deprecated"
     DESCRIPTION = "description"
     ENUM = "enum"
     FORMAT = "format"

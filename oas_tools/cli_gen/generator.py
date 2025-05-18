@@ -720,6 +720,7 @@ if __name__ == "__main__":
         path_params = self.op_params(op, "path")
         query_params = self.op_params(op, "query")
         body_params = self.op_body_settable_properties(op)
+        command_args = [quoted(node.command)]
 
         req_args = []
         if node.pagination:
@@ -737,6 +738,13 @@ if __name__ == "__main__":
             req_args.append("body=body")
         req_args.append("timemout=_api_timeout")
 
+        deprecation_warning = ""
+        deprecated = op.get(OasField.DEPRECATED, False)
+        if deprecated:
+            command_args.append("hidden=True")
+            message = f"{node.identifier} is deprecated and should not be used."
+            deprecation_warning = SEP1 + f'_l.logger().warning("{message}")'
+
         func_name = self.function_name(node.identifier)
         func_args = []
         func_args.extend(self.op_path_arguments(path_params))
@@ -745,14 +753,15 @@ if __name__ == "__main__":
         func_args.extend(self.command_infra_arguments(node))
         args_str = SEP1 + f",{SEP1}".join(func_args) + "," + NL
 
+        command_args.append(f'short_help="{self.op_short_help(op)}"')
         self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
 
         return f"""
 {self.enum_definitions(path_params, query_params, body_params)}
-@app.command("{node.command}", short_help="{self.op_short_help(op)}")
+@app.command({', '.join(command_args)})
 def {func_name}({args_str}) -> None:
     {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
-    _l.init_logging(_log_level)
+    _l.init_logging(_log_level){deprecation_warning}
     headers = _r.request_headers(_api_key{self.op_content_header(op)})
     url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}
     missing = {self.op_check_missing(query_params, body_params)}

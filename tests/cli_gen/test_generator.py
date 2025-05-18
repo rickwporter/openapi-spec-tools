@@ -1029,6 +1029,23 @@ def test_function_definition_paged():
     assert 'data = _r.depaginate(page_info, url, headers=headers, params=params, timemout=_api_timeout)' in text
 
 
+def test_function_deprecated():
+    oas = open_oas(asset_filename("misc.yaml"))
+    item = CommandNode(command='sna', identifier='snafooCheck')
+    uut = Generator("cli_package", oas)
+    text = uut.function_definition(item)
+
+    assert '@app.command("sna", hidden=True, short_help="Check on how messed up things are")' in text
+    assert 'def snafoo_check(' in text
+
+    # check a couple arguments
+    assert '_api_host: _a.ApiHostOption' in text
+    assert '_log_level: _a.LogLevelOption' in text
+
+    # check the warning log
+    assert '_l.logger().warning("snafooCheck is deprecated and should not be used.")' in text
+
+
 def test_main():
     uut = Generator("cli_package", {})
     text = uut.main()
