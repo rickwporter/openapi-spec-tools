@@ -29,7 +29,7 @@ class RoleEnum(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("create", help="")
+@app.command("create", short_help="")
 def memberships_create(
     user: Annotated[str, typer.Option(show_default=False, help="The user of the membership.")] = None,
     role: Annotated[RoleEnum, typer.Option(show_default=False, case_sensitive=False)] = None,
@@ -68,7 +68,7 @@ def memberships_create(
     return
 
 
-@app.command("delete", help="")
+@app.command("delete", short_help="")
 def memberships_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",
@@ -106,7 +106,7 @@ class Role(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("list", help="")
+@app.command("list", short_help="")
 def memberships_list(
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
@@ -160,7 +160,7 @@ class RoleEnum(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("set", help="")
+@app.command("set", short_help="")
 def memberships_update(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     user: Annotated[str, typer.Option(show_default=False, help="The user of the membership.")] = None,
@@ -204,7 +204,7 @@ def memberships_update(
     return
 
 
-@app.command("show", help="")
+@app.command("show", short_help="")
 def memberships_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",
@@ -242,7 +242,7 @@ class RoleEnum(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("update", help="")
+@app.command("update", short_help="")
 def memberships_partial_update(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     user: Annotated[Optional[str], typer.Option(show_default=False, help="The user of the membership.")] = None,

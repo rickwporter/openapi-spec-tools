@@ -23,7 +23,7 @@ app = typer.Typer(no_args_is_help=True, help="Manage CloudTruth environments")
 app.add_typer(environments_tags, name="tags")
 
 
-@app.command("create", help="")
+@app.command("create", short_help="")
 def environments_create(
     name: Annotated[str, typer.Option(show_default=False, help="The environment name.")] = None,
     description: Annotated[Optional[str], typer.Option(show_default=False, help="A description of the environment.  You may find it helpful to document how this environment is used to assist others when they need to maintain software that uses this content.")] = None,
@@ -64,7 +64,7 @@ def environments_create(
     return
 
 
-@app.command("delete", help="")
+@app.command("delete", short_help="")
 def environments_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",
@@ -95,7 +95,7 @@ def environments_destroy(
     return
 
 
-@app.command("list", help="")
+@app.command("list", short_help="")
 def environments_list(
     description__icontains: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None,
     name: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None,
@@ -145,7 +145,7 @@ def environments_list(
     return
 
 
-@app.command("pushes", help="List push operations.")
+@app.command("pushes", short_help="List push operations.")
 def environments_pushes_list(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
@@ -190,7 +190,7 @@ def environments_pushes_list(
     return
 
 
-@app.command("set", help="")
+@app.command("set", short_help="")
 def environments_update(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     name: Annotated[str, typer.Option(show_default=False, help="The environment name.")] = None,
@@ -235,7 +235,7 @@ def environments_update(
     return
 
 
-@app.command("show", help="")
+@app.command("show", short_help="")
 def environments_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="A UUID string identifying this environment ledger.")],
     _api_host: _a.ApiHostOption = "",
@@ -266,7 +266,7 @@ def environments_retrieve(
     return
 
 
-@app.command("update", help="")
+@app.command("update", short_help="")
 def environments_partial_update(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     name: Annotated[Optional[str], typer.Option(show_default=False, help="The environment name.")] = None,

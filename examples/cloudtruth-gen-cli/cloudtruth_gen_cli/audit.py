@@ -30,7 +30,7 @@ class Action(str, Enum):  # noqa: F811
     UPDATE = "update"
 
 
-@app.command("list", help="A searchable log of all the actions taken by users and service accounts within the organization.")
+@app.command("list", short_help="A searchable log of all the actions taken by users and service accounts within the organization.")
 def audit_list(
     action: Annotated[Optional[Action], typer.Option(show_default=False, case_sensitive=False, help="The action that was taken.")] = None,
     earliest: Annotated[Optional[datetime], typer.Option(show_default=False, help="")] = None,
@@ -101,7 +101,7 @@ def audit_list(
     return
 
 
-@app.command("show", help="Retrieve one record from the audit log.")
+@app.command("show", short_help="Retrieve one record from the audit log.")
 def audit_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",
@@ -135,7 +135,7 @@ def audit_retrieve(
     return
 
 
-@app.command("summary", help="Summary information about the organization\'s audit trail.")
+@app.command("summary", short_help="Summary information about the organization\'s audit trail.")
 def audit_summary_retrieve(
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,

@@ -22,7 +22,7 @@ from cloudtruth_gen_cli import _requests as _r
 app = typer.Typer(no_args_is_help=True, help="Manage CloudTruth users")
 
 
-@app.command("current", help="Current user information")
+@app.command("current", short_help="Current user information")
 def users_current_retrieve(
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
@@ -55,7 +55,7 @@ def users_current_retrieve(
     return
 
 
-@app.command("delete", help="Delete the specified user.")
+@app.command("delete", short_help="Delete the specified user.")
 def users_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",
@@ -98,7 +98,7 @@ def users_destroy(
     return
 
 
-@app.command("list", help="")
+@app.command("list", short_help="")
 def users_list(
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
@@ -142,7 +142,7 @@ def users_list(
     return
 
 
-@app.command("show", help="")
+@app.command("show", short_help="")
 def users_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",

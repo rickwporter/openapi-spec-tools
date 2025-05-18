@@ -22,7 +22,7 @@ from cloudtruth_gen_cli import _requests as _r
 app = typer.Typer(no_args_is_help=True, help="Manage environment tags")
 
 
-@app.command("create", help="Tags allow you to name stable points in time for your configuration.")
+@app.command("create", short_help="Tags allow you to name stable points in time for your configuration.")
 def environments_tags_create(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     name: Annotated[str, typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
@@ -73,7 +73,7 @@ def environments_tags_create(
     return
 
 
-@app.command("delete", help="Tags allow you to name stable points in time for your configuration.")
+@app.command("delete", short_help="Tags allow you to name stable points in time for your configuration.")
 def environments_tags_destroy(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],
@@ -111,7 +111,7 @@ def environments_tags_destroy(
     return
 
 
-@app.command("list", help="Tags allow you to name stable points in time for your configuration.")
+@app.command("list", short_help="Tags allow you to name stable points in time for your configuration.")
 def environments_tags_list(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     description__icontains: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None,
@@ -177,7 +177,7 @@ def environments_tags_list(
     return
 
 
-@app.command("set", help="Tags allow you to name stable points in time for your configuration.")
+@app.command("set", short_help="Tags allow you to name stable points in time for your configuration.")
 def environments_tags_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],
@@ -229,7 +229,7 @@ def environments_tags_update(
     return
 
 
-@app.command("show", help="Tags allow you to name stable points in time for your configuration.")
+@app.command("show", short_help="Tags allow you to name stable points in time for your configuration.")
 def environments_tags_retrieve(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],
@@ -267,7 +267,7 @@ def environments_tags_retrieve(
     return
 
 
-@app.command("update", help="Tags allow you to name stable points in time for your configuration.")
+@app.command("update", short_help="Tags allow you to name stable points in time for your configuration.")
 def environments_tags_partial_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],

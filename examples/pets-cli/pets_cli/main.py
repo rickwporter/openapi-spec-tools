@@ -22,7 +22,7 @@ from pets_cli import _requests as _r
 app = typer.Typer(no_args_is_help=True, help="Manage pets")
 
 
-@app.command("add", help="Create a pet")
+@app.command("add", short_help="Create a pet")
 def create_pets(
     id: Annotated[int, typer.Option(show_default=False)] = None,
     name: Annotated[str, typer.Option(show_default=False)] = None,
@@ -71,7 +71,7 @@ def create_pets(
     return
 
 
-@app.command("delete", help="Delete a pet")
+@app.command("delete", short_help="Delete a pet")
 def delete_pet_by_id(
     pet_id: Annotated[str, typer.Argument(show_default=False, help="The id of the pet to retrieve")],
     _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
@@ -105,7 +105,7 @@ def delete_pet_by_id(
     return
 
 
-@app.command("list", help="List all pets")
+@app.command("list", short_help="List all pets")
 def list_pets(
     limit: Annotated[Optional[int], typer.Option(max=100, show_default=False, help="How many items to return at one time (max 100)")] = None,
     _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
@@ -143,7 +143,7 @@ def list_pets(
     return
 
 
-@app.command("show", help="Info for a specific pet")
+@app.command("show", short_help="Info for a specific pet")
 def show_pet_by_id(
     pet_id: Annotated[str, typer.Argument(show_default=False, help="The id of the pet to retrieve")],
     _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",

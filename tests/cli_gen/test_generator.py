@@ -975,7 +975,7 @@ def test_function_definition_item():
     item = tree.find("pet", "create")
     uut = Generator("cli_package", oas)
     text = uut.function_definition(item)
-    assert '@app.command("create", help="Create a pet")' in text
+    assert '@app.command("create", short_help="Create a pet")' in text
     assert 'def create_pets(' in text
     assert '# handler for createPets: POST /pets' in text
 
@@ -1011,7 +1011,7 @@ def test_function_definition_paged():
     uut = Generator("cli_package", oas)
     text = uut.function_definition(item)
 
-    assert '@app.command("list", help="List all pets")' in text
+    assert '@app.command("list", short_help="List all pets")' in text
     assert 'def list_pets(' in text
 
     # check arguments

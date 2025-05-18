@@ -38,10 +38,10 @@ def test_generate_node_single():
 
     expected = [
         # app.command stuff
-        '@app.command("add", help="Create a pet")',
-        '@app.command("delete", help="Delete a pet")',
-        '@app.command("list", help="List all pets")',
-        '@app.command("show", help="Info for a specific pet")',
+        '@app.command("add", short_help="Create a pet")',
+        '@app.command("delete", short_help="Delete a pet")',
+        '@app.command("list", short_help="List all pets")',
+        '@app.command("show", short_help="Info for a specific pet")',
 
         # function definitions - partial to allow for expansion
         'def create_pets',
@@ -75,23 +75,23 @@ def test_generate_node_multiple():
             'app.add_typer(veterinarians, name="vets")',
         ],
         "owners": [
-            '@app.command("create", help="Create a pet owner")',
-            '@app.command("delete", help="Delete an owner")',
-            '@app.command("pets", help="List owners pets")',
-            '@app.command("update", help="Update an owner")',
+            '@app.command("create", short_help="Create a pet owner")',
+            '@app.command("delete", short_help="Delete an owner")',
+            '@app.command("pets", short_help="List owners pets")',
+            '@app.command("update", short_help="Update an owner")',
         ],
         "pets": [
-            '@app.command("create", help="Create a pet")',
-            '@app.command("delete", help="Delete a pet")',
-            '@app.command("update", help="Info for a specific pet")',
+            '@app.command("create", short_help="Create a pet")',
+            '@app.command("delete", short_help="Delete a pet")',
+            '@app.command("update", short_help="Info for a specific pet")',
         ],
         "pets_examine":[
-            '@app.command("blood-pressure", help="Record result of blood-pressure")',
-            '@app.command("heart-rate", help="Record result of heart-rate")',
+            '@app.command("blood-pressure", short_help="Record result of blood-pressure")',
+            '@app.command("heart-rate", short_help="Record result of heart-rate")',
         ],
         "veterinarians": [
-            '@app.command("add", help="Create a veterinarian")',
-            '@app.command("delete", help="Delete a veterinarian")',
+            '@app.command("add", short_help="Create a veterinarian")',
+            '@app.command("delete", short_help="Delete a veterinarian")',
         ],
     }
 
@@ -137,7 +137,7 @@ def test_generate_node_skip_bugged():
             'app.add_typer(owners, name="owners")',
         ],
         "pets": [
-            '@app.command("delete", help="Delete a pet")',
+            '@app.command("delete", short_help="Delete a pet")',
         ],
     }
 

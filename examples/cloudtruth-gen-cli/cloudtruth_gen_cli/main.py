@@ -31,7 +31,7 @@ app.add_typer(memberships, name="membership")
 app.add_typer(users, name="user")
 
 
-@app.command("backup", help="Get a snapshot of all Projects with parameters")
+@app.command("backup", short_help="Get a snapshot of all Projects with parameters")
 def backup_snapshot_create(
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
@@ -64,7 +64,7 @@ def backup_snapshot_create(
     return
 
 
-@app.command("generate-password", help="Get a randomly generated password using AWS Secrets Manager, with fallback to /dev/urandom.")
+@app.command("generate-password", short_help="Get a randomly generated password using AWS Secrets Manager, with fallback to /dev/urandom.")
 def utils_generate_password_create(
     length: Annotated[Optional[int], typer.Option(show_default=False, help="The length of the password to generate.  Minimum of 8, maximum of 4095.")] = None,
     require_hardware_generation: Annotated[bool, typer.Option(help="Default behavior is to fallback to /dev/urandom if we fail to get a random password from AWS Secrets Manager.  If set to \'True\', we will not fallback to local password generation using /dev/urandom.  Default: False")] = False,

@@ -29,7 +29,7 @@ class RoleEnum(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("create", help="Grants allow you to enable access control on Environments and Projects.")
+@app.command("create", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_create(
     principal: Annotated[str, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
     scope: Annotated[str, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
@@ -79,7 +79,7 @@ def grants_create(
     return
 
 
-@app.command("delete", help="Grants allow you to enable access control on Environments and Projects.")
+@app.command("delete", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",
@@ -117,7 +117,7 @@ def grants_destroy(
     return
 
 
-@app.command("delete-many", help="Removes grants matching the query parameters atomically.")
+@app.command("delete-many", short_help="Removes grants matching the query parameters atomically.")
 def grants_multi_destroy(
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
@@ -160,7 +160,7 @@ class Role(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("list", help="Grants allow you to enable access control on Environments and Projects.")
+@app.command("list", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_list(
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
@@ -224,7 +224,7 @@ class RoleEnum(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("set", help="Grants allow you to enable access control on Environments and Projects.")
+@app.command("set", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_update(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     principal: Annotated[str, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
@@ -275,7 +275,7 @@ def grants_update(
     return
 
 
-@app.command("show", help="Grants allow you to enable access control on Environments and Projects.")
+@app.command("show", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     _api_host: _a.ApiHostOption = "",
@@ -320,7 +320,7 @@ class RoleEnum(str, Enum):  # noqa: F811
     VIEWER = "VIEWER"
 
 
-@app.command("update", help="Grants allow you to enable access control on Environments and Projects.")
+@app.command("update", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_partial_update(
     id: Annotated[str, typer.Argument(show_default=False, help="")],
     principal: Annotated[Optional[str], typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,

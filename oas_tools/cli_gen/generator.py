@@ -748,7 +748,7 @@ if __name__ == "__main__":
 
         return f"""
 {self.enum_definitions(path_params, query_params, body_params)}
-@app.command("{node.command}", help="{self.op_short_help(op)}")
+@app.command("{node.command}", short_help="{self.op_short_help(op)}")
 def {func_name}({args_str}) -> None:
     {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
     _l.init_logging(_log_level)
