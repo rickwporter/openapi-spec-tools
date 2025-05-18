@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 from enum import Enum
+from typing import Optional
 
 import typer
 import yaml
@@ -179,17 +180,52 @@ def render_missing(missing: dict[str, list[str]]) -> str:
     )
 
 
-@app.command("generate", help="Generate CLI code")
+@app.command("generate", short_help="Generate CLI code")
 def generate_cli(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
     package_name: Annotated[str, typer.Argument(show_default=False, help="Base package name")],
-    directory: Annotated[str, typer.Argument(show_default=False, help="Project directory name")],
+    project_dir: Annotated[
+        Optional[str],
+        typer.Option(show_default=False, help="Project directory name")
+    ] = None,
+    code_dir: Annotated[
+        Optional[str],
+        typer.Option(show_default=False, help="Directory for code -- overrides default")
+    ] = None,
+    test_dir: Annotated[
+        Optional[str],
+        typer.Option(show_default=False, help="Directory for tests -- overrides default")
+    ] = None,
     include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "DEBUG",
 ) -> None:
+    """
+    Generates CLI code based on the provided parameters.
+
+    Use either `--project-dir` to set both relative code and test directories, or
+    set the paths specifically using `--code-dir` and `--test-dir`.
+    """
     init_logging(log_level, GENERATOR_LOG_CLASS)
+
+    if project_dir:
+        code_dir = code_dir or os.path.join(project_dir, package_name)
+        test_dir = test_dir or os.path.join(project_dir, "tests")
+    else:
+        if not code_dir:
+            typer.echo(
+                "Must provide code directory using either `--project-dir` (which uses package"
+                " name), or `--code-dir`"
+            )
+            raise typer.Exit(1)
+        if not test_dir and include_tests:
+            typer.echo(
+                "Must provide test directory using either `--project-dir` (which uses "
+                "tests sub-directory), or `--tests-dir`"
+            )
+            raise typer.Exit(1)
+
     commands = file_to_tree(layout_file, start=start)
     oas = open_oas(openapi_file)
 
@@ -198,9 +234,6 @@ def generate_cli(
         typer.echo(render_missing(missing))
         raise typer.Exit(1)
 
-    os.makedirs(directory, exist_ok=True)
-
-    code_dir = os.path.join(directory, package_name)
     os.makedirs(code_dir, exist_ok=True)
 
     # create the init file
@@ -215,11 +248,10 @@ def generate_cli(
     generate_node(generator, commands, code_dir)
 
     if include_tests:
-        test_dir = os.path.join(directory, "tests")
         os.makedirs(test_dir, exist_ok=True)
         copy_tests(test_dir,  package_name)
 
-    typer.echo(f"Generated files in {directory}")
+    typer.echo("Generated files")
 
 
 @app.command("check", help="Check OAS contains layout operations")

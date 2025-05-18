@@ -232,21 +232,41 @@ def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> 
         output = mock_stdout.getvalue()
         assert to_ascii(output) == to_ascii(expected)
 
-@pytest.mark.parametrize("include_tests", [True, False])
-def test_cli_generate_success(include_tests):
+
+@pytest.mark.parametrize(
+    ["code_dir", "test_dir", "include_tests", "expected_code", "expected_test"],
+    [
+        pytest.param(None, None, True, "my_cli_pkg", "tests", id="basic"),
+        pytest.param(None, None, False, "my_cli_pkg", "tests", id="no-tests"),
+        pytest.param("sna", "foo", True, "sna", "foo", id="overrides"),
+        pytest.param("sna", "foo", False, "sna", "foo", id="untested-overrides"),
+    ],
+)
+def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, expected_test):
     layout_file = asset_filename("layout_pets.yaml")
     oas_file = asset_filename("pet2.yaml")
     pkg_name = "my_cli_pkg"
     directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+    code_path = Path(base_dir, code_dir).as_posix() if code_dir else None
+    test_path = Path(base_dir, test_dir).as_posix() if test_dir else None
 
     with (
         mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
     ):
-        generate_cli(layout_file, oas_file, pkg_name, directory.name, include_tests=include_tests)
-        assert f"Generated files in {directory.name}\n" == mock_stdout.getvalue()
+        generate_cli(
+            layout_file,
+            oas_file,
+            pkg_name,
+            project_dir=directory.name,
+            code_dir=code_path,
+            test_dir=test_path,
+            include_tests=include_tests
+        )
+        assert "Generated files\n" == mock_stdout.getvalue()
 
     # NOTE: just check some basics here -- more detailed checks elsewhere
-    path = Path(directory.name) / pkg_name
+    path = Path(directory.name) / expected_code
     file = path / "main.py"
     assert file.exists()
 
@@ -269,7 +289,7 @@ def test_cli_generate_success(include_tests):
     }
     assert filenames == expected
 
-    path = Path(directory.name) / "tests"
+    path = Path(directory.name) / expected_test
     if not include_tests:
         assert not path.exists()
     else:
@@ -282,6 +302,48 @@ def test_cli_generate_success(include_tests):
             "test_requests.py",
         }
         assert filenames == expected
+
+
+@pytest.mark.parametrize(
+    ["code_dir", "test_dir", "include_tests", "error"],
+    [
+        pytest.param(
+            None,
+            "foo",
+            False,
+            (
+                "Must provide code directory using either `--project-dir` (which "
+                "uses package name), or `--code-dir`\n"
+            ),
+            id="no-code",
+        ),
+        pytest.param(
+            "sna",
+            None,
+            True,
+            (
+                "Must provide test directory using either `--project-dir` (which uses "
+                "tests sub-directory), or `--tests-dir`\n"
+            ),
+            id="no-test",
+        ),
+    ]
+)
+def test_cli_generate_location_errors(code_dir, test_dir, include_tests, error):
+    layout_file = asset_filename("layout_pets.yaml")
+    oas_file = asset_filename("pet2.yaml")
+    pkg_name = "my_cli_pkg"
+
+    with (
+        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+    ):
+        with pytest.raises(typer.Exit) as context:
+            generate_cli(
+                layout_file, oas_file, pkg_name, code_dir=code_dir, test_dir=test_dir, include_tests=include_tests
+            )
+        ex = context.value
+        assert ex.exit_code == 1
+        assert error == mock_stdout.getvalue()
 
 
 def test_cli_generate_failure():
