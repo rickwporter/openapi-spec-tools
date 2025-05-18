@@ -27,6 +27,11 @@ def maybe_quoted(item: Any) -> str:
     return str(item)
 
 
+def quoted(s: str) -> str:
+    """Returns a double quoted version of the provided string"""
+    return f'"{s}"'
+
+
 def simple_escape(text: str) -> str:
     """Replaces characters that are problematic in simple quoted strings"""
     lines = [_.strip() for _ in text.splitlines() if _.strip()]

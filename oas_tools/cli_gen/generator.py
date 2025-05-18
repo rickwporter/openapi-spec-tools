@@ -8,6 +8,7 @@ from oas_tools.cli_gen._logging import get_logger
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.layout_types import CommandNode
 from oas_tools.cli_gen.utils import maybe_quoted
+from oas_tools.cli_gen.utils import quoted
 from oas_tools.cli_gen.utils import set_missing
 from oas_tools.cli_gen.utils import simple_escape
 from oas_tools.cli_gen.utils import to_camel_case
@@ -636,7 +637,7 @@ if __name__ == "__main__":
             return ""
 
         lines = ["if not _details:"]
-        args = [maybe_quoted(v) for v in node.summary_fields]
+        args = [quoted(v) for v in node.summary_fields]
         lines.append(f"    data = summary(data, [{', '.join(args)}])")
         return SEP2 + SEP2.join(lines)
 
@@ -646,20 +647,20 @@ if __name__ == "__main__":
         args = {"max_count": "_max_count"}
         names = command.pagination
         if names.page_size:
-            args["page_size_name"] = maybe_quoted(names.page_size)
+            args["page_size_name"] = quoted(names.page_size)
             args["page_size_value"] = self.variable_name(names.page_size)
         if names.page_start:
-            args["page_start_name"] = maybe_quoted(names.page_start)
+            args["page_start_name"] = quoted(names.page_start)
             args["page_start_value"] = self.variable_name(names.page_start)
         if names.item_start:
-            args["item_start_name"] = maybe_quoted(names.item_start)
+            args["item_start_name"] = quoted(names.item_start)
             args["item_start_value"] = self.variable_name(names.item_start)
         if names.items_property:
-            args["item_property_name"] = maybe_quoted(names.items_property)
+            args["item_property_name"] = quoted(names.items_property)
         if names.next_header:
-            args["next_header_name"] = maybe_quoted(names.next_header)
+            args["next_header_name"] = quoted(names.next_header)
         if names.next_property:
-            args["next_property_name"] = maybe_quoted(names.next_property)
+            args["next_property_name"] = quoted(names.next_property)
 
         arg_text = ', '.join([f"{k}={v}" for k, v in args.items()])
         return f"{SEP1}page_info = _r.PageParams({arg_text})"
@@ -726,7 +727,7 @@ if __name__ == "__main__":
             req_args.append("page_info")
         else:
             req_func = "request"
-            req_args.append(maybe_quoted(method))
+            req_args.append(quoted(method))
         req_args.extend([
             "url",
             "headers=headers",
