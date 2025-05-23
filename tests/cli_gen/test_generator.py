@@ -1051,3 +1051,74 @@ def test_main():
     text = uut.main()
     assert 'if __name__ == "__main__":' in text
     assert "app()" in text
+
+
+@pytest.mark.parametrize(
+    ["oas_filename", "layout_filename", "expected"],
+    [
+        pytest.param(
+            "pet2.yaml",
+            "layout_pets.yaml",
+            {
+                'description': 'Manage pets',
+                'name': 'main',
+                'operations': [
+                    {
+                        'function': 'create_pets',
+                        'help': 'Create a pet',
+                        'method': 'POST',
+                        'name': 'add',
+                        'operationId': 'createPets',
+                        'path': '/pets'
+                    },
+                    {
+                        'function': 'delete_pet_by_id',
+                        'help': 'Delete a pet',
+                        'method': 'DELETE',
+                        'name': 'delete',
+                        'operationId': 'deletePetById',
+                        'path': '/pets/{petId}'
+                    },
+                    {
+                        'function': 'list_pets',
+                        'help': 'List all pets',
+                        'method': 'GET',
+                        'name': 'list',
+                        'operationId': 'listPets',
+                        'path': '/pets'
+                    },
+                    {
+                        'function': 'show_pet_by_id',
+                        'help': 'Info for a specific pet',
+                        'method': 'GET',
+                        'name': 'show',
+                        'operationId': 'showPetById',
+                        'path': '/pets/{petId}'
+                    }
+                ]
+            },
+            id="single",
+        ),
+        pytest.param(
+            "pet2.yaml",
+            "layout_pets2.yaml",
+            {
+                'description': 'Pet management application',
+                 'name': 'main',
+                 'operations': [
+                    {'name': 'owners', 'subcommandId': 'owners'},
+                    {'name': 'pet', 'subcommandId': 'pets'},
+                    {'name': 'vets', 'subcommandId': 'veterinarians'},
+                ]
+            },
+            id="subcommands",
+        )
+    ]
+)
+def test_tree_data(oas_filename, layout_filename, expected):
+    oas = open_oas(asset_filename(oas_filename))
+    uut = Generator("cli", oas)
+    node = file_to_tree(asset_filename(layout_filename))
+
+    result = uut.tree_data(node)
+    assert expected == result

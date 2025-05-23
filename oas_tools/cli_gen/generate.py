@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Any
 
 from oas_tools.cli_gen._logging import logger
+from oas_tools.cli_gen._tree import TreeField
+from oas_tools.cli_gen._tree import TreeNode
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generator import COPYRIGHT
 from oas_tools.cli_gen.generator import Generator
@@ -52,6 +54,34 @@ def generate_node(generator: Generator, node: LayoutNode, directory: str) -> Non
     # recursively do the same for sub-commands
     for command in node.subcommands():
         generate_node(generator, command, directory)
+
+
+def generate_tree_node(generator: Generator, node: LayoutNode) -> TreeNode:
+    """Generate a TreeNode hierarchy for the comm"""
+    data = generator.tree_data(node)
+    children = []
+    for item in data.get(TreeField.OPERATIONS, []):
+        op_id = item.get(TreeField.OP_ID)
+        if not op_id:
+            continue
+        op = TreeNode(
+            name=item.get(TreeField.NAME),
+            help=item.get(TreeField.HELP),
+            operation=item.get(TreeField.OP_ID),
+            function=item.get(TreeField.FUNC),
+            method=item.get(TreeField.METHOD),
+            path=item.get(TreeField.PATH),
+        )
+        children.append(op)
+
+    for sub in node.subcommands():
+        children.append(generate_tree_node(generator, sub))
+
+    return TreeNode(
+        name=data.get(TreeField.NAME),
+        help=data.get(TreeField.DESCRIPTION),
+        children=children,
+    )
 
 
 def check_for_missing(node: LayoutNode, oas: dict[str, Any]) -> dict[str, list[str]]:

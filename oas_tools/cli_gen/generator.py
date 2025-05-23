@@ -5,6 +5,7 @@ from typing import Any
 from typing import Optional
 
 from oas_tools.cli_gen._logging import logger
+from oas_tools.cli_gen._tree import TreeField
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.layout_types import LayoutNode
 from oas_tools.cli_gen.utils import maybe_quoted
@@ -778,3 +779,30 @@ def {func_name}({args_str}) -> None:
 
     return
 """
+
+    def tree_data(self, node: LayoutNode) -> dict[str, Any]:
+        """Gets the tree data for the specifed node"""
+        data = {
+            TreeField.NAME.value: node.command,
+            TreeField.DESCRIPTION.value: node.description
+        }
+
+        operations = []
+        for item in node.operations():
+            op = self.operations.get(item.identifier)
+            child = {
+                TreeField.NAME.value: item.command,
+                TreeField.OP_ID.value: item.identifier,
+                TreeField.FUNC.value: self.function_name(item.identifier),
+                TreeField.METHOD.value: op.get(OasField.X_METHOD).upper(),
+                TreeField.PATH.value: op.get(OasField.X_PATH),
+                TreeField.HELP.value: self.op_short_help(op),
+            }
+            operations.append(child)
+
+        for item in node.subcommands():
+            operations.append({TreeField.NAME.value: item.command, TreeField.SUB_CMD.value: item.identifier})
+
+        data[TreeField.OPERATIONS.value] = operations
+
+        return data

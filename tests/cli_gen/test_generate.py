@@ -11,6 +11,7 @@ from oas_tools.cli_gen.generate import copy_infrastructure
 from oas_tools.cli_gen.generate import copy_tests
 from oas_tools.cli_gen.generate import find_unreferenced
 from oas_tools.cli_gen.generate import generate_node
+from oas_tools.cli_gen.generate import generate_tree_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
 from oas_tools.utils import open_oas
@@ -154,6 +155,22 @@ def test_generate_node_skip_bugged():
 
         for v in unexpected:
             assert v not in text
+
+
+@pytest.mark.parametrize(
+    ["oas_filename", "layout_filename", "expected"],
+    [
+        pytest.param("pet2.yaml", "layout_pets.yaml", {'list', 'show', 'add', 'delete'}, id="simple"),
+        pytest.param("pets_and_vets.yaml", "layout_pets2.yaml", {'owners', 'pet', 'vets'}, id="subcommands"),
+    ]
+)
+def test_generate_tree_node(oas_filename, layout_filename, expected):
+    oas = open_oas(asset_filename(oas_filename))
+    layout = file_to_tree(asset_filename(layout_filename))
+    generator = Generator("cli", oas)
+    tree = generate_tree_node(generator, layout)
+    names = {node.name() for node in tree.children()}
+    assert expected == names
 
 
 @pytest.mark.parametrize(
