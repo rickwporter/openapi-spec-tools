@@ -47,6 +47,7 @@ max-statements = 75
 [tool.ruff.lint.per-file-ignores]
 # ignore the unused imports in init
 "__init__.py" = ["F401"]
+"tests/cli_gen/cli_output.py" = ["W291"]
 
 [tool.pytest.ini_options]
 addopts = [

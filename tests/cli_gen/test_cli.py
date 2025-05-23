@@ -9,12 +9,23 @@ from unittest import mock
 import pytest
 import typer
 
+from oas_tools.cli_gen.cli import TreeDisplay
 from oas_tools.cli_gen.cli import TreeFormat
 from oas_tools.cli_gen.cli import generate_check_missing
 from oas_tools.cli_gen.cli import generate_cli
 from oas_tools.cli_gen.cli import generate_unreferenced
 from oas_tools.cli_gen.cli import layout_check_format
 from oas_tools.cli_gen.cli import layout_tree
+from oas_tools.cli_gen.cli import show_cli_tree
+from tests.cli_gen.cli_output import P_V_ALL
+from tests.cli_gen.cli_output import P_V_MID
+from tests.cli_gen.cli_output import P_V_PETS
+from tests.cli_gen.cli_output import P_V_SHALLOW
+from tests.cli_gen.cli_output import PET_ALL
+from tests.cli_gen.cli_output import PET_FUNC
+from tests.cli_gen.cli_output import PET_HELP
+from tests.cli_gen.cli_output import PET_OP
+from tests.cli_gen.cli_output import PET_PATH
 from tests.cli_gen.helpers import to_ascii
 from tests.helpers import asset_filename
 
@@ -456,5 +467,52 @@ def test_unreferenced(layout_file, oas_file, full, expected):
     ):
         lf_name = asset_filename(layout_file)
         generate_unreferenced(lf_name, asset_filename(oas_file), full_path=full)
+        result = mock_stdout.getvalue()
+        assert expected == result
+
+
+@pytest.mark.parametrize(
+    ["layout_file", "oas_file", "start", "display", "depth", "expected"],
+    [
+        pytest.param(
+            "layout_pets.yaml", "pet2.yaml", "gone", TreeDisplay.ALL, 10, "", id="empty",
+        ),
+        pytest.param(
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.ALL, 10, PET_ALL, id="all",
+        ),
+        pytest.param(
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.HELP, 10, PET_HELP, id="help",
+        ),
+        pytest.param(
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.FUNCTION, 10, PET_FUNC, id="func",
+        ),
+        pytest.param(
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.OPERATION, 10, PET_OP, id="operation",
+        ),
+        pytest.param(
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.PATH, 10, PET_PATH, id="path",
+        ),
+        pytest.param(
+            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.ALL, 10, P_V_ALL, id="complete",
+        ),
+        pytest.param(
+            "layout_pets2.yaml", "pets_and_vets.yaml", "pets", TreeDisplay.OPERATION, 10, P_V_PETS, id="alt-start",
+        ),
+        pytest.param(
+            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.OPERATION, 0, P_V_SHALLOW, id="depth=0",
+        ),
+        pytest.param(
+            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.OPERATION, 1, P_V_MID, id="depth=1",
+        ),
+    ]
+)
+def test_show_cli_tree(layout_file, oas_file, start, display, depth, expected):
+    lname = asset_filename(layout_file)
+    oname = asset_filename(oas_file)
+    with (
+        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+    ):
+        show_cli_tree(lname, oname, start=start, display=display, max_depth=depth)
+
         result = mock_stdout.getvalue()
         assert expected == result

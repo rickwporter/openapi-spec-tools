@@ -12,12 +12,15 @@ from typing_extensions import Annotated
 
 from oas_tools.cli_gen._arguments import LogLevelOption
 from oas_tools.cli_gen._logging import init_logging
+from oas_tools.cli_gen._tree import TreeDisplay
+from oas_tools.cli_gen._tree import create_tree_table
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generate import check_for_missing
 from oas_tools.cli_gen.generate import copy_infrastructure
 from oas_tools.cli_gen.generate import copy_tests
 from oas_tools.cli_gen.generate import find_unreferenced
 from oas_tools.cli_gen.generate import generate_node
+from oas_tools.cli_gen.generate import generate_tree_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import DEFAULT_START
 from oas_tools.cli_gen.layout import check_pagination_definitions
@@ -306,6 +309,28 @@ def generate_unreferenced(
             typer.echo(f"  - {op.get(OasField.OP_ID)}")
 
     typer.echo(f"\nFound {len(unreferenced)} operations in {len(paths)} paths")
+
+
+@app.command("tree", help="Displays the CLI tree")
+def show_cli_tree(
+    layout_file: LayoutFilenameArgument,
+    openapi_file: OpenApiFilenameArgument,
+    start: StartPointOption = DEFAULT_START,
+    display: Annotated[
+        TreeDisplay,
+        typer.Option(case_sensitive=False, help="Details to show about tree")
+    ] = TreeDisplay.ALL,
+    max_depth: Annotated[int, typer.Option(help="Maximum tree depth to show")] = 10,
+) -> None:
+    layout = file_to_tree(layout_file, start=start)
+    oas = open_oas(openapi_file)
+    generator = Generator("", oas)
+
+    tree = generate_tree_node(generator, layout)
+
+    table = create_tree_table(tree, display, max_depth)
+    console = Console()
+    console.print(table)
 
 
 if __name__ == "__main__":
