@@ -53,14 +53,14 @@ class PaginationNames:
 
 
 @dataclasses.dataclass
-class CommandNode:
+class LayoutNode:
     command: str
     identifier: str
     description: str = ""
     bugs: list[str] = dataclasses.field(default_factory=list)
     summary_fields: list[str] = dataclasses.field(default_factory=list)
     extra: dict[str, Any] = dataclasses.field(default_factory=dict)
-    children: list["CommandNode"] = dataclasses.field(default_factory=list)
+    children: list["LayoutNode"] = dataclasses.field(default_factory=list)
     pagination: Optional[PaginationNames] = None
 
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
@@ -71,15 +71,15 @@ class CommandNode:
 
         return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
 
-    def subcommands(self, include_bugged: bool = False) -> list["CommandNode"]:
-        """Return a list of CommandNodes that have children."""
+    def subcommands(self, include_bugged: bool = False) -> list["LayoutNode"]:
+        """Return a list of LayoutNodes that have children."""
         return [n for n in self.children if n.children and (include_bugged or not n.bugs)]
 
-    def operations(self, include_bugged: bool = False) -> list["CommandNode"]:
-        """Return a list of CommandNodes without any children."""
+    def operations(self, include_bugged: bool = False) -> list["LayoutNode"]:
+        """Return a list of LayoutNodes without any children."""
         return [n for n in self.children if not n.children and (include_bugged or not n.bugs)]
 
-    def find(self, *args) -> Optional["CommandNode"]:
+    def find(self, *args) -> Optional["LayoutNode"]:
         """Search for the provided commands"""
         for child in self.children:
             if child.command == args[0]:

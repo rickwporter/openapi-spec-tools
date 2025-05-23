@@ -3,8 +3,8 @@ from typing import Optional
 
 import yaml
 
-from .layout_types import CommandNode
 from .layout_types import LayoutField
+from .layout_types import LayoutNode
 from .layout_types import PaginationField
 from .layout_types import PaginationNames
 
@@ -59,8 +59,8 @@ def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames
     )
 
 
-def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> CommandNode:
-    """Recursively converts elements from data to CommandNodes"""
+def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
+    """Recursively converts elements from data to LayoutNodes"""
     description = item.get(LayoutField.DESCRIPTION, "")
     # identifier = item.get(LayoutField.OP_ID) or identifier
     # parse bugs and summary fields into a list
@@ -82,7 +82,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         op_id = op_data.get(LayoutField.OP_ID)
         children.append(data_to_node(data, op_id, op_name, op_data))
 
-    return CommandNode(
+    return LayoutNode(
         command=command,
         identifier=identifier,
         description=description,
@@ -94,7 +94,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     )
 
 
-def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> CommandNode:
+def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> LayoutNode:
     """Puts the data into a tree structure starting at start."""
     top = data.get(start, {})
 
@@ -241,7 +241,7 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
 
     return errors
 
-def file_to_tree(filename: str, start: str = DEFAULT_START) -> CommandNode:
-    """Utility to open filename and parse to a CommandNode tree."""
+def file_to_tree(filename: str, start: str = DEFAULT_START) -> LayoutNode:
+    """Utility to open filename and parse to a LayoutNode tree."""
     data = open_layout(filename)
     return parse_to_tree(data, start)

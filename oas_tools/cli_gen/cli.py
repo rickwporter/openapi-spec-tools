@@ -28,7 +28,7 @@ from oas_tools.cli_gen.layout import operation_order
 from oas_tools.cli_gen.layout import subcommand_missing_properties
 from oas_tools.cli_gen.layout import subcommand_order
 from oas_tools.cli_gen.layout import subcommand_references
-from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.layout_types import LayoutNode
 from oas_tools.types import OasField
 from oas_tools.utils import open_oas
 
@@ -147,7 +147,7 @@ def layout_tree(
         print(yaml.dump(tree.as_dict(), indent=indent, sort_keys=False))
         return
 
-    def add_node(table: Table, node: CommandNode, level: int) -> None:
+    def add_node(table: Table, node: LayoutNode, level: int) -> None:
         name = f"{' ' * indent * level}{node.command}"
         table.add_row(name, node.identifier, node.description)
         for child in node.children:

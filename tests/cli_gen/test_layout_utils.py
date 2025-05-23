@@ -12,7 +12,7 @@ from oas_tools.cli_gen.layout import parse_to_tree
 from oas_tools.cli_gen.layout import subcommand_missing_properties
 from oas_tools.cli_gen.layout import subcommand_order
 from oas_tools.cli_gen.layout import subcommand_references
-from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.layout_types import LayoutNode
 from oas_tools.cli_gen.layout_types import PaginationNames
 from tests.helpers import asset_filename
 
@@ -212,7 +212,7 @@ def test_parse_pagination(data, expected) -> None:
         pytest.param(
             "sna",
             {},
-            CommandNode(
+            LayoutNode(
                 command="sna",
                 identifier="sna",
             ),
@@ -228,7 +228,7 @@ def test_parse_pagination(data, expected) -> None:
                 OP_ID: "op1",
                 OPS: [],
             },
-            CommandNode(
+            LayoutNode(
                 command="sna",
                 identifier="sna",
                 description="my desc",
@@ -246,12 +246,12 @@ def test_parse_pagination(data, expected) -> None:
                     {NAME: "foo", OP_ID: "op1"}, {NAME: "bar", OP_ID: "op2"}
                 ],
             },
-            CommandNode(
+            LayoutNode(
                 command="sna",
                 identifier="sna",
                 children=[
-                    CommandNode(command="foo", description="", identifier="op1"),
-                    CommandNode(command="bar", description="", identifier="op2"),
+                    LayoutNode(command="foo", description="", identifier="op1"),
+                    LayoutNode(command="bar", description="", identifier="op2"),
                 ],
             ),
             id="sub-ops",
@@ -263,14 +263,14 @@ def test_parse_pagination(data, expected) -> None:
                     {NAME: "foo", SUB_ID: "sub1"}, {NAME: "bar", SUB_ID: "sub2"}
                 ],
             },
-            CommandNode(
+            LayoutNode(
                 command="sna",
                 identifier="sna",
                 children=[
-                    CommandNode(command="foo", identifier="sub1", description="sub-command desc", children=[
-                        CommandNode(command="dazed", identifier="confused"),
+                    LayoutNode(command="foo", identifier="sub1", description="sub-command desc", children=[
+                        LayoutNode(command="dazed", identifier="confused"),
                     ]),
-                    CommandNode(command="bar", identifier="sub2", description="more help", bugs=["a", "bc"]),
+                    LayoutNode(command="bar", identifier="sub2", description="more help", bugs=["a", "bc"]),
                 ],
             ),
             id="sub-cmds",
@@ -297,25 +297,25 @@ def test_data_to_node_basic(name, item, expected) -> None:
     [
         pytest.param(
             "foo",
-            CommandNode(command="foo", identifier="foo"),
+            LayoutNode(command="foo", identifier="foo"),
             id="empty",
         ),
         pytest.param(
             "top",
-            CommandNode(
+            LayoutNode(
                 command="top",
                 identifier="top",
                 description="top level item",
                 children=[
-                    CommandNode(
+                    LayoutNode(
                         command="blah",
                         identifier="command1",
                         children=[
-                            CommandNode(command="foo", identifier="op1"),
-                            CommandNode(command="bar", identifier="op2"),
+                            LayoutNode(command="foo", identifier="op1"),
+                            LayoutNode(command="bar", identifier="op2"),
                         ],
                     ),
-                    CommandNode(
+                    LayoutNode(
                         command="zey",
                         identifier="command2",
                         description="some help"
@@ -326,17 +326,17 @@ def test_data_to_node_basic(name, item, expected) -> None:
         ),
         pytest.param(
             "command2",
-            CommandNode(command="command2", identifier="command2", description="some help"),
+            LayoutNode(command="command2", identifier="command2", description="some help"),
             id="command2",
         ),
         pytest.param(
             "command1",
-            CommandNode(
+            LayoutNode(
                 command="command1",
                 identifier="command1",
                 children=[
-                    CommandNode(command="foo", identifier="op1"),
-                    CommandNode(command="bar", identifier="op2"),
+                    LayoutNode(command="foo", identifier="op1"),
+                    LayoutNode(command="bar", identifier="op2"),
                 ],
             ),
             id="command1",
@@ -417,20 +417,20 @@ def test_pagination_definitions(data, expected) -> None:
 
 
 def test_lists() -> None:
-    uut = CommandNode(
+    uut = LayoutNode(
         command="top",
         identifier="top",
         description="top level item",
         children=[
-            CommandNode(
+            LayoutNode(
                 command="blah",
                 identifier="command1",
                 children=[
-                    CommandNode(command="foo", identifier="op1"),
-                    CommandNode(command="bar", identifier="op2"),
+                    LayoutNode(command="foo", identifier="op1"),
+                    LayoutNode(command="bar", identifier="op2"),
                 ],
             ),
-            CommandNode(
+            LayoutNode(
                 command="zey",
                 identifier="command2",
                 description="some help",
@@ -446,21 +446,21 @@ def test_lists() -> None:
 
 
 def test_lists_bugged() -> None:
-    uut = CommandNode(
+    uut = LayoutNode(
         command="top",
         identifier="top",
         description="top level item",
         children=[
-            CommandNode(
+            LayoutNode(
                 command="blah",
                 identifier="command1",
                 bugs=["456"],
                 children=[
-                    CommandNode(command="foo", identifier="op1"),
-                    CommandNode(command="bar", identifier="op2", bugs=["abc"]),
+                    LayoutNode(command="foo", identifier="op1"),
+                    LayoutNode(command="bar", identifier="op2", bugs=["abc"]),
                 ],
             ),
-            CommandNode(
+            LayoutNode(
                 command="zey",
                 identifier="command2",
                 description="some help",
@@ -500,7 +500,7 @@ def test_file_to_tree() -> None:
         pytest.param(("pet", "feed"), None, id="child-not-found"),
         pytest.param(
             ("pet", "create"),
-            CommandNode(command="create", identifier="createPets", summary_fields=["name"]),
+            LayoutNode(command="create", identifier="createPets", summary_fields=["name"]),
             id="child",
         ),
     ]

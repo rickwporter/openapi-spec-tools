@@ -6,7 +6,7 @@ from oas_tools.cli_gen._logging import logger
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from oas_tools.cli_gen.generator import COPYRIGHT
 from oas_tools.cli_gen.generator import Generator
-from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.layout_types import LayoutNode
 from oas_tools.cli_gen.utils import to_snake_case
 from oas_tools.types import OasField
 from oas_tools.utils import map_operations
@@ -31,7 +31,7 @@ TEST_FILES = {
 logger = logger(GENERATOR_LOG_CLASS)
 
 
-def generate_node(generator: Generator, node: CommandNode, directory: str) -> None:
+def generate_node(generator: Generator, node: LayoutNode, directory: str) -> None:
     """Creates a file/module for the current node, and recursively goes through sub-commands."""
     module_name = to_snake_case(node.identifier)
     logger.info(f"Generating {module_name} module")
@@ -54,9 +54,9 @@ def generate_node(generator: Generator, node: CommandNode, directory: str) -> No
         generate_node(generator, command, directory)
 
 
-def check_for_missing(node: CommandNode, oas: dict[str, Any]) -> dict[str, list[str]]:
+def check_for_missing(node: LayoutNode, oas: dict[str, Any]) -> dict[str, list[str]]:
     """Look for operations in node (and children) that are NOT in the OpenAPI spec"""
-    def _check_missing(node: CommandNode, ops: dict[str, Any]) -> dict[str, list[str]]:
+    def _check_missing(node: LayoutNode, ops: dict[str, Any]) -> dict[str, list[str]]:
         current = []
         for op in node.operations():
             if op.identifier not in operations:
@@ -77,9 +77,9 @@ def check_for_missing(node: CommandNode, oas: dict[str, Any]) -> dict[str, list[
     return missing
 
 
-def find_unreferenced(node: CommandNode, oas: dict[str, Any]) -> dict[str, Any]:
+def find_unreferenced(node: LayoutNode, oas: dict[str, Any]) -> dict[str, Any]:
     """Finds the operations in the OAS that are unrerenced by the commands."""
-    def _find_operations(_node: CommandNode) -> set[str]:
+    def _find_operations(_node: LayoutNode) -> set[str]:
         """Recursively finds all the operations for this node and it's children"""
         current = set()
         for op in _node.operations(include_bugged=True):

@@ -6,7 +6,7 @@ from typing import Optional
 
 from oas_tools.cli_gen._logging import logger
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
-from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.layout_types import LayoutNode
 from oas_tools.cli_gen.utils import maybe_quoted
 from oas_tools.cli_gen.utils import quoted
 from oas_tools.cli_gen.utils import set_missing
@@ -72,13 +72,13 @@ from {self.package_name} import _logging as _l
 from {self.package_name} import _requests as _r
 """
 
-    def subcommand_imports(self, subcommands: list[CommandNode]) -> str:
+    def subcommand_imports(self, subcommands: list[LayoutNode]) -> str:
         return NL.join(
             f"from {self.package_name}.{to_snake_case(n.identifier)} import app as {to_snake_case(n.identifier)}"
             for n in subcommands
         )
 
-    def app_definition(self, node: CommandNode) -> str:
+    def app_definition(self, node: LayoutNode) -> str:
         result = f"""
 
 app = typer.Typer(no_args_is_help=True, help="{simple_escape(node.description)}")
@@ -368,7 +368,7 @@ if __name__ == "__main__":
 
         return value
 
-    def command_infra_arguments(self, command: CommandNode) -> list[str]:
+    def command_infra_arguments(self, command: LayoutNode) -> list[str]:
         args = [
             f'_api_host: _a.ApiHostOption = "{self.default_host}"',
             '_api_key: _a.ApiKeyOption = None',
@@ -632,7 +632,7 @@ if __name__ == "__main__":
 
         return SEP1.join(lines)
 
-    def summary_display(self, node: CommandNode) -> str:
+    def summary_display(self, node: LayoutNode) -> str:
         if not node.summary_fields:
             return ""
 
@@ -641,7 +641,7 @@ if __name__ == "__main__":
         lines.append(f"    data = summary(data, [{', '.join(args)}])")
         return SEP2 + SEP2.join(lines)
 
-    def pagination_creation(self, command: CommandNode) -> str:
+    def pagination_creation(self, command: LayoutNode) -> str:
         if not command.pagination:
             return ''
         args = {"max_count": "_max_count"}
@@ -713,7 +713,7 @@ if __name__ == "__main__":
 
         return NL + NL.join(declarations)
 
-    def function_definition(self, node: CommandNode) -> str:
+    def function_definition(self, node: LayoutNode) -> str:
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
         path = op.get(OasField.X_PATH)

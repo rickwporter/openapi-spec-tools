@@ -5,7 +5,7 @@ import pytest
 
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import file_to_tree
-from oas_tools.cli_gen.layout_types import CommandNode
+from oas_tools.cli_gen.layout_types import LayoutNode
 from oas_tools.cli_gen.layout_types import PaginationNames
 from oas_tools.types import OasField
 from oas_tools.utils import map_operations
@@ -895,7 +895,7 @@ def test_op_body_arguments():
     ]
 )
 def test_pagination_creation(names, expected) -> None:
-    node = CommandNode(command="foo", identifier="bar", pagination=names)
+    node = LayoutNode(command="foo", identifier="bar", pagination=names)
     uut = Generator("foo", {})
     result = uut.pagination_creation(node)
     assert expected == result.strip()
@@ -903,8 +903,8 @@ def test_pagination_creation(names, expected) -> None:
 @pytest.mark.parametrize(
     ["command", "has_details"],
     [
-        pytest.param(CommandNode("foo", "foo"), False, id="no-summary"),
-        pytest.param(CommandNode("foo", "foo", summary_fields=["abc"]), True, id="summary"),
+        pytest.param(LayoutNode("foo", "foo"), False, id="no-summary"),
+        pytest.param(LayoutNode("foo", "foo", summary_fields=["abc"]), True, id="summary"),
     ],
 )
 def test_op_infra_arguments(command, has_details):
@@ -959,12 +959,12 @@ def test_op_check_missing():
 def test_summary_display():
     uut = Generator("foo", {})
 
-    command = CommandNode("foo", "foo", summary_fields=["abc", "defGhi"])
+    command = LayoutNode("foo", "foo", summary_fields=["abc", "defGhi"])
     text = uut.summary_display(command)
     assert 'if not _details:' in text
     assert 'data = summary(data, ["abc", "defGhi"])' in text
 
-    command = CommandNode("foo", "foo")
+    command = LayoutNode("foo", "foo")
     text = uut.summary_display(command)
     assert '' == text
 
@@ -1031,7 +1031,7 @@ def test_function_definition_paged():
 
 def test_function_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
-    item = CommandNode(command='sna', identifier='snafooCheck')
+    item = LayoutNode(command='sna', identifier='snafooCheck')
     uut = Generator("cli_package", oas)
     text = uut.function_definition(item)
 
