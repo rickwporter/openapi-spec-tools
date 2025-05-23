@@ -11,8 +11,8 @@ def test_tree_node_get():
         method="madness",
         path="narrow",
     )
-    assert "myName" == node.name()
-    assert [] == node.children()
+    assert "myName" == node.name
+    assert [] == node.children
 
     assert "not helpful" == node.get(TreeDisplay.HELP)
     assert "pysops" == node.get(TreeDisplay.OPERATION)

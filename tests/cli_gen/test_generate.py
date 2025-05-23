@@ -169,7 +169,7 @@ def test_generate_tree_node(oas_filename, layout_filename, expected):
     layout = file_to_tree(asset_filename(layout_filename))
     generator = Generator("cli", oas)
     tree = generate_tree_node(generator, layout)
-    names = {node.name() for node in tree.children()}
+    names = {node.name for node in tree.children}
     assert expected == names
 
 

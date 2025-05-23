@@ -1,3 +1,4 @@
+import dataclasses
 from enum import Enum
 from typing import Optional
 
@@ -28,40 +29,25 @@ class TreeField(str, Enum):
     MODULE = "module"
 
 
+@dataclasses.dataclass
 class TreeNode:
-    def __init__(
-        self,
-        name: str,
-        help: Optional[str] = None,
-        operation: Optional[str] = None,
-        function: Optional[str] = None,
-        method: Optional[str] = None,
-        path: Optional[str] = None,
-        children: Optional[list] = None,
-    ):
-        self._name = name
-        self._help = help
-        self._operation = operation
-        self._function = function
-        self._method = method
-        self._path = path
-        self._children = children or []
-
-    def name(self) -> str:
-        return self._name or ''
-
-    def children(self) -> list:
-        return self._children
+    name: str
+    help: Optional[str] = None
+    operation: Optional[str] = None
+    function: Optional[str] = None
+    method: Optional[str] = None
+    path: Optional[str] = None
+    children: list["TreeNode"] = dataclasses.field(default_factory=list)
 
     def get(self, display: TreeDisplay) -> str:
         if display == TreeDisplay.HELP:
-            return self._help or ''
+            return self.help or ''
         if display == TreeDisplay.FUNCTION:
-            return self._function or ''
+            return self.function or ''
         if display == TreeDisplay.OPERATION:
-            return self._operation or ''
+            return self.operation or ''
         if display == TreeDisplay.PATH:
-            return f"{self._method.upper():6} {self._path}" if self._path else ''
+            return f"{self.method.upper():6} {self.path}" if self.path else ''
         return None
 
 
@@ -98,9 +84,9 @@ def add_node_to_table(table: Table, node: TreeNode, display: TreeDisplay, depth:
     else:
         content = create_node_table(node)
 
-    table.add_row(indent + node.name(), content)
+    table.add_row(indent + node.name, content)
     if max_depth > depth:
-        for child in node.children():
+        for child in node.children:
             add_node_to_table(table, child, display, depth + 1, max_depth)
 
 
@@ -119,7 +105,7 @@ def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> T
     )
     table.add_column("Command", style="bold cyan", no_wrap=True)
     table.add_column(display.value.title())
-    for child in node.children():
+    for child in node.children:
         add_node_to_table(table, child, display, 0, max_depth)
 
     return table
