@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timezone
+from pathlib import Path
 
 import pytest
 
@@ -1122,3 +1123,17 @@ def test_tree_data(oas_filename, layout_filename, expected):
 
     result = uut.tree_data(node)
     assert expected == result
+
+@pytest.mark.parametrize(
+    ["oas_filename", "layout_filename", "tree_filename"],
+    [
+        pytest.param("pet2.yaml", "layout_pets.yaml", "tree_pets.yaml", id="simple"),
+        pytest.param("ct.yaml", "layout_cloudtruth.yaml", "tree_cloudtruth.yaml", id="nested"),
+    ]
+)
+def test_tree_yaml(oas_filename, layout_filename, tree_filename):
+    oas = open_oas(asset_filename(oas_filename))
+    uut = Generator("cli", oas)
+    node = file_to_tree(asset_filename(layout_filename))
+    expected = Path(asset_filename(tree_filename)).read_text()
+    assert expected == uut.get_tree_yaml(node)

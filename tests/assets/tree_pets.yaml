@@ -1,0 +1,28 @@
+main:
+  description: Manage pets
+  name: main
+  operations:
+  - function: create_pets
+    help: Create a pet
+    method: POST
+    name: add
+    operationId: createPets
+    path: /pets
+  - function: delete_pet_by_id
+    help: Delete a pet
+    method: DELETE
+    name: delete
+    operationId: deletePetById
+    path: /pets/{petId}
+  - function: list_pets
+    help: List all pets
+    method: GET
+    name: list
+    operationId: listPets
+    path: /pets
+  - function: show_pet_by_id
+    help: Info for a specific pet
+    method: GET
+    name: show
+    operationId: showPetById
+    path: /pets/{petId}

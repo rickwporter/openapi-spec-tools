@@ -1,0 +1,252 @@
+audit:
+  description: View CloudTruth audit data
+  name: audit
+  operations:
+  - function: audit_list
+    help: A searchable log of all the actions taken by users and service accounts
+      within the organization.
+    method: GET
+    name: list
+    operationId: audit_list
+    path: /api/v1/audit/
+  - function: audit_retrieve
+    help: Retrieve one record from the audit log.
+    method: GET
+    name: show
+    operationId: audit_retrieve
+    path: /api/v1/audit/{id}/
+  - function: audit_summary_retrieve
+    help: Summary information about the organization\'s audit trail.
+    method: GET
+    name: summary
+    operationId: audit_summary_retrieve
+    path: /api/v1/audit/summary/
+environments:
+  description: Manage CloudTruth environments
+  name: environment
+  operations:
+  - function: environments_create
+    help: ''
+    method: POST
+    name: create
+    operationId: environments_create
+    path: /api/v1/environments/
+  - function: environments_destroy
+    help: ''
+    method: DELETE
+    name: delete
+    operationId: environments_destroy
+    path: /api/v1/environments/{id}/
+  - function: environments_list
+    help: ''
+    method: GET
+    name: list
+    operationId: environments_list
+    path: /api/v1/environments/
+  - function: environments_pushes_list
+    help: List push operations.
+    method: GET
+    name: pushes
+    operationId: environments_pushes_list
+    path: /api/v1/environments/{environment_pk}/pushes/
+  - function: environments_update
+    help: ''
+    method: PUT
+    name: set
+    operationId: environments_update
+    path: /api/v1/environments/{id}/
+  - function: environments_retrieve
+    help: ''
+    method: GET
+    name: show
+    operationId: environments_retrieve
+    path: /api/v1/environments/{id}/
+  - function: environments_partial_update
+    help: ''
+    method: PATCH
+    name: update
+    operationId: environments_partial_update
+    path: /api/v1/environments/{id}/
+  - name: tags
+    subcommandId: environments_tags
+environments_tags:
+  description: Manage environment tags
+  name: tags
+  operations:
+  - function: environments_tags_create
+    help: Tags allow you to name stable points in time for your configuration.
+    method: POST
+    name: create
+    operationId: environments_tags_create
+    path: /api/v1/environments/{environment_pk}/tags/
+  - function: environments_tags_destroy
+    help: Tags allow you to name stable points in time for your configuration.
+    method: DELETE
+    name: delete
+    operationId: environments_tags_destroy
+    path: /api/v1/environments/{environment_pk}/tags/{id}/
+  - function: environments_tags_list
+    help: Tags allow you to name stable points in time for your configuration.
+    method: GET
+    name: list
+    operationId: environments_tags_list
+    path: /api/v1/environments/{environment_pk}/tags/
+  - function: environments_tags_update
+    help: Tags allow you to name stable points in time for your configuration.
+    method: PUT
+    name: set
+    operationId: environments_tags_update
+    path: /api/v1/environments/{environment_pk}/tags/{id}/
+  - function: environments_tags_retrieve
+    help: Tags allow you to name stable points in time for your configuration.
+    method: GET
+    name: show
+    operationId: environments_tags_retrieve
+    path: /api/v1/environments/{environment_pk}/tags/{id}/
+  - function: environments_tags_partial_update
+    help: Tags allow you to name stable points in time for your configuration.
+    method: PATCH
+    name: update
+    operationId: environments_tags_partial_update
+    path: /api/v1/environments/{environment_pk}/tags/{id}/
+grants:
+  description: Manage CloudTruth grants
+  name: grants
+  operations:
+  - function: grants_create
+    help: Grants allow you to enable access control on Environments and Projects.
+    method: POST
+    name: create
+    operationId: grants_create
+    path: /api/v1/grants/
+  - function: grants_destroy
+    help: Grants allow you to enable access control on Environments and Projects.
+    method: DELETE
+    name: delete
+    operationId: grants_destroy
+    path: /api/v1/grants/{id}/
+  - function: grants_multi_destroy
+    help: Removes grants matching the query parameters atomically.
+    method: DELETE
+    name: delete-many
+    operationId: grants_multi_destroy
+    path: /api/v1/grants/multi/
+  - function: grants_list
+    help: Grants allow you to enable access control on Environments and Projects.
+    method: GET
+    name: list
+    operationId: grants_list
+    path: /api/v1/grants/
+  - function: grants_update
+    help: Grants allow you to enable access control on Environments and Projects.
+    method: PUT
+    name: set
+    operationId: grants_update
+    path: /api/v1/grants/{id}/
+  - function: grants_retrieve
+    help: Grants allow you to enable access control on Environments and Projects.
+    method: GET
+    name: show
+    operationId: grants_retrieve
+    path: /api/v1/grants/{id}/
+  - function: grants_partial_update
+    help: Grants allow you to enable access control on Environments and Projects.
+    method: PATCH
+    name: update
+    operationId: grants_partial_update
+    path: /api/v1/grants/{id}/
+main:
+  description: Manage CloudTruth application
+  name: main
+  operations:
+  - function: backup_snapshot_create
+    help: Get a snapshot of all Projects with parameters
+    method: POST
+    name: backup
+    operationId: backup_snapshot_create
+    path: /api/v1/backup/snapshot/
+  - function: utils_generate_password_create
+    help: Get a randomly generated password using AWS Secrets Manager, with fallback
+      to /dev/urandom.
+    method: POST
+    name: generate-password
+    operationId: utils_generate_password_create
+    path: /api/v1/utils/generate_password/
+  - name: audit
+    subcommandId: audit
+  - name: environment
+    subcommandId: environments
+  - name: grants
+    subcommandId: grants
+  - name: membership
+    subcommandId: memberships
+  - name: user
+    subcommandId: users
+memberships:
+  description: Manage CloudTruth memberships
+  name: membership
+  operations:
+  - function: memberships_create
+    help: ''
+    method: POST
+    name: create
+    operationId: memberships_create
+    path: /api/v1/memberships/
+  - function: memberships_destroy
+    help: ''
+    method: DELETE
+    name: delete
+    operationId: memberships_destroy
+    path: /api/v1/memberships/{id}/
+  - function: memberships_list
+    help: ''
+    method: GET
+    name: list
+    operationId: memberships_list
+    path: /api/v1/memberships/
+  - function: memberships_update
+    help: ''
+    method: PUT
+    name: set
+    operationId: memberships_update
+    path: /api/v1/memberships/{id}/
+  - function: memberships_retrieve
+    help: ''
+    method: GET
+    name: show
+    operationId: memberships_retrieve
+    path: /api/v1/memberships/{id}/
+  - function: memberships_partial_update
+    help: ''
+    method: PATCH
+    name: update
+    operationId: memberships_partial_update
+    path: /api/v1/memberships/{id}/
+users:
+  description: Manage CloudTruth users
+  name: user
+  operations:
+  - function: users_current_retrieve
+    help: Current user information
+    method: GET
+    name: current
+    operationId: users_current_retrieve
+    path: /api/v1/users/current/
+  - function: users_destroy
+    help: Delete the specified user.
+    method: DELETE
+    name: delete
+    operationId: users_destroy
+    path: /api/v1/users/{id}/
+  - function: users_list
+    help: ''
+    method: GET
+    name: list
+    operationId: users_list
+    path: /api/v1/users/
+  - function: users_retrieve
+    help: ''
+    method: GET
+    name: show
+    operationId: users_retrieve
+    path: /api/v1/users/{id}/

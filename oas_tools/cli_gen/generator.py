@@ -4,6 +4,8 @@ from datetime import datetime
 from typing import Any
 from typing import Optional
 
+import yaml
+
 from oas_tools.cli_gen._logging import logger
 from oas_tools.cli_gen._tree import TreeField
 from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
@@ -61,6 +63,7 @@ class Generator:
 from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
+from pathlib import Path
 from typing import Optional
 from typing_extensions import Annotated
 
@@ -806,3 +809,15 @@ def {func_name}({args_str}) -> None:
         data[TreeField.OPERATIONS.value] = operations
 
         return data
+
+    def get_tree_map(self, node: LayoutNode) -> dict[str, Any]:
+        """Gets the tree data in a "flat" format for more readable representation in file"""
+        result = {node.identifier: self.tree_data(node)}
+        for sub in node.subcommands():
+            result.update(self.get_tree_map(sub))
+        return result
+
+    def get_tree_yaml(self, node: LayoutNode) -> str:
+        """Gets the layout YAML text for the node (including children)"""
+        data = self.get_tree_map(node)
+        return yaml.dump(data, indent=2, sort_keys=True)

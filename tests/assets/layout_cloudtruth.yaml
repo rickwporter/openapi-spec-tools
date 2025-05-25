@@ -1,0 +1,147 @@
+main:
+  description: Manage CloudTruth application
+  operations:
+  - name: audit
+    subcommandId: audit
+  - name: backup
+    operationId: backup_snapshot_create
+  - name: environment
+    subcommandId: environments
+  - name: generate-password
+    operationId: utils_generate_password_create
+  - name: grants
+    subcommandId: grants
+  - name: membership
+    subcommandId: memberships
+  - name: user
+    subcommandId: users
+
+audit:
+  description: View CloudTruth audit data
+  operations:
+  - name: list
+    operationId: audit_list
+    pagination:
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
+      itemProperty: result
+  - name: show
+    operationId: audit_retrieve
+  - name: summary
+    operationId: audit_summary_retrieve
+
+environments:
+  description: Manage CloudTruth environments
+  operations:
+  - name: copy
+    operationId: environments_copy_create
+    bugIds: complex-value
+  - name: create
+    operationId: environments_create
+  - name: delete
+    operationId: environments_destroy
+  - name: list
+    operationId: environments_list
+    pagination:
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
+      itemProperty: result
+  - name: pushes
+    operationId: environments_pushes_list
+    pagination:
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
+      itemProperty: result
+  - name: set
+    operationId: environments_update
+  - name: show
+    operationId: environments_retrieve
+  - name: tags
+    subcommandId: environments_tags
+  - name: update
+    operationId: environments_partial_update
+
+environments_tags:
+  description: Manage environment tags
+  operations:
+  - name: create
+    operationId: environments_tags_create
+  - name: delete
+    operationId: environments_tags_destroy
+  - name: list
+    operationId: environments_tags_list
+    pagination:
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
+      itemProperty: result
+  - name: set
+    operationId: environments_tags_update
+  - name: show
+    operationId: environments_tags_retrieve
+  - name: update
+    operationId: environments_tags_partial_update
+
+grants:
+  description: Manage CloudTruth grants
+  operations:
+  - name: create
+    operationId: grants_create
+  - name: delete
+    operationId: grants_destroy
+  - name: delete-many
+    operationId: grants_multi_destroy
+  - name: list
+    operationId: grants_list
+    pagination:
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
+      itemProperty: result
+  - name: set
+    operationId: grants_update
+  - name: show
+    operationId: grants_retrieve
+  - name: update
+    operationId: grants_partial_update
+
+memberships:
+  description: Manage CloudTruth memberships
+  operations:
+  - name: create
+    operationId: memberships_create
+  - name: delete
+    operationId: memberships_destroy
+  - name: list
+    operationId: memberships_list
+    pagination:
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
+      itemProperty: result
+  - name: set
+    operationId: memberships_update
+  - name: show
+    operationId: memberships_retrieve
+  - name: update
+    operationId: memberships_partial_update
+
+users:
+  description: Manage CloudTruth users
+  operations:
+  - name: current
+    operationId: users_current_retrieve
+  - name: delete
+    operationId: users_destroy
+  - name: list
+    operationId: users_list
+    pagination:
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
+      itemProperty: result
+  - name: show
+    operationId: users_retrieve
