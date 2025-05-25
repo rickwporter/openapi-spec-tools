@@ -57,7 +57,7 @@ def generate_node(generator: Generator, node: LayoutNode, directory: str) -> Non
 
 
 def generate_tree_node(generator: Generator, node: LayoutNode) -> TreeNode:
-    """Generate a TreeNode hierarchy for the comm"""
+    """Generate a TreeNode hierarchy for the specified node."""
     data = generator.tree_data(node)
     children = []
     for item in data.get(TreeField.OPERATIONS, []):

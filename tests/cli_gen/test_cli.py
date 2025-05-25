@@ -475,7 +475,13 @@ def test_unreferenced(layout_file, oas_file, full, expected):
     ["layout_file", "oas_file", "start", "display", "depth", "expected"],
     [
         pytest.param(
-            "layout_pets.yaml", "pet2.yaml", "gone", TreeDisplay.ALL, 10, "", id="empty",
+            "layout_pets.yaml",
+            "pet2.yaml",
+            "gone",
+            TreeDisplay.ALL,
+            10,
+            "No operations or sub-commands found\n",
+            id="empty",
         ),
         pytest.param(
             "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.ALL, 10, PET_ALL, id="all",

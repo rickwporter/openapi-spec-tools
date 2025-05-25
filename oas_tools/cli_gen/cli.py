@@ -327,8 +327,12 @@ def show_cli_tree(
     generator = Generator("", oas)
 
     tree = generate_tree_node(generator, layout)
+    if not tree.children:
+        typer.echo("No operations or sub-commands found")
+        return
 
     table = create_tree_table(tree, display, max_depth)
+    table.show_header = True
     console = Console()
     console.print(table)
 

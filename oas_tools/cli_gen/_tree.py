@@ -31,6 +31,11 @@ class TreeField(str, Enum):
 
 @dataclasses.dataclass
 class TreeNode:
+    """Represents the relationship between the CLI and OAS
+
+    The structure is picked up from the layout file, and details about help, path, etc
+    come from the OAS.
+    """
     name: str
     help: Optional[str] = None
     operation: Optional[str] = None
@@ -78,6 +83,7 @@ def create_node_table(node: TreeNode) -> Table:
 
 
 def add_node_to_table(table: Table, node: TreeNode, display: TreeDisplay, depth: int, max_depth: int) -> None:
+    """Adds a node (with children) to the table"""
     indent = INDENT * depth
     if display != TreeDisplay.ALL:
         content = node.get(display)
@@ -91,10 +97,16 @@ def add_node_to_table(table: Table, node: TreeNode, display: TreeDisplay, depth:
 
 
 def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> Table:
+    """Creates the tree table.
+
+    It is a "flat" table where the left column is the commands with each child being
+    indented another level beyond the parent. The right column is either a single property,
+    or a table of properties.
+    """
     table = Table(
         highlight=False,
         show_header=False,
-        expand=True,
+        expand=False,
         box=None,
         show_lines=False,
         leading=0,
