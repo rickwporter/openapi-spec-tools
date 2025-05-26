@@ -6,6 +6,7 @@ from typing_extensions import Annotated
 from oas_tools.cli_gen._display import OutputFormat
 from oas_tools.cli_gen._display import OutputStyle
 from oas_tools.cli_gen._logging import LogLevel
+from oas_tools.cli_gen._tree import TreeDisplay
 
 ENV_API_HOST = "API_HOST"
 ENV_API_KEY = "API_KEY"
@@ -57,6 +58,14 @@ LogLevelOption = Annotated[
         help="Log level",
     ),
 ]
+MaxDepthOption = Annotated[
+    int,
+    typer.Option(
+        "--depth",
+        "--max-depth",
+        help="Maximum depth of tree to display."
+    ),
+]
 MaxCountOption = Annotated[
     Optional[int],
     typer.Option(
@@ -81,5 +90,12 @@ OutputStyleOption = Annotated[
         case_sensitive=False,
         envvar=ENV_OUT_STYLE,
         help="Style for output",
+    ),
+]
+TreeDisplayOption = Annotated[
+    TreeDisplay,
+    typer.Option(
+        case_sensitive=False,
+        help="Details of the CLI command tree to show."
     ),
 ]

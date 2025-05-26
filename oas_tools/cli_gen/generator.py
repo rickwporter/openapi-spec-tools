@@ -74,6 +74,7 @@ from {self.package_name} import _display as _d
 from {self.package_name} import _exceptions as _e
 from {self.package_name} import _logging as _l
 from {self.package_name} import _requests as _r
+from {self.package_name} import _tree as _t
 """
 
     def subcommand_imports(self, subcommands: list[LayoutNode]) -> str:
@@ -821,3 +822,16 @@ def {func_name}({args_str}) -> None:
         """Gets the layout YAML text for the node (including children)"""
         data = self.get_tree_map(node)
         return yaml.dump(data, indent=2, sort_keys=True)
+
+    def tree_function(self, node: LayoutNode) -> str:
+        """Generates the function to show subcommands"""
+        return f"""
+@app.command("commands", short_help="Display commands tree for sub-commands")
+def show_commands(
+    display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
+    depth: _a.MaxDepthOption = 5,
+) -> None:
+    path = Path(__file__).parent / "tree.yaml"
+    _t.tree(path.as_posix(), "{node.identifier}", display, depth)
+    return
+"""

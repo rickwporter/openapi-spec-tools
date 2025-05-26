@@ -296,7 +296,9 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
         "_exceptions.py",
         "_logging.py",
         "_requests.py",
+        "_tree.py",
         "main.py",
+        "tree.yaml",
     }
     assert filenames == expected
 
@@ -311,6 +313,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
             "test_exceptions.py",
             "test_logging.py",
             "test_requests.py",
+            "test_tree.py",
         }
         assert filenames == expected
 

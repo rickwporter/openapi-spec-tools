@@ -20,6 +20,7 @@ from oas_tools.cli_gen.generate import copy_infrastructure
 from oas_tools.cli_gen.generate import copy_tests
 from oas_tools.cli_gen.generate import find_unreferenced
 from oas_tools.cli_gen.generate import generate_node
+from oas_tools.cli_gen.generate import generate_tree_file
 from oas_tools.cli_gen.generate import generate_tree_node
 from oas_tools.cli_gen.generator import Generator
 from oas_tools.cli_gen.layout import DEFAULT_START
@@ -250,6 +251,9 @@ def generate_cli(
     generator = Generator(package_name, oas)
     generate_node(generator, commands, code_dir)
 
+    # create the tree
+    generate_tree_file(generator, commands, code_dir)
+
     if include_tests:
         os.makedirs(test_dir, exist_ok=True)
         copy_tests(test_dir,  package_name)
@@ -333,6 +337,7 @@ def show_cli_tree(
 
     table = create_tree_table(tree, display, max_depth)
     table.show_header = True
+    table.expand = False
     console = Console()
     console.print(table)
 

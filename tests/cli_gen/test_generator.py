@@ -1124,6 +1124,7 @@ def test_tree_data(oas_filename, layout_filename, expected):
     result = uut.tree_data(node)
     assert expected == result
 
+
 @pytest.mark.parametrize(
     ["oas_filename", "layout_filename", "tree_filename"],
     [
@@ -1137,3 +1138,15 @@ def test_tree_yaml(oas_filename, layout_filename, tree_filename):
     node = file_to_tree(asset_filename(layout_filename))
     expected = Path(asset_filename(tree_filename)).read_text()
     assert expected == uut.get_tree_yaml(node)
+
+
+def test_tree_function():
+    node = LayoutNode("bar", "foo_bar")
+    uut = Generator("cli", {})
+
+    text = uut.tree_function(node)
+    assert '@app.command("commands", short_help="Display commands tree for sub-commands")' in text
+    assert 'def show_commands' in text
+    assert 'display: _a.TreeDisplayOption = _a.TreeDisplay.HELP' in text
+    assert 'depth: _a.MaxDepthOption = 5' in text
+    assert '_t.tree(path.as_posix(), "foo_bar", display, depth)' in text

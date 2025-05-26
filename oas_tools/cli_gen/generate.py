@@ -20,6 +20,7 @@ INFRASTRUCTURE_FILES = {
     "_exceptions.py": "_exceptions.py",
     "_logging.py": "_logging.py",
     "_requests.py": "_requests.py",
+    "_tree.py": "_tree.py",
 }
 
 TEST_FILES = {
@@ -28,6 +29,7 @@ TEST_FILES = {
     "test_exceptions.py": "test_exceptions.py",
     "test_logging.py": "test_logging.py",
     "test_requests.py": "test_requests.py",
+    "test_tree.py": "test_tree.py",
 }
 
 logger = logger(GENERATOR_LOG_CLASS)
@@ -42,6 +44,7 @@ def generate_node(generator: Generator, node: LayoutNode, directory: str) -> Non
     text += generator.standard_imports()
     text += generator.subcommand_imports(node.subcommands())
     text += generator.app_definition(node)
+    text += generator.tree_function(node)
     for command in node.operations():
         text += generator.function_definition(command)
     text += generator.main()
@@ -82,6 +85,14 @@ def generate_tree_node(generator: Generator, node: LayoutNode) -> TreeNode:
         help=data.get(TreeField.DESCRIPTION),
         children=children,
     )
+
+
+def generate_tree_file(generator: Generator, node: LayoutNode, directory: str) -> None:
+    """Creates the YAML file"""
+    filename = os.path.join(directory, "tree.yaml")
+    with open(filename, "w") as fp:
+        fp.write(generator.copyright())
+        fp.write(generator.get_tree_yaml(node))
 
 
 def check_for_missing(node: LayoutNode, oas: dict[str, Any]) -> dict[str, list[str]]:
