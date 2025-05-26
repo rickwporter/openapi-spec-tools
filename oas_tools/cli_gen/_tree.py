@@ -2,6 +2,9 @@ import dataclasses
 from enum import Enum
 from typing import Optional
 
+import yaml
+from rich.console import Console
+from rich.panel import Panel
 from rich.table import Table
 
 INDENT = "  "
@@ -54,6 +57,35 @@ class TreeNode:
         if display == TreeDisplay.PATH:
             return f"{self.method.upper():6} {self.path}" if self.path else ''
         return None
+
+
+def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> Optional[TreeNode]:
+    """Parses the specified file into a tree."""
+    item = data.get(identifier)
+    children = []
+    for operation in item.get(TreeField.OPERATIONS, []):
+        child_name = operation.get(TreeField.NAME)
+        sub_command = operation.get(TreeField.SUB_CMD)
+        if sub_command:
+            child = parse_tree(sub_command, child_name, data)
+            children.append(child)
+        else:
+            children.append(
+                TreeNode(
+                    name=child_name,
+                    help=operation.get(TreeField.HELP),
+                    operation=operation.get(TreeField.OP_ID),
+                    function=operation.get(TreeField.FUNC),
+                    method=operation.get(TreeField.METHOD),
+                    path=operation.get(TreeField.PATH),
+                )
+            )
+
+    return TreeNode(
+        name=command + '*',
+        help=item.get(TreeField.DESCRIPTION),
+        children=children,
+    )
 
 
 def create_node_table(node: TreeNode) -> Table:
@@ -121,3 +153,17 @@ def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> T
         add_node_to_table(table, child, display, 0, max_depth)
 
     return table
+
+
+def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int) -> None:
+    """Prints the tree table for the specified command."""
+    with open(filename) as fp:
+        data = yaml.safe_load(fp)
+
+    # parse into the tree format
+    node = parse_tree(identifier, identifier, data)
+    table = create_tree_table(node, display, max_depth)
+
+    panel = Panel(table, border_style="dim", title="Command Tree", title_align="left")
+    console = Console()
+    console.print(panel)
