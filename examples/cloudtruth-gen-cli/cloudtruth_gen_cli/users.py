@@ -7,6 +7,7 @@
 from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
+from pathlib import Path
 from typing import Optional
 from typing_extensions import Annotated
 
@@ -17,9 +18,19 @@ from cloudtruth_gen_cli import _display as _d
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
 from cloudtruth_gen_cli import _requests as _r
+from cloudtruth_gen_cli import _tree as _t
 
 
 app = typer.Typer(no_args_is_help=True, help="Manage CloudTruth users")
+
+@app.command("commands", short_help="Display commands tree for sub-commands")
+def show_commands(
+    display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
+    depth: _a.MaxDepthOption = 5,
+) -> None:
+    path = Path(__file__).parent / "tree.yaml"
+    _t.tree(path.as_posix(), "users", display, depth)
+    return
 
 
 @app.command("current", short_help="Current user information")
