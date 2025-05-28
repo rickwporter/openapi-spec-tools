@@ -1,0 +1,34 @@
+main:
+  description: Generated GitHub CLI from OAS
+  operations:
+  - name: users
+    subcommandId: users
+
+users:
+  description: Manage GitHub users
+  operations:
+  - name: attestations
+    operationId: users/list-attestations
+    pagination:
+      pageSize: per-page
+  - name: blocks
+    subcommandId: users_blocks
+  - name: current
+    operationId: users/get-authenticated
+  - name: list
+    operationId: users/list
+    pagination:
+      pageSize: per-page
+  - name: show-by-id
+    operationId: users/get-by-id
+  - name: show-by-name
+    operationId: users/get-by-username
+
+users_blocks:
+  description: Managed blocked users
+  operations:
+  - name: list
+    operationId: users/list-blocked-by-authenticated-user
+    pagination:
+      pageSize: per-page
+      pageStart: page

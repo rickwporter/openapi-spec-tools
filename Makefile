@@ -52,14 +52,18 @@ cov: ## Run unit tests with code coverage measurments (use TEST_TARGET to scope)
 
 ###########
 ##@ Examples
-examples: pets-cli ct-cli ## Complete cycle on all examples
+examples: pets-cli ct-cli gh-cli ## Complete cycle on all examples
 
 example-gen: ## Generate example code (no tests)
 	make -C examples/pets-cli gen
 	make -C examples/cloudtruth-gen-cli gen
+	make -C examples/github gen
 
 pets-cli: ## Generate pets-cli
 	make -C examples/pets-cli all
 
 ct-cli: ## Generate the cloudtruth-cli
+	make -C examples/cloudtruth-gen-cli all
+
+gh-cli: ## Generate the Github CLI
 	make -C examples/cloudtruth-gen-cli all
