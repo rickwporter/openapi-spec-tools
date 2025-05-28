@@ -29,8 +29,12 @@ build: wheel
 wheel: ## Build the wheel file
 	poetry build
 
+prereq: install
 install: ## Install package(s) and development tools
 	poetry install --with dev
+
+uncommitted: ## Check for uncommitted changes
+	make -f uncommitted.mk check
 
 ###########
 ##@ Lint
