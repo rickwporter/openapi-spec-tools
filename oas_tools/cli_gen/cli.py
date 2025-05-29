@@ -174,6 +174,27 @@ def layout_tree(
     return
 
 
+@layout.command(
+    "operations",
+    short_help="List all operationIds referenced"
+)
+def layout_operations(
+    filename: LayoutFilenameArgument,
+    start: StartPointOption = DEFAULT_START,
+) -> None:
+    """Get a list of opertionId's used in the specified layout file."""
+    def _operations(_node: LayoutNode) -> set[str]:
+        ops = set([op.identifier for op in _node.operations()])
+        for sub in _node.subcommands():
+            ops.update(_operations(sub))
+        return ops
+
+    tree = file_to_tree(filename, start=start)
+    operations = _operations(tree)
+    print('\n'.join(sorted(operations)))
+    return
+
+
 #################################################
 # Generate stuff
 

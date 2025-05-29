@@ -15,6 +15,7 @@ from oas_tools.cli_gen.cli import generate_check_missing
 from oas_tools.cli_gen.cli import generate_cli
 from oas_tools.cli_gen.cli import generate_unreferenced
 from oas_tools.cli_gen.cli import layout_check_format
+from oas_tools.cli_gen.cli import layout_operations
 from oas_tools.cli_gen.cli import layout_tree
 from oas_tools.cli_gen.cli import show_cli_tree
 from tests.cli_gen.cli_output import P_V_ALL
@@ -239,6 +240,81 @@ children:
 def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
         layout_tree(asset_filename("layout_pets2.yaml"), start=start, style=style)
+
+        output = mock_stdout.getvalue()
+        assert to_ascii(output) == to_ascii(expected)
+
+
+LAYOUT_OPS_PET = """\
+createPets
+deletePetById
+listPets
+showPetById
+"""
+LAYOUT_OPS_CT_FULL = """\
+audit_list
+audit_retrieve
+audit_summary_retrieve
+backup_snapshot_create
+environments_create
+environments_destroy
+environments_list
+environments_partial_update
+environments_pushes_list
+environments_retrieve
+environments_tags_create
+environments_tags_destroy
+environments_tags_list
+environments_tags_partial_update
+environments_tags_retrieve
+environments_tags_update
+environments_update
+grants_create
+grants_destroy
+grants_list
+grants_multi_destroy
+grants_partial_update
+grants_retrieve
+grants_update
+memberships_create
+memberships_destroy
+memberships_list
+memberships_partial_update
+memberships_retrieve
+memberships_update
+users_current_retrieve
+users_destroy
+users_list
+users_retrieve
+utils_generate_password_create
+"""
+LAYOUT_OPS_CT_ENV = """\
+environments_create
+environments_destroy
+environments_list
+environments_partial_update
+environments_pushes_list
+environments_retrieve
+environments_tags_create
+environments_tags_destroy
+environments_tags_list
+environments_tags_partial_update
+environments_tags_retrieve
+environments_tags_update
+environments_update
+"""
+
+@pytest.mark.parametrize(
+    ["filename", "start", "expected"],
+    [
+        pytest.param("layout_pets.yaml", "main", LAYOUT_OPS_PET, id="simple"),
+        pytest.param("layout_cloudtruth.yaml", "main", LAYOUT_OPS_CT_FULL, id="subcommands"),
+        pytest.param("layout_cloudtruth.yaml", "environments", LAYOUT_OPS_CT_ENV, id="start"),
+    ]
+)
+def test_layout_operations(filename, start, expected) -> None:
+    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+        layout_operations(asset_filename(filename), start=start)
 
         output = mock_stdout.getvalue()
         assert to_ascii(output) == to_ascii(expected)
