@@ -18,6 +18,7 @@ from oas_tools.cli_gen.cli import layout_check_format
 from oas_tools.cli_gen.cli import layout_operations
 from oas_tools.cli_gen.cli import layout_tree
 from oas_tools.cli_gen.cli import show_cli_tree
+from oas_tools.cli_gen.cli import trim_oas
 from tests.cli_gen.cli_output import P_V_ALL
 from tests.cli_gen.cli_output import P_V_MID
 from tests.cli_gen.cli_output import P_V_PETS
@@ -601,3 +602,12 @@ def test_show_cli_tree(layout_file, oas_file, start, display, depth, expected):
 
         result = mock_stdout.getvalue()
         assert expected == result
+
+
+def test_trim_oas():
+    directory = TemporaryDirectory()
+    updated = Path(directory.name) / "trimmed.yaml"
+    trim_oas(asset_filename("layout_cloudtruth.yaml"), asset_filename("ct.yaml"), updated_file=updated)
+    expected = Path(asset_filename("ct_trimmed.yaml")).read_text()
+    actual = updated.read_text()
+    assert expected == actual

@@ -1,0 +1,2661 @@
+components:
+  schemas:
+    AuditTrail:
+      properties:
+        action:
+          description: The action that was taken.
+          readOnly: true
+          type: string
+        id:
+          description: A unique identifier for the audit record.
+          format: uuid
+          readOnly: true
+          type: string
+        object_id:
+          description: The id of the object associated with the action.
+          readOnly: true
+          type: string
+        object_name:
+          description: The name of the object associated with the action, if applicable.
+          readOnly: true
+          type: string
+        object_type:
+          allOf:
+          - $ref: '#/components/schemas/ObjectTypeEnum'
+          description: The type of object associated with the action.
+          readOnly: true
+        timestamp:
+          description: The timestamp of the activity that was audited.
+          format: date-time
+          readOnly: true
+          type: string
+        url:
+          format: uri
+          readOnly: true
+          type: string
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          description: Details of the user associated with this change.
+          readOnly: true
+      required:
+      - action
+      - id
+      - object_id
+      - object_name
+      - object_type
+      - timestamp
+      - url
+      - user
+      type: object
+    AuditTrailSummary:
+      properties:
+        earliest:
+          description: The earliest audit record timestamp available.
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        max_days:
+          description: The maximum number of days the system will save auditing records,
+            based on your subscription.
+          readOnly: true
+          type: integer
+        max_records:
+          description: The maximum number of auditing records the system will save
+            based on your subscription.
+          readOnly: true
+          type: integer
+        total:
+          description: The total number of audit records available.
+          readOnly: true
+          type: integer
+      required:
+      - max_days
+      - max_records
+      - total
+      type: object
+    AwsPush:
+      description: 'Push actions can be configured to send configuration and secrets
+        to
+
+        integrations when tags are updated.'
+      properties:
+        coerce_parameters:
+          description: This setting allows parameters (non-secrets) to be pushed to
+            a destination that only supports storing secrets.  This may increase your
+            overall cost from the cloud provider as some cloud providers charge a
+            premium for secrets-only storage.
+          type: boolean
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        description:
+          description: The optional description for the action.
+          type: string
+        dry_run:
+          description: When set to dry-run mode an action will report the changes
+            that it would have made in task steps, however those changes are not actually
+            performed.
+          type: boolean
+        force:
+          description: Normally, push will check to see if it originated the values
+            in the destination before making changes to them.  Forcing a push disables
+            the ownership check.
+          type: boolean
+        id:
+          description: Unique identifier for the action.
+          format: uuid
+          readOnly: true
+          type: string
+        include_parameters:
+          description: Include parameters (non-secrets) in the values being pushed.  This
+            setting requires the destination to support parameters or for the `coerce_parameters`
+            flag to be enabled, otherwise the push will fail.
+          type: boolean
+        include_secrets:
+          description: Include secrets in the values being pushed.  This setting requires
+            the destination to support secrets, otherwise the push will fail.
+          type: boolean
+        include_templates:
+          description: Include templates in the values being pushed.
+          type: boolean
+        latest_task:
+          allOf:
+          - $ref: '#/components/schemas/AwsPushTask'
+          description: The most recent task run for this action.
+          nullable: true
+          readOnly: true
+        local:
+          description: Normally, push will process all parameters including those
+            that flow in from project dependencies.  Declaring a push as `local` will
+            cause it to only process the parameters defined in the selected projects.
+          type: boolean
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        name:
+          description: The action name.
+          maxLength: 256
+          type: string
+        projects:
+          description: Projects that are included in the push.
+          items:
+            format: uri
+            type: string
+          type: array
+        region:
+          allOf:
+          - $ref: '#/components/schemas/AwsRegionEnum'
+          description: The AWS region this push targets.  This region must be enabled
+            in the integration.
+        resource:
+          description: "Defines a path through the integration to the location where\
+            \ values will be pushed.\n\nThe following mustache-style substitutions\
+            \ can be used in the string:\n\n  - ``{{ environment }}`` to insert the\
+            \ environment name\n  - ``{{ parameter }}`` to insert the parameter name\n\
+            \  - ``{{ project }}`` to insert the project name\n  - ``{{ push }}``\
+            \ to insert the push name\n  - ``{{ tag }}`` to insert the tag name\n\n\
+            We recommend that you use project, environment, and parameter at a minimum\
+            \ to disambiguate your pushed resource identifiers.\n\nIf you include\
+            \ multiple projects in the push, the `project` substitution is required.\
+            \  If you include multiple tags from different environments in the push,\
+            \ the `environment` substitution is required.  If you include multiple\
+            \ tags from the same environment in the push, the `tag` substitution is\
+            \ required.  In all cases, the `parameter` substitution is always required."
+          maxLength: 1024
+          nullable: true
+          type: string
+        service:
+          allOf:
+          - $ref: '#/components/schemas/AwsServiceEnum'
+          description: The AWS service this push targets.  This service must be enabled
+            in the integration.
+        tags:
+          description: Tags are used to select parameters by environment from the
+            projects included in the push.  You cannot have two tags from the same
+            environment in the same push.
+          items:
+            format: uri
+            type: string
+          type: array
+        url:
+          format: uri
+          readOnly: true
+          type: string
+      required:
+      - created_at
+      - id
+      - name
+      - projects
+      - region
+      - service
+      - tags
+      - url
+      type: object
+    AwsPushTask:
+      description: Push task for an AWS integration.
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        dry_run:
+          description: Indicates task steps were only simulated, not actually performed.
+          type: boolean
+        error_code:
+          description: If an error occurs early during processing, before attempting
+            to process values, this code may be helpful in determining the problem.
+          maxLength: 256
+          nullable: true
+          type: string
+        error_detail:
+          description: If an error occurs early during processing, before attempting
+            to process values, this detail may be helpful in determining the problem.
+          nullable: true
+          type: string
+        id:
+          description: The unique identifier for the task.
+          format: uuid
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        reason:
+          description: The reason why this task was triggered.
+          maxLength: 256
+          nullable: true
+          type: string
+        state:
+          allOf:
+          - $ref: '#/components/schemas/StateEnum'
+          description: The current state of this task.
+        url:
+          format: uri
+          readOnly: true
+          type: string
+      required:
+      - created_at
+      - id
+      - url
+      type: object
+    AwsRegionEnum:
+      enum:
+      - af-south-1
+      - ap-east-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-south-1
+      - ap-southeast-1
+      - ap-southeast-2
+      - ca-central-1
+      - cn-north-1
+      - cn-northwest-1
+      - eu-central-1
+      - eu-north-1
+      - eu-south-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - me-south-1
+      - sa-east-1
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      type: string
+    AwsServiceEnum:
+      enum:
+      - s3
+      - secretsmanager
+      - ssm
+      type: string
+    BackupDataSnapshot:
+      description: Environment, parameter-type, and project (including parameters
+        and values) data at a point in time.
+      properties:
+        environments:
+          additionalProperties:
+            $ref: '#/components/schemas/BackupEnvironment'
+          type: object
+        projects:
+          additionalProperties:
+            $ref: '#/components/schemas/BackupProject'
+          type: object
+        timestamp:
+          format: date-time
+          type: string
+        types:
+          additionalProperties:
+            $ref: '#/components/schemas/BackupParameterType'
+          type: object
+      required:
+      - environments
+      - projects
+      - timestamp
+      - types
+      type: object
+    BackupEnvironment:
+      description: Basic environment data at a point in time.
+      properties:
+        description:
+          nullable: true
+          type: string
+        name:
+          type: string
+        parent:
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object
+    BackupExternalReference:
+      description: External reference data at a point in time.
+      properties:
+        fqn:
+          type: string
+        jmes_path:
+          nullable: true
+          type: string
+      required:
+      - fqn
+      type: object
+    BackupParameter:
+      description: Parameter, rule, and value data at a point in time.
+      properties:
+        description:
+          nullable: true
+          type: string
+        name:
+          type: string
+        param_type:
+          type: string
+        project:
+          type: string
+        rules:
+          additionalProperties:
+            $ref: '#/components/schemas/BackupParameterRule'
+          type: object
+        secret:
+          type: boolean
+        values:
+          additionalProperties:
+            allOf:
+            - $ref: '#/components/schemas/BackupParameterValue'
+            nullable: true
+          type: object
+      required:
+      - name
+      - param_type
+      - project
+      - rules
+      - secret
+      - values
+      type: object
+    BackupParameterRule:
+      description: Rule that is applied to a parameter or parameter-type at a point
+        in time.
+      properties:
+        constraint:
+          type: string
+        rule_type:
+          type: string
+      required:
+      - constraint
+      - rule_type
+      type: object
+    BackupParameterType:
+      description: Parameter type (and rule) data at a point in time.
+      properties:
+        description:
+          nullable: true
+          type: string
+        name:
+          type: string
+        parent:
+          type: string
+        rules:
+          additionalProperties:
+            $ref: '#/components/schemas/BackupParameterRule'
+          type: object
+      required:
+      - name
+      - parent
+      - rules
+      type: object
+    BackupParameterValue:
+      description: Parameter value data at a point in time.
+      properties:
+        environment:
+          type: string
+        evaluated:
+          type: boolean
+        external:
+          allOf:
+          - $ref: '#/components/schemas/BackupExternalReference'
+          nullable: true
+        project:
+          nullable: true
+          type: string
+        raw:
+          nullable: true
+          type: string
+        source:
+          nullable: true
+          type: string
+        value:
+          nullable: true
+          type: string
+      required:
+      - environment
+      - evaluated
+      type: object
+    BackupProject:
+      description: Environment, parameter-type, and project (including parameters
+        and values) data at a point in time.
+      properties:
+        description:
+          nullable: true
+          type: string
+        name:
+          type: string
+        parameters:
+          additionalProperties:
+            $ref: '#/components/schemas/BackupParameter'
+          type: object
+        parent:
+          nullable: true
+          type: string
+        templates:
+          additionalProperties:
+            $ref: '#/components/schemas/BackupTemplate'
+          type: object
+      required:
+      - name
+      - parameters
+      - templates
+      type: object
+    BackupTemplate:
+      description: Template data at a given point in time.
+      properties:
+        description:
+          nullable: true
+          type: string
+        name:
+          type: string
+        text:
+          type: string
+      required:
+      - name
+      - text
+      type: object
+    Environment:
+      properties:
+        access_controlled:
+          description: Indicates if access control is being enforced through grants.
+          type: boolean
+        children:
+          description: This is the opposite of `parent`, see that field for more details.
+          items:
+            format: uri
+            type: string
+          readOnly: true
+          type: array
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        description:
+          description: A description of the environment.  You may find it helpful
+            to document how this environment is used to assist others when they need
+            to maintain software that uses this content.
+          type: string
+        id:
+          readOnly: true
+          type: string
+        ledger_id:
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        name:
+          description: The environment name.
+          type: string
+        parent:
+          description: Environments can inherit from a single parent environment which
+            provides values for parameters when specific environments do not have
+            a value set.  Every organization has one default environment that cannot
+            be removed.
+          format: uri
+          nullable: true
+          type: string
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: Your role in the environment, if the environment is access-controlled.
+          nullable: true
+          readOnly: true
+        url:
+          description: The URL for the environment.
+          format: uri
+          readOnly: true
+          type: string
+      required:
+      - children
+      - created_at
+      - id
+      - ledger_id
+      - name
+      - url
+      type: object
+    EnvironmentCreate:
+      properties:
+        description:
+          description: A description of the environment.  You may find it helpful
+            to document how this environment is used to assist others when they need
+            to maintain software that uses this content.
+          type: string
+        name:
+          description: The environment name.
+          maxLength: 256
+          type: string
+        parent:
+          description: Environments can inherit from a single parent environment which
+            provides values for parameters when specific environments do not have
+            a value set.  Every organization has one default environment that cannot
+            be removed.
+          format: uri
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object
+    EnvironmentUpdate:
+      properties:
+        access_controlled:
+          description: Indicates if access control is being enforced through grants.
+          type: boolean
+        children:
+          description: This is the opposite of `parent`, see that field for more details.
+          items:
+            format: uri
+            type: string
+          readOnly: true
+          type: array
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        description:
+          description: A description of the environment.  You may find it helpful
+            to document how this environment is used to assist others when they need
+            to maintain software that uses this content.
+          type: string
+        id:
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        name:
+          description: The environment name.
+          maxLength: 256
+          type: string
+        parent:
+          description: Environments can inherit from a single parent environment which
+            provides values for parameters when specific environments do not have
+            a value set.  Every organization has one default environment that cannot
+            be removed.
+          format: uri
+          nullable: true
+          type: string
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: Your role in the environment, if the environment is access-controlled.
+          nullable: true
+          readOnly: true
+      required:
+      - children
+      - created_at
+      - id
+      - name
+      type: object
+    GeneratedPasswordResponse:
+      properties:
+        value:
+          description: The generated password value
+          type: string
+      required:
+      - value
+      type: object
+    Grant:
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        id:
+          description: A unique identifier for the grant.
+          format: uuid
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        principal:
+          description: The URI of a principal for the grant; this must reference a
+            user or group.
+          format: uri
+          type: string
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the principal has in the given scope.
+        scope:
+          description: The URI of a scope for the grant; this must reference a project
+            or environment.
+          format: uri
+          type: string
+        url:
+          format: uri
+          readOnly: true
+          type: string
+      required:
+      - created_at
+      - id
+      - principal
+      - role
+      - scope
+      - url
+      type: object
+    Membership:
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        id:
+          description: A unique identifier for the membership.
+          format: uuid
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        organization:
+          description: The organization that the user is a member of.
+          format: uri
+          type: string
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the user has in the organization.
+        url:
+          format: uri
+          readOnly: true
+          type: string
+        user:
+          description: The user of the membership.
+          format: uri
+          type: string
+      required:
+      - created_at
+      - id
+      - organization
+      - role
+      - url
+      - user
+      type: object
+    MembershipCreate:
+      properties:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the user has in the organization.
+        user:
+          description: The user of the membership.
+          format: uri
+          type: string
+      required:
+      - role
+      - user
+      type: object
+    ObjectTypeEnum:
+      enum:
+      - AwsIntegration
+      - Environment
+      - GitHubIntegration
+      - Grant
+      - Invitation
+      - Membership
+      - Organization
+      - Parameter
+      - ParameterRule
+      - ParameterType
+      - ParameterTypeRule
+      - Project
+      - Pull
+      - Push
+      - ServiceAccount
+      - Tag
+      - Task
+      - Template
+      - Value
+      type: string
+    OperationEnum:
+      enum:
+      - create
+      - read
+      - update
+      - delete
+      type: string
+    PaginatedAuditTrailList:
+      properties:
+        count:
+          example: 123
+          type: integer
+        next:
+          example: http://api.example.org/accounts/?page=4
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?page=2
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/AuditTrail'
+          type: array
+      type: object
+    PaginatedEnvironmentList:
+      properties:
+        count:
+          example: 123
+          type: integer
+        next:
+          example: http://api.example.org/accounts/?page=4
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?page=2
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/Environment'
+          type: array
+      type: object
+    PaginatedGrantList:
+      properties:
+        count:
+          example: 123
+          type: integer
+        next:
+          example: http://api.example.org/accounts/?page=4
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?page=2
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/Grant'
+          type: array
+      type: object
+    PaginatedMembershipList:
+      properties:
+        count:
+          example: 123
+          type: integer
+        next:
+          example: http://api.example.org/accounts/?page=4
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?page=2
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/Membership'
+          type: array
+      type: object
+    PaginatedTagList:
+      properties:
+        count:
+          example: 123
+          type: integer
+        next:
+          example: http://api.example.org/accounts/?page=4
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?page=2
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/Tag'
+          type: array
+      type: object
+    PaginatedTaskStepList:
+      properties:
+        count:
+          example: 123
+          type: integer
+        next:
+          example: http://api.example.org/accounts/?page=4
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?page=2
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/TaskStep'
+          type: array
+      type: object
+    PaginatedUserList:
+      properties:
+        count:
+          example: 123
+          type: integer
+        next:
+          example: http://api.example.org/accounts/?page=4
+          format: uri
+          nullable: true
+          type: string
+        previous:
+          example: http://api.example.org/accounts/?page=2
+          format: uri
+          nullable: true
+          type: string
+        results:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+      type: object
+    PatchedEnvironmentUpdate:
+      properties:
+        access_controlled:
+          description: Indicates if access control is being enforced through grants.
+          type: boolean
+        children:
+          description: This is the opposite of `parent`, see that field for more details.
+          items:
+            format: uri
+            type: string
+          readOnly: true
+          type: array
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        description:
+          description: A description of the environment.  You may find it helpful
+            to document how this environment is used to assist others when they need
+            to maintain software that uses this content.
+          type: string
+        id:
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        name:
+          description: The environment name.
+          maxLength: 256
+          type: string
+        parent:
+          description: Environments can inherit from a single parent environment which
+            provides values for parameters when specific environments do not have
+            a value set.  Every organization has one default environment that cannot
+            be removed.
+          format: uri
+          nullable: true
+          type: string
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: Your role in the environment, if the environment is access-controlled.
+          nullable: true
+          readOnly: true
+      type: object
+    PatchedGrant:
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        id:
+          description: A unique identifier for the grant.
+          format: uuid
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        principal:
+          description: The URI of a principal for the grant; this must reference a
+            user or group.
+          format: uri
+          type: string
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the principal has in the given scope.
+        scope:
+          description: The URI of a scope for the grant; this must reference a project
+            or environment.
+          format: uri
+          type: string
+        url:
+          format: uri
+          readOnly: true
+          type: string
+      type: object
+    PatchedMembership:
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        id:
+          description: A unique identifier for the membership.
+          format: uuid
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        organization:
+          description: The organization that the user is a member of.
+          format: uri
+          type: string
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          description: The role that the user has in the organization.
+        url:
+          format: uri
+          readOnly: true
+          type: string
+        user:
+          description: The user of the membership.
+          format: uri
+          type: string
+      type: object
+    PatchedTagUpdate:
+      description: Details for updating a tag.
+      properties:
+        description:
+          description: A description of the tag.  You may find it helpful to document
+            how this tag is used to assist others when they need to maintain software
+            that uses this content.
+          type: string
+        id:
+          description: A unique identifier for the tag.
+          format: uuid
+          readOnly: true
+          type: string
+        immutable:
+          description: If True, this tag cannot be modified once it is created.
+          type: boolean
+        name:
+          description: The tag name. Tag names may contain alphanumeric, hyphen, underscore,
+            or period characters. Tag names are case sensitive. The name cannot be
+            modified.
+          maxLength: 64
+          pattern: ^[\w.-]+$
+          type: string
+        timestamp:
+          description: The point in time this tag represents.  If explicitly set to
+            `null` then the current time will be used.
+          format: date-time
+          nullable: true
+          type: string
+      type: object
+    RoleEnum:
+      enum:
+      - OWNER
+      - ADMIN
+      - CONTRIB
+      - VIEWER
+      type: string
+    StateEnum:
+      enum:
+      - queued
+      - running
+      - skipped
+      - success
+      - failure
+      type: string
+    Tag:
+      description: The details of a tag.
+      properties:
+        description:
+          description: A description of the tag.  You may find it helpful to document
+            how this tag is used to assist others when they need to maintain software
+            that uses this content.
+          type: string
+        id:
+          description: A unique identifier for the tag.
+          format: uuid
+          readOnly: true
+          type: string
+        immutable:
+          description: If True, this tag cannot be modified once it is created.
+          type: boolean
+        name:
+          description: The tag name. Tag names may contain alphanumeric, hyphen, underscore,
+            or period characters. Tag names are case sensitive. The name cannot be
+            modified.
+          maxLength: 64
+          pattern: ^[\w.-]+$
+          type: string
+        push_urls:
+          description: Push actions associated with the tag.
+          items:
+            format: uri
+            type: string
+          readOnly: true
+          type: array
+        pushes:
+          description: Deprecated. Only shows pushes for aws integrations in /api/v1/.
+          items:
+            $ref: '#/components/schemas/AwsPush'
+          readOnly: true
+          type: array
+        timestamp:
+          description: The point in time this tag represents.
+          format: date-time
+          type: string
+        url:
+          format: uri
+          readOnly: true
+          type: string
+        usage:
+          allOf:
+          - $ref: '#/components/schemas/TagReadUsage'
+          readOnly: true
+      required:
+      - id
+      - name
+      - push_urls
+      - pushes
+      - timestamp
+      - url
+      - usage
+      type: object
+    TagCreate:
+      description: Details for creating a tag.
+      properties:
+        description:
+          description: A description of the tag.  You may find it helpful to document
+            how this tag is used to assist others when they need to maintain software
+            that uses this content.
+          type: string
+        immutable:
+          description: If True, this tag cannot be modified once it is created.
+          type: boolean
+        name:
+          description: The tag name. Tag names may contain alphanumeric, hyphen, underscore,
+            or period characters. Tag names are case sensitive. The name cannot be
+            modified.
+          maxLength: 64
+          pattern: ^[\w.-]+$
+          type: string
+        timestamp:
+          description: The point in time this tag represents. If not specified then
+            the current time will be used.
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object
+    TagReadUsage:
+      description: The read usage details of a tag.
+      properties:
+        last_read:
+          description: The last time a configuration was retrieved with this tag.
+          format: date-time
+          nullable: true
+          type: string
+        last_read_by:
+          description: The last user (id) to use this tag to read configuration.
+          maxLength: 256
+          type: string
+        total_reads:
+          description: The number of times the tag has been used to read configuration.
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+      required:
+      - total_reads
+      type: object
+    TagUpdate:
+      description: Details for updating a tag.
+      properties:
+        description:
+          description: A description of the tag.  You may find it helpful to document
+            how this tag is used to assist others when they need to maintain software
+            that uses this content.
+          type: string
+        id:
+          description: A unique identifier for the tag.
+          format: uuid
+          readOnly: true
+          type: string
+        immutable:
+          description: If True, this tag cannot be modified once it is created.
+          type: boolean
+        name:
+          description: The tag name. Tag names may contain alphanumeric, hyphen, underscore,
+            or period characters. Tag names are case sensitive. The name cannot be
+            modified.
+          maxLength: 64
+          pattern: ^[\w.-]+$
+          type: string
+        timestamp:
+          description: The point in time this tag represents.  If explicitly set to
+            `null` then the current time will be used.
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    TaskStep:
+      description: 'Each task detail documents the synchronization of a single
+
+        value through an integration.'
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        environment:
+          description: The environment affected by this step.
+          format: uri
+          nullable: true
+          readOnly: true
+          type: string
+        environment_id:
+          description: The environment id involved in the operation.
+          format: uuid
+          nullable: true
+          type: string
+        environment_name:
+          description: The environment name involved in the operation.
+          maxLength: 256
+          nullable: true
+          type: string
+        error_code:
+          description: An error code, if not successful.
+          maxLength: 256
+          nullable: true
+          type: string
+        error_detail:
+          description: Details on the error that occurred during processing.
+          nullable: true
+          type: string
+        fqn:
+          description: The fully-qualified name (FQN) this of the value that was changed.
+          maxLength: 1024
+          nullable: true
+          type: string
+        id:
+          description: Unique identifier for a task step.
+          format: uuid
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        operation:
+          allOf:
+          - $ref: '#/components/schemas/OperationEnum'
+          description: 'The operation performed, if any.
+
+
+            When the operation is an update, there may be additional details in the
+            success_detail field to describe the change.
+
+
+            When the project is filled in but the environment and parameterare not,
+            the operation is on the project.  When the environmentis filled in but
+            the project and parameter are not, the operationis on the environment.  When
+            the project and parameter are filledin but the environment is not, the
+            operation is on the parameter.When all three are filled in, the operation
+            is on the value ofthe parameter of the project in the specified environment.'
+          nullable: true
+        parameter:
+          description: The parameter affected by this step.
+          format: uri
+          nullable: true
+          readOnly: true
+          type: string
+        parameter_id:
+          description: The parameter id involved in the operation.
+          format: uuid
+          nullable: true
+          type: string
+        parameter_name:
+          description: The parameter name involved in the operation.
+          maxLength: 256
+          nullable: true
+          type: string
+        project:
+          description: The project affected by this step.
+          format: uri
+          nullable: true
+          readOnly: true
+          type: string
+        project_id:
+          description: The project id involved in the operation.
+          format: uuid
+          nullable: true
+          type: string
+        project_name:
+          description: The project name involved in the operation.
+          maxLength: 256
+          nullable: true
+          type: string
+        success:
+          description: Indicates if the operation was successful.
+          type: boolean
+        success_detail:
+          description: Additional details about the successful operation, if any.
+          nullable: true
+          type: string
+        summary:
+          description: The summary of this step (what it was trying to do).
+          nullable: true
+          type: string
+        url:
+          format: uri
+          readOnly: true
+          type: string
+        venue_id:
+          description: The integration-native id for the resource.
+          maxLength: 2048
+          nullable: true
+          type: string
+        venue_name:
+          description: The name of the item or resource as known by the integration.
+          maxLength: 1024
+          nullable: true
+          type: string
+      required:
+      - created_at
+      - id
+      - success
+      - url
+      type: object
+    User:
+      properties:
+        created_at:
+          format: date-time
+          readOnly: true
+          type: string
+        email:
+          nullable: true
+          readOnly: true
+          type: string
+        id:
+          description: The unique identifier of a user.
+          maxLength: 256
+          type: string
+        membership_id:
+          description: Membership identifier for user.
+          nullable: true
+          readOnly: true
+          type: string
+        modified_at:
+          format: date-time
+          nullable: true
+          readOnly: true
+          type: string
+        name:
+          nullable: true
+          readOnly: true
+          type: string
+        organization_name:
+          description: The user's organization name.
+          nullable: true
+          readOnly: true
+          type: string
+        picture_url:
+          nullable: true
+          readOnly: true
+          type: string
+        role:
+          description: The user's role in the current organization (defined by the
+            request authorization header).
+          nullable: true
+          readOnly: true
+          type: string
+        type:
+          description: The type of user record.
+          maxLength: 12
+          type: string
+        url:
+          format: uri
+          readOnly: true
+          type: string
+      required:
+      - created_at
+      - id
+      - url
+      type: object
+  securitySchemes:
+    ApiKeyAuth:
+      description: "\nUse your CloudTruth API Key to authenticate to the API.  You\
+        \ can get\nan API Key by creating a Service Account.  During setup of the\
+        \ Service\nAccount you will generate a long-lived API key intended for use\
+        \ by automation\nand API clients.  Access through the service account will\
+        \ be audited separately\nfrom any other user.\n\nIf you are just trying to\
+        \ use the API in a normal workflow, this is likely the\nauthentication mechanism\
+        \ you want to use.\n\nTo use the API Key, place your API Key in the Authorization\
+        \ header as 'Api-Key APIKEY', where\nAPIKEY is your CloudTruth API Key.  For\
+        \ example:\n\n    Authorization: Api-Key fskur.ghlsiudhrg84so938r5u\n    \
+        \    "
+      in: header
+      name: Authorization
+      type: apiKey
+    JWTAuth:
+      description: "\nUse your JWT to authenticate to the API.  This is how the CloudTruth\n\
+        Web UI authenticates to the backend.  It requires a user to have already logged\
+        \ in\nand gotten a JWT from the login process.  This is usually done by an\
+        \ Auth0 authentication\nflow from one of the Auth0 javascript libraries. \
+        \ Alternatively, you can pull the\nJWT from your browser if you have a logged\
+        \ in session with the CloudTruth UI.\n\nThis authentication mechanism is intended\
+        \ for deeper integrations into the CloudTruth\nsystem, where you want to handle\
+        \ the user logins directly in your application.  For\nnormal API use, you\
+        \ likely want the Api-Key authentication header and not this one.\n\nTo use\
+        \ the JWT, place your JWT in the Authorization header as 'Bearer JWT', where\n\
+        JWT is your JWT.  For example:\n\n    Authorization: Bearer eyJhbGciOiJIkuydfy.eyJzdWIiOiIxMjM....\n\
+        \        "
+      in: header
+      name: Authorization
+      type: apiKey
+    tokenAuth:
+      scheme: bearer
+      type: http
+externalDocs:
+  url: https://docs.cloudtruth.com/
+info:
+  contact:
+    email: support@cloudtruth.com
+    name: CloudTruth Support
+  description: CloudTruth centralizes your configuration parameters and secrets making
+    them easier to manage and use as a team.
+  title: CloudTruth Management API
+  version: v1
+openapi: 3.0.3
+paths:
+  /api/v1/audit/:
+    get:
+      description: A searchable log of all the actions taken by users and service
+        accounts within the organization.
+      operationId: audit_list
+      parameters:
+      - description: The action that was taken.
+        in: query
+        name: action
+        schema:
+          enum:
+          - create
+          - delete
+          - pull
+          - push
+          - update
+          type: string
+      - in: query
+        name: earliest
+        schema:
+          format: date-time
+          type: string
+      - description: Returns records for the environment, associated tags, and values.
+        in: query
+        name: environment_id
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: latest
+        schema:
+          format: date-time
+          type: string
+      - in: query
+        name: object_id
+        schema:
+          type: string
+      - in: query
+        name: object_type
+        schema:
+          type: string
+      - description: Which field to use when ordering the results.
+        in: query
+        name: ordering
+        required: false
+        schema:
+          type: string
+      - description: A page number within the paginated result set.
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: Number of results to return per page.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          type: integer
+      - description: Returns records for the parameter and associated values.
+        in: query
+        name: parameter_id
+        schema:
+          format: uuid
+          type: string
+      - description: Returns records for the project, it's parameters, and associated
+          values.
+        in: query
+        name: project_id
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: user_id
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditTrailList'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/audit/summary/:
+    get:
+      description: Summary information about the organization's audit trail.
+      operationId: audit_summary_retrieve
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditTrailSummary'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/audit/{id}/:
+    get:
+      description: Retrieve one record from the audit log.
+      operationId: audit_retrieve
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the audit record.
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditTrail'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/backup/snapshot/:
+    post:
+      operationId: backup_snapshot_create
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupDataSnapshot'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+      summary: Get a snapshot of all Projects with parameters
+  /api/v1/environments/:
+    get:
+      operationId: environments_list
+      parameters:
+      - in: query
+        name: description__icontains
+        schema:
+          type: string
+      - in: query
+        name: name
+        schema:
+          type: string
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - description: Which field to use when ordering the results.
+        in: query
+        name: ordering
+        required: false
+        schema:
+          type: string
+      - description: A page number within the paginated result set.
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: Number of results to return per page.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnvironmentList'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    post:
+      operationId: environments_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnvironmentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnvironmentCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/environments/{environment_pk}/pushes/:
+    get:
+      description: The push operations that this environment was involved in.
+      operationId: environments_pushes_list
+      parameters:
+      - in: path
+        name: environment_pk
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Which field to use when ordering the results.
+        in: query
+        name: ordering
+        required: false
+        schema:
+          type: string
+      - description: A page number within the paginated result set.
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: Number of results to return per page.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskStepList'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+      summary: List push operations.
+  /api/v1/environments/{environment_pk}/tags/:
+    get:
+      description: 'Tags allow you to name stable points in time for your configuration.
+
+
+        Any query API that accepts an `as_of` option will also accept a `tag`
+
+        option however they are mutually exclusive.'
+      operationId: environments_tags_list
+      parameters:
+      - in: query
+        name: description__icontains
+        schema:
+          type: string
+      - in: path
+        name: environment_pk
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: name
+        schema:
+          type: string
+      - in: query
+        name: name__icontains
+        schema:
+          type: string
+      - description: Which field to use when ordering the results.
+        in: query
+        name: ordering
+        required: false
+        schema:
+          type: string
+      - description: A page number within the paginated result set.
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: Number of results to return per page.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: timestamp
+        schema:
+          format: date-time
+          type: string
+      - in: query
+        name: timestamp__gte
+        schema:
+          format: date-time
+          type: string
+      - in: query
+        name: timestamp__lte
+        schema:
+          format: date-time
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTagList'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    post:
+      description: 'Tags allow you to name stable points in time for your configuration.
+
+
+        Any query API that accepts an `as_of` option will also accept a `tag`
+
+        option however they are mutually exclusive.'
+      operationId: environments_tags_create
+      parameters:
+      - in: path
+        name: environment_pk
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TagCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TagCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/environments/{environment_pk}/tags/{id}/:
+    delete:
+      description: 'Tags allow you to name stable points in time for your configuration.
+
+
+        Any query API that accepts an `as_of` option will also accept a `tag`
+
+        option however they are mutually exclusive.'
+      operationId: environments_tags_destroy
+      parameters:
+      - in: path
+        name: environment_pk
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the tag.
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: No response body
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    get:
+      description: 'Tags allow you to name stable points in time for your configuration.
+
+
+        Any query API that accepts an `as_of` option will also accept a `tag`
+
+        option however they are mutually exclusive.'
+      operationId: environments_tags_retrieve
+      parameters:
+      - in: path
+        name: environment_pk
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the tag.
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    patch:
+      description: 'Tags allow you to name stable points in time for your configuration.
+
+
+        Any query API that accepts an `as_of` option will also accept a `tag`
+
+        option however they are mutually exclusive.'
+      operationId: environments_tags_partial_update
+      parameters:
+      - in: path
+        name: environment_pk
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the tag.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTagUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTagUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTagUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagUpdate'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    put:
+      description: 'Tags allow you to name stable points in time for your configuration.
+
+
+        Any query API that accepts an `as_of` option will also accept a `tag`
+
+        option however they are mutually exclusive.'
+      operationId: environments_tags_update
+      parameters:
+      - in: path
+        name: environment_pk
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the tag.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TagUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TagUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagUpdate'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/environments/{id}/:
+    delete:
+      operationId: environments_destroy
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the environment.
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Environment destroyed.
+        '409':
+          description: The environment has children and cannot be removed.
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    get:
+      operationId: environments_retrieve
+      parameters:
+      - description: A UUID string identifying this environment ledger.
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    patch:
+      operationId: environments_partial_update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the environment.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvironmentUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvironmentUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEnvironmentUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentUpdate'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    put:
+      operationId: environments_update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the environment.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnvironmentUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnvironmentUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnvironmentUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentUpdate'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/grants/:
+    get:
+      description: 'Grants allow you to enable access control on Environments and
+        Projects.
+
+
+        Grants are part of the role-based access control feature set, so
+
+        if your subscription does not have support for it, these paths
+
+        will return a 403 Forbidden error.'
+      operationId: grants_list
+      parameters:
+      - description: Which field to use when ordering the results.
+        in: query
+        name: ordering
+        required: false
+        schema:
+          type: string
+      - description: A page number within the paginated result set.
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: Number of results to return per page.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          type: integer
+      - description: Filter by principal (User, Group). Returns direct grant assignments,
+          not indirect (user via group).
+        in: query
+        name: principal
+        schema:
+          format: uri
+          type: string
+      - description: Filter by role.
+        in: query
+        name: role
+        schema:
+          enum:
+          - ADMIN
+          - CONTRIB
+          - OWNER
+          - VIEWER
+          type: string
+      - description: Filter by grant scope (Environment, Project).
+        in: query
+        name: scope
+        schema:
+          format: uri
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGrantList'
+          description: ''
+        '403':
+          description: 'Forbidden: see response for further details.'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    post:
+      description: 'Grants allow you to enable access control on Environments and
+        Projects.
+
+
+        Grants are part of the role-based access control feature set, so
+
+        if your subscription does not have support for it, these paths
+
+        will return a 403 Forbidden error.'
+      operationId: grants_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Grant'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Grant'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Grant'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Grant'
+          description: ''
+        '403':
+          description: 'Forbidden: see response for further details.'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/grants/multi/:
+    delete:
+      description: 'Removes grants matching the query parameters atomically.
+
+
+        Use this technique to disable access control on a scope,
+
+        or remove all grants for a user.'
+      operationId: grants_multi_destroy
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Grant'
+          description: ''
+        '403':
+          description: 'Forbidden: see response for further details.'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/grants/{id}/:
+    delete:
+      description: 'Grants allow you to enable access control on Environments and
+        Projects.
+
+
+        Grants are part of the role-based access control feature set, so
+
+        if your subscription does not have support for it, these paths
+
+        will return a 403 Forbidden error.'
+      operationId: grants_destroy
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the grant.
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Deleted.
+        '403':
+          description: 'Forbidden: see response for further details.'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    get:
+      description: 'Grants allow you to enable access control on Environments and
+        Projects.
+
+
+        Grants are part of the role-based access control feature set, so
+
+        if your subscription does not have support for it, these paths
+
+        will return a 403 Forbidden error.'
+      operationId: grants_retrieve
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the grant.
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Grant'
+          description: ''
+        '403':
+          description: 'Forbidden: see response for further details.'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    patch:
+      description: 'Grants allow you to enable access control on Environments and
+        Projects.
+
+
+        Grants are part of the role-based access control feature set, so
+
+        if your subscription does not have support for it, these paths
+
+        will return a 403 Forbidden error.'
+      operationId: grants_partial_update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the grant.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGrant'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGrant'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGrant'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Grant'
+          description: ''
+        '403':
+          description: 'Forbidden: see response for further details.'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    put:
+      description: 'Grants allow you to enable access control on Environments and
+        Projects.
+
+
+        Grants are part of the role-based access control feature set, so
+
+        if your subscription does not have support for it, these paths
+
+        will return a 403 Forbidden error.'
+      operationId: grants_update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the grant.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Grant'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Grant'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Grant'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Grant'
+          description: ''
+        '403':
+          description: 'Forbidden: see response for further details.'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/memberships/:
+    get:
+      operationId: memberships_list
+      parameters:
+      - description: Which field to use when ordering the results.
+        in: query
+        name: ordering
+        required: false
+        schema:
+          type: string
+      - description: A page number within the paginated result set.
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: Number of results to return per page.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          type: integer
+      - description: The role that the user has in the organization.
+        in: query
+        name: role
+        schema:
+          enum:
+          - ADMIN
+          - CONTRIB
+          - OWNER
+          - VIEWER
+          type: string
+      - description: The unique identifier of a user.
+        in: query
+        name: user
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMembershipList'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    post:
+      operationId: memberships_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MembershipCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MembershipCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/memberships/{id}/:
+    delete:
+      operationId: memberships_destroy
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the membership.
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: No response body
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    get:
+      operationId: memberships_retrieve
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the membership.
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    patch:
+      operationId: memberships_partial_update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the membership.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMembership'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMembership'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMembership'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+    put:
+      operationId: memberships_update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: A unique identifier for the membership.
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Membership'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Membership'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/users/:
+    get:
+      operationId: users_list
+      parameters:
+      - description: Which field to use when ordering the results.
+        in: query
+        name: ordering
+        required: false
+        schema:
+          type: string
+      - description: A page number within the paginated result set.
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: Number of results to return per page.
+        in: query
+        name: page_size
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: type
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/users/current/:
+    get:
+      description: Get user information about the current user.
+      operationId: users_current_retrieve
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: User information
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+      summary: Current user information
+  /api/v1/users/{id}/:
+    delete:
+      description: '### Description ###
+
+
+        Delete the specified user.  This removes all access the User may have to any
+        Organization.
+
+
+        ### Pre-Conditions ###
+
+
+        - The user cannot be the only owner of any Organization.
+
+        - The bearer token must belong to the user being deleted.
+
+        - All of the memberships related to the User will be deleted, so all the membership
+        deletion pre-conditions must also be met.
+
+        '
+      operationId: users_destroy
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: The unique identifier of a user.
+          type: string
+      responses:
+        '204':
+          description: User deleted. The client should behave as if the user logged
+            out.
+        '400':
+          description: 'Bad Request
+
+
+            - Is the user the only owner of any organization?
+
+            - Were all required fields provided?'
+        '403':
+          description: 'Forbidden
+
+
+            - Did the Bearer token belong to the User being deleted?'
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+      summary: Delete the specified user.
+    get:
+      operationId: users_retrieve
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          description: The unique identifier of a user.
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+  /api/v1/utils/generate_password/:
+    post:
+      description: Endpoint for accessing utility functions
+      operationId: utils_generate_password_create
+      parameters:
+      - description: The length of the password to generate.  Minimum of 8, maximum
+          of 4095.
+        in: query
+        name: length
+        required: true
+        schema:
+          type: integer
+      - description: 'Default behavior is to fallback to /dev/urandom if we fail to
+          get a random password from AWS Secrets Manager.  If set to ''True'', we
+          will not fallback to local password generation using /dev/urandom.  Default:
+          False'
+        in: query
+        name: require_hardware_generation
+        schema:
+          default: false
+          type: boolean
+      - description: 'The password must include lowercase letters [a-z]. Default:
+          True.'
+        in: query
+        name: require_lowercase
+        schema:
+          default: true
+          type: boolean
+      - description: 'The password must include numbers [0-9].  Default: True.'
+        in: query
+        name: require_numbers
+        schema:
+          default: true
+          type: boolean
+      - description: 'The password must include spaces [ ].  Default: False.'
+        in: query
+        name: require_spaces
+        schema:
+          default: false
+          type: boolean
+      - description: 'The password must include symbols [!"#$%&''()*+,-./:;<=>?@[\]^_`{|}~].  Default:
+          False.'
+        in: query
+        name: require_symbols
+        schema:
+          default: false
+          type: boolean
+      - description: 'The password must include uppercase letters [A-Z].  Default:
+          True.'
+        in: query
+        name: require_uppercase
+        schema:
+          default: true
+          type: boolean
+      responses:
+        '201':
+          content:
+            application/json:
+              examples:
+                GenerateAPassword:
+                  description: Successfully generated random password.
+                  summary: Generate a password
+                  value:
+                    value: S*f4wg8lR$7gfwefhuL>UIuyg4efb
+              schema:
+                $ref: '#/components/schemas/GeneratedPasswordResponse'
+          description: ''
+      security:
+      - JWTAuth: []
+      - ApiKeyAuth: []
+      - tokenAuth: []
+      summary: Get a randomly generated password using AWS Secrets Manager, with fallback
+        to /dev/urandom.

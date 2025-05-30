@@ -415,7 +415,7 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
             if _is_nullable(prop_data) and prop_name in required:
                 required.remove(prop_name)
         if required:
-            schema_value[OasField.REQUIRED.value] = list(required)
+            schema_value[OasField.REQUIRED.value] = sorted(list(required))
 
     return result
 

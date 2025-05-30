@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from copy import deepcopy
 from enum import Enum
 from typing import Optional
 
@@ -35,6 +36,9 @@ from oas_tools.cli_gen.layout import subcommand_references
 from oas_tools.cli_gen.layout_types import LayoutNode
 from oas_tools.types import OasField
 from oas_tools.utils import open_oas
+from oas_tools.utils import remove_schema_tags
+from oas_tools.utils import schema_operations_filter
+from oas_tools.utils import set_nullable_not_required
 
 SEP = "\n    "
 
@@ -365,3 +369,56 @@ def show_cli_tree(
 
 if __name__ == "__main__":
     app()
+
+
+@app.command(
+    "trim",
+    short_help="Create an OpenAPI spec that only contains data referenced by layout"
+)
+def trim_oas(
+    layout_file: LayoutFilenameArgument,
+    openapi_file: OpenApiFilenameArgument,
+    updated_file: Annotated[
+        Optional[str],
+        typer.Option(
+            show_default=False,
+            help="Filename for updated OpenAPI spec, overwrites original of not specified.",
+        ),
+    ] = None,
+    start: StartPointOption = DEFAULT_START,
+    nullable_not_required: Annotated[
+        bool,
+        typer.Option(help="Remove 'nullable' properties from required list"),
+    ] = True,
+    remove_all_tags: Annotated[bool, typer.Option(help="Remove all tags")] = True,
+    indent: Annotated[
+        int,
+        typer.Option(min=1, max=10, help="Number of characters to indent on YAML display"),
+    ] = 2,
+) -> None:
+    """Create a version of the OpenAPI spec with only the data associated with the operations and paths
+    required for use with the provide layout file."""
+    def _operations(_node: LayoutNode) -> set[str]:
+        ops = set([op.identifier for op in _node.operations()])
+        for sub in _node.subcommands():
+            ops.update(_operations(sub))
+        return ops
+
+    layout = file_to_tree(layout_file, start=start)
+    oas = open_oas(openapi_file)
+    updated = deepcopy(oas)
+
+    operations = _operations(layout)
+    updated = schema_operations_filter(updated, allow=operations)
+    if remove_all_tags:
+        updated = remove_schema_tags(updated)
+
+    if nullable_not_required:
+        updated = set_nullable_not_required(updated)
+
+    out_file = updated_file or openapi_file
+    with open(out_file, "w") as fp:
+        yaml.dump(updated, fp, indent=indent, sort_keys=True)
+
+    typer.echo(f"Wrote to {out_file}")
+    return
