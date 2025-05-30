@@ -50,7 +50,7 @@ jobs:
       - name: Install the project dependencies
         run: poetry install
       - name: Test
-        run: poetry run coverage run -m pytest -v
+        run: poetry run coverage run -m pytest -v tests
         env:
           COVERAGE_FILE: coverage/.coverage.${{ runner.os }}-py${{ matrix.python-version }}
           CONTEXT: ${{ runner.os }}-py${{ matrix.python-version }}
