@@ -8,6 +8,7 @@ help: ## This message
 
 LAYOUT_FILE := layout.yaml
 OPENAPI_SPEC := api.github.com.yaml
+TRIMMED_SPEC := trimmed.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := github_gen_cli
 
@@ -32,8 +33,11 @@ all: gen lint install ## Perform a full cycle
 layout-lint:  ## Check the layout file format
 	cli-gen layout check $(LAYOUT_FILE)
 
+trim: ## Creates the skinny OpenAPI spec
+	cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC)
+
 gen: layout-lint ## Generate CLI code
-	cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	cli-gen generate $(LAYOUT_FILE) $(TRIMMED_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
