@@ -23,19 +23,19 @@ wheel: ## Build the wheel package that is installable
 install: ## Install the package
 	poetry install
 
-all: gen lint install cov ## Perform a full cycle
-	pets
+all: install gen lint cov ## Perform a full cycle
+	$(poetry_run) pets
 
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
-	cli-gen layout check $(LAYOUT_FILE)
+	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
 
 gen: layout-lint ## Generate CLI code
-	cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY)
+	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY)
 
 missing: ## Print the OAS operations not in the layout
-	cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
+	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 ###########
 ##@ Linting

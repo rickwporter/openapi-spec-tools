@@ -23,19 +23,19 @@ wheel: ## Build the wheel package that is installable
 install: ## Install the package
 	poetry install
 
-all: gen lint install ## Perform a full cycle
-	cloudtruth 
+all: install gen lint ## Perform a full cycle
+	$(poetry_run) cloudtruth 
 
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
-	cli-gen layout check $(LAYOUT_FILE)
+	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
 
 gen: layout-lint ## Generate CLI code
-	cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
-	cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
+	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 
 ###########
