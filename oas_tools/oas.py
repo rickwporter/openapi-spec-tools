@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
@@ -35,6 +36,21 @@ def short_filename(long: str) -> str:
     return Path(long).name
 
 
+def console_factory() -> Console:  # pragma: no cover
+    """Utility to consolidate creation/initialization of Console.
+
+    A little hacky here... Allow terminal width to be set directly by an environment variable, or
+    when detecting that we're testing use a wide terminal to avoid line wrap issues.
+    """
+    width = os.environ.get("TERMINAL_WIDTH")
+    pytest_version = os.environ.get("PYTEST_VERSION")
+    if width is not None:
+        width = int(width)
+    elif pytest_version is not None:
+        width = 3000
+    return Console(width=width)
+
+
 #################################################
 # Top-level stuff
 app = typer.Typer(
@@ -52,7 +68,7 @@ def info(
     spec = open_oas(filename)
 
     info = spec.get("info", {})
-    console = Console()
+    console = console_factory()
     console.print(yaml.dump({"info": info}, indent=len(INDENT)))
     return
 
@@ -84,7 +100,7 @@ def summary(
                 orig = tag_count.get(tag, 0)
                 tag_count[tag] = orig + 1
 
-    console = Console()
+    console = console_factory()
     console.print(f"OpenAPI spec ({short_filename(filename)}):")
     console.print(f"{INDENT}Models: {model_count}")
     console.print(f"{INDENT}Paths: {path_count}")
@@ -112,7 +128,7 @@ def diff(
     old_spec = open_oas(original)
     new_spec = open_oas(updated)
 
-    console = Console()
+    console = console_factory()
     diffs = find_diffs(old_spec, new_spec)
     if not diffs:
         console.print(f"No differences between {short_filename(original)} and {short_filename(updated)}")
@@ -176,7 +192,7 @@ def update(
         with open(updated_filename, "w") as fp:
             yaml.dump(updated, fp, indent=indent)
 
-    console = Console()
+    console = console_factory()
     diffs = find_diffs(old_spec, updated)
     if display_option == DisplayOption.NONE:
         pass
@@ -221,7 +237,7 @@ def operation_list(
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
 
-    console = Console()
+    console = console_factory()
     match_info = f" matching '{search}'" if search else ""
     if not names:
         console.print(f"No operations found{match_info}")
@@ -253,7 +269,7 @@ def operation_show(
         inner["params"] = path_params
     inner[method] = operation
 
-    console = Console()
+    console = console_factory()
     console.print(yaml.dump({path: inner}, indent=len(INDENT)))
     return
 
@@ -274,7 +290,7 @@ def operation_models(
     models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
     matches = model_filter(models, op_references)
 
-    console = Console()
+    console = console_factory()
     if not matches:
         console.print(f"{operation_name} does not reference any models")
     else:
@@ -314,7 +330,7 @@ def paths_list(
         if include_subpaths:
             match_info += " including sub-paths"
 
-    console = Console()
+    console = console_factory()
     if not names:
         console.print(f"No paths found{match_info}")
     else:
@@ -348,7 +364,7 @@ def paths_show(
         }
         paths = results
 
-    console = Console()
+    console = console_factory()
     console.print(yaml.dump(paths, indent=len(INDENT)))
     return
 
@@ -375,7 +391,7 @@ def paths_operations(
     if not result:
         error_out(f"failed to find {path_name}")
 
-    console = Console()
+    console = console_factory()
     console.print(yaml.dump(result, indent=len(INDENT)))
     return
 
@@ -400,7 +416,7 @@ def models_list(
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
 
-    console = Console()
+    console = console_factory()
     match_info = f" matching '{search}'" if search else ""
     if not names:
         console.print(f"No models found{match_info}")
@@ -430,7 +446,7 @@ def models_show(
         models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
         models = model_filter(models, set([model_name]))
 
-    console = Console()
+    console = console_factory()
     console.print(yaml.dump(models, indent=len(INDENT)))
     return
 
@@ -448,7 +464,7 @@ def models_uses(
 
     references = model_references(models)
 
-    console = Console()
+    console = console_factory()
     matches = unroll(references, references.get(model_name))
     if not matches:
         console.print(f"{model_name} does not use any other models")
@@ -471,7 +487,7 @@ def models_used_by(
     if model_name not in models:
         error_out(f"no model '{model_name}' found")
 
-    console = Console()
+    console = console_factory()
     matches = models_referenced_by(models, model_name)
     if not matches:
         console.print(f"{model_name} is not used by any other models")
@@ -507,7 +523,7 @@ def models_operations(
                 op_id = op_data.get(OasField.OP_ID)
                 matches.append(op_id)
 
-    console = Console()
+    console = console_factory()
     console.print(f"Found {model_name} is used by {len(matches)} operations:")
     for n in sorted(matches):
         console.print(f"{INDENT}{n}")
@@ -543,7 +559,7 @@ def tags_list(
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
 
-    console = Console()
+    console = console_factory()
     match_info = f" matching '{search}'" if search else ""
     if not names:
         console.print(f"No tags found{match_info}")
@@ -579,7 +595,7 @@ def tags_show(
     if not operations:
         error_out(f"failed to find {tag_name}")
 
-    console = Console()
+    console = console_factory()
     names = sorted(operations.keys())
     console.print(f"Tag {tag_name} has {len(names)} operations:")
     for n in names:
@@ -604,7 +620,7 @@ def content_type_list(
     if content_type:
         content = {k: v for k, v in content.items() if k == content_type}
 
-    console = Console()
+    console = console_factory()
     if not content:
         console.print("No content-types found")
         return
