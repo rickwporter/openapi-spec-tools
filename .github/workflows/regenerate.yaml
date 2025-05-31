@@ -25,6 +25,6 @@ jobs:
       - name: Install the project dependencies
         run: poetry install
       - name: Regenerate
-        run: make example-gen
+        run: make examples
       - name: Check unchanged
         run: make uncommitted
