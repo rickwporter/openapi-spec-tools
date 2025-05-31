@@ -178,7 +178,8 @@ SUB_DISPLAY = """\
 def test_show_tree(start, display, depth, expected):
     directory = TemporaryDirectory()
     file = Path(directory.name, "sample.yaml")
-    file.write_text(SAMPLE_TREE)
+    with open(file.as_posix(), "w") as fp:
+        fp.write(SAMPLE_TREE)
 
     with (
         mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout,
