@@ -186,5 +186,5 @@ def test_show_tree(start, display, depth, expected):
     ):
         tree(file.as_posix(), identifier=start, display=display, max_depth=depth)
 
-        result = mock_stdout.getvalue()
+        result = mock_stdout.getvalue().replace("\r", "")
         assert to_ascii(expected) == to_ascii(result)
