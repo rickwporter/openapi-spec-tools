@@ -369,6 +369,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     expected = {
         "__init__.py",
         "_arguments.py",
+        "_console.py",
         "_display.py",
         "_exceptions.py",
         "_logging.py",
@@ -386,6 +387,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
         filenames = set(i.name for i in path.iterdir())
         expected = {
             "helpers.py",
+            "test_console.py",
             "test_display.py",
             "test_exceptions.py",
             "test_logging.py",

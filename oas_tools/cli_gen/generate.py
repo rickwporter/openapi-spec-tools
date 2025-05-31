@@ -16,6 +16,7 @@ from oas_tools.utils import map_operations
 # Maps the source to destination (currently all the same).
 INFRASTRUCTURE_FILES = {
     "_arguments.py": "_arguments.py",
+    "_console.py": "_console.py",
     "_display.py": "_display.py",
     "_exceptions.py": "_exceptions.py",
     "_logging.py": "_logging.py",
@@ -25,6 +26,7 @@ INFRASTRUCTURE_FILES = {
 
 TEST_FILES = {
     "helpers.py": "helpers.py",
+    "test_console.py": "test_console.py",
     "test_display.py": "test_display.py",
     "test_exceptions.py": "test_exceptions.py",
     "test_logging.py": "test_logging.py",
