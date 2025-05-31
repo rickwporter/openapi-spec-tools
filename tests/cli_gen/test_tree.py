@@ -1,4 +1,4 @@
-import io
+from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
@@ -181,7 +181,7 @@ def test_show_tree(start, display, depth, expected):
     file.write_text(SAMPLE_TREE)
 
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout,
     ):
         tree(file.as_posix(), identifier=start, display=display, max_depth=depth)
 

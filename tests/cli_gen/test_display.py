@@ -1,6 +1,6 @@
-import io
 import json
 from copy import deepcopy
+from io import StringIO
 from itertools import zip_longest
 from unittest import mock
 
@@ -464,7 +464,7 @@ SIMPLE_TABLE = """\
     ]
 )
 def test_display(data, fmt, expected):
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
         display(data, fmt, OutputStyle.NONE)
         output = mock_stdout.getvalue()
         assert to_ascii(expected) == to_ascii(output)
