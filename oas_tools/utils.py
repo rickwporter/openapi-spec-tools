@@ -15,7 +15,7 @@ def open_oas(filename: str) -> Any:
     """
     Open the specified filename, and return the dictionary.
     """
-    with open(filename, "r") as fp:
+    with open(filename, "r", encoding="utf-8", newline="\n") as fp:
         return yaml.safe_load(fp)
 
 

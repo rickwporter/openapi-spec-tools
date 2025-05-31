@@ -178,7 +178,7 @@ SUB_DISPLAY = """\
 def test_show_tree(start, display, depth, expected):
     directory = TemporaryDirectory()
     file = Path(directory.name, "sample.yaml")
-    with open(file.as_posix(), "w") as fp:
+    with open(file.as_posix(), "w", encoding="utf-8", newline="\n") as fp:
         fp.write(SAMPLE_TREE)
 
     with (

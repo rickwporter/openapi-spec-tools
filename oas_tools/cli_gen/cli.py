@@ -267,7 +267,8 @@ def generate_cli(
 
     # create the init file
     init_file = os.path.join(code_dir, '__init__.py')
-    with open(init_file, "w"):
+    with open(init_file, "w", encoding="utf-8", newline="\n"):
+        # do not bother writing anything to init file
         pass
 
     # copy over the basic infrastructure
@@ -417,7 +418,7 @@ def trim_oas(
         updated = set_nullable_not_required(updated)
 
     out_file = updated_file or openapi_file
-    with open(out_file, "w") as fp:
+    with open(out_file, "w", encoding="utf-8", newline="\n") as fp:
         yaml.dump(updated, fp, indent=indent, sort_keys=True)
 
     typer.echo(f"Wrote to {out_file}")

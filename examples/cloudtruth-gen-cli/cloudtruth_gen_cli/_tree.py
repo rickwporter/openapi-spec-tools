@@ -161,7 +161,7 @@ def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> T
 
 def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int) -> None:
     """Prints the tree table for the specified command."""
-    with open(filename) as fp:
+    with open(filename, "r", encoding="utf-8", newline="\n") as fp:
         data = yaml.safe_load(fp)
 
     # parse into the tree format

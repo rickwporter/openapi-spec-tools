@@ -189,7 +189,7 @@ def update(
         updated = schema_operations_filter(updated, allow=set(allowed_operations))
 
     if updated_filename:
-        with open(updated_filename, "w") as fp:
+        with open(updated_filename, "w", encoding="utf-8", newline="\n") as fp:
             yaml.dump(updated, fp, indent=indent)
 
     console = console_factory()

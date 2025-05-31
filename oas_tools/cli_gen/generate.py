@@ -50,7 +50,7 @@ def generate_node(generator: Generator, node: LayoutNode, directory: str) -> Non
     text += generator.main()
 
     filename = os.path.join(directory, module_name + ".py")
-    with open(filename, "w") as fp:
+    with open(filename, "w", encoding="utf-8", newline="\n") as fp:
         fp.write(text)
     os.chmod(filename, 0o755)
 
@@ -90,7 +90,7 @@ def generate_tree_node(generator: Generator, node: LayoutNode) -> TreeNode:
 def generate_tree_file(generator: Generator, node: LayoutNode, directory: str) -> None:
     """Creates the YAML file"""
     filename = os.path.join(directory, "tree.yaml")
-    with open(filename, "w") as fp:
+    with open(filename, "w", encoding="utf-8", newline="\n") as fp:
         fp.write(generator.copyright())
         fp.write(generator.get_tree_yaml(node))
 
@@ -143,8 +143,8 @@ def find_unreferenced(node: LayoutNode, oas: dict[str, Any]) -> dict[str, Any]:
 def copy_and_update(src_filename: str, dst_filename: str, replacements: dict[str, str]):
     """Copies text from src to dst with replacements of current package name to the supplied value."""
     with (
-        open(src_filename, "r") as src_fp,
-        open(dst_filename, "w") as dst_fp,
+        open(src_filename, "r", encoding="utf-8", newline="\n") as src_fp,
+        open(dst_filename, "w", encoding="utf-8", newline="\n") as dst_fp,
     ):
         # NOTE: ignore the shebangs for now... not used to copy over executable files
         dst_fp.write(COPYRIGHT)
