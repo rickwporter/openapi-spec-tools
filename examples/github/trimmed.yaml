@@ -29414,9 +29414,9 @@ components:
           format: uri
           type: string
       required:
+      - custom_404
       - public
       - url
-      - custom_404
       title: GitHub Pages
       type: object
     pages-https-certificate:
@@ -29453,8 +29453,8 @@ components:
           type: string
       required:
       - description
-      - state
       - domains
+      - state
       title: Pages Https Certificate
       type: object
     pages-source-hash:
@@ -29632,35 +29632,35 @@ components:
         user_view_type:
           type: string
       required:
-      - following_url
-      - site_admin
-      - collaborators
-      - followers
-      - html_url
-      - owned_private_repos
-      - subscriptions_url
-      - id
-      - following
-      - two_factor_authentication
-      - type
-      - organizations_url
-      - repos_url
-      - node_id
-      - updated_at
-      - followers_url
-      - login
-      - received_events_url
-      - public_repos
       - avatar_url
-      - events_url
-      - disk_usage
-      - gists_url
-      - total_private_repos
+      - collaborators
       - created_at
-      - url
+      - disk_usage
+      - events_url
+      - followers
+      - followers_url
+      - following
+      - following_url
+      - gists_url
+      - html_url
+      - id
+      - login
+      - node_id
+      - organizations_url
+      - owned_private_repos
       - private_gists
       - public_gists
+      - public_repos
+      - received_events_url
+      - repos_url
+      - site_admin
       - starred_url
+      - subscriptions_url
+      - total_private_repos
+      - two_factor_authentication
+      - type
+      - updated_at
+      - url
       title: Private User
       type: object
     public-user:
@@ -29790,29 +29790,29 @@ components:
         user_view_type:
           type: string
       required:
-      - following_url
-      - site_admin
-      - followers
-      - html_url
-      - subscriptions_url
-      - id
-      - following
-      - type
-      - organizations_url
-      - repos_url
-      - node_id
-      - updated_at
-      - followers_url
-      - login
-      - received_events_url
-      - public_repos
       - avatar_url
-      - events_url
-      - gists_url
       - created_at
-      - url
+      - events_url
+      - followers
+      - followers_url
+      - following
+      - following_url
+      - gists_url
+      - html_url
+      - id
+      - login
+      - node_id
+      - organizations_url
       - public_gists
+      - public_repos
+      - received_events_url
+      - repos_url
+      - site_admin
       - starred_url
+      - subscriptions_url
+      - type
+      - updated_at
+      - url
       title: Public User
       type: object
     simple-user:
@@ -29894,23 +29894,23 @@ components:
           example: public
           type: string
       required:
-      - repos_url
-      - following_url
-      - gists_url
-      - organizations_url
-      - subscriptions_url
-      - node_id
-      - followers_url
-      - id
-      - login
-      - received_events_url
-      - site_admin
-      - url
-      - type
       - avatar_url
       - events_url
+      - followers_url
+      - following_url
+      - gists_url
       - html_url
+      - id
+      - login
+      - node_id
+      - organizations_url
+      - received_events_url
+      - repos_url
+      - site_admin
       - starred_url
+      - subscriptions_url
+      - type
+      - url
       title: Simple User
       type: object
 externalDocs:

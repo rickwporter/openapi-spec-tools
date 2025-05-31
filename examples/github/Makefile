@@ -36,7 +36,7 @@ layout-lint:  ## Check the layout file format
 trim: ## Creates the skinny OpenAPI spec
 	cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC)
 
-gen: layout-lint ## Generate CLI code
+gen: layout-lint trim ## Generate CLI code
 	cli-gen generate $(LAYOUT_FILE) $(TRIMMED_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
