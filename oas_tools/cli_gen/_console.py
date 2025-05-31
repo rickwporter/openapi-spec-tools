@@ -2,8 +2,10 @@ import os
 
 from rich.console import Console
 
+TEST_TERMINAL_WIDTH = 100
 
-def console_factory(*args, **kwargs) -> Console:  # pragma: no cover
+
+def console_factory(*args, **kwargs) -> Console:
     """Utility to consolidate creation/initialization of Console.
 
     A little hacky here... Allow terminal width to be set directly by an environment variable, or
@@ -17,7 +19,7 @@ def console_factory(*args, **kwargs) -> Console:  # pragma: no cover
     elif width_env is not None:
         width = int(width_env)
     elif pytest_version is not None:
-        width = 100
+        width = TEST_TERMINAL_WIDTH
     return Console(*args, width=width, **kwargs)
 
 
