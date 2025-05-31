@@ -26,21 +26,21 @@ install: ## Install the package
 	poetry install
 
 all: install gen lint ## Perform a full cycle
-	gh-cli
+	$(poetry_run) gh-cli
 
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
-	cli-gen layout check $(LAYOUT_FILE)
+	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
 
 trim: ## Creates the skinny OpenAPI spec
-	cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC)
+	$(poetry_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC)
 
 gen: layout-lint trim ## Generate CLI code
-	cli-gen generate $(LAYOUT_FILE) $(TRIMMED_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(TRIMMED_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
-	cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
+	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 ###########
 ##@ Linting
