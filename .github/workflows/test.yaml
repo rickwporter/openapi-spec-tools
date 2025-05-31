@@ -91,10 +91,8 @@ jobs:
         run: ls -la coverage
       - name: Combine coverage
         run: poetry run coverage combine coverage
-      - name: List file
-        run: tree .
       - name: Coverage report
-        run: poetry run coverage report
+        run: poetry run coverage report --skip-empty --show-missing --include=oas_tools/*
       - name: Coverage HTML
         run: poetry run coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
       - name: Store coverage HTML
