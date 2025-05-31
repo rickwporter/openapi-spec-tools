@@ -25,6 +25,7 @@ ruff = "^0.11.9"
 black = "^25.1.0"
 pytest = "^8.3.5"
 coverage = "^7.8.0"
+oas-tools = {path = "../..", develop = true}
 
 [tool.ruff]
 line-length = 250

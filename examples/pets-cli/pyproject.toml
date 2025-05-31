@@ -21,6 +21,7 @@ ruff = "^0.11.7"
 pytest = "^8.3.5"
 black = "^25.1.0"
 coverage = "^7.8.0"
+oas-tools = {path = "../..", develop = true}
 
 [tool.poetry.scripts]
 # this adds the main CLI function to allow calling directly from a shell
