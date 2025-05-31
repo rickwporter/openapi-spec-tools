@@ -94,7 +94,7 @@ jobs:
       - name: Coverage report
         run: poetry run coverage report --skip-empty --show-missing --include=oas_tools/*
       - name: Coverage HTML
-        run: poetry run coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
+        run: poetry run coverage html --show-contexts --title "Coverage for ${{ github.sha }}" --include=oas_tools/*
       - name: Store coverage HTML
         uses: actions/upload-artifact@v4
         with:
