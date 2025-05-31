@@ -6,7 +6,7 @@ from typing import Optional
 
 import typer
 import yaml
-from rich import print
+from rich.console import Console
 from typing_extensions import Annotated
 
 from oas_tools._typer import OasFilenameArgument
@@ -52,7 +52,8 @@ def info(
     spec = open_oas(filename)
 
     info = spec.get("info", {})
-    print(yaml.dump({"info": info}, indent=len(INDENT)))
+    console = Console()
+    console.print(yaml.dump({"info": info}, indent=len(INDENT)))
     return
 
 
@@ -83,15 +84,16 @@ def summary(
                 orig = tag_count.get(tag, 0)
                 tag_count[tag] = orig + 1
 
-    print(f"OpenAPI spec ({short_filename(filename)}):")
-    print(f"{INDENT}Models: {model_count}")
-    print(f"{INDENT}Paths: {path_count}")
-    print(f"{INDENT}Operation methods ({sum(method_count.values())}):")
+    console = Console()
+    console.print(f"OpenAPI spec ({short_filename(filename)}):")
+    console.print(f"{INDENT}Models: {model_count}")
+    console.print(f"{INDENT}Paths: {path_count}")
+    console.print(f"{INDENT}Operation methods ({sum(method_count.values())}):")
     for k, v in method_count.items():
-        print(f"{INDENT * 2}{k}: {v}")
-    print(f"{INDENT}Tags ({len(tag_count)}) with operation counts:")
+        console.print(f"{INDENT * 2}{k}: {v}")
+    console.print(f"{INDENT}Tags ({len(tag_count)}) with operation counts:")
     for k, v in tag_count.items():
-        print(f"{INDENT * 2}{k}: {v}")
+        console.print(f"{INDENT * 2}{k}: {v}")
 
     return
 
@@ -110,11 +112,12 @@ def diff(
     old_spec = open_oas(original)
     new_spec = open_oas(updated)
 
+    console = Console()
     diffs = find_diffs(old_spec, new_spec)
     if not diffs:
-        print(f"No differences between {short_filename(original)} and {short_filename(updated)}")
+        console.print(f"No differences between {short_filename(original)} and {short_filename(updated)}")
     else:
-        print(yaml.dump(diffs, indent=len(INDENT)))
+        console.print(yaml.dump(diffs, indent=len(INDENT)))
     return
 
 
@@ -173,18 +176,19 @@ def update(
         with open(updated_filename, "w") as fp:
             yaml.dump(updated, fp, indent=indent)
 
+    console = Console()
     diffs = find_diffs(old_spec, updated)
     if display_option == DisplayOption.NONE:
         pass
     elif display_option == DisplayOption.FINAL:
-        print(yaml.dump(updated, indent=indent))
+        console.print(yaml.dump(updated, indent=indent))
     elif not diffs:
-        print(f"No differences between {short_filename(original_filename)} and updated")
+        console.print(f"No differences between {short_filename(original_filename)} and updated")
     elif display_option == DisplayOption.DIFF:
-        print(yaml.dump(diffs, indent=indent))
+        console.print(yaml.dump(diffs, indent=indent))
     else:  # must be DisplayOption.SUMMARY:
         diff_count = count_values(diffs)
-        print(f"Found {diff_count} differences from {short_filename(original_filename)}")
+        console.print(f"Found {diff_count} differences from {short_filename(original_filename)}")
 
     return
 
@@ -217,13 +221,14 @@ def operation_list(
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
 
+    console = Console()
     match_info = f" matching '{search}'" if search else ""
     if not names:
-        print(f"No operations found{match_info}")
+        console.print(f"No operations found{match_info}")
     else:
-        print(f"Found {len(names)} operations{match_info}:")
+        console.print(f"Found {len(names)} operations{match_info}:")
         for n in names:
-            print(f"{INDENT}{n}")
+            console.print(f"{INDENT}{n}")
 
     return
 
@@ -248,7 +253,8 @@ def operation_show(
         inner["params"] = path_params
     inner[method] = operation
 
-    print(yaml.dump({path: inner}, indent=len(INDENT)))
+    console = Console()
+    console.print(yaml.dump({path: inner}, indent=len(INDENT)))
     return
 
 
@@ -268,12 +274,13 @@ def operation_models(
     models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
     matches = model_filter(models, op_references)
 
+    console = Console()
     if not matches:
-        print(f"{operation_name} does not reference any models")
+        console.print(f"{operation_name} does not reference any models")
     else:
-        print(f"Found {operation_name} uses {len(matches)} models:")
+        console.print(f"Found {operation_name} uses {len(matches)} models:")
         for n in sorted(matches):
-            print(f"{INDENT}{n}")
+            console.print(f"{INDENT}{n}")
 
     return
 
@@ -307,12 +314,13 @@ def paths_list(
         if include_subpaths:
             match_info += " including sub-paths"
 
+    console = Console()
     if not names:
-        print(f"No paths found{match_info}")
+        console.print(f"No paths found{match_info}")
     else:
-        print(f"Found {len(names)} paths{match_info}:")
+        console.print(f"Found {len(names)} paths{match_info}:")
         for n in names:
-            print(f"{INDENT}{n}")
+            console.print(f"{INDENT}{n}")
 
     return
 
@@ -340,7 +348,8 @@ def paths_show(
         }
         paths = results
 
-    print(yaml.dump(paths, indent=len(INDENT)))
+    console = Console()
+    console.print(yaml.dump(paths, indent=len(INDENT)))
     return
 
 
@@ -366,7 +375,8 @@ def paths_operations(
     if not result:
         error_out(f"failed to find {path_name}")
 
-    print(yaml.dump(result, indent=len(INDENT)))
+    console = Console()
+    console.print(yaml.dump(result, indent=len(INDENT)))
     return
 
 
@@ -390,13 +400,14 @@ def models_list(
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
 
+    console = Console()
     match_info = f" matching '{search}'" if search else ""
     if not names:
-        print(f"No models found{match_info}")
+        console.print(f"No models found{match_info}")
     else:
-        print(f"Found {len(names)} models{match_info}:")
+        console.print(f"Found {len(names)} models{match_info}:")
         for n in names:
-            print(f"{INDENT}{n}")
+            console.print(f"{INDENT}{n}")
 
     return
 
@@ -419,7 +430,8 @@ def models_show(
         models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
         models = model_filter(models, set([model_name]))
 
-    print(yaml.dump(models, indent=len(INDENT)))
+    console = Console()
+    console.print(yaml.dump(models, indent=len(INDENT)))
     return
 
 
@@ -436,13 +448,14 @@ def models_uses(
 
     references = model_references(models)
 
+    console = Console()
     matches = unroll(references, references.get(model_name))
     if not matches:
-        print(f"{model_name} does not use any other models")
+        console.print(f"{model_name} does not use any other models")
     else:
-        print(f"Found {model_name} uses {len(matches)} models:")
+        console.print(f"Found {model_name} uses {len(matches)} models:")
         for n in sorted(matches):
-            print(f"{INDENT}{n}")
+            console.print(f"{INDENT}{n}")
 
     return
 
@@ -458,13 +471,14 @@ def models_used_by(
     if model_name not in models:
         error_out(f"no model '{model_name}' found")
 
+    console = Console()
     matches = models_referenced_by(models, model_name)
     if not matches:
-        print(f"{model_name} is not used by any other models")
+        console.print(f"{model_name} is not used by any other models")
     else:
-        print(f"Found {model_name} is used by {len(matches)} models:")
+        console.print(f"Found {model_name} is used by {len(matches)} models:")
         for n in sorted(matches):
-            print(f"{INDENT}{n}")
+            console.print(f"{INDENT}{n}")
 
     return
 
@@ -493,9 +507,10 @@ def models_operations(
                 op_id = op_data.get(OasField.OP_ID)
                 matches.append(op_id)
 
-    print(f"Found {model_name} is used by {len(matches)} operations:")
+    console = Console()
+    console.print(f"Found {model_name} is used by {len(matches)} operations:")
     for n in sorted(matches):
-        print(f"{INDENT}{n}")
+        console.print(f"{INDENT}{n}")
 
     return
 
@@ -528,13 +543,14 @@ def tags_list(
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
 
+    console = Console()
     match_info = f" matching '{search}'" if search else ""
     if not names:
-        print(f"No tags found{match_info}")
+        console.print(f"No tags found{match_info}")
     else:
-        print(f"Found {len(names)} tags{match_info}:")
+        console.print(f"Found {len(names)} tags{match_info}:")
         for n in names:
-            print(f"{INDENT}{n}")
+            console.print(f"{INDENT}{n}")
 
     return
 
@@ -563,10 +579,11 @@ def tags_show(
     if not operations:
         error_out(f"failed to find {tag_name}")
 
+    console = Console()
     names = sorted(operations.keys())
-    print(f"Tag {tag_name} has {len(names)} operations:")
+    console.print(f"Tag {tag_name} has {len(names)} operations:")
     for n in names:
-        print(f"{INDENT}{n}")
+        console.print(f"{INDENT}{n}")
     return
 
 
@@ -587,17 +604,18 @@ def content_type_list(
     if content_type:
         content = {k: v for k, v in content.items() if k == content_type}
 
+    console = Console()
     if not content:
-        print("No content-types found")
+        console.print("No content-types found")
         return
 
     for name, operations in content.items():
-        print(name)
+        console.print(name)
         for op_id in sorted(list(operations))[:max_size]:
-            print(f"    {op_id}")
+            console.print(f"    {op_id}")
         if len(operations) > max_size:
-            print("    ...")
-            print(f"    + {len(operations) - max_size} more")
+            console.print("    ...")
+            console.print(f"    + {len(operations) - max_size} more")
 
 
 if __name__ == "__main__":
