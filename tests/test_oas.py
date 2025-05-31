@@ -1,4 +1,3 @@
-import io
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -28,6 +27,7 @@ from oas_tools.oas import tags_list
 from oas_tools.oas import tags_show
 from oas_tools.oas import update
 
+from .helpers import StringIo
 from .helpers import asset_filename
 
 PET_YAML = asset_filename("pet.yaml")
@@ -38,7 +38,7 @@ PET3_YAML = asset_filename("pet3.yaml")
 #################################################
 # Top-level stuff
 def test_info() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         info(PET2_YAML)
 
         output = mock_stdout.getvalue()
@@ -54,7 +54,7 @@ info:
 
 
 def test_summary() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         summary(PET2_YAML)
 
         output = mock_stdout.getvalue()
@@ -75,7 +75,7 @@ OpenAPI spec (pet2.yaml):
         assert output == expected
 
 def test_diff_found() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         diff(asset_filename("pet.yaml"), PET2_YAML)
 
         output = mock_stdout.getvalue()
@@ -98,7 +98,7 @@ tags: added
         assert output == expected
 
 def test_diff_not_found() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         diff(PET2_YAML, PET2_YAML)
 
         output = mock_stdout.getvalue().replace("\n", "")
@@ -211,14 +211,14 @@ servers:
     ]
 )
 def test_update_success(filename: str, kwargs: dict[str, Any], expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         update(filename, **kwargs)
         output = mock_stdout.getvalue()
         assert output == expected
 
 def test_update_success_save() -> None:
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
         tempfile.TemporaryDirectory() as temp_dir,
     ):
         temp_file = Path(temp_dir) / "foo.yaml"
@@ -236,7 +236,7 @@ def test_update_success_save() -> None:
 
 
 def test_update_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         with pytest.raises(typer.Exit) as err:
             update(PET2_YAML, allowed_operations=["listPets"], remove_operations=["deletePetById"])
         assert err.value.exit_code == 1
@@ -265,7 +265,7 @@ def test_update_failure() -> None:
     ]
 )
 def test_operation_list(filename, search, expected) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         operation_list(filename, search)
 
         output = mock_stdout.getvalue()
@@ -343,7 +343,7 @@ PET2_SHOW_DELETE_OP = """\
     ]
 )
 def test_operation_show_success(filename, operation, expected) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         operation_show(filename, operation)
 
         output = mock_stdout.getvalue()
@@ -351,7 +351,7 @@ def test_operation_show_success(filename, operation, expected) -> None:
 
 
 def test_operation_show_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "missingPets"
         with pytest.raises(typer.Exit) as err:
             operation_show(PET2_YAML, search)
@@ -373,7 +373,7 @@ def test_operation_show_failure() -> None:
     ]
 )
 def test_operation_models_success(filename, operation, expected) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         operation_models(filename, operation)
 
         output = mock_stdout.getvalue()
@@ -381,7 +381,7 @@ def test_operation_models_success(filename, operation, expected) -> None:
 
 
 def test_operation_models_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "listCoyoteFood"
         with pytest.raises(typer.Exit) as err:
             operation_models(PET2_YAML, search)
@@ -409,7 +409,7 @@ def test_operation_models_failure() -> None:
     ]
 )
 def test_paths_list(filename: str, search: Optional[str], subpaths: bool, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         paths_list(filename, search, subpaths)
 
         output = mock_stdout.getvalue()
@@ -574,7 +574,7 @@ paths:
     ]
 )
 def test_paths_show_success(filename: str, path: str, references: bool, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         paths_show(filename, path, include_models=references)
 
         output = mock_stdout.getvalue()
@@ -582,7 +582,7 @@ def test_paths_show_success(filename: str, path: str, references: bool, expected
 
 
 def test_paths_show_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "/pet/name"
         with pytest.raises(typer.Exit) as err:
             paths_show(PET2_YAML, search)
@@ -620,7 +620,7 @@ def test_paths_show_failure() -> None:
     ]
 )
 def test_paths_operations_successs(filename: str, search: Optional[str], subpaths: bool, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         paths_operations(filename, search, subpaths)
 
         output = mock_stdout.getvalue()
@@ -628,7 +628,7 @@ def test_paths_operations_successs(filename: str, search: Optional[str], subpath
 
 
 def test_paths_operations_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "/no/such/path"
         with pytest.raises(typer.Exit) as err:
             paths_operations(PET2_YAML, search)
@@ -648,7 +648,7 @@ def test_paths_operations_failure() -> None:
     ]
 )
 def test_models_list(filename: str, search: Optional[str], expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         models_list(filename, search)
 
         output = mock_stdout.getvalue()
@@ -687,7 +687,7 @@ Pet:
     ]
 )
 def test_models_show_success(filename, model, references, expected) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         models_show(filename, model, references)
 
         output = mock_stdout.getvalue()
@@ -695,7 +695,7 @@ def test_models_show_success(filename, model, references, expected) -> None:
 
 
 def test_models_show_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "Dog"
         with pytest.raises(typer.Exit) as err:
             models_show(PET2_YAML, search)
@@ -712,7 +712,7 @@ def test_models_show_failure() -> None:
     ]
 )
 def test_models_uses_success(filename: str, model: str, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         models_uses(filename, model)
 
         output = mock_stdout.getvalue()
@@ -720,7 +720,7 @@ def test_models_uses_success(filename: str, model: str, expected: str) -> None:
 
 
 def test_models_uses_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "Dog"
         with pytest.raises(typer.Exit) as err:
             models_uses(PET2_YAML, search)
@@ -737,7 +737,7 @@ def test_models_uses_failure() -> None:
     ]
 )
 def test_models_used_by_success(filename: str, model: str, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         models_used_by(filename, model)
 
         output = mock_stdout.getvalue()
@@ -745,7 +745,7 @@ def test_models_used_by_success(filename: str, model: str, expected: str) -> Non
 
 
 def test_models_used_by_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "Dog"
         with pytest.raises(typer.Exit) as err:
             models_used_by(PET2_YAML, search)
@@ -766,7 +766,7 @@ def test_models_used_by_failure() -> None:
     ]
 )
 def test_models_operations_success(filename: str, model: str, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         models_operations(filename, model)
 
         output = mock_stdout.getvalue()
@@ -774,7 +774,7 @@ def test_models_operations_success(filename: str, model: str, expected: str) -> 
 
 
 def test_models_operations_failures() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "Iguana"
         with pytest.raises(typer.Exit) as err:
             models_operations(PET2_YAML, search)
@@ -794,7 +794,7 @@ def test_models_operations_failures() -> None:
     ]
 )
 def test_tags_list(filename: str, search: Optional[str], expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         tags_list(filename, search)
 
         output = mock_stdout.getvalue()
@@ -807,7 +807,7 @@ def test_tags_list(filename: str, search: Optional[str], expected: str) -> None:
     ]
 )
 def test_tags_show_success(filename, model, expected) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         tags_show(filename, model)
 
         output = mock_stdout.getvalue()
@@ -815,7 +815,7 @@ def test_tags_show_success(filename, model, expected) -> None:
 
 
 def test_tags_show_failure() -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         search = "Dog"
         with pytest.raises(typer.Exit) as err:
             tags_show(PET2_YAML, search)
@@ -856,7 +856,7 @@ def test_content_type_list(filename, max_size, content_type, expected) -> None:
     if max_size is not None:
         args["max_size"] = max_size
 
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         content_type_list(**args)
 
         output = mock_stdout.getvalue()

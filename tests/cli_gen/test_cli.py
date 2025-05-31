@@ -1,4 +1,3 @@
-import io
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -29,6 +28,7 @@ from tests.cli_gen.cli_output import PET_HELP
 from tests.cli_gen.cli_output import PET_OP
 from tests.cli_gen.cli_output import PET_PATH
 from tests.cli_gen.helpers import to_ascii
+from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
 BAD_LAYOUT_FILE = asset_filename("layout_bad.yaml")
@@ -132,7 +132,7 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
 )
 def test_layout_check_format_failure(layout_args: dict[str, Any], message: str) -> None:
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         with pytest.raises(typer.Exit) as err:
             layout_check_format(**layout_args)
@@ -143,7 +143,7 @@ def test_layout_check_format_failure(layout_args: dict[str, Any], message: str) 
 
 def test_layout_check_format_success() -> None:
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         filename = asset_filename("layout_pets.yaml")
         layout_check_format(filename=filename)
@@ -239,7 +239,7 @@ children:
     ]
 )
 def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         layout_tree(asset_filename("layout_pets2.yaml"), start=start, style=style)
 
         output = mock_stdout.getvalue()
@@ -314,7 +314,7 @@ environments_update
     ]
 )
 def test_layout_operations(filename, start, expected) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         layout_operations(asset_filename(filename), start=start)
 
         output = mock_stdout.getvalue()
@@ -340,7 +340,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     test_path = Path(base_dir, test_dir).as_posix() if test_dir else None
 
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         generate_cli(
             layout_file,
@@ -426,7 +426,7 @@ def test_cli_generate_location_errors(code_dir, test_dir, include_tests, error):
     pkg_name = "my_cli_pkg"
 
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         with pytest.raises(typer.Exit) as context:
             generate_cli(
@@ -450,7 +450,7 @@ Commands with missing operations:
 """
 
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         with pytest.raises(typer.Exit) as context:
             generate_cli(layout_file, oas_file, pkg_name, directory.name)
@@ -470,7 +470,7 @@ Commands with missing operations:
 """
 
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         with pytest.raises(typer.Exit) as context:
             generate_check_missing(layout_file, oas_file)
@@ -484,7 +484,7 @@ def test_cli_check_success():
     oas_file = asset_filename("pet2.yaml")
 
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         generate_check_missing(layout_file, oas_file)
         assert f"All operations in {layout_file} found in {oas_file}\n" == mock_stdout.getvalue()
@@ -543,7 +543,7 @@ Found 9 operations in 8 paths
 )
 def test_unreferenced(layout_file, oas_file, full, expected):
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         lf_name = asset_filename(layout_file)
         generate_unreferenced(lf_name, asset_filename(oas_file), full_path=full)
@@ -596,7 +596,7 @@ def test_show_cli_tree(layout_file, oas_file, start, display, depth, expected):
     lname = asset_filename(layout_file)
     oname = asset_filename(oas_file)
     with (
-        mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout,
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         show_cli_tree(lname, oname, start=start, display=display, max_depth=depth)
 
