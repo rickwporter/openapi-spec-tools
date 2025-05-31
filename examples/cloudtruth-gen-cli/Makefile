@@ -23,7 +23,7 @@ wheel: ## Build the wheel package that is installable
 install: ## Install the package
 	poetry install
 
-all: gen lint install ## Perform a full cycle
+all: install gen lint ## Perform a full cycle
 	cloudtruth 
 
 ###########

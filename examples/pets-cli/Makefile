@@ -23,7 +23,7 @@ wheel: ## Build the wheel package that is installable
 install: ## Install the package
 	poetry install
 
-all: gen lint install cov ## Perform a full cycle
+all: install gen lint cov ## Perform a full cycle
 	pets
 
 ###########
