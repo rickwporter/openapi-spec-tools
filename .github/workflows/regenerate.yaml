@@ -1,16 +1,19 @@
-name: Lint
+name: Regenerate
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types:
-      - opened
-      - synchronize
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - synchronize
+  workflow_run:
+    types: 
+      - requested
 
 jobs:
-  lint:
+  regen:
     runs-on: ubuntu-latest
     steps:
       - name: Dump GitHub context
