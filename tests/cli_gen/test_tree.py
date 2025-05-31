@@ -71,7 +71,7 @@ environments_tags:
   name: tags
   operations:
   - function: environments_tags_create
-    help: Tags allow you to name stable points in time for your configuration.
+    help: Tags allow you to name stable points for your configuration.
     method: POST
     name: create
     operationId: environments_tags_create
@@ -126,7 +126,7 @@ FULL_DISPLAY = """\
 │                    path       DELETE /api/v1/environments/{id}/              │
 │                    function   environments_destroy                           │
 │   tags*            help  Manage environment tags                             │
-│     create         help  Tags allow you to name stable points in time for yo │
+│     create         help  Tags allow you to name stable points for your confi │
 │                    oper  environments_tags_create                            │
 │                    path  POST   /api/v1/environments/{environment_pk}/tags/  │
 │                    func  environments_tags_create                            │
@@ -161,7 +161,7 @@ DEPTH_DISPLAY = """\
 """
 SUB_DISPLAY = """\
 ╭─ Command Tree ───────────────────────────────────────────────────────────────╮
-│ create  Tags allow you to name stable points in time for your configuration. │
+│ create  Tags allow you to name stable points for your configuration.         │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 """
 

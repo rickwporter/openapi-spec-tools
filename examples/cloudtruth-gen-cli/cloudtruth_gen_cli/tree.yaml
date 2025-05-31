@@ -78,37 +78,37 @@ environments_tags:
   name: tags
   operations:
   - function: environments_tags_create
-    help: Tags allow you to name stable points in time for your configuration.
+    help: Tags allow you to name stable points for your configuration.
     method: POST
     name: create
     operationId: environments_tags_create
     path: /api/v1/environments/{environment_pk}/tags/
   - function: environments_tags_destroy
-    help: Tags allow you to name stable points in time for your configuration.
+    help: Tags allow you to name stable points for your configuration.
     method: DELETE
     name: delete
     operationId: environments_tags_destroy
     path: /api/v1/environments/{environment_pk}/tags/{id}/
   - function: environments_tags_list
-    help: Tags allow you to name stable points in time for your configuration.
+    help: Tags allow you to name stable points for your configuration.
     method: GET
     name: list
     operationId: environments_tags_list
     path: /api/v1/environments/{environment_pk}/tags/
   - function: environments_tags_update
-    help: Tags allow you to name stable points in time for your configuration.
+    help: Tags allow you to name stable points for your configuration.
     method: PUT
     name: set
     operationId: environments_tags_update
     path: /api/v1/environments/{environment_pk}/tags/{id}/
   - function: environments_tags_retrieve
-    help: Tags allow you to name stable points in time for your configuration.
+    help: Tags allow you to name stable points for your configuration.
     method: GET
     name: show
     operationId: environments_tags_retrieve
     path: /api/v1/environments/{environment_pk}/tags/{id}/
   - function: environments_tags_partial_update
-    help: Tags allow you to name stable points in time for your configuration.
+    help: Tags allow you to name stable points for your configuration.
     method: PATCH
     name: update
     operationId: environments_tags_partial_update

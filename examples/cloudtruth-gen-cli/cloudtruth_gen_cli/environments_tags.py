@@ -33,7 +33,7 @@ def show_commands(
     return
 
 
-@app.command("create", short_help="Tags allow you to name stable points in time for your configuration.")
+@app.command("create", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_create(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     name: Annotated[str, typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
@@ -48,7 +48,7 @@ def environments_tags_create(
     _out_style: _a.OutputStyleOption = _a.OutputStyle.ALL,
 ) -> None:
     '''
-    Tags allow you to name stable points in time for your configuration.
+    Tags allow you to name stable points for your configuration.
 
     Any query API that accepts an `as_of` option will also accept a `tag`
     option however they are mutually exclusive.
@@ -84,7 +84,7 @@ def environments_tags_create(
     return
 
 
-@app.command("delete", short_help="Tags allow you to name stable points in time for your configuration.")
+@app.command("delete", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_destroy(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],
@@ -96,7 +96,7 @@ def environments_tags_destroy(
     _out_style: _a.OutputStyleOption = _a.OutputStyle.ALL,
 ) -> None:
     '''
-    Tags allow you to name stable points in time for your configuration.
+    Tags allow you to name stable points for your configuration.
 
     Any query API that accepts an `as_of` option will also accept a `tag`
     option however they are mutually exclusive.
@@ -122,7 +122,7 @@ def environments_tags_destroy(
     return
 
 
-@app.command("list", short_help="Tags allow you to name stable points in time for your configuration.")
+@app.command("list", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_list(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     description__icontains: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None,
@@ -143,7 +143,7 @@ def environments_tags_list(
     _max_count: _a.MaxCountOption = None,
 ) -> None:
     '''
-    Tags allow you to name stable points in time for your configuration.
+    Tags allow you to name stable points for your configuration.
 
     Any query API that accepts an `as_of` option will also accept a `tag`
     option however they are mutually exclusive.
@@ -188,7 +188,7 @@ def environments_tags_list(
     return
 
 
-@app.command("set", short_help="Tags allow you to name stable points in time for your configuration.")
+@app.command("set", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],
@@ -204,7 +204,7 @@ def environments_tags_update(
     _out_style: _a.OutputStyleOption = _a.OutputStyle.ALL,
 ) -> None:
     '''
-    Tags allow you to name stable points in time for your configuration.
+    Tags allow you to name stable points for your configuration.
 
     Any query API that accepts an `as_of` option will also accept a `tag`
     option however they are mutually exclusive.
@@ -240,7 +240,7 @@ def environments_tags_update(
     return
 
 
-@app.command("show", short_help="Tags allow you to name stable points in time for your configuration.")
+@app.command("show", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_retrieve(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],
@@ -252,7 +252,7 @@ def environments_tags_retrieve(
     _out_style: _a.OutputStyleOption = _a.OutputStyle.ALL,
 ) -> None:
     '''
-    Tags allow you to name stable points in time for your configuration.
+    Tags allow you to name stable points for your configuration.
 
     Any query API that accepts an `as_of` option will also accept a `tag`
     option however they are mutually exclusive.
@@ -278,7 +278,7 @@ def environments_tags_retrieve(
     return
 
 
-@app.command("update", short_help="Tags allow you to name stable points in time for your configuration.")
+@app.command("update", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_partial_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
     id: Annotated[str, typer.Argument(show_default=False, help="")],
@@ -294,7 +294,7 @@ def environments_tags_partial_update(
     _out_style: _a.OutputStyleOption = _a.OutputStyle.ALL,
 ) -> None:
     '''
-    Tags allow you to name stable points in time for your configuration.
+    Tags allow you to name stable points for your configuration.
 
     Any query API that accepts an `as_of` option will also accept a `tag`
     option however they are mutually exclusive.

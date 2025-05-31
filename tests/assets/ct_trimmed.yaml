@@ -1648,7 +1648,7 @@ paths:
       summary: List push operations.
   /api/v1/environments/{environment_pk}/tags/:
     get:
-      description: 'Tags allow you to name stable points in time for your configuration.
+      description: 'Tags allow you to name stable points for your configuration.
 
 
         Any query API that accepts an `as_of` option will also accept a `tag`
@@ -1719,7 +1719,7 @@ paths:
       - ApiKeyAuth: []
       - tokenAuth: []
     post:
-      description: 'Tags allow you to name stable points in time for your configuration.
+      description: 'Tags allow you to name stable points for your configuration.
 
 
         Any query API that accepts an `as_of` option will also accept a `tag`
@@ -1758,7 +1758,7 @@ paths:
       - tokenAuth: []
   /api/v1/environments/{environment_pk}/tags/{id}/:
     delete:
-      description: 'Tags allow you to name stable points in time for your configuration.
+      description: 'Tags allow you to name stable points for your configuration.
 
 
         Any query API that accepts an `as_of` option will also accept a `tag`
@@ -1787,7 +1787,7 @@ paths:
       - ApiKeyAuth: []
       - tokenAuth: []
     get:
-      description: 'Tags allow you to name stable points in time for your configuration.
+      description: 'Tags allow you to name stable points for your configuration.
 
 
         Any query API that accepts an `as_of` option will also accept a `tag`
@@ -1820,7 +1820,7 @@ paths:
       - ApiKeyAuth: []
       - tokenAuth: []
     patch:
-      description: 'Tags allow you to name stable points in time for your configuration.
+      description: 'Tags allow you to name stable points for your configuration.
 
 
         Any query API that accepts an `as_of` option will also accept a `tag`
@@ -1864,7 +1864,7 @@ paths:
       - ApiKeyAuth: []
       - tokenAuth: []
     put:
-      description: 'Tags allow you to name stable points in time for your configuration.
+      description: 'Tags allow you to name stable points for your configuration.
 
 
         Any query API that accepts an `as_of` option will also accept a `tag`
