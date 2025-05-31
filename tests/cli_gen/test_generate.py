@@ -264,6 +264,7 @@ def test_copy_infrastructure():
     filenames = set(i.name for i in dst_path.iterdir())
     expected = {
         "_arguments.py",
+        "_console.py",
         "_display.py",
         "_exceptions.py",
         "_logging.py",
@@ -282,6 +283,7 @@ def test_copy_tests():
     filenames = set(i.name for i in dst_path.iterdir())
     expected = {
         "helpers.py",
+        "test_console.py",
         "test_display.py",
         "test_exceptions.py",
         "test_logging.py",

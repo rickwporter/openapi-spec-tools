@@ -7,9 +7,10 @@ from enum import Enum
 from typing import Optional
 
 import yaml
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+
+from pets_cli._console import console_factory
 
 INDENT = "  "
 
@@ -169,5 +170,5 @@ def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int) -
     table = create_tree_table(node, display, max_depth)
 
     panel = Panel(table, border_style="dim", title="Command Tree", title_align="left")
-    console = Console()
+    console = console_factory()
     console.print(panel)

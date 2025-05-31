@@ -100,69 +100,69 @@ main:
 """
 
 FULL_DISPLAY = """\
-╭─ Command Tree ───────────────────────────────────────────────────────────────╮
-│ backup             help       Get a snapshot of all Projects with parameters │
-│                    operation  backup_snapshot_create                         │
-│                    path       POST   /api/v1/backup/snapshot/                │
-│                    function   backup_snapshot_create                         │
-│ generate-password  help  Get a randomly generated password using AWS Secrets │
-│                    oper  utils_generate_password_create                      │
-│                    path  POST   /api/v1/utils/generate_password/             │
-│                    func  utils_generate_password_create                      │
-│ audit*             help  View CloudTruth audit data                          │
-│   list             help  A searchable log of all the actions taken by users  │
-│                    oper  audit_list                                          │
-│                    path  GET    /api/v1/audit/                               │
-│                    func  audit_list                                          │
-│   show             help       Retrieve one record from the audit log.        │
-│                    operation  audit_retrieve                                 │
-│                    path       GET    /api/v1/audit/{id}/                     │
-│                    function   audit_retrieve                                 │
-│ environment*       help  Manage CloudTruth environments                      │
-│   create           operation  environments_create                            │
-│                    path       POST   /api/v1/environments/                   │
-│                    function   environments_create                            │
-│   delete           operation  environments_destroy                           │
-│                    path       DELETE /api/v1/environments/{id}/              │
-│                    function   environments_destroy                           │
-│   tags*            help  Manage environment tags                             │
-│     create         help  Tags allow you to name stable points for your confi │
-│                    oper  environments_tags_create                            │
-│                    path  POST   /api/v1/environments/{environment_pk}/tags/  │
-│                    func  environments_tags_create                            │
-╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Command Tree ───────────────────────────────────────────────────────────────────────────────────╮
+│ backup             help       Get a snapshot of all Projects with parameters                     │
+│                    operation  backup_snapshot_create                                             │
+│                    path       POST   /api/v1/backup/snapshot/                                    │
+│                    function   backup_snapshot_create                                             │
+│ generate-password  help  Get a randomly generated password using AWS Secrets Manager, with fallb │
+│                    oper  utils_generate_password_create                                          │
+│                    path  POST   /api/v1/utils/generate_password/                                 │
+│                    func  utils_generate_password_create                                          │
+│ audit*             help  View CloudTruth audit data                                              │
+│   list             help  A searchable log of all the actions taken by users and service accounts │
+│                    oper  audit_list                                                              │
+│                    path  GET    /api/v1/audit/                                                   │
+│                    func  audit_list                                                              │
+│   show             help       Retrieve one record from the audit log.                            │
+│                    operation  audit_retrieve                                                     │
+│                    path       GET    /api/v1/audit/{id}/                                         │
+│                    function   audit_retrieve                                                     │
+│ environment*       help  Manage CloudTruth environments                                          │
+│   create           operation  environments_create                                                │
+│                    path       POST   /api/v1/environments/                                       │
+│                    function   environments_create                                                │
+│   delete           operation  environments_destroy                                               │
+│                    path       DELETE /api/v1/environments/{id}/                                  │
+│                    function   environments_destroy                                               │
+│   tags*            help  Manage environment tags                                                 │
+│     create         help       Tags allow you to name stable points for your configuration.       │
+│                    operation  environments_tags_create                                           │
+│                    path       POST   /api/v1/environments/{environment_pk}/tags/                 │
+│                    function   environments_tags_create                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
 OP_DISPLAY = """\
-╭─ Command Tree ───────────────────────────────────────────────────────────────╮
-│ backup             backup_snapshot_create                                    │
-│ generate-password  utils_generate_password_create                            │
-│ audit*                                                                       │
-│   list             audit_list                                                │
-│   show             audit_retrieve                                            │
-│ environment*                                                                 │
-│   create           environments_create                                       │
-│   delete           environments_destroy                                      │
-│   tags*                                                                      │
-│     create         environments_tags_create                                  │
-╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Command Tree ───────────────────────────────────────────────────────────────────────────────────╮
+│ backup             backup_snapshot_create                                                        │
+│ generate-password  utils_generate_password_create                                                │
+│ audit*                                                                                           │
+│   list             audit_list                                                                    │
+│   show             audit_retrieve                                                                │
+│ environment*                                                                                     │
+│   create           environments_create                                                           │
+│   delete           environments_destroy                                                          │
+│   tags*                                                                                          │
+│     create         environments_tags_create                                                      │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
 DEPTH_DISPLAY = """\
-╭─ Command Tree ───────────────────────────────────────────────────────────────╮
-│ backup             backup_snapshot_create                                    │
-│ generate-password  utils_generate_password_create                            │
-│ audit*                                                                       │
-│   list             audit_list                                                │
-│   show             audit_retrieve                                            │
-│ environment*                                                                 │
-│   create           environments_create                                       │
-│   delete           environments_destroy                                      │
-│   tags*                                                                      │
-╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Command Tree ───────────────────────────────────────────────────────────────────────────────────╮
+│ backup             backup_snapshot_create                                                        │
+│ generate-password  utils_generate_password_create                                                │
+│ audit*                                                                                           │
+│   list             audit_list                                                                    │
+│   show             audit_retrieve                                                                │
+│ environment*                                                                                     │
+│   create           environments_create                                                           │
+│   delete           environments_destroy                                                          │
+│   tags*                                                                                          │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
 SUB_DISPLAY = """\
-╭─ Command Tree ───────────────────────────────────────────────────────────────╮
-│ create  Tags allow you to name stable points for your configuration.         │
-╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Command Tree ───────────────────────────────────────────────────────────────────────────────────╮
+│ create  Tags allow you to name stable points for your configuration.                             │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
 
 

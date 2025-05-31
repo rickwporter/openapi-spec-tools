@@ -38,7 +38,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install poetry
         uses: abatilo/actions-poetry@v4
-      - name: Setup a local virtual environment (if no poetry.toml file)
+      - name: Setup a virtual environment
         run: |
           poetry config virtualenvs.create true --local
           poetry config virtualenvs.in-project true --local
@@ -73,16 +73,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v4
+      - name: Setup a virtual environment
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - name: Install the project dependencies
+        run: poetry install
       - name: Get coverage files
         uses: actions/download-artifact@v4
         with:
           pattern: coverage-*
           path: coverage
           merge-multiple: true
-      - run: ls -la coverage
-      - run: coverage combine coverage
-      - run: coverage report
-      - run: coverage html --show-contexts --title "Coverage for ${{ github.sha }}"
+      - name: List coverage files
+        run: ls -la coverage
+      - name: Combine coverage
+        run: poetry run coverage combine coverage
+      - name: Coverage report
+        run: poetry run coverage report --skip-empty --show-missing --include=oas_tools/*
+      - name: Coverage HTML
+        run: poetry run coverage html --show-contexts --title "Coverage for ${{ github.sha }}" --include=oas_tools/*
       - name: Store coverage HTML
         uses: actions/upload-artifact@v4
         with:

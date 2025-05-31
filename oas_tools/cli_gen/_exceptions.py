@@ -1,6 +1,7 @@
 import typer
 from requests import HTTPError
-from rich import print
+
+from oas_tools.cli_gen._console import console_factory
 
 
 class MissingRequiredError(Exception):
@@ -16,5 +17,6 @@ def handle_exceptions(ex: Exception) -> None:
         message = str(ex.args[0])
     else:
         message = str(ex)
-    print(f"[red]ERROR:[/red] {message}")
+    console = console_factory()
+    console.print(f"[red]ERROR:[/red] {message}")
     raise typer.Exit(1)

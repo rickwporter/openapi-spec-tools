@@ -5,9 +5,10 @@ from typing import Optional
 
 import yaml
 from rich.box import HEAVY_HEAD
-from rich.console import Console
 from rich.markup import escape
 from rich.table import Table
+
+from oas_tools.cli_gen._console import console_factory
 
 DEFAULT_ROW_PROPS = {
     "justify": "left",
@@ -289,7 +290,7 @@ def display(obj: Any, fmt: OutputFormat, style: OutputStyle, indent: int = 2) ->
     """
     no_color = style != OutputStyle.ALL
     highlight = style != OutputStyle.NONE
-    console = Console(no_color=no_color, highlight=highlight)
+    console = console_factory(no_color=no_color, highlight=highlight)
 
     if fmt == OutputFormat.JSON:
         console.print_json(data=obj, indent=indent, highlight=highlight)
