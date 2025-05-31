@@ -30,7 +30,6 @@ from oas_tools.oas import update
 
 from .helpers import asset_filename
 
-FILENAME = "FILENAME"
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
 PET3_YAML = asset_filename("pet3.yaml")
@@ -58,9 +57,9 @@ def test_summary() -> None:
     with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
         summary(PET2_YAML)
 
-        output = mock_stdout.getvalue().replace(PET2_YAML, FILENAME)
-        expected = f"""\
-OpenAPI spec ({FILENAME}):
+        output = mock_stdout.getvalue()
+        expected = """\
+OpenAPI spec (pet2.yaml):
     Models: 3
     Paths: 2
     Operation methods (4):
@@ -102,8 +101,8 @@ def test_diff_not_found() -> None:
     with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
         diff(PET2_YAML, PET2_YAML)
 
-        output = mock_stdout.getvalue().replace(PET2_YAML, FILENAME).replace("\n", "")
-        expected = f"No differences between {FILENAME} and {FILENAME}"
+        output = mock_stdout.getvalue().replace("\n", "")
+        expected = "No differences between pet2.yaml and pet2.yaml"
         assert output == expected
 
 PET2_DIFF_TAG_YAML = """\
@@ -171,7 +170,7 @@ servers:
 @pytest.mark.parametrize(
     ["filename", "kwargs", "expected"],
     [
-        pytest.param(PET2_YAML, {}, f"No differences between {FILENAME} and updated\n", id="no-updates"),
+        pytest.param(PET2_YAML, {}, "No differences between pet2.yaml and updated\n", id="no-updates"),
         pytest.param(PET2_YAML, {"remove_all_tags": True}, PET2_DIFF_TAG_YAML, id="remove-tags"),
         pytest.param(
             PET2_YAML,
@@ -188,7 +187,7 @@ servers:
         pytest.param(
             PET2_YAML,
             {"remove_all_tags": True, "display_option": DisplayOption.SUMMARY},
-            f"Found 5 differences from {FILENAME}\n",
+            "Found 5 differences from pet2.yaml\n",
             id="remove-tags-summary",
         ),
         pytest.param(
@@ -200,7 +199,7 @@ servers:
         pytest.param(
             PET2_YAML,
             {"remove_operations": ["listPets", "createPets"], "display_option": DisplayOption.SUMMARY},
-            f"Found 2 differences from {FILENAME}\n",
+            "Found 2 differences from pet2.yaml\n",
             id="remove-ops",
         ),
         pytest.param(
@@ -214,7 +213,7 @@ servers:
 def test_update_success(filename: str, kwargs: dict[str, Any], expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
         update(filename, **kwargs)
-        output = mock_stdout.getvalue().replace(filename, FILENAME)
+        output = mock_stdout.getvalue()
         assert output == expected
 
 def test_update_success_save() -> None:

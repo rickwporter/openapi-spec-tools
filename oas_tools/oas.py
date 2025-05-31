@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from copy import deepcopy
 from enum import Enum
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -27,6 +28,11 @@ from oas_tools.utils import set_nullable_not_required
 from oas_tools.utils import unroll
 
 INDENT = "    "
+
+
+def short_filename(long: str) -> str:
+    """Shorten the filename to just the name portion."""
+    return Path(long).name
 
 
 #################################################
@@ -77,7 +83,7 @@ def summary(
                 orig = tag_count.get(tag, 0)
                 tag_count[tag] = orig + 1
 
-    print(f"OpenAPI spec ({filename}):")
+    print(f"OpenAPI spec ({short_filename(filename)}):")
     print(f"{INDENT}Models: {model_count}")
     print(f"{INDENT}Paths: {path_count}")
     print(f"{INDENT}Operation methods ({sum(method_count.values())}):")
@@ -106,7 +112,7 @@ def diff(
 
     diffs = find_diffs(old_spec, new_spec)
     if not diffs:
-        print(f"No differences between {original} and {updated}")
+        print(f"No differences between {short_filename(original)} and {short_filename(updated)}")
     else:
         print(yaml.dump(diffs, indent=len(INDENT)))
     return
@@ -173,12 +179,12 @@ def update(
     elif display_option == DisplayOption.FINAL:
         print(yaml.dump(updated, indent=indent))
     elif not diffs:
-        print(f"No differences between {original_filename} and updated")
+        print(f"No differences between {short_filename(original_filename)} and updated")
     elif display_option == DisplayOption.DIFF:
         print(yaml.dump(diffs, indent=indent))
     else:  # must be DisplayOption.SUMMARY:
         diff_count = count_values(diffs)
-        print(f"Found {diff_count} differences from {original_filename}")
+        print(f"Found {diff_count} differences from {short_filename(original_filename)}")
 
     return
 
