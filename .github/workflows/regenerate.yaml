@@ -8,9 +8,7 @@ on:
   #   types:
   #     - opened
   #     - synchronize
-  workflow_run:
-    types: 
-      - requested
+  workflow_dispatch:
 
 jobs:
   regen:
