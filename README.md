@@ -17,3 +17,9 @@ See the examples in `examples/` for some more complete works.
 ## client.mk
 
 The `client.mk` file is an example of a `Makefile` to invoke the [OpenAPI generator](https://github.com/OpenAPITools/openapi-generator) via a container. The file can be copied/modified to be invoked with an OpenAPI specfication (other than `openapi.yaml`) and a real package name. For a more complete list of generator options, look at the [OpenAPI generator usage documentation](https://openapi-generator.tech/docs/usage#generate).
+
+## Contributing
+
+The [DEVELOPMENT.md](DEVELOPMENT.md) has more information about getting setup as a developer.
+
+The [TODO.md](TODO.md) has some ideas where this project can be improved and expanded -- please add your ideas here, or email Rick directly (rickwporter@gmail.com). 
