@@ -36,7 +36,7 @@ def short_filename(long: str) -> str:
     return Path(long).name
 
 
-def console_factory() -> Console:  # pragma: no cover
+def console_factory() -> Console:
     """Utility to consolidate creation/initialization of Console.
 
     A little hacky here... Allow terminal width to be set directly by an environment variable, or
