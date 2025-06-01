@@ -1,3 +1,4 @@
+import os
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -8,6 +9,7 @@ import pytest
 import typer
 
 from oas_tools.oas import DisplayOption
+from oas_tools.oas import console_factory
 from oas_tools.oas import content_type_list
 from oas_tools.oas import diff
 from oas_tools.oas import info
@@ -33,6 +35,24 @@ from .helpers import asset_filename
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
 PET3_YAML = asset_filename("pet3.yaml")
+
+
+#################################################
+# Utilities
+
+def test_console_factory() -> None:
+    # when running the tests, the PYTEST_VERSION is defined by default
+    console = console_factory()
+    assert 3000 == console.width
+
+    with mock.patch.dict(os.environ, {"TERMINAL_WIDTH": "12"}):
+        console = console_factory()
+        assert 12 == console.width
+
+    # using default width for the platform, so it seems to vary
+    with mock.patch.dict(os.environ, {}, clear=True):
+        console = console_factory()
+        assert console.width != 3000
 
 
 #################################################
