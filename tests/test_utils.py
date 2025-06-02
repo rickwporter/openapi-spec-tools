@@ -3,19 +3,19 @@ from typing import Any
 
 import pytest
 
-from oas_tools.types import OasField
-from oas_tools.utils import count_values
-from oas_tools.utils import find_diffs
-from oas_tools.utils import find_paths
-from oas_tools.utils import find_references
-from oas_tools.utils import map_content_types
-from oas_tools.utils import map_operations
-from oas_tools.utils import model_filter
-from oas_tools.utils import model_references
-from oas_tools.utils import models_referenced_by
-from oas_tools.utils import remove_schema_tags
-from oas_tools.utils import schema_operations_filter
-from oas_tools.utils import set_nullable_not_required
+from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import count_values
+from openapi_spec_tools.utils import find_diffs
+from openapi_spec_tools.utils import find_paths
+from openapi_spec_tools.utils import find_references
+from openapi_spec_tools.utils import map_content_types
+from openapi_spec_tools.utils import map_operations
+from openapi_spec_tools.utils import model_filter
+from openapi_spec_tools.utils import model_references
+from openapi_spec_tools.utils import models_referenced_by
+from openapi_spec_tools.utils import remove_schema_tags
+from openapi_spec_tools.utils import schema_operations_filter
+from openapi_spec_tools.utils import set_nullable_not_required
 
 from .helpers import open_test_oas
 

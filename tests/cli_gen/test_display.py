@@ -8,13 +8,13 @@ import pytest
 import yaml
 from rich.box import HEAVY_HEAD
 
-from oas_tools.cli_gen._display import OutputFormat
-from oas_tools.cli_gen._display import OutputStyle
-from oas_tools.cli_gen._display import RichTable
-from oas_tools.cli_gen._display import TableConfig
-from oas_tools.cli_gen._display import display
-from oas_tools.cli_gen._display import rich_table_factory
-from oas_tools.cli_gen._display import summary
+from openapi_spec_tools.cli_gen._display import OutputFormat
+from openapi_spec_tools.cli_gen._display import OutputStyle
+from openapi_spec_tools.cli_gen._display import RichTable
+from openapi_spec_tools.cli_gen._display import TableConfig
+from openapi_spec_tools.cli_gen._display import display
+from openapi_spec_tools.cli_gen._display import rich_table_factory
+from openapi_spec_tools.cli_gen._display import summary
 from tests.cli_gen.helpers import to_ascii
 
 SIMPLE_DICT = {

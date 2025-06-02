@@ -8,16 +8,16 @@ from unittest import mock
 import pytest
 import typer
 
-from oas_tools.cli_gen.cli import TreeDisplay
-from oas_tools.cli_gen.cli import TreeFormat
-from oas_tools.cli_gen.cli import generate_check_missing
-from oas_tools.cli_gen.cli import generate_cli
-from oas_tools.cli_gen.cli import generate_unreferenced
-from oas_tools.cli_gen.cli import layout_check_format
-from oas_tools.cli_gen.cli import layout_operations
-from oas_tools.cli_gen.cli import layout_tree
-from oas_tools.cli_gen.cli import show_cli_tree
-from oas_tools.cli_gen.cli import trim_oas
+from openapi_spec_tools.cli_gen.cli import TreeDisplay
+from openapi_spec_tools.cli_gen.cli import TreeFormat
+from openapi_spec_tools.cli_gen.cli import generate_check_missing
+from openapi_spec_tools.cli_gen.cli import generate_cli
+from openapi_spec_tools.cli_gen.cli import generate_unreferenced
+from openapi_spec_tools.cli_gen.cli import layout_check_format
+from openapi_spec_tools.cli_gen.cli import layout_operations
+from openapi_spec_tools.cli_gen.cli import layout_tree
+from openapi_spec_tools.cli_gen.cli import show_cli_tree
+from openapi_spec_tools.cli_gen.cli import trim_oas
 from tests.cli_gen.cli_output import P_V_ALL
 from tests.cli_gen.cli_output import P_V_MID
 from tests.cli_gen.cli_output import P_V_PETS

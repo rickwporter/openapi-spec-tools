@@ -2,7 +2,7 @@ import io
 from pathlib import Path
 from typing import Any
 
-from oas_tools.utils import open_oas
+from openapi_spec_tools.utils import open_oas
 
 ASSET_PATH = Path(__file__).parent / "assets"
 

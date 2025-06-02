@@ -4,17 +4,17 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from oas_tools.cli_gen.generate import COPYRIGHT
-from oas_tools.cli_gen.generate import check_for_missing
-from oas_tools.cli_gen.generate import copy_and_update
-from oas_tools.cli_gen.generate import copy_infrastructure
-from oas_tools.cli_gen.generate import copy_tests
-from oas_tools.cli_gen.generate import find_unreferenced
-from oas_tools.cli_gen.generate import generate_node
-from oas_tools.cli_gen.generate import generate_tree_node
-from oas_tools.cli_gen.generator import Generator
-from oas_tools.cli_gen.layout import file_to_tree
-from oas_tools.utils import open_oas
+from openapi_spec_tools.cli_gen.generate import COPYRIGHT
+from openapi_spec_tools.cli_gen.generate import check_for_missing
+from openapi_spec_tools.cli_gen.generate import copy_and_update
+from openapi_spec_tools.cli_gen.generate import copy_infrastructure
+from openapi_spec_tools.cli_gen.generate import copy_tests
+from openapi_spec_tools.cli_gen.generate import find_unreferenced
+from openapi_spec_tools.cli_gen.generate import generate_node
+from openapi_spec_tools.cli_gen.generate import generate_tree_node
+from openapi_spec_tools.cli_gen.generator import Generator
+from openapi_spec_tools.cli_gen.layout import file_to_tree
+from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 
 
@@ -202,7 +202,7 @@ def test_copy_and_update():
     dst_path = Path(tempdir.name) / "my_destination.py"
     package = "this.is_a.different.package"
     replacements = {
-        "oas_tools.cli_gen": package,
+        "openapi_spec_tools.cli_gen": package,
     }
 
     copy_and_update(source, dst_path.as_posix(), replacements)
@@ -210,7 +210,7 @@ def test_copy_and_update():
     text = dst_path.read_text()
     assert COPYRIGHT in text
     assert package in text
-    assert "oas_tools.cli_gen" not in text
+    assert "openapi_spec_tools.cli_gen" not in text
 
 
 @pytest.mark.parametrize(

@@ -1,19 +1,19 @@
 import pytest
 
-from oas_tools.cli_gen.layout import check_pagination_definitions
-from oas_tools.cli_gen.layout import data_to_node
-from oas_tools.cli_gen.layout import field_to_list
-from oas_tools.cli_gen.layout import file_to_tree
-from oas_tools.cli_gen.layout import operation_duplicates
-from oas_tools.cli_gen.layout import operation_order
-from oas_tools.cli_gen.layout import parse_extras
-from oas_tools.cli_gen.layout import parse_pagination
-from oas_tools.cli_gen.layout import parse_to_tree
-from oas_tools.cli_gen.layout import subcommand_missing_properties
-from oas_tools.cli_gen.layout import subcommand_order
-from oas_tools.cli_gen.layout import subcommand_references
-from oas_tools.cli_gen.layout_types import LayoutNode
-from oas_tools.cli_gen.layout_types import PaginationNames
+from openapi_spec_tools.cli_gen.layout import check_pagination_definitions
+from openapi_spec_tools.cli_gen.layout import data_to_node
+from openapi_spec_tools.cli_gen.layout import field_to_list
+from openapi_spec_tools.cli_gen.layout import file_to_tree
+from openapi_spec_tools.cli_gen.layout import operation_duplicates
+from openapi_spec_tools.cli_gen.layout import operation_order
+from openapi_spec_tools.cli_gen.layout import parse_extras
+from openapi_spec_tools.cli_gen.layout import parse_pagination
+from openapi_spec_tools.cli_gen.layout import parse_to_tree
+from openapi_spec_tools.cli_gen.layout import subcommand_missing_properties
+from openapi_spec_tools.cli_gen.layout import subcommand_order
+from openapi_spec_tools.cli_gen.layout import subcommand_references
+from openapi_spec_tools.cli_gen.layout_types import LayoutNode
+from openapi_spec_tools.cli_gen.layout_types import PaginationNames
 from tests.helpers import asset_filename
 
 OPS = "operations"

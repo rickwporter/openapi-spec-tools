@@ -5,9 +5,9 @@ from unittest import mock
 
 import pytest
 
-from oas_tools.cli_gen._tree import TreeDisplay
-from oas_tools.cli_gen._tree import TreeNode
-from oas_tools.cli_gen._tree import tree
+from openapi_spec_tools.cli_gen._tree import TreeDisplay
+from openapi_spec_tools.cli_gen._tree import TreeNode
+from openapi_spec_tools.cli_gen._tree import tree
 from tests.cli_gen.helpers import to_ascii
 
 

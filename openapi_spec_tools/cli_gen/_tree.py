@@ -6,7 +6,7 @@ import yaml
 from rich.panel import Panel
 from rich.table import Table
 
-from oas_tools.cli_gen._console import console_factory
+from openapi_spec_tools.cli_gen._console import console_factory
 
 INDENT = "  "
 

@@ -6,19 +6,19 @@ from typing import Optional
 
 import yaml
 
-from oas_tools.cli_gen._logging import logger
-from oas_tools.cli_gen._tree import TreeField
-from oas_tools.cli_gen.constants import GENERATOR_LOG_CLASS
-from oas_tools.cli_gen.layout_types import LayoutNode
-from oas_tools.cli_gen.utils import maybe_quoted
-from oas_tools.cli_gen.utils import quoted
-from oas_tools.cli_gen.utils import set_missing
-from oas_tools.cli_gen.utils import simple_escape
-from oas_tools.cli_gen.utils import to_camel_case
-from oas_tools.cli_gen.utils import to_snake_case
-from oas_tools.types import ContentType
-from oas_tools.types import OasField
-from oas_tools.utils import map_operations
+from openapi_spec_tools.cli_gen._logging import logger
+from openapi_spec_tools.cli_gen._tree import TreeField
+from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
+from openapi_spec_tools.cli_gen.layout_types import LayoutNode
+from openapi_spec_tools.cli_gen.utils import maybe_quoted
+from openapi_spec_tools.cli_gen.utils import quoted
+from openapi_spec_tools.cli_gen.utils import set_missing
+from openapi_spec_tools.cli_gen.utils import simple_escape
+from openapi_spec_tools.cli_gen.utils import to_camel_case
+from openapi_spec_tools.cli_gen.utils import to_snake_case
+from openapi_spec_tools.types import ContentType
+from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import map_operations
 
 NL = "\n"
 SEP1 = "\n    "

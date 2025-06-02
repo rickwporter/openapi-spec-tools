@@ -1,8 +1,8 @@
 import os
 from unittest import mock
 
-from oas_tools.cli_gen._console import TEST_TERMINAL_WIDTH
-from oas_tools.cli_gen._console import console_factory
+from openapi_spec_tools.cli_gen._console import TEST_TERMINAL_WIDTH
+from openapi_spec_tools.cli_gen._console import console_factory
 
 
 def test_console_factory_width_arg():

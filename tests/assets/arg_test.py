@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import typer
 
-import oas_tools.cli_gen._arguments as _a
+import openapi_spec_tools.cli_gen._arguments as _a
 
 app = typer.Typer(no_args_is_help=True, help="Random help")
 
@@ -17,7 +17,7 @@ def get_pet(
     _max_count: _a.MaxCountOption = None,
 ):
     """
-    This is to show that oas_tools.cli_gen is obliterated.
+    This is to show that openapi_spec_tools.cli_gen is obliterated.
     """
     print(f"""\
 _api_host={_api_host}

@@ -4,13 +4,13 @@ from pathlib import Path
 
 import pytest
 
-from oas_tools.cli_gen.generator import Generator
-from oas_tools.cli_gen.layout import file_to_tree
-from oas_tools.cli_gen.layout_types import LayoutNode
-from oas_tools.cli_gen.layout_types import PaginationNames
-from oas_tools.types import OasField
-from oas_tools.utils import map_operations
-from oas_tools.utils import open_oas
+from openapi_spec_tools.cli_gen.generator import Generator
+from openapi_spec_tools.cli_gen.layout import file_to_tree
+from openapi_spec_tools.cli_gen.layout_types import LayoutNode
+from openapi_spec_tools.cli_gen.layout_types import PaginationNames
+from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import map_operations
+from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 
 SUM = "summary"
