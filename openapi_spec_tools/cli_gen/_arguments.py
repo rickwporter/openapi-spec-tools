@@ -3,10 +3,10 @@ from typing import Optional
 import typer
 from typing_extensions import Annotated
 
-from oas_tools.cli_gen._display import OutputFormat
-from oas_tools.cli_gen._display import OutputStyle
-from oas_tools.cli_gen._logging import LogLevel
-from oas_tools.cli_gen._tree import TreeDisplay
+from openapi_spec_tools.cli_gen._display import OutputFormat
+from openapi_spec_tools.cli_gen._display import OutputStyle
+from openapi_spec_tools.cli_gen._logging import LogLevel
+from openapi_spec_tools.cli_gen._tree import TreeDisplay
 
 ENV_API_HOST = "API_HOST"
 ENV_API_KEY = "API_KEY"

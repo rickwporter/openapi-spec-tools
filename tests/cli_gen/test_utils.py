@@ -1,8 +1,8 @@
 import pytest
 
-from oas_tools.cli_gen.utils import maybe_quoted
-from oas_tools.cli_gen.utils import to_camel_case
-from oas_tools.cli_gen.utils import to_snake_case
+from openapi_spec_tools.cli_gen.utils import maybe_quoted
+from openapi_spec_tools.cli_gen.utils import to_camel_case
+from openapi_spec_tools.cli_gen.utils import to_snake_case
 
 
 @pytest.mark.parametrize(

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "oas-tools"
+name = "openapi-spec-tools"
 version = "0.1.0"
 description = "OpenAPI specification tools for analyzing, updating, and generating a CLI."
 authors = ["Rick Porter <rickwporter@gmail.com>"]
@@ -13,8 +13,8 @@ rich = "^13.9.4"
 requests = "^2.32.3"
 
 [tool.poetry.scripts]
-oas = "oas_tools.oas:app"
-cli-gen = "oas_tools.cli_gen.cli:app"
+oas = "openapi_spec_tools.oas:app"
+cli-gen = "openapi_spec_tools.cli_gen.cli:app"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
@@ -60,7 +60,7 @@ junit_family = "xunit2"
 [tool.coverage.run]
 data_file = ".coverage"
 source = [
-    "oas_tools",
+    "openapi_spec_tools",
 ]
 
 [tool.coverage.report]

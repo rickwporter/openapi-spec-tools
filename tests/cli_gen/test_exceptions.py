@@ -5,8 +5,8 @@ import pytest
 import typer
 from requests import HTTPError
 
-from oas_tools.cli_gen._exceptions import MissingRequiredError
-from oas_tools.cli_gen._exceptions import handle_exceptions
+from openapi_spec_tools.cli_gen._exceptions import MissingRequiredError
+from openapi_spec_tools.cli_gen._exceptions import handle_exceptions
 
 
 @pytest.mark.parametrize(

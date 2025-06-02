@@ -8,26 +8,26 @@ from unittest import mock
 import pytest
 import typer
 
-from oas_tools.oas import DisplayOption
-from oas_tools.oas import console_factory
-from oas_tools.oas import content_type_list
-from oas_tools.oas import diff
-from oas_tools.oas import info
-from oas_tools.oas import models_list
-from oas_tools.oas import models_operations
-from oas_tools.oas import models_show
-from oas_tools.oas import models_used_by
-from oas_tools.oas import models_uses
-from oas_tools.oas import operation_list
-from oas_tools.oas import operation_models
-from oas_tools.oas import operation_show
-from oas_tools.oas import paths_list
-from oas_tools.oas import paths_operations
-from oas_tools.oas import paths_show
-from oas_tools.oas import summary
-from oas_tools.oas import tags_list
-from oas_tools.oas import tags_show
-from oas_tools.oas import update
+from openapi_spec_tools.oas import DisplayOption
+from openapi_spec_tools.oas import console_factory
+from openapi_spec_tools.oas import content_type_list
+from openapi_spec_tools.oas import diff
+from openapi_spec_tools.oas import info
+from openapi_spec_tools.oas import models_list
+from openapi_spec_tools.oas import models_operations
+from openapi_spec_tools.oas import models_show
+from openapi_spec_tools.oas import models_used_by
+from openapi_spec_tools.oas import models_uses
+from openapi_spec_tools.oas import operation_list
+from openapi_spec_tools.oas import operation_models
+from openapi_spec_tools.oas import operation_show
+from openapi_spec_tools.oas import paths_list
+from openapi_spec_tools.oas import paths_operations
+from openapi_spec_tools.oas import paths_show
+from openapi_spec_tools.oas import summary
+from openapi_spec_tools.oas import tags_list
+from openapi_spec_tools.oas import tags_show
+from openapi_spec_tools.oas import update
 
 from .helpers import StringIo
 from .helpers import asset_filename

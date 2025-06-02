@@ -122,12 +122,12 @@ tests/cli_gen/test_console.py::test_console_factory_unspecified PASSED          
 poetry run coverage report -m
 Name                            Stmts   Miss  Cover   Missing
 -------------------------------------------------------------
-oas_tools/__init__.py              10      0   100%
-oas_tools/_typer.py                 7      7     0%   5-16
-oas_tools/cli_gen/_console.py      14      0   100%
-oas_tools/oas.py                  364    364     0%   2-634
-oas_tools/types.py                 47      0   100%
-oas_tools/utils.py                236    210    11%   18-19, 44-51, 60-69, 76-81, 88-90, 102-158, 167-182, 189-190, 198, 206-209, 216-224, 276-287, 294-308, 319-333, 339-357, 406-420, 435-495, 500-513
+openapi_spec_tools/__init__.py              10      0   100%
+openapi_spec_tools/_typer.py                 7      7     0%   5-16
+openapi_spec_tools/cli_gen/_console.py      14      0   100%
+openapi_spec_tools/oas.py                  364    364     0%   2-634
+openapi_spec_tools/types.py                 47      0   100%
+openapi_spec_tools/utils.py                236    210    11%   18-19, 44-51, 60-69, 76-81, 88-90, 102-158, 167-182, 189-190, 198, 206-209, 216-224, 276-287, 294-308, 319-333, 339-357, 406-420, 435-495, 500-513
 -------------------------------------------------------------
 TOTAL                             678    581    14%
 poetry run coverage html

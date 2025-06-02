@@ -9,7 +9,7 @@ from typing import Optional
 
 import requests
 
-from oas_tools.cli_gen._logging import logger
+from openapi_spec_tools.cli_gen._logging import logger
 
 GET = "GET"
 

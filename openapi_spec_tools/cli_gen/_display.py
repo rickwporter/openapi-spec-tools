@@ -8,7 +8,7 @@ from rich.box import HEAVY_HEAD
 from rich.markup import escape
 from rich.table import Table
 
-from oas_tools.cli_gen._console import console_factory
+from openapi_spec_tools.cli_gen._console import console_factory
 
 DEFAULT_ROW_PROPS = {
     "justify": "left",

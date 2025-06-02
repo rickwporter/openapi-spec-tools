@@ -8,13 +8,13 @@ from requests import HTTPError
 from requests import Request
 from requests import Response
 
-from oas_tools.cli_gen._requests import PageParams
-from oas_tools.cli_gen._requests import _pretty_params
-from oas_tools.cli_gen._requests import create_url
-from oas_tools.cli_gen._requests import depaginate
-from oas_tools.cli_gen._requests import raise_for_error
-from oas_tools.cli_gen._requests import request
-from oas_tools.cli_gen._requests import request_headers
+from openapi_spec_tools.cli_gen._requests import PageParams
+from openapi_spec_tools.cli_gen._requests import _pretty_params
+from openapi_spec_tools.cli_gen._requests import create_url
+from openapi_spec_tools.cli_gen._requests import depaginate
+from openapi_spec_tools.cli_gen._requests import raise_for_error
+from openapi_spec_tools.cli_gen._requests import request
+from openapi_spec_tools.cli_gen._requests import request_headers
 
 
 @pytest.mark.parametrize(
@@ -174,7 +174,7 @@ def test_request(method, body, params, expected):
     url = "https://foo/path"
     response = success_response(url=url, body=body)
 
-    prefix = "oas_tools.cli_gen"
+    prefix = "openapi_spec_tools.cli_gen"
     with (
         mock.patch(f"{prefix}._requests.requests.request") as mock_request,
         mock.patch(f"{prefix}._requests.logger.debug") as mock_debug,
@@ -254,9 +254,9 @@ def test_depaginate_single_success(page_params, resp_body, expected):
     response = success_response(method="GET", url=url, body=resp_body)
 
     with (
-        mock.patch("oas_tools.cli_gen._requests.requests.get", return_value=response) as mock_get,
-        mock.patch("oas_tools.cli_gen._requests.logger.info") as mock_info,
-        mock.patch("oas_tools.cli_gen._requests.logger.debug") as mock_debug,
+        mock.patch("openapi_spec_tools.cli_gen._requests.requests.get", return_value=response) as mock_get,
+        mock.patch("openapi_spec_tools.cli_gen._requests.logger.info") as mock_info,
+        mock.patch("openapi_spec_tools.cli_gen._requests.logger.debug") as mock_debug,
     ):
         # start with the results
         items = depaginate(page_params, url)
@@ -289,9 +289,9 @@ def test_depagination_next_header():
     page_params = PageParams(next_header_name=next_header)
 
     with (
-        mock.patch("oas_tools.cli_gen._requests.requests.get") as mock_get,
-        mock.patch("oas_tools.cli_gen._requests.logger.info") as mock_info,
-        mock.patch("oas_tools.cli_gen._requests.logger.debug") as mock_debug,
+        mock.patch("openapi_spec_tools.cli_gen._requests.requests.get") as mock_get,
+        mock.patch("openapi_spec_tools.cli_gen._requests.logger.info") as mock_info,
+        mock.patch("openapi_spec_tools.cli_gen._requests.logger.debug") as mock_debug,
     ):
         mock_get.side_effect = [resp1, resp2]
 
@@ -328,9 +328,9 @@ def test_depagination_next_property():
     page_params = PageParams(items_property_name=item_prop, next_property_name=next_prop)
 
     with (
-        mock.patch("oas_tools.cli_gen._requests.requests.get") as mock_get,
-        mock.patch("oas_tools.cli_gen._requests.logger.info") as mock_info,
-        mock.patch("oas_tools.cli_gen._requests.logger.debug") as mock_debug,
+        mock.patch("openapi_spec_tools.cli_gen._requests.requests.get") as mock_get,
+        mock.patch("openapi_spec_tools.cli_gen._requests.logger.info") as mock_info,
+        mock.patch("openapi_spec_tools.cli_gen._requests.logger.debug") as mock_debug,
     ):
         mock_get.side_effect = [resp1, resp2]
 
