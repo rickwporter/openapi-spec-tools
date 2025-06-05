@@ -38,13 +38,13 @@ def test_short_ref(full_name, expected) -> None:
 @pytest.mark.parametrize(
     ["asset", "path", "references"],
     [
-        pytest.param("pet.yaml", "/pets", {"Error", "Pet", "Pets"}, id="/pet"),
-        pytest.param("pet.yaml", "/pets/{petId}", {"Error", "Pet"}, id="/pets/{petId}"),
+        pytest.param("pet.yaml", "/pets", {"schemas/Error", "schemas/Pet", "schemas/Pets"}, id="/pet"),
+        pytest.param("pet.yaml", "/pets/{petId}", {"schemas/Error", "schemas/Pet"}, id="/pets/{petId}"),
         pytest.param("ct.yaml", "/api/schema/", set(), id="/api/schema"),
         pytest.param(
             "ct.yaml",
             "/api/v1/environments/",
-            {"Environment", "EnvironmentCreate", "PaginatedEnvironmentList"},
+            {"schemas/Environment", "schemas/EnvironmentCreate", "schemas/PaginatedEnvironmentList"},
             id="/api/v1/environments",
         )
     ],
@@ -168,11 +168,11 @@ def test_count_values_failure() -> None:
 
 def test_model_references() -> None:
     oas = open_test_oas("pet2.yaml")
-    models = oas.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(oas.get(OasField.COMPONENTS, {}))
     expected = {
-        "Pets": set(["Pet"]),
-        "Pet": set(),
-        "Error": set(),
+        "schemas/Pets": set(["schemas/Pet"]),
+        "schemas/Pet": set(),
+        "schemas/Error": set(),
     }
     assert expected == model_references(models)
 
@@ -180,8 +180,8 @@ def test_model_references() -> None:
 @pytest.mark.parametrize(
     ["asset", "model_name", "keys"],
     [
-        pytest.param("pet2.yaml", "Pets", ["Pets", "Pet"]),
-        pytest.param("pet2.yaml", "Pet", ["Pet"]),
+        pytest.param("pet2.yaml", "schemas/Pets", ["schemas/Pets", "schemas/Pet"], id="multi"),
+        pytest.param("pet2.yaml", "schemas/Pet", ["schemas/Pet"], id="single"),
     ],
 )
 def test_model_filter(
@@ -190,7 +190,7 @@ def test_model_filter(
     keys: list[str],
 ) -> None:
     schema = open_test_oas(asset)
-    models = schema.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(schema.get(OasField.COMPONENTS, {}))
     filtered = model_filter(models, set([model_name]))
     assert set(keys) == set(filtered)
 
@@ -198,8 +198,8 @@ def test_model_filter(
 @pytest.mark.parametrize(
     ["asset", "model_name", "keys"],
     [
-        pytest.param("pet2.yaml", "Pets", []),
-        pytest.param("pet2.yaml", "Pet", ["Pets"]),
+        pytest.param("pet2.yaml", "schemas/Pets", [], id="no-refs"),
+        pytest.param("pet2.yaml", "schemas/Pet", ["schemas/Pets"], id="referenced"),
     ]
 )
 def test_models_referenced_by(
@@ -208,7 +208,7 @@ def test_models_referenced_by(
     keys: list[str],
 ) -> None:
     schema = open_test_oas(asset)
-    models = schema.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(schema.get(OasField.COMPONENTS, {}))
     referenced_by = models_referenced_by(models, model_name)
     assert set(keys) == set(referenced_by)
 
