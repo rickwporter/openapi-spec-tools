@@ -9,6 +9,7 @@ from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_content_types
+from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import model_filter
 from openapi_spec_tools.utils import model_references
@@ -16,8 +17,22 @@ from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
+from openapi_spec_tools.utils import short_ref
 
 from .helpers import open_test_oas
+
+
+@pytest.mark.parametrize(
+    ["full_name", "expected"],
+    [
+        pytest.param("", "", id="empty"),
+        pytest.param("#/components/sna", "sna", id="one"),
+        pytest.param("#/components/sna/foo", "sna/foo", id="two"),
+        pytest.param("/sna/foo/bar", "sna/foo/bar", id="no-component"),
+    ]
+)
+def test_short_ref(full_name, expected) -> None:
+    assert expected == short_ref(full_name)
 
 
 @pytest.mark.parametrize(
@@ -197,6 +212,20 @@ def test_models_referenced_by(
     referenced_by = models_referenced_by(models, model_name)
     assert set(keys) == set(referenced_by)
 
+
+
+def test_map_models() -> None:
+    oas = open_test_oas("misc.yaml")
+    models = map_models(oas.get(OasField.COMPONENTS))
+    keys = models.keys()
+    expected = set([
+        "parameters/PageSize",
+        "schemas/Pets",
+        "schemas/Address",
+        "schemas/Owner",
+        "schemas/Species",
+    ])
+    assert expected.issubset(keys)
 
 
 def test_map_operations() -> None:

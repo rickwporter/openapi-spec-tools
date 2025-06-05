@@ -182,6 +182,15 @@ def count_values(obj: dict[str, Any]) -> int:
     return total
 
 
+def short_ref(full_name: str) -> str:
+    """Get the shorter reference name (drops the '#/component')"""
+    values = [
+        part for part in full_name.split('/')
+        if part and part not in ('#', OasField.COMPONENTS.value)
+    ]
+    return '/'.join(values)
+
+
 def find_references(obj: dict[str, Any]) -> set[str]:
     """
     Walks the 'obj' dictionary to find all the reference values (e.g. "$ref").
@@ -222,6 +231,18 @@ def models_referenced_by(models: dict[str, Any], model_name: str) -> set[str]:
             referenced_by[r] = curr
 
     return unroll(referenced_by, referenced_by.get(model_name, set()))
+
+
+def map_models(comonents: dict[str, Any]) -> dict[str, Any]:
+    """
+    Flattens the components into a 1 layer map.
+    """
+    models = {}
+    for component, values in comonents.items():
+        for name, data in values.items():
+            models[f"{component}/{name}"] = data
+
+    return models
 
 
 def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
