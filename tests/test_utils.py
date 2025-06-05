@@ -12,6 +12,7 @@ from openapi_spec_tools.utils import map_content_types
 from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import model_filter
+from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import remove_schema_tags
@@ -193,6 +194,21 @@ def test_model_filter(
     models = map_models(schema.get(OasField.COMPONENTS, {}))
     filtered = model_filter(models, set([model_name]))
     assert set(keys) == set(filtered)
+
+
+@pytest.mark.parametrize(
+    ["needle", "expected"],
+    [
+        pytest.param("", None, id="empty"),
+        pytest.param("Error", "schemas/Error", id="partial"),
+        pytest.param("schemas/Pets", "schemas/Pets", id="fullname"),
+        # NOTE: does not test multiples in different sections
+    ]
+)
+def test_model_full_name(needle, expected) -> None:
+    schema = open_test_oas("pet2.yaml")
+    models = map_models(schema.get(OasField.COMPONENTS, {}))
+    assert expected == model_full_name(models, needle)
 
 
 @pytest.mark.parametrize(

@@ -1349,40 +1349,6 @@ components:
       - id
       - url
       type: object
-  securitySchemes:
-    ApiKeyAuth:
-      description: "\nUse your CloudTruth API Key to authenticate to the API.  You\
-        \ can get\nan API Key by creating a Service Account.  During setup of the\
-        \ Service\nAccount you will generate a long-lived API key intended for use\
-        \ by automation\nand API clients.  Access through the service account will\
-        \ be audited separately\nfrom any other user.\n\nIf you are just trying to\
-        \ use the API in a normal workflow, this is likely the\nauthentication mechanism\
-        \ you want to use.\n\nTo use the API Key, place your API Key in the Authorization\
-        \ header as 'Api-Key APIKEY', where\nAPIKEY is your CloudTruth API Key.  For\
-        \ example:\n\n    Authorization: Api-Key fskur.ghlsiudhrg84so938r5u\n    \
-        \    "
-      in: header
-      name: Authorization
-      type: apiKey
-    JWTAuth:
-      description: "\nUse your JWT to authenticate to the API.  This is how the CloudTruth\n\
-        Web UI authenticates to the backend.  It requires a user to have already logged\
-        \ in\nand gotten a JWT from the login process.  This is usually done by an\
-        \ Auth0 authentication\nflow from one of the Auth0 javascript libraries. \
-        \ Alternatively, you can pull the\nJWT from your browser if you have a logged\
-        \ in session with the CloudTruth UI.\n\nThis authentication mechanism is intended\
-        \ for deeper integrations into the CloudTruth\nsystem, where you want to handle\
-        \ the user logins directly in your application.  For\nnormal API use, you\
-        \ likely want the Api-Key authentication header and not this one.\n\nTo use\
-        \ the JWT, place your JWT in the Authorization header as 'Bearer JWT', where\n\
-        JWT is your JWT.  For example:\n\n    Authorization: Bearer eyJhbGciOiJIkuydfy.eyJzdWIiOiIxMjM....\n\
-        \        "
-      in: header
-      name: Authorization
-      type: apiKey
-    tokenAuth:
-      scheme: bearer
-      type: http
 externalDocs:
   url: https://docs.cloudtruth.com/
 info:

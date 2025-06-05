@@ -245,6 +245,35 @@ def map_models(comonents: dict[str, Any]) -> dict[str, Any]:
     return models
 
 
+def unmap_models(models: dict[str, Any]) -> dict[str, Any]:
+    """
+    Reconstitutes the components section.
+    """
+    # re-organize models into sub-sections
+    components = {}
+    for full_name, model_def in models.items():
+        parts = full_name.split('/')
+        comp_name = parts[0]
+        model_name = parts[1]
+        temp = components.get(comp_name, {})
+        temp[model_name] = model_def
+        components[comp_name] = temp
+
+    return components
+
+
+def model_full_name(models: dict[str, Any], name: str) -> Optional[str]:
+    """Searches for a model matching the specified name. The name may be a partial name."""
+    if name in models:
+        return name
+
+    matches = [k for k in models.keys() if name == k.split('/')[-1]]
+    if len(matches) == 1:
+        return matches[0]
+
+    return None
+
+
 def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     """
     Takes the 'paths' dictionary and transforms into an dictionary with the 'operationId'
@@ -495,18 +524,12 @@ def schema_operations_filter(
         for name, model in models.items()
     }
     used_models = unroll(model_refs, op_refs)
+    models = {
+        name: value for name, value in models.items()
+        if name in used_models
+    }
 
-    # re-organize models into sub-sections
-    components = {}
-    for full_name in used_models:
-        model_def = models.get(full_name)
-        parts = full_name.split('/')
-        comp_name = parts[0]
-        model_name = parts[1]
-        temp = components.get(comp_name, {})
-        temp[model_name] = model_def
-        components[comp_name] = temp
-    result[OasField.COMPONENTS.value] = components
+    result[OasField.COMPONENTS.value] = unmap_models(models)
 
     # compile a list of tags that are used
     used_tags = set()

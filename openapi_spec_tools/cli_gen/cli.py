@@ -368,10 +368,6 @@ def show_cli_tree(
     console.print(table)
 
 
-if __name__ == "__main__":
-    app()
-
-
 @app.command(
     "trim",
     short_help="Create an OpenAPI spec that only contains data referenced by layout"
@@ -423,3 +419,7 @@ def trim_oas(
 
     typer.echo(f"Wrote to {out_file}")
     return
+
+
+if __name__ == "__main__":
+    app()
