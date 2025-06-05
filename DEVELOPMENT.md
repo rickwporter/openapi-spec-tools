@@ -1,6 +1,6 @@
-# oas-tools Development
+# openapi-spec-tools Development
 
-Thanks for thinking about contributing to the oas-tools project.
+Thanks for thinking about contributing to the openapi-spec-tools project.
 
 ## Getting Started
 
@@ -27,7 +27,7 @@ Collecting cachecontrol<0.15.0,>=0.14.0 (from cachecontrol[filecache]<0.15.0,>=0
 (.env) %
 ```
 
-Now, install the `oas-tools` package with all the dependencies (incinding the development tools).
+Now, install the `openapi-spec-tools` package with all the dependencies (incinding the development tools).
 
 ```terminal
 (.env) % make install
@@ -52,7 +52,7 @@ Package operations: 15 installs, 0 updates, 0 removals
   - Installing ruff (0.9.10)
   - Installing typer (0.15.3)
 
-Installing the current project: oas-tools (0.1.0)
+Installing the current project: openapi-spec-tools (0.1.0)
 (.env) % 
 ```
 
@@ -106,9 +106,9 @@ The `make` command allows users to see the command that is run by design. This a
 (.env) % TEST_TARGET=tests/cli_gen/test_console.py make cov
 poetry run coverage run -m pytest -v tests/cli_gen/test_console.py
 =============== test session starts ===============
-platform darwin -- Python 3.9.21, pytest-8.3.5, pluggy-1.5.0 -- /Users/rick/temp/oas-tools/.env/bin/python
+platform darwin -- Python 3.9.21, pytest-8.3.5, pluggy-1.5.0 -- /Users/rick/temp/openapi-spec-tools/.env/bin/python
 cachedir: .pytest_cache
-rootdir: /Users/rick/temp/oas-tools
+rootdir: /Users/rick/temp/openapi-spec-tools
 configfile: pyproject.toml
 plugins: anyio-4.9.0
 collected 4 items

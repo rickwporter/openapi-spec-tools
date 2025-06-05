@@ -19,7 +19,7 @@ Some of the above topics are explored in more depth below.
 
 The diff provides a more YAML-centric means of looking at the data. Instead of the output of the tradition diff utility, this provides the whole structure for things that have changed. Here's an example:
 ```shell
-(.env) ~/oas-tools> oas diff old_ct.yaml ct.yaml 
+(.env) ~/openapi-spec-tools> oas diff old_ct.yaml ct.yaml 
 components:
     schemas:
         AwsPullTaskStep:
@@ -46,7 +46,7 @@ paths:
                 content:
                     multipart/form-data: removed
 
-(.env) ~/oas-tools> 
+(.env) ~/openapi-spec-tools> 
 ```
 
 Unlike the [openapi-diff tool](https://github.com/OpenAPITools/openapi-diff), this program does NOT make any judgements about what is a breaking change or not.
