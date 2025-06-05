@@ -1,4 +1,4 @@
-# oas-tools
+# openapi-spec-tools
 
 Welcome to OpenAPI specification (OAS) tools!
 

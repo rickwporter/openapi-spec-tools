@@ -25,7 +25,7 @@ poetry new widgets
 poetry add typer rich requests
 
 # add the development tools
-poetry add --group dev ruff pytest black coverage oas-tools
+poetry add --group dev ruff pytest black coverage openapi-spec-tools
 ```
 
 Add an entry to `tools.poetry.scripts` that installs a script to directly run the CLI program.
