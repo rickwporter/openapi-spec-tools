@@ -361,7 +361,7 @@ files = [
 ]
 
 [[package]]
-name = "oas-tools"
+name = "openapi-spec-tools"
 version = "0.1.0"
 description = "OpenAPI specification tools for analyzing, updating, and generating a CLI."
 optional = false
