@@ -182,12 +182,21 @@ def count_values(obj: dict[str, Any]) -> int:
     return total
 
 
+def short_ref(full_name: str) -> str:
+    """Get the shorter reference name (drops the '#/component')"""
+    values = [
+        part for part in full_name.split('/')
+        if part and part not in ('#', OasField.COMPONENTS.value)
+    ]
+    return '/'.join(values)
+
+
 def find_references(obj: dict[str, Any]) -> set[str]:
     """
     Walks the 'obj' dictionary to find all the reference values (e.g. "$ref").
     """
     refs = find_dict_prop(obj, OasField.REFS)
-    return set([_.split("/")[-1] for _ in refs])
+    return set([short_ref(_) for _ in refs])
 
 
 
@@ -222,6 +231,47 @@ def models_referenced_by(models: dict[str, Any], model_name: str) -> set[str]:
             referenced_by[r] = curr
 
     return unroll(referenced_by, referenced_by.get(model_name, set()))
+
+
+def map_models(comonents: dict[str, Any]) -> dict[str, Any]:
+    """
+    Flattens the components into a 1 layer map.
+    """
+    models = {}
+    for component, values in comonents.items():
+        for name, data in values.items():
+            models[f"{component}/{name}"] = data
+
+    return models
+
+
+def unmap_models(models: dict[str, Any]) -> dict[str, Any]:
+    """
+    Reconstitutes the components section.
+    """
+    # re-organize models into sub-sections
+    components = {}
+    for full_name, model_def in models.items():
+        parts = full_name.split('/')
+        comp_name = parts[0]
+        model_name = parts[1]
+        temp = components.get(comp_name, {})
+        temp[model_name] = model_def
+        components[comp_name] = temp
+
+    return components
+
+
+def model_full_name(models: dict[str, Any], name: str) -> Optional[str]:
+    """Searches for a model matching the specified name. The name may be a partial name."""
+    if name in models:
+        return name
+
+    matches = [k for k in models.keys() if name == k.split('/')[-1]]
+    if len(matches) == 1:
+        return matches[0]
+
+    return None
 
 
 def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
@@ -468,17 +518,18 @@ def schema_operations_filter(
 
     # figure out all the models that are referenced from the remaining operations
     op_refs = find_references(op_map)
-    models = result.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(result.pop(OasField.COMPONENTS, {}))
     model_refs = {
         name: find_references(model)
         for name, model in models.items()
     }
     used_models = unroll(model_refs, op_refs)
-    unused_models = models.keys() - used_models
+    models = {
+        name: value for name, value in models.items()
+        if name in used_models
+    }
 
-    # remove the unused models
-    for name in unused_models:
-        models.pop(name)
+    result[OasField.COMPONENTS.value] = unmap_models(models)
 
     # compile a list of tags that are used
     used_tags = set()

@@ -9,27 +9,43 @@ from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_content_types
+from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import model_filter
+from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
+from openapi_spec_tools.utils import short_ref
 
 from .helpers import open_test_oas
 
 
 @pytest.mark.parametrize(
+    ["full_name", "expected"],
+    [
+        pytest.param("", "", id="empty"),
+        pytest.param("#/components/sna", "sna", id="one"),
+        pytest.param("#/components/sna/foo", "sna/foo", id="two"),
+        pytest.param("/sna/foo/bar", "sna/foo/bar", id="no-component"),
+    ]
+)
+def test_short_ref(full_name, expected) -> None:
+    assert expected == short_ref(full_name)
+
+
+@pytest.mark.parametrize(
     ["asset", "path", "references"],
     [
-        pytest.param("pet.yaml", "/pets", {"Error", "Pet", "Pets"}, id="/pet"),
-        pytest.param("pet.yaml", "/pets/{petId}", {"Error", "Pet"}, id="/pets/{petId}"),
+        pytest.param("pet.yaml", "/pets", {"schemas/Error", "schemas/Pet", "schemas/Pets"}, id="/pet"),
+        pytest.param("pet.yaml", "/pets/{petId}", {"schemas/Error", "schemas/Pet"}, id="/pets/{petId}"),
         pytest.param("ct.yaml", "/api/schema/", set(), id="/api/schema"),
         pytest.param(
             "ct.yaml",
             "/api/v1/environments/",
-            {"Environment", "EnvironmentCreate", "PaginatedEnvironmentList"},
+            {"schemas/Environment", "schemas/EnvironmentCreate", "schemas/PaginatedEnvironmentList"},
             id="/api/v1/environments",
         )
     ],
@@ -153,11 +169,11 @@ def test_count_values_failure() -> None:
 
 def test_model_references() -> None:
     oas = open_test_oas("pet2.yaml")
-    models = oas.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(oas.get(OasField.COMPONENTS, {}))
     expected = {
-        "Pets": set(["Pet"]),
-        "Pet": set(),
-        "Error": set(),
+        "schemas/Pets": set(["schemas/Pet"]),
+        "schemas/Pet": set(),
+        "schemas/Error": set(),
     }
     assert expected == model_references(models)
 
@@ -165,8 +181,8 @@ def test_model_references() -> None:
 @pytest.mark.parametrize(
     ["asset", "model_name", "keys"],
     [
-        pytest.param("pet2.yaml", "Pets", ["Pets", "Pet"]),
-        pytest.param("pet2.yaml", "Pet", ["Pet"]),
+        pytest.param("pet2.yaml", "schemas/Pets", ["schemas/Pets", "schemas/Pet"], id="multi"),
+        pytest.param("pet2.yaml", "schemas/Pet", ["schemas/Pet"], id="single"),
     ],
 )
 def test_model_filter(
@@ -175,16 +191,31 @@ def test_model_filter(
     keys: list[str],
 ) -> None:
     schema = open_test_oas(asset)
-    models = schema.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(schema.get(OasField.COMPONENTS, {}))
     filtered = model_filter(models, set([model_name]))
     assert set(keys) == set(filtered)
 
 
 @pytest.mark.parametrize(
+    ["needle", "expected"],
+    [
+        pytest.param("", None, id="empty"),
+        pytest.param("Error", "schemas/Error", id="partial"),
+        pytest.param("schemas/Pets", "schemas/Pets", id="fullname"),
+        # NOTE: does not test multiples in different sections
+    ]
+)
+def test_model_full_name(needle, expected) -> None:
+    schema = open_test_oas("pet2.yaml")
+    models = map_models(schema.get(OasField.COMPONENTS, {}))
+    assert expected == model_full_name(models, needle)
+
+
+@pytest.mark.parametrize(
     ["asset", "model_name", "keys"],
     [
-        pytest.param("pet2.yaml", "Pets", []),
-        pytest.param("pet2.yaml", "Pet", ["Pets"]),
+        pytest.param("pet2.yaml", "schemas/Pets", [], id="no-refs"),
+        pytest.param("pet2.yaml", "schemas/Pet", ["schemas/Pets"], id="referenced"),
     ]
 )
 def test_models_referenced_by(
@@ -193,10 +224,24 @@ def test_models_referenced_by(
     keys: list[str],
 ) -> None:
     schema = open_test_oas(asset)
-    models = schema.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(schema.get(OasField.COMPONENTS, {}))
     referenced_by = models_referenced_by(models, model_name)
     assert set(keys) == set(referenced_by)
 
+
+
+def test_map_models() -> None:
+    oas = open_test_oas("misc.yaml")
+    models = map_models(oas.get(OasField.COMPONENTS))
+    keys = models.keys()
+    expected = set([
+        "parameters/PageSize",
+        "schemas/Pets",
+        "schemas/Address",
+        "schemas/Owner",
+        "schemas/Species",
+    ])
+    assert expected.issubset(keys)
 
 
 def test_map_operations() -> None:

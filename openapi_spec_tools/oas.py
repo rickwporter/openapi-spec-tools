@@ -3,6 +3,7 @@ import os
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
+from typing import Any
 from typing import Optional
 
 import typer
@@ -18,14 +19,17 @@ from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_content_types
+from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import model_filter
+from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import open_oas
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
+from openapi_spec_tools.utils import unmap_models
 from openapi_spec_tools.utils import unroll
 
 INDENT = "    "
@@ -49,6 +53,26 @@ def console_factory() -> Console:
     elif pytest_version is not None:
         width = 3000
     return Console(width=width)
+
+
+def remove_list_prefix(items: list[str]) -> list[str]:
+    """
+    Remove a common model prefix. This typically happens when everything is in schemas/
+    """
+    prefix = items[0].split('/')[0] + '/'
+    if not all(_.startswith(prefix) for _ in items):
+        return items
+
+    return [_.replace(prefix, "") for _ in items]
+
+
+def remove_dict_prefix(map: dict[str, Any]) -> dict[str, Any]:
+    keys = list(map.keys())
+    prefix = keys[0].split('/')[0] + '/'
+    if not all(_.startswith(prefix) for _ in keys):
+        return map
+
+    return {k.replace(prefix, ""): v for k, v in map.items()}
 
 
 #################################################
@@ -86,7 +110,7 @@ def summary(
         'post': 0,
     }
     path_count = 0
-    model_count = len(spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {}))
+    model_count = len(map_models(spec.get(OasField.COMPONENTS, {})))
     tag_count = {}
 
     for path_data in spec.get(OasField.PATHS, {}).values():
@@ -287,13 +311,14 @@ def operation_models(
         error_out(f"failed to find {operation_name}")
 
     op_references = find_references(operation)
-    models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+    models = map_models(spec.get(OasField.COMPONENTS, {}))
     matches = model_filter(models, op_references)
 
     console = console_factory()
     if not matches:
         console.print(f"{operation_name} does not reference any models")
     else:
+        matches = remove_dict_prefix(matches)
         console.print(f"Found {operation_name} uses {len(matches)} models:")
         for n in sorted(matches):
             console.print(f"{INDENT}{n}")
@@ -356,11 +381,11 @@ def paths_show(
 
     if include_models:
         references = find_references(paths)
-        models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
+        models = map_models(spec.get(OasField.COMPONENTS, {}))
         used = model_filter(models, references)
         results = {
             OasField.PATHS.value: paths,
-            OasField.COMPONENTS.value: {OasField.SCHEMAS.value: used}
+            OasField.COMPONENTS.value: unmap_models(used),
         }
         paths = results
 
@@ -411,7 +436,8 @@ def models_list(
 ) -> None:
     spec = open_oas(filename)
 
-    names = sorted(spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {}).keys())
+    models = map_models(spec.get(OasField.COMPONENTS, {}))
+    names = sorted(models.keys())
     if search:
         needle = search.lower()
         names = [_ for _ in names if needle in _.lower()]
@@ -422,6 +448,7 @@ def models_list(
         console.print(f"No models found{match_info}")
     else:
         console.print(f"Found {len(names)} models{match_info}:")
+        names = remove_list_prefix(names)
         for n in names:
             console.print(f"{INDENT}{n}")
 
@@ -436,15 +463,17 @@ def models_show(
 ) -> None:
     spec = open_oas(filename)
 
-    model = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {}).get(model_name)
+    models = map_models(spec.get(OasField.COMPONENTS, {}))
+    full_name = model_full_name(models, model_name)
+    model = models.get(full_name)
     if not model:
         error_out(f"failed to find {model_name}")
 
     if not include_referenced:
-        models = {model_name: model}
+        models = {full_name: model}
     else:
-        models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
-        models = model_filter(models, set([model_name]))
+        models = model_filter(models, set([full_name]))
+    models = remove_dict_prefix(models)
 
     console = console_factory()
     console.print(yaml.dump(models, indent=len(INDENT)))
@@ -458,17 +487,19 @@ def models_uses(
 ) -> None:
     spec = open_oas(filename)
 
-    models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
-    if model_name not in models:
+    models = map_models(spec.get(OasField.COMPONENTS, {}))
+    full_name = model_full_name(models, model_name)
+    if not full_name:
         error_out(f"no model '{model_name}' found")
 
     references = model_references(models)
 
     console = console_factory()
-    matches = unroll(references, references.get(model_name))
+    matches = unroll(references, references.get(full_name))
     if not matches:
         console.print(f"{model_name} does not use any other models")
     else:
+        matches = remove_list_prefix(list(matches))
         console.print(f"Found {model_name} uses {len(matches)} models:")
         for n in sorted(matches):
             console.print(f"{INDENT}{n}")
@@ -483,15 +514,17 @@ def models_used_by(
 ) -> None:
     spec = open_oas(filename)
 
-    models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
-    if model_name not in models:
+    models = map_models(spec.get(OasField.COMPONENTS, {}))
+    full_name = model_full_name(models, model_name)
+    if not full_name:
         error_out(f"no model '{model_name}' found")
 
     console = console_factory()
-    matches = models_referenced_by(models, model_name)
+    matches = models_referenced_by(models, full_name)
     if not matches:
         console.print(f"{model_name} is not used by any other models")
     else:
+        matches = remove_list_prefix(list(matches))
         console.print(f"Found {model_name} is used by {len(matches)} models:")
         for n in sorted(matches):
             console.print(f"{INDENT}{n}")
@@ -506,12 +539,13 @@ def models_operations(
 ) -> None:
     spec = open_oas(filename)
 
-    models = spec.get(OasField.COMPONENTS, {}).get(OasField.SCHEMAS, {})
-    if model_name not in models:
+    models = map_models(spec.get(OasField.COMPONENTS, {}))
+    full_name = model_full_name(models, model_name)
+    if not full_name:
         error_out(f"no model '{model_name}' found")
 
-    model_refs = models_referenced_by(models, model_name)
-    model_refs.add(model_name)  # include the direct references, too
+    model_refs = models_referenced_by(models, full_name)
+    model_refs.add(full_name)  # include the direct references, too
 
     matches = []
     for path_data in spec.get(OasField.PATHS, {}).values():
@@ -523,6 +557,7 @@ def models_operations(
                 op_id = op_data.get(OasField.OP_ID)
                 matches.append(op_id)
 
+    matches = remove_list_prefix(matches)
     console = console_factory()
     console.print(f"Found {model_name} is used by {len(matches)} operations:")
     for n in sorted(matches):

@@ -24,6 +24,8 @@ from openapi_spec_tools.oas import operation_show
 from openapi_spec_tools.oas import paths_list
 from openapi_spec_tools.oas import paths_operations
 from openapi_spec_tools.oas import paths_show
+from openapi_spec_tools.oas import remove_dict_prefix
+from openapi_spec_tools.oas import remove_list_prefix
 from openapi_spec_tools.oas import summary
 from openapi_spec_tools.oas import tags_list
 from openapi_spec_tools.oas import tags_show
@@ -881,3 +883,27 @@ def test_content_type_list(filename, max_size, content_type, expected) -> None:
 
         output = mock_stdout.getvalue()
         assert output == expected
+
+
+@pytest.mark.parametrize(
+    ["items", "expected"],
+    [
+        pytest.param(["a/b"], ["b"], id="single"),
+        pytest.param(["a/b", "a/c"], ["b", "c"], id="common"),
+        pytest.param(["a/b", "b/c"], ["a/b", "b/c"], id="no-common"),
+    ]
+)
+def test_remove_list_prefix(items, expected) -> None:
+    assert expected == remove_list_prefix(items)
+
+
+@pytest.mark.parametrize(
+    ["map", "expected"],
+    [
+        pytest.param({"a/b": {"foo": "bar"}}, {"b": {"foo": "bar"}}, id="single"),
+        pytest.param({"a/b": None, "a/c": "sna"}, {"b": None, "c": "sna"}, id="common"),
+        pytest.param({"a/b": "x", "b/c": "y"}, {"a/b": "x", "b/c": "y"}, id="no-common"),
+    ]
+)
+def test_remove_dict_prefix(map, expected) -> None:
+    assert expected == remove_dict_prefix(map)
