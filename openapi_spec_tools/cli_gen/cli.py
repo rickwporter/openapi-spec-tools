@@ -411,8 +411,8 @@ def trim_oas(
     updated = deepcopy(oas)
 
     operations = _operations(layout)
-    for property in remove_properties:
-        updated = remove_property(updated, property)
+    for prop_name in remove_properties:
+        updated = remove_property(updated, prop_name)
 
     updated = schema_operations_filter(updated, allow=operations)
     if remove_all_tags:
