@@ -729,15 +729,12 @@ components:
     PaginatedAuditTrailList:
       properties:
         count:
-          example: 123
           type: integer
         next:
-          example: http://api.example.org/accounts/?page=4
           format: uri
           nullable: true
           type: string
         previous:
-          example: http://api.example.org/accounts/?page=2
           format: uri
           nullable: true
           type: string
@@ -749,15 +746,12 @@ components:
     PaginatedEnvironmentList:
       properties:
         count:
-          example: 123
           type: integer
         next:
-          example: http://api.example.org/accounts/?page=4
           format: uri
           nullable: true
           type: string
         previous:
-          example: http://api.example.org/accounts/?page=2
           format: uri
           nullable: true
           type: string
@@ -769,15 +763,12 @@ components:
     PaginatedGrantList:
       properties:
         count:
-          example: 123
           type: integer
         next:
-          example: http://api.example.org/accounts/?page=4
           format: uri
           nullable: true
           type: string
         previous:
-          example: http://api.example.org/accounts/?page=2
           format: uri
           nullable: true
           type: string
@@ -789,15 +780,12 @@ components:
     PaginatedMembershipList:
       properties:
         count:
-          example: 123
           type: integer
         next:
-          example: http://api.example.org/accounts/?page=4
           format: uri
           nullable: true
           type: string
         previous:
-          example: http://api.example.org/accounts/?page=2
           format: uri
           nullable: true
           type: string
@@ -809,15 +797,12 @@ components:
     PaginatedTagList:
       properties:
         count:
-          example: 123
           type: integer
         next:
-          example: http://api.example.org/accounts/?page=4
           format: uri
           nullable: true
           type: string
         previous:
-          example: http://api.example.org/accounts/?page=2
           format: uri
           nullable: true
           type: string
@@ -829,15 +814,12 @@ components:
     PaginatedTaskStepList:
       properties:
         count:
-          example: 123
           type: integer
         next:
-          example: http://api.example.org/accounts/?page=4
           format: uri
           nullable: true
           type: string
         previous:
-          example: http://api.example.org/accounts/?page=2
           format: uri
           nullable: true
           type: string
@@ -849,15 +831,12 @@ components:
     PaginatedUserList:
       properties:
         count:
-          example: 123
           type: integer
         next:
-          example: http://api.example.org/accounts/?page=4
           format: uri
           nullable: true
           type: string
         previous:
-          example: http://api.example.org/accounts/?page=2
           format: uri
           nullable: true
           type: string

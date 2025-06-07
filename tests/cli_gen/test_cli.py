@@ -609,7 +609,12 @@ def test_show_cli_tree(layout_file, oas_file, start, display, depth, expected):
 def test_trim_oas():
     directory = TemporaryDirectory()
     updated = Path(directory.name) / "trimmed.yaml"
-    trim_oas(asset_filename("layout_cloudtruth.yaml"), asset_filename("ct.yaml"), updated_file=updated)
+    trim_oas(
+        asset_filename("layout_cloudtruth.yaml"),
+        asset_filename("ct.yaml"),
+        updated_file=updated,
+        remove_properties=["example"],
+    )
     expected = Path(asset_filename("ct_trimmed.yaml")).read_text()
     actual = updated.read_text()
     assert expected == actual
