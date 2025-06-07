@@ -15,6 +15,7 @@ from openapi_spec_tools.utils import model_filter
 from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
+from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
@@ -468,3 +469,30 @@ def test_map_content_types():
     result = map_content_types(schema)
     expected = {'createPets', 'deletePetById', 'showPetById', 'listPets'}
     assert expected == result['application/json']
+
+
+def test_remove_property():
+    original = {
+        "a": "b",
+        "b": "c",
+        "c": {"d": "e"},  # empty dict is removed
+        "d": None,
+        "e": {},
+        "f": [
+            None,
+            "a",
+            {"d": 1},  # keep empty dict's in list to preserve order/size
+            {"d": 2, "e": True},
+        ],
+        "g": [],
+        "h": None,
+    }
+    expected = {
+        "a": "b",
+        "b": "c",
+        "e": {},
+        "f": [None, "a", {}, {"e": True}],
+        "g": [],
+        "h": None,
+    }
+    assert expected == remove_property(original, "d")

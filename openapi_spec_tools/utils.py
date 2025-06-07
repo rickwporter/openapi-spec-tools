@@ -562,3 +562,35 @@ def map_content_types(schema: dict[str, Any]) -> dict[str, set]:
                     content[content_type] = items
 
     return content
+
+
+def remove_property(schema: dict[str, Any], property: str) -> dict[str, Any]:
+    """Recursively remove any property matching this name."""
+    result = deepcopy(schema)
+    if isinstance(result, dict):
+        result.pop(property, None)
+        dead_keys = set()
+        for key, value in result.items():
+            if not value:
+                continue
+
+            v = remove_property(value, property)
+            if not v:
+                dead_keys.add(key)
+                continue
+
+            result[key] = v
+
+        for key in dead_keys:
+            result.pop(key)
+
+    elif isinstance(result, list):
+        temp = []
+        for item in result:
+            if not item:
+                temp.append(item)
+                continue
+            temp.append(remove_property(item, property))
+        result = temp
+
+    return result
