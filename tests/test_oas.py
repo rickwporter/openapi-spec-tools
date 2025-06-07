@@ -188,6 +188,15 @@ servers:
 -   url: http://petstore.swagger.io/v1
 
 """
+PET2_HEADERS_REMOVED = """\
+paths:
+    /pets:
+        get:
+            responses:
+                '200':
+                    headers: removed
+
+"""
 
 @pytest.mark.parametrize(
     ["filename", "kwargs", "expected"],
@@ -230,6 +239,12 @@ servers:
             PET2_UPDATE_DELETE,
             id="allow-ops",
         ),
+        pytest.param(
+            PET2_YAML,
+            {"remove_properties": ["headers"]},
+            PET2_HEADERS_REMOVED,
+            id="remove-property",
+        )
     ]
 )
 def test_update_success(filename: str, kwargs: dict[str, Any], expected: str) -> None:
