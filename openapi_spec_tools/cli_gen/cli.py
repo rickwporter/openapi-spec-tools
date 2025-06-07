@@ -36,6 +36,7 @@ from openapi_spec_tools.cli_gen.layout import subcommand_references
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import open_oas
+from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
@@ -382,6 +383,10 @@ def trim_oas(
             help="Filename for updated OpenAPI spec, overwrites original of not specified.",
         ),
     ] = None,
+    remove_properties: Annotated[
+        list[str],
+        typer.Option("--remove", show_default=False, help="List of properties to remove."),
+    ] = [],
     start: StartPointOption = DEFAULT_START,
     nullable_not_required: Annotated[
         bool,
@@ -406,6 +411,9 @@ def trim_oas(
     updated = deepcopy(oas)
 
     operations = _operations(layout)
+    for prop_name in remove_properties:
+        updated = remove_property(updated, prop_name)
+
     updated = schema_operations_filter(updated, allow=operations)
     if remove_all_tags:
         updated = remove_schema_tags(updated)

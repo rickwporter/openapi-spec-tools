@@ -26,6 +26,7 @@ from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import open_oas
+from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
@@ -185,6 +186,10 @@ def update(
         Optional[list[str]],
         typer.Option("--allow-op", show_default=False, help="List of operations to keep"),
     ] = None,
+    remove_properties: Annotated[
+        list[str],
+        typer.Option("--remove", show_default=False, help="List of properties to remove."),
+    ] = [],
     display_option: Annotated[
         DisplayOption,
         typer.Option("--display", help="Shown on console at conclusion", case_sensitive=False),
@@ -202,6 +207,9 @@ def update(
 
     if remove_all_tags:
         updated = remove_schema_tags(updated)
+
+    for prop_name in remove_properties:
+        updated = remove_property(updated, prop_name)
 
     if nullable_not_required:
         updated = set_nullable_not_required(updated)

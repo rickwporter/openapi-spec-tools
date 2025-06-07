@@ -34,7 +34,7 @@ layout-lint:  ## Check the layout file format
 	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
 
 trim: ## Creates the skinny OpenAPI spec
-	$(poetry_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC)
+	$(poetry_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC) --remove examples
 
 gen: layout-lint trim ## Generate CLI code
 	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(TRIMMED_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
