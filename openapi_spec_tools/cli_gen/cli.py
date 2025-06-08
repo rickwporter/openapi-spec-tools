@@ -3,6 +3,7 @@ import os
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
+from typing import Any
 from typing import Optional
 
 import typer
@@ -48,6 +49,25 @@ SEP = "\n    "
 LayoutFilenameArgument = Annotated[str, typer.Argument(show_default=False , help="Layout file YAML definition")]
 OpenApiFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification filename")]
 StartPointOption = Annotated[str, typer.Option(help="Start point for CLI in layout file")]
+
+
+#################################################
+# Utilities
+def open_oas_with_error_handling(filename: str) -> Any:
+    """
+    Performs error handling around opening an OpenAPI spec, and avoids the standard Typer
+    error handling that is quite verbose.
+    """
+    try:
+        return open_oas(filename)
+    except FileNotFoundError:
+        message = f"failed to find {filename}"
+    except Exception as ex:
+        message = f"unable to parse {filename}: {ex}"
+
+    typer.echo(f"ERROR: {message}")
+    raise typer.Exit(1)
+
 
 #################################################
 # Top-level stuff
@@ -263,7 +283,7 @@ def generate_cli(
             raise typer.Exit(1)
 
     commands = file_to_tree(layout_file, start=start)
-    oas = open_oas(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file)
 
     if copyright_file:
         text = Path(copyright_file).read_text()
@@ -305,7 +325,7 @@ def generate_check_missing(
     start: StartPointOption = DEFAULT_START,
 ) -> None:
     commands = file_to_tree(layout_file, start=start)
-    oas = open_oas(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file)
 
     missing = check_for_missing(commands, oas)
     if missing:
@@ -323,7 +343,7 @@ def generate_unreferenced(
     full_path: Annotated[bool, typer.Option(help="Use full URL path that included variables")] = False,
 ) -> None:
     commands = file_to_tree(layout_file, start=start)
-    oas = open_oas(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file)
 
     unreferenced = find_unreferenced(commands, oas)
     if not unreferenced:
@@ -364,7 +384,7 @@ def show_cli_tree(
     max_depth: Annotated[int, typer.Option(help="Maximum tree depth to show")] = 10,
 ) -> None:
     layout = file_to_tree(layout_file, start=start)
-    oas = open_oas(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file)
     generator = Generator("", oas)
 
     tree = generate_tree_node(generator, layout)
@@ -417,7 +437,7 @@ def trim_oas(
         return ops
 
     layout = file_to_tree(layout_file, start=start)
-    oas = open_oas(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file)
     updated = deepcopy(oas)
 
     operations = _operations(layout)

@@ -16,6 +16,7 @@ from openapi_spec_tools.cli_gen.cli import generate_unreferenced
 from openapi_spec_tools.cli_gen.cli import layout_check_format
 from openapi_spec_tools.cli_gen.cli import layout_operations
 from openapi_spec_tools.cli_gen.cli import layout_tree
+from openapi_spec_tools.cli_gen.cli import open_oas_with_error_handling
 from openapi_spec_tools.cli_gen.cli import show_cli_tree
 from openapi_spec_tools.cli_gen.cli import trim_oas
 from tests.cli_gen.cli_output import P_V_ALL
@@ -30,6 +31,26 @@ from tests.cli_gen.cli_output import PET_PATH
 from tests.cli_gen.helpers import to_ascii
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
+
+
+@pytest.mark.parametrize(
+    ["filename", "message"],
+    [
+        pytest.param("gone", "ERROR: failed to find", id="missing"),
+        pytest.param("bad.json", "ERROR: unable to parse", id="bad"),
+    ]
+)
+def test_open_oas(filename, message) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        open_oas_with_error_handling(asset_filename(filename))
+
+    assert err.value.exit_code == 1
+    output = mock_stdout.getvalue()
+    assert output.startswith(message)
+
 
 BAD_LAYOUT_FILE = asset_filename("layout_bad.yaml")
 
