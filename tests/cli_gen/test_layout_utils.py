@@ -4,6 +4,7 @@ from openapi_spec_tools.cli_gen.layout import check_pagination_definitions
 from openapi_spec_tools.cli_gen.layout import data_to_node
 from openapi_spec_tools.cli_gen.layout import field_to_list
 from openapi_spec_tools.cli_gen.layout import file_to_tree
+from openapi_spec_tools.cli_gen.layout import open_layout
 from openapi_spec_tools.cli_gen.layout import operation_duplicates
 from openapi_spec_tools.cli_gen.layout import operation_order
 from openapi_spec_tools.cli_gen.layout import parse_extras
@@ -22,6 +23,14 @@ NAME = "name"
 OP_ID = "operationId"
 PAGE = "pagination"
 SUB_ID = "subcommandId"
+
+
+def test_open_layout() -> None:
+    data = open_layout(asset_filename("layout_pets.yaml"))
+    assert data is not None
+
+    with pytest.raises(FileNotFoundError):
+        open_layout("no-such-file")
 
 
 @pytest.mark.parametrize(

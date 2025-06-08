@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 from typing import Optional
 
@@ -15,6 +16,10 @@ def open_layout(filename: str) -> Any:
     """
     Open the specified filename, and return the dictionary.
     """
+    file = Path(filename)
+    if not file.exists():
+        raise FileNotFoundError(filename)
+
     with open(filename, "r", encoding="utf-8", newline="\n") as fp:
         return yaml.safe_load(fp)
 
