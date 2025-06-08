@@ -2,6 +2,7 @@
 import os
 from copy import deepcopy
 from enum import Enum
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -23,6 +24,7 @@ from openapi_spec_tools.cli_gen.generate import find_unreferenced
 from openapi_spec_tools.cli_gen.generate import generate_node
 from openapi_spec_tools.cli_gen.generate import generate_tree_file
 from openapi_spec_tools.cli_gen.generate import generate_tree_node
+from openapi_spec_tools.cli_gen.generate import set_copyright
 from openapi_spec_tools.cli_gen.generator import Generator
 from openapi_spec_tools.cli_gen.layout import DEFAULT_START
 from openapi_spec_tools.cli_gen.layout import check_pagination_definitions
@@ -227,6 +229,10 @@ def generate_cli(
         Optional[str],
         typer.Option(show_default=False, help="Directory for tests -- overrides default")
     ] = None,
+    copyright_file: Annotated[
+        Optional[str],
+        typer.Option(show_default=False, help="File name containing copyright message (for non-default)"),
+    ] = None,
     include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "DEBUG",
@@ -258,6 +264,10 @@ def generate_cli(
 
     commands = file_to_tree(layout_file, start=start)
     oas = open_oas(openapi_file)
+
+    if copyright_file:
+        text = Path(copyright_file).read_text()
+        set_copyright(text)
 
     missing = check_for_missing(commands, oas)
     if missing:
