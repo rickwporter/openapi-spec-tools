@@ -69,7 +69,7 @@ def remove_list_prefix(items: list[str]) -> list[str]:
 
 def remove_dict_prefix(map: dict[str, Any]) -> dict[str, Any]:
     """
-    If all the keys of the provided map start with the same prefix (before /), it removes the prefix fro mthe keys
+    If all the keys of the provided map start with the same prefix (before /), it removes the prefix from the keys
     """
     keys = list(map.keys())
     prefix = keys[0].split('/')[0] + '/'
