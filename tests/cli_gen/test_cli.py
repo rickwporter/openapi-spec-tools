@@ -409,6 +409,10 @@ def test_cli_generate_success_copyright(copyright_fixture):
     copyright_file = base_dir / "copyright.txt"
     copyright_file.write_bytes(copyright_text.encode(encoding="utf-8"))
 
+    def _read_text(filename: str) -> str:
+        with open(filename, "r", encoding="utf-8", newline="\n") as fp:
+            return fp.read()
+
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         generate_cli(
             layout_file,
@@ -434,7 +438,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
     path = base_dir / pkg_name
     for fname in filenames:
         file = path / fname
-        text = file.read_text()
+        text = _read_text(file.as_posix())
         assert copyright_text in text
 
     filenames = {
@@ -449,7 +453,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
     path = base_dir / "tests"
     for fname in filenames:
         file = path / fname
-        text = file.read_text()
+        text = _read_text(file.as_posix())
         assert copyright_text in text
 
 
