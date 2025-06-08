@@ -20,7 +20,7 @@ from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 
 
-def test_copyright():
+def test_copyright(copyright_fixture):
     assert DEFAULT_COPYRIGHT == copyright()
 
     text = "this is my copyright"
