@@ -407,7 +407,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
 
     copyright_text = "# Simple copyright message"
     copyright_file = base_dir / "copyright.txt"
-    copyright_file.write_text(copyright_text)
+    copyright_file.write_bytes(copyright_text.encode())
 
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
@@ -433,7 +433,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
         "main.py",
         "tree.yaml",
     }
-    path = Path(directory.name) / pkg_name
+    path = base_dir / pkg_name
     for fname in filenames:
         file = path / fname
         text = file.read_text()
@@ -448,7 +448,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
         "test_requests.py",
         "test_tree.py",
     }
-    path = Path(directory.name) / "tests"
+    path = base_dir / "tests"
     for fname in filenames:
         file = path / fname
         text = file.read_text()
