@@ -397,6 +397,64 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
         assert filenames == expected
 
 
+def test_cli_generate_success_copyright(copyright_fixture):
+    layout_file = asset_filename("layout_pets.yaml")
+    oas_file = asset_filename("pet2.yaml")
+
+    pkg_name = "my_cli_pkg"
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+
+    copyright_text = "# Simple copyright message"
+    copyright_file = base_dir / "copyright.txt"
+    copyright_file.write_text(copyright_text)
+
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+    ):
+        generate_cli(
+            layout_file,
+            oas_file,
+            pkg_name,
+            project_dir=directory.name,
+            include_tests=True,
+            copyright_file=copyright_file.as_posix()
+        )
+        assert "Generated files\n" == mock_stdout.getvalue()
+
+    filenames = {
+        "_arguments.py",
+        "_console.py",
+        "_display.py",
+        "_exceptions.py",
+        "_logging.py",
+        "_requests.py",
+        "_tree.py",
+        "main.py",
+        "tree.yaml",
+    }
+    path = Path(directory.name) / pkg_name
+    for fname in filenames:
+        file = path / fname
+        text = file.read_text()
+        assert copyright_text in text
+
+    filenames = {
+        "helpers.py",
+        "test_console.py",
+        "test_display.py",
+        "test_exceptions.py",
+        "test_logging.py",
+        "test_requests.py",
+        "test_tree.py",
+    }
+    path = Path(directory.name) / "tests"
+    for fname in filenames:
+        file = path / fname
+        text = file.read_text()
+        assert copyright_text in text
+
+
 @pytest.mark.parametrize(
     ["code_dir", "test_dir", "include_tests", "error"],
     [
