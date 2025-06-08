@@ -407,11 +407,9 @@ def test_cli_generate_success_copyright(copyright_fixture):
 
     copyright_text = "# Simple copyright message"
     copyright_file = base_dir / "copyright.txt"
-    copyright_file.write_bytes(copyright_text.encode())
+    copyright_file.write_bytes(copyright_text.encode(encoding="utf-8"))
 
-    with (
-        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
-    ):
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         generate_cli(
             layout_file,
             oas_file,
