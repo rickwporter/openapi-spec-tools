@@ -68,12 +68,32 @@ def remove_list_prefix(items: list[str]) -> list[str]:
 
 
 def remove_dict_prefix(map: dict[str, Any]) -> dict[str, Any]:
+    """
+    If all the keys of the provided map start with the same prefix (before /), it removes the prefix fro mthe keys
+    """
     keys = list(map.keys())
     prefix = keys[0].split('/')[0] + '/'
     if not all(_.startswith(prefix) for _ in keys):
         return map
 
     return {k.replace(prefix, ""): v for k, v in map.items()}
+
+
+def open_oas_with_error_handling(filename: str) -> Any:
+    """
+    Performs error handling around opening an OpenAPI spec, and avoids the standard Typer
+    error handling that is quite verbose.
+    """
+    try:
+        return open_oas(filename)
+    except FileNotFoundError:
+        message = f"failed to find {filename}"
+    except Exception as ex:
+        message = f"unable to parse {filename}: {ex}"
+
+    console = console_factory()
+    console.print(f"[red]ERROR:[/red] {message}")
+    raise typer.Exit(1)
 
 
 #################################################
@@ -90,7 +110,7 @@ app = typer.Typer(
 def info(
     filename: OasFilenameArgument,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     info = spec.get("info", {})
     console = console_factory()
@@ -102,7 +122,7 @@ def info(
 def summary(
     filename: OasFilenameArgument,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
     method_count = {
         'get': 0,
         'put': 0,
@@ -150,8 +170,8 @@ def diff(
         typer.Argument(metavar="FILENAME", show_default=False, help="Updated OpenAPI specification filename"),
     ],
 ) -> None:
-    old_spec = open_oas(original)
-    new_spec = open_oas(updated)
+    old_spec = open_oas_with_error_handling(original)
+    new_spec = open_oas_with_error_handling(updated)
 
     console = console_factory()
     diffs = find_diffs(old_spec, new_spec)
@@ -199,7 +219,7 @@ def update(
         typer.Option(min=1, max=10, help="Number of characters to indent on YAML display"),
     ] = len(INDENT),
 ) -> None:
-    old_spec = open_oas(original_filename)
+    old_spec = open_oas_with_error_handling(original_filename)
     updated = deepcopy(old_spec)
 
     if allowed_operations and remove_operations:
@@ -261,7 +281,7 @@ def operation_list(
         typer.Option("--contains", help="Search for this value in the operation names"),
     ] = None,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
     names = sorted(operations.keys())
@@ -286,7 +306,7 @@ def operation_show(
     filename: OasFilenameArgument,
     operation_name: Annotated[str, typer.Argument(help="Name of the operation to show")],
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
     operation = operations.get(operation_name)
@@ -311,7 +331,7 @@ def operation_models(
     filename: OasFilenameArgument,
     operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
     operation = operations.get(operation_name)
@@ -352,7 +372,7 @@ def paths_list(
     search: PathSearchOption = None,
     include_subpaths: PathSubpathOption = False,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     paths = find_paths(spec.get(OasField.PATHS, {}), search, include_subpaths)
     names = sorted(paths.keys())
@@ -381,7 +401,7 @@ def paths_show(
     include_subpaths: PathSubpathOption = False,
     include_models: PathModelsOption = False,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     paths = find_paths(spec.get(OasField.PATHS, {}), path_name, include_subpaths)
     if not paths:
@@ -409,7 +429,7 @@ def paths_operations(
     path_name: Annotated[str, typer.Option(help="Name of the path to show")],
     include_subpaths: PathSubpathOption = False,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     result = {}
     paths = find_paths(spec.get(OasField.PATHS, {}), path_name, include_subpaths)
@@ -442,7 +462,7 @@ def models_list(
         typer.Option("--contains", help="Search for this value in the model names"),
     ] = None,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     names = sorted(models.keys())
@@ -469,7 +489,7 @@ def models_show(
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
     include_referenced: Annotated[bool, typer.Option("--references", help="Include referenced models")] = False,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -493,7 +513,7 @@ def models_uses(
     filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -520,7 +540,7 @@ def models_used_by(
     filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -545,7 +565,7 @@ def models_operations(
     filename: OasFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to search for")],
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -584,7 +604,7 @@ def tags_list(
     filename: OasFilenameArgument,
     search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the tag names")] = None,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     # NOTE: not all OAS's include a "tags" section, so walk the operations
 
@@ -619,7 +639,7 @@ def tags_show(
     filename: OasFilenameArgument,
     tag_name: Annotated[str, typer.Argument(help="Name of the tag to show")],
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
 
     operations = {}
     for path, path_data in spec.get(OasField.PATHS, {}).items():
@@ -657,7 +677,7 @@ def content_type_list(
     max_size: Annotated[int, typer.Option(help="Maximum number of operations to show")] = 10,
     content_type: Annotated[Optional[str], typer.Option(help="Only display for specified content type")] = None,
 ) -> None:
-    spec = open_oas(filename)
+    spec = open_oas_with_error_handling(filename)
     content = map_content_types(spec)
 
     if content_type:
