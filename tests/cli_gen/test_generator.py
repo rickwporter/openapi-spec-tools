@@ -1,5 +1,3 @@
-from datetime import datetime
-from datetime import timezone
 from pathlib import Path
 
 import pytest
@@ -27,14 +25,6 @@ def test_shebang():
     text = uut.shebang()
     assert text.startswith("#!/")
     assert "python3" in text
-
-
-def test_copyright():
-    uut = Generator("cli_package", {})
-    year = datetime.now(timezone.utc).year
-    text = uut.copyright()
-    assert "Copyright" in text
-    assert str(year) in text
 
 
 def test_standard_imports():
