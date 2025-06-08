@@ -1,5 +1,7 @@
+import json
 from copy import deepcopy
 from itertools import zip_longest
+from pathlib import Path
 from typing import Any
 from typing import Optional
 from typing import Union
@@ -15,7 +17,13 @@ def open_oas(filename: str) -> Any:
     """
     Open the specified filename, and return the dictionary.
     """
+    path = Path(filename)
+    if not path.exists():
+        raise FileNotFoundError(filename)
+
     with open(filename, "r", encoding="utf-8", newline="\n") as fp:
+        if filename.endswith('json'):
+            return json.load(fp)
         return yaml.safe_load(fp)
 
 

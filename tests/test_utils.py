@@ -15,13 +15,25 @@ from openapi_spec_tools.utils import model_filter
 from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
+from openapi_spec_tools.utils import open_oas
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
 from openapi_spec_tools.utils import short_ref
 
+from .helpers import asset_filename
 from .helpers import open_test_oas
+
+
+def test_open_oas() -> None:
+    # check we get same values for JSON and YAML versions
+    pet_yaml = open_oas(asset_filename("pet2.yaml"))
+    pet_json = open_oas(asset_filename("pet2.json"))
+    assert pet_yaml == pet_json
+
+    with pytest.raises(FileNotFoundError):
+        open_oas("no-such-file")
 
 
 @pytest.mark.parametrize(
