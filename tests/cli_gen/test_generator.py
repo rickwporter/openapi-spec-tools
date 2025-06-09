@@ -167,10 +167,10 @@ def test_op_param_formation():
         params["page-size"] = page_size
     params["anotherQparam"] = another_qparam
     if more is not None:
-        _l.logger().warning("more is deprecated")
+        _l.logger().warning("--more is deprecated")
         params["more"] = more
     if day_value is not None:
-        _l.logger().warning("dayValue was deprecated in last-release")
+        _l.logger().warning("--day-value was deprecated in last-release")
         params["dayValue"] = day_value\
 """
     text = uut.op_param_formation(query_params)
@@ -242,6 +242,23 @@ def test_function_name(proposed, expected):
 def test_variable_name(proposed, expected):
     uut = Generator("", {})
     assert expected == uut.variable_name(proposed)
+
+
+@pytest.mark.parametrize(
+    ["proposed", "expected"],
+    [
+        pytest.param("simple", "--simple", id="simple"),
+        pytest.param("snake_case_value", "--snake-case-value", id="snake"),
+        pytest.param("camelCaseValue", "--camel-case-value", id="camel"),
+        pytest.param("decimal.dot.value", "--decimal-dot-value", id="dotted"),
+        pytest.param("users/list", "--users-list", id="slash"),
+        pytest.param("page-name", "--page-name", id="dash"),
+    ],
+)
+def test_option_name(proposed, expected):
+    uut = Generator("", {})
+    assert expected == uut.option_name(proposed)
+
 
 @pytest.mark.parametrize(
     ["param_data", "expected"],

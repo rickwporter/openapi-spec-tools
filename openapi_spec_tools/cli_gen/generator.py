@@ -157,6 +157,10 @@ if __name__ == "__main__":
             value = value.replace(v, '_')
         return value
 
+    def option_name(self, s: str) -> str:
+        """Returns the typer option name for the provided string."""
+        value = self.variable_name(s)
+        return "--" + value.replace("_", "-")
 
     def model_is_complex(self, model: dict[str, Any]) -> bool:
         """Determines if the model is complex, such that it would not work well with a list.
@@ -578,13 +582,14 @@ if __name__ == "__main__":
         for param in query_params:
             param_name = param.get(OasField.NAME)
             var_name = self.variable_name(param_name)
+            option = self.option_name(param_name)
             deprecated = param.get(OasField.DEPRECATED, False)
             x_deprecated = param.get(OasField.X_DEPRECATED, None)
             dep_warning = ""
             if x_deprecated:
-                dep_warning = f'{SEP2}_l.logger().warning("{param_name} was deprecated in {x_deprecated}")'
+                dep_warning = f'{SEP2}_l.logger().warning("{option} was deprecated in {x_deprecated}")'
             elif deprecated:
-                dep_warning = f'{SEP2}_l.logger().warning("{param_name} is deprecated")'
+                dep_warning = f'{SEP2}_l.logger().warning("{option} is deprecated")'
             if param.get(OasField.REQUIRED, False):
                 result += f'{SEP1}params[{quoted(param_name)}] = {var_name}'
             else:
@@ -623,14 +628,14 @@ if __name__ == "__main__":
         for param in query_params:
             if param.get(OasField.REQUIRED, False):
                 var_name = self.variable_name(param.get(OasField.NAME))
-                option = '--' + var_name.replace('_', '-')
+                option = self.option_name(var_name)
                 lines.append(f'if {var_name} is None:')
                 lines.append(f'    missing.append("{option}")')
 
         for prop_name, prop_data in body_params.items():
             if prop_data.get(OasField.REQUIRED):
                 var_name = self.variable_name(prop_name)
-                option = '--' + var_name.replace('_', '-')
+                option = self.option_name(prop_name)
                 lines.append(f'if {var_name} is None:')
                 lines.append(f'    missing.append("{option}")')
 
