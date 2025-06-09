@@ -167,8 +167,10 @@ def test_op_param_formation():
         params["page-size"] = page_size
     params["anotherQparam"] = another_qparam
     if more is not None:
+        _l.logger().warning("more is deprecated")
         params["more"] = more
     if day_value is not None:
+        _l.logger().warning("dayValue was deprecated in last-release")
         params["dayValue"] = day_value\
 """
     text = uut.op_param_formation(query_params)
@@ -378,10 +380,10 @@ def test_op_query_arguments():
         'another_qparam: Annotated[Optional[str], typer.Option(show_default=False, help="Query parameter")] = None'
         in text
     )
-    assert 'more: Annotated[bool, typer.Option(help="")] = False' in text
+    assert 'more: Annotated[bool, typer.Option(hidden=True, help="")] = False' in text
     assert (
         'day_value: Annotated[Optional[DayValue], '
-        'typer.Option(show_default=False, case_sensitive=False, help="")] = None'
+        'typer.Option(show_default=False, case_sensitive=False, hidden=True, help="")] = None'
         in text
     )
     assert (

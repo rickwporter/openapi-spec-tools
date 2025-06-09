@@ -578,15 +578,17 @@ if __name__ == "__main__":
         for param in query_params:
             param_name = param.get(OasField.NAME)
             var_name = self.variable_name(param_name)
+            deprecated = param.get(OasField.DEPRECATED, False)
+            x_deprecated = param.get(OasField.X_DEPRECATED, None)
+            dep_warning = ""
+            if x_deprecated:
+                dep_warning = f'{SEP2}_l.logger().warning("{param_name} was deprecated in {x_deprecated}")'
+            elif deprecated:
+                dep_warning = f'{SEP2}_l.logger().warning("{param_name} is deprecated")'
             if param.get(OasField.REQUIRED, False):
-                result += f"""
-    params["{param_name}"] = {var_name}\
-"""
+                result += f'{SEP1}params[{quoted(param_name)}] = {var_name}'
             else:
-                result += f"""
-    if {var_name} is not None:
-        params["{param_name}"] = {var_name}\
-"""
+                result += f'{SEP1}if {var_name} is not None:{dep_warning}{SEP2}params[{quoted(param_name)}] = {var_name}'
         return result
 
     def op_content_header(self, operation: dict[str, Any]) -> str:

@@ -80,6 +80,7 @@ paths:
         - name: more
           in: query
           required: false
+          deprecated: true
           schema:
             type: boolean
             default: false
@@ -89,6 +90,7 @@ paths:
           deprecated: true
         - name: dayValue
           in: query
+          x-deprecated: last-release
           schema:
             type: str
             enum:
