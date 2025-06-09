@@ -587,13 +587,14 @@ if __name__ == "__main__":
             x_deprecated = param.get(OasField.X_DEPRECATED, None)
             dep_warning = ""
             if x_deprecated:
-                dep_warning = f'{SEP2}_l.logger().warning("{option} was deprecated in {x_deprecated}")'
+                dep_warning = f'_l.logger().warning("{option} was deprecated in {x_deprecated}"){SEP2}'
             elif deprecated:
-                dep_warning = f'{SEP2}_l.logger().warning("{option} is deprecated")'
+                dep_warning = f'_l.logger().warning("{option} is deprecated"){SEP2}'
             if param.get(OasField.REQUIRED, False):
                 result += f'{SEP1}params[{quoted(param_name)}] = {var_name}'
             else:
-                result += f'{SEP1}if {var_name} is not None:{dep_warning}{SEP2}params[{quoted(param_name)}] = {var_name}'
+                result += f'{SEP1}if {var_name} is not None:'
+                result += f'{SEP2}{dep_warning}params[{quoted(param_name)}] = {var_name}'
         return result
 
     def op_content_header(self, operation: dict[str, Any]) -> str:
