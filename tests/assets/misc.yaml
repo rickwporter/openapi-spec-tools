@@ -139,6 +139,13 @@ paths:
       responses:
         '202':
           description: This is an empty response
+    delete:
+      operationId: snafooDelete
+      summary: Straighten things out
+      x-deprecated: 3.2.1
+      responses:
+        '204':
+          description: This is an empty response
 components:
   parameters:
     PageSize:

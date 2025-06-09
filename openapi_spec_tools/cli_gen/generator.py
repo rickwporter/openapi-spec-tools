@@ -734,7 +734,12 @@ if __name__ == "__main__":
 
         deprecation_warning = ""
         deprecated = op.get(OasField.DEPRECATED, False)
-        if deprecated:
+        x_deprecated = op.get(OasField.X_DEPRECATED, None)
+        if x_deprecated:
+            command_args.append("hidden=True")
+            message = f"{node.identifier} was deprecated in {x_deprecated}, and should not be used."
+            deprecation_warning = SEP1 + f'_l.logger().warning("{message}")'
+        elif deprecated:
             command_args.append("hidden=True")
             message = f"{node.identifier} is deprecated and should not be used."
             deprecation_warning = SEP1 + f'_l.logger().warning("{message}")'

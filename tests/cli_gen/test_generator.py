@@ -1037,6 +1037,23 @@ def test_function_deprecated():
     assert '_l.logger().warning("snafooCheck is deprecated and should not be used.")' in text
 
 
+def test_function_x_deprecated():
+    oas = open_oas(asset_filename("misc.yaml"))
+    item = LayoutNode(command='sna', identifier='snafooDelete')
+    uut = Generator("cli_package", oas)
+    text = uut.function_definition(item)
+
+    assert '@app.command("sna", hidden=True, short_help="Straighten things out")' in text
+    assert 'def snafoo_delete(' in text
+
+    # check a couple arguments
+    assert '_api_host: _a.ApiHostOption' in text
+    assert '_log_level: _a.LogLevelOption' in text
+
+    # check the warning log
+    assert '_l.logger().warning("snafooDelete was deprecated in 3.2.1, and should not be used.")' in text
+
+
 def test_main():
     uut = Generator("cli_package", {})
     text = uut.main()
