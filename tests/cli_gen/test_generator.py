@@ -346,7 +346,12 @@ def test_op_body_formation():
     assert 'body["id"]' not in text  # ignore read-only
     assert 'body["name"] = name' in text  # required
     assert 'if another_value is not None:' in text  # not required, so check if not None
-    assert 'body["anotherValue"] = another_value'  # check prop vs variable name
+    assert '_l.logger().warning("--another-value is deprecated and should not be used")' in text
+    assert 'body["anotherValue"] = another_value' in text  # check prop vs variable name
+    assert 'if bogus is not None:' in text
+    assert '_l.logger().warning("--bogus was deprecated in 7.8.9 and should not be used")' in text
+    assert 'body["bogus"] = bogus' in text
+
 
 def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))

@@ -612,10 +612,20 @@ if __name__ == "__main__":
         lines = ["body = {}"]
         for prop_name, prop_data in body_params.items():
             var_name = self.variable_name(prop_name)
+            option = self.option_name(prop_name)
+            deprecated = prop_data.get(OasField.DEPRECATED, False)
+            x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
+            dep_msg = ""
+            if x_deprecated:
+                dep_msg = f"{option} was deprecated in {x_deprecated} and should not be used"
+            elif deprecated:
+                dep_msg = f"{option} is deprecated and should not be used"
             if prop_data.get(OasField.REQUIRED):
                 lines.append(f'body["{prop_name}"] = {var_name}')
             else:
                 lines.append(f'if {var_name} is not None:')
+                if dep_msg:
+                    lines.append(f'    _l.logger().warning("{dep_msg}")')
                 lines.append(f'    body["{prop_name}"] = {var_name}')
 
         return SEP1 + SEP1.join(lines)
