@@ -305,11 +305,6 @@ def test_data_to_node_basic(name, item, expected) -> None:
     ["start", "expected"],
     [
         pytest.param(
-            "foo",
-            LayoutNode(command="foo", identifier="foo"),
-            id="empty",
-        ),
-        pytest.param(
             "top",
             LayoutNode(
                 command="top",
@@ -352,7 +347,7 @@ def test_data_to_node_basic(name, item, expected) -> None:
         )
     ]
 )
-def test_parse_to_tree(start, expected) -> None:
+def test_parse_to_tree_success(start, expected) -> None:
     data = {
         "top": {
             DESC: "top level item",
@@ -367,6 +362,12 @@ def test_parse_to_tree(start, expected) -> None:
     }
     node = parse_to_tree(data, start)
     assert expected == node
+
+
+def test_parse_to_tree_error() -> None:
+    data = {"sna": "foo"}
+    with pytest.raises(ValueError, match="No start value found for "):
+        parse_to_tree(data, "foo")
 
 
 @pytest.mark.parametrize(

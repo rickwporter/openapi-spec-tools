@@ -1,0 +1,9 @@
+main:
+  description: something
+  operations:
+    - name: hospital
+      subcommandId: hospital
+
+hospital:
+  description: A place with empty operations
+  opertions: []

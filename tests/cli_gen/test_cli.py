@@ -79,6 +79,7 @@ def test_open_layout_with_error(filename, message) -> None:
     [
         pytest.param("gone", "ERROR: failed to find", id="missing"),
         pytest.param("bad.yaml", "ERROR: unable to parse", id="bad"),
+        pytest.param("pet2.yaml", "ERROR: No start value found for 'start'", id="bad"),
     ]
 )
 def test_layout_tree_with_error(filename, message) -> None:
@@ -679,9 +680,9 @@ def test_unreferenced(layout_file, oas_file, full, expected):
     ["layout_file", "oas_file", "start", "display", "depth", "expected"],
     [
         pytest.param(
-            "layout_pets.yaml",
+            "layout_operationless.yaml",
             "pet2.yaml",
-            "gone",
+            "hospital",
             TreeDisplay.ALL,
             10,
             "No operations or sub-commands found\n",

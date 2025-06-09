@@ -94,6 +94,8 @@ def layout_tree_with_error_handling(filename: str, start: str) -> LayoutNode:
         return file_to_tree(filename, start)
     except FileNotFoundError:
         message = f"failed to find {filename}"
+    except ValueError as ex:
+        message = str(ex)
     except Exception as ex:
         message = f"unable to parse {filename}: {ex}"
 
