@@ -458,6 +458,8 @@ if __name__ == "__main__":
         var_name = self.variable_name(param.get(OasField.NAME))
         description = param.get(OasField.DESCRIPTION) or ""
         required = param.get(OasField.REQUIRED, False)
+        deprected = param.get(OasField.DEPRECATED, False)
+        x_deprecated = param.get(OasField.X_DEPRECATED, None)
         schema = param.get(OasField.SCHEMA, {})
         schema_default = schema.get(OasField.DEFAULT)
         arg_type = self.get_parameter_pytype(param)
@@ -492,6 +494,8 @@ if __name__ == "__main__":
         is_enum = bool(schema.get(OasField.ENUM))
         if is_enum:
             typer_args.append("case_sensitive=False")
+        if deprected or x_deprecated:
+            typer_args.append("hidden=True")
         typer_args.append(f'help="{simple_escape(description)}"')
         comma = ', '
 
@@ -535,6 +539,10 @@ if __name__ == "__main__":
             is_enum = bool(prop_data.get(OasField.ENUM))
             if is_enum:
                 t_args["case_sensitive"] = False
+            deprected = prop_data.get(OasField.DEPRECATED, False)
+            x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
+            if deprected or x_deprecated:
+                t_args["hidden"] = True
             help = prop_data.get(OasField.DESCRIPTION)
             if help:
                 t_args['help'] = f'"{simple_escape(help)}"'

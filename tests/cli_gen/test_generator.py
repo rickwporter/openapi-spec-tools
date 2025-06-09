@@ -341,14 +341,14 @@ def test_op_path_arguments():
 
     assert 'num_feet: Annotated[Optional[int], typer.Option(show_default=False, help="Number of feet")] = None' in text
     assert 'species: Annotated[str, typer.Option(help="Species name in Latin without spaces")] = "monkey"' in text
-    assert 'neutered: Annotated[bool, typer.Option(help="Ouch")] = True' in text
+    assert 'neutered: Annotated[bool, typer.Option(hidden=True, help="Ouch")] = True' in text
     assert (
         'birthday: Annotated[Optional[datetime], typer.Option(show_default=False, help="When is the party?")] = None'
         in text
     )
     assert 'must_have: Annotated[str, typer.Argument(show_default=False, help="")]' in text
     assert 'your_boat: Annotated[float, typer.Option(help="Pi is always good")] = 3.14159' in text
-    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, help="")] = None' in text
+    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, hidden=True, help="")] = None' in text
 
     # make sure we ignore the query params
     assert 'situation: Annotated' not in text
@@ -833,11 +833,11 @@ def test_op_body_arguments():
     assert 'name: Annotated[str, typer.Option(show_default=False, help="Pet name")] = None' in text
     assert 'tag: Annotated[Optional[str], typer.Option(show_default=False, help="Pet classification")] = None' in text
     assert (
-        'another_value: Annotated[Optional[str], typer.Option(show_default=False, '
+        'another_value: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, '
         'help="A string with a default")] = "Anything goes"'
         in text
     )
-    assert 'bogus: Annotated[Any, typer.Option(show_default=False, help="Misleading help")] = None' in text
+    assert 'bogus: Annotated[Any, typer.Option(show_default=False, hidden=True, help="Misleading help")] = None' in text
     assert (
         'flavor: Annotated[Optional[Species], '
         'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'

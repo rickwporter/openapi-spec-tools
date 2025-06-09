@@ -48,6 +48,7 @@ paths:
           in: path
           required: false
           description: Ouch
+          x-deprecated: 2000.01.01
           schema:
             type: boolean
             default: true
@@ -85,6 +86,7 @@ paths:
         - name: foobar
           type: bogus
           in: path
+          deprecated: true
         - name: dayValue
           in: query
           schema:
@@ -176,6 +178,7 @@ components:
           description: A string with a default
           type: string
           default: Anything goes
+          deprecated: true
     PetExt:
       allOf:
       - $ref: "#/components/schemas/Pet"
@@ -183,6 +186,7 @@ components:
           bogus:
             description: "Misleading help"
             type: imaginary
+            x-deprecated: 7.8.9
           flavor:
             $ref: "#/components/schemas/Species"
     Pets:
