@@ -16,6 +16,8 @@ from openapi_spec_tools.cli_gen.cli import generate_unreferenced
 from openapi_spec_tools.cli_gen.cli import layout_check_format
 from openapi_spec_tools.cli_gen.cli import layout_operations
 from openapi_spec_tools.cli_gen.cli import layout_tree
+from openapi_spec_tools.cli_gen.cli import layout_tree_with_error_handling
+from openapi_spec_tools.cli_gen.cli import open_layout_with_error_handling
 from openapi_spec_tools.cli_gen.cli import open_oas_with_error_handling
 from openapi_spec_tools.cli_gen.cli import show_cli_tree
 from openapi_spec_tools.cli_gen.cli import trim_oas
@@ -37,7 +39,8 @@ from tests.helpers import asset_filename
     ["filename", "message"],
     [
         pytest.param("gone", "ERROR: failed to find", id="missing"),
-        pytest.param("bad.json", "ERROR: unable to parse", id="bad"),
+        pytest.param("bad.json", "ERROR: unable to parse", id="bad-json"),
+        pytest.param("bad.yaml", "ERROR: unable to parse", id="bad-yaml"),
     ]
 )
 def test_open_oas(filename, message) -> None:
@@ -46,6 +49,45 @@ def test_open_oas(filename, message) -> None:
         pytest.raises(typer.Exit) as err,
     ):
         open_oas_with_error_handling(asset_filename(filename))
+
+    assert err.value.exit_code == 1
+    output = mock_stdout.getvalue()
+    assert output.startswith(message)
+
+
+@pytest.mark.parametrize(
+    ["filename", "message"],
+    [
+        pytest.param("gone", "ERROR: failed to find", id="missing"),
+        pytest.param("bad.yaml", "ERROR: unable to parse", id="bad"),
+    ]
+)
+def test_open_layout_with_error(filename, message) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        open_layout_with_error_handling(asset_filename(filename))
+
+    assert err.value.exit_code == 1
+    output = mock_stdout.getvalue()
+    assert output.startswith(message)
+
+
+@pytest.mark.parametrize(
+    ["filename", "message"],
+    [
+        pytest.param("gone", "ERROR: failed to find", id="missing"),
+        pytest.param("bad.yaml", "ERROR: unable to parse", id="bad"),
+        pytest.param("pet2.yaml", "ERROR: No start value found for 'start'", id="bad"),
+    ]
+)
+def test_layout_tree_with_error(filename, message) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        layout_tree_with_error_handling(asset_filename(filename), "start")
 
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()
@@ -638,9 +680,9 @@ def test_unreferenced(layout_file, oas_file, full, expected):
     ["layout_file", "oas_file", "start", "display", "depth", "expected"],
     [
         pytest.param(
-            "layout_pets.yaml",
+            "layout_operationless.yaml",
             "pet2.yaml",
-            "gone",
+            "hospital",
             TreeDisplay.ALL,
             10,
             "No operations or sub-commands found\n",

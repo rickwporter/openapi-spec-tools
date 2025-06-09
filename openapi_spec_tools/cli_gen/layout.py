@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 from typing import Optional
 
@@ -15,6 +16,10 @@ def open_layout(filename: str) -> Any:
     """
     Open the specified filename, and return the dictionary.
     """
+    file = Path(filename)
+    if not file.exists():
+        raise FileNotFoundError(filename)
+
     with open(filename, "r", encoding="utf-8", newline="\n") as fp:
         return yaml.safe_load(fp)
 
@@ -97,6 +102,8 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
 def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> LayoutNode:
     """Puts the data into a tree structure starting at start."""
     top = data.get(start, {})
+    if not top:
+        raise ValueError(f"No start value found for '{start}'")
 
     return data_to_node(data, start, start, top)
 

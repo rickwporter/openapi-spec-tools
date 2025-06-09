@@ -69,6 +69,40 @@ def open_oas_with_error_handling(filename: str) -> Any:
     raise typer.Exit(1)
 
 
+def open_layout_with_error_handling(filename: str) -> Any:
+    """
+    Performs error handling around opening a layout file, and avoids the standard Typer
+    error handling that is quite verbose.
+    """
+    try:
+        return open_layout(filename)
+    except FileNotFoundError:
+        message = f"failed to find {filename}"
+    except Exception as ex:
+        message = f"unable to parse {filename}: {ex}"
+
+    typer.echo(f"ERROR: {message}")
+    raise typer.Exit(1)
+
+
+def layout_tree_with_error_handling(filename: str, start: str) -> LayoutNode:
+    """
+    Performs error handling around opening a layout file, and avoids the standard Typer
+    error handling that is quite verbose.
+    """
+    try:
+        return file_to_tree(filename, start)
+    except FileNotFoundError:
+        message = f"failed to find {filename}"
+    except ValueError as ex:
+        message = str(ex)
+    except Exception as ex:
+        message = f"unable to parse {filename}: {ex}"
+
+    typer.echo(f"ERROR: {message}")
+    raise typer.Exit(1)
+
+
 #################################################
 # Top-level stuff
 layout = typer.Typer(
@@ -100,7 +134,7 @@ def layout_check_format(
     op_order: Annotated[bool, typer.Option(help="Check the operations order within each sub-command")] = True,
     pagination: Annotated[bool, typer.Option(help="Check the pagination parameters for issues")] = True,
 ) -> None:
-    data = open_layout(filename)
+    data = open_layout_with_error_handling(filename)
 
     def _dict_to_str(errors: dict[str, str], sep=SEP) -> str:
         return f"{sep}{sep.join([f'{k}: {v}' for k, v in errors.items()])}"
@@ -169,7 +203,7 @@ def layout_tree(
     style: Annotated[TreeFormat, typer.Option(case_sensitive=False, help="Output style")] = TreeFormat.TEXT,
     indent: Annotated[int, typer.Option(min=1, max=10, help="Number of characters of indent")] = 2,
 ) -> None:
-    tree = file_to_tree(filename, start=start)
+    tree = layout_tree_with_error_handling(filename, start=start)
     if style == TreeFormat.JSON:
         print_json(data=tree.as_dict(), indent=indent, sort_keys=False)
         return
@@ -216,7 +250,7 @@ def layout_operations(
             ops.update(_operations(sub))
         return ops
 
-    tree = file_to_tree(filename, start=start)
+    tree = layout_tree_with_error_handling(filename, start=start)
     operations = _operations(tree)
     print('\n'.join(sorted(operations)))
     return
@@ -282,7 +316,7 @@ def generate_cli(
             )
             raise typer.Exit(1)
 
-    commands = file_to_tree(layout_file, start=start)
+    commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
     if copyright_file:
@@ -324,7 +358,7 @@ def generate_check_missing(
     openapi_file: OpenApiFilenameArgument,
     start: StartPointOption = DEFAULT_START,
 ) -> None:
-    commands = file_to_tree(layout_file, start=start)
+    commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
     missing = check_for_missing(commands, oas)
@@ -342,7 +376,7 @@ def generate_unreferenced(
     start: StartPointOption = DEFAULT_START,
     full_path: Annotated[bool, typer.Option(help="Use full URL path that included variables")] = False,
 ) -> None:
-    commands = file_to_tree(layout_file, start=start)
+    commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
     unreferenced = find_unreferenced(commands, oas)
@@ -383,7 +417,7 @@ def show_cli_tree(
     ] = TreeDisplay.ALL,
     max_depth: Annotated[int, typer.Option(help="Maximum tree depth to show")] = 10,
 ) -> None:
-    layout = file_to_tree(layout_file, start=start)
+    layout = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
     generator = Generator("", oas)
 
@@ -436,7 +470,7 @@ def trim_oas(
             ops.update(_operations(sub))
         return ops
 
-    layout = file_to_tree(layout_file, start=start)
+    layout = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
     updated = deepcopy(oas)
 
