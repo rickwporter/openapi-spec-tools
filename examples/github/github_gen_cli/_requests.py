@@ -12,10 +12,50 @@ from typing import Any
 from typing import Optional
 
 import requests
+import yaml
 
 from github_gen_cli._logging import logger
 
 GET = "GET"
+EXTENSION_MAP = {
+    "application/java-archive": "jar",
+    "application/octet-stream": "bin",
+    "application/pdf": "pdf",
+    "application/xhtml+xml": "xhtml",
+    "application/x-shockwave-flash": "swf",
+    "application/ld+json": "",
+    "application/xml": "xml",
+    "application/zip": "zip",
+    "audio/mpeg": "mpeg",
+    "audio/x-ms-wma": "wma",
+    "audio/vnd.rn-realaudio": "ra",
+    "audio/x-wav": "wav",
+    "image/gif": "gif",
+    "image/jpeg": "jpeg",
+    "image/png": "png",
+    "image/tiff": "tif",
+    "image/vnd.microsoft.icon": "ico",
+    "image/x-icon": "ico",
+    "image/svg+xml": "svg",
+    "text/css": "css",
+    "text/csv": "csv",
+    "text/html": "html",
+    "text/javascript": "js",
+    "text/xml": "xml",
+    "video/mpeg": "mpeg",
+    "video/mp4": "mp4",
+    "video/quicktime": "qt",
+    "video/x-ms-wmv": "wmv",
+    "application/vnd.android.package-archive": "apk",
+    "application/vnd.oasis.opendocument.text": "txt",
+    "application/vnd.ms-excel": "xls",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xls",
+    "application/vnd.ms-powerpoint": "ppt",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": "xml",
+    "application/msword": "doc",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "doc",
+    "application/vnd.mozilla.xul+xml": "xml",
+}
 
 logger = logger()
 
@@ -128,16 +168,38 @@ def request(
 
     raise_for_error(response)
 
-    # now that we've stopped the clock, let's inspect the body before throwing exceptions
-    result = None
-    if response.content:
+    if not response.content:
+        return None
+
+    encoding = response.encoding or "utf-8"
+    content_type = response.headers.get("Content-type", "application/json")
+    if content_type == "application/json":
         try:
-            result = response.json()
-            # logger.info(f"{method} {pretty_url} body:\n{json.dump(result, indent=2, sort_keys=False)}")
+            return response.json()
         except json.JSONDecodeError:
             logger.error(f"Failed to decode {method} {pretty_url} response")
+            return None
 
-    return result
+    if content_type == "application/yaml":
+        try:
+            content = response.content.decode(encoding=encoding, errors="ignore")
+            return yaml.safe_load(content)
+        except Exception as ex:
+            logger.error(f"Failed to decode {method} {pretty_url} response: {ex}")
+            return None
+
+    if content_type == "text/plain":
+        return response.content.decode(encoding=encoding, errors="ignore")
+
+    extension = EXTENSION_MAP.get(content_type)
+    if extension:
+        filename = f"output.{extension}"
+        with open(filename, "wb") as fp:
+            fp.write(response.content)
+        return f"Wrote content to {filename}"
+
+    logger.error(f"Unhandled content-type={content_type}")
+    return None
 
 
 def depaginate(

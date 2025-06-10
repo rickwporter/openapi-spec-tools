@@ -465,6 +465,9 @@ SIMPLE_TABLE = """\
         pytest.param(SIMPLE_DICT, OutputFormat.JSON, json.dumps(SIMPLE_DICT, indent=2), id="json-dict"),
         pytest.param(SIMPLE_DICT, OutputFormat.YAML, yaml.dump(SIMPLE_DICT, indent=2), id="yaml-dict"),
         pytest.param(SIMPLE_DICT, OutputFormat.TABLE, SIMPLE_TABLE, id="table-dict"),
+        pytest.param("My party", OutputFormat.JSON, "My party", id="json-text"),
+        pytest.param("My party", OutputFormat.YAML, "My party", id="yaml-text"),
+        pytest.param("My party", OutputFormat.TABLE, "My party", id="table-text"),
     ]
 )
 def test_display(data, fmt, expected):
