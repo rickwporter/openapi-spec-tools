@@ -167,8 +167,10 @@ def test_op_param_formation():
         params["page-size"] = page_size
     params["anotherQparam"] = another_qparam
     if more is not None:
+        _l.logger().warning("--more is deprecated")
         params["more"] = more
     if day_value is not None:
+        _l.logger().warning("--day-value was deprecated in last-release")
         params["dayValue"] = day_value\
 """
     text = uut.op_param_formation(query_params)
@@ -240,6 +242,23 @@ def test_function_name(proposed, expected):
 def test_variable_name(proposed, expected):
     uut = Generator("", {})
     assert expected == uut.variable_name(proposed)
+
+
+@pytest.mark.parametrize(
+    ["proposed", "expected"],
+    [
+        pytest.param("simple", "--simple", id="simple"),
+        pytest.param("snake_case_value", "--snake-case-value", id="snake"),
+        pytest.param("camelCaseValue", "--camel-case-value", id="camel"),
+        pytest.param("decimal.dot.value", "--decimal-dot-value", id="dotted"),
+        pytest.param("users/list", "--users-list", id="slash"),
+        pytest.param("page-name", "--page-name", id="dash"),
+    ],
+)
+def test_option_name(proposed, expected):
+    uut = Generator("", {})
+    assert expected == uut.option_name(proposed)
+
 
 @pytest.mark.parametrize(
     ["param_data", "expected"],
@@ -327,7 +346,12 @@ def test_op_body_formation():
     assert 'body["id"]' not in text  # ignore read-only
     assert 'body["name"] = name' in text  # required
     assert 'if another_value is not None:' in text  # not required, so check if not None
-    assert 'body["anotherValue"] = another_value'  # check prop vs variable name
+    assert '_l.logger().warning("--another-value is deprecated and should not be used")' in text
+    assert 'body["anotherValue"] = another_value' in text  # check prop vs variable name
+    assert 'if bogus is not None:' in text
+    assert '_l.logger().warning("--bogus was deprecated in 7.8.9 and should not be used")' in text
+    assert 'body["bogus"] = bogus' in text
+
 
 def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
@@ -341,14 +365,14 @@ def test_op_path_arguments():
 
     assert 'num_feet: Annotated[Optional[int], typer.Option(show_default=False, help="Number of feet")] = None' in text
     assert 'species: Annotated[str, typer.Option(help="Species name in Latin without spaces")] = "monkey"' in text
-    assert 'neutered: Annotated[bool, typer.Option(help="Ouch")] = True' in text
+    assert 'neutered: Annotated[bool, typer.Option(hidden=True, help="Ouch")] = True' in text
     assert (
         'birthday: Annotated[Optional[datetime], typer.Option(show_default=False, help="When is the party?")] = None'
         in text
     )
     assert 'must_have: Annotated[str, typer.Argument(show_default=False, help="")]' in text
     assert 'your_boat: Annotated[float, typer.Option(help="Pi is always good")] = 3.14159' in text
-    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, help="")] = None' in text
+    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, hidden=True, help="")] = None' in text
 
     # make sure we ignore the query params
     assert 'situation: Annotated' not in text
@@ -378,10 +402,10 @@ def test_op_query_arguments():
         'another_qparam: Annotated[Optional[str], typer.Option(show_default=False, help="Query parameter")] = None'
         in text
     )
-    assert 'more: Annotated[bool, typer.Option(help="")] = False' in text
+    assert 'more: Annotated[bool, typer.Option(hidden=True, help="")] = False' in text
     assert (
         'day_value: Annotated[Optional[DayValue], '
-        'typer.Option(show_default=False, case_sensitive=False, help="")] = None'
+        'typer.Option(show_default=False, case_sensitive=False, hidden=True, help="")] = None'
         in text
     )
     assert (
@@ -833,11 +857,11 @@ def test_op_body_arguments():
     assert 'name: Annotated[str, typer.Option(show_default=False, help="Pet name")] = None' in text
     assert 'tag: Annotated[Optional[str], typer.Option(show_default=False, help="Pet classification")] = None' in text
     assert (
-        'another_value: Annotated[Optional[str], typer.Option(show_default=False, '
+        'another_value: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, '
         'help="A string with a default")] = "Anything goes"'
         in text
     )
-    assert 'bogus: Annotated[Any, typer.Option(show_default=False, help="Misleading help")] = None' in text
+    assert 'bogus: Annotated[Any, typer.Option(show_default=False, hidden=True, help="Misleading help")] = None' in text
     assert (
         'flavor: Annotated[Optional[Species], '
         'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'
@@ -1035,6 +1059,23 @@ def test_function_deprecated():
 
     # check the warning log
     assert '_l.logger().warning("snafooCheck is deprecated and should not be used.")' in text
+
+
+def test_function_x_deprecated():
+    oas = open_oas(asset_filename("misc.yaml"))
+    item = LayoutNode(command='sna', identifier='snafooDelete')
+    uut = Generator("cli_package", oas)
+    text = uut.function_definition(item)
+
+    assert '@app.command("sna", hidden=True, short_help="Straighten things out")' in text
+    assert 'def snafoo_delete(' in text
+
+    # check a couple arguments
+    assert '_api_host: _a.ApiHostOption' in text
+    assert '_log_level: _a.LogLevelOption' in text
+
+    # check the warning log
+    assert '_l.logger().warning("snafooDelete was deprecated in 3.2.1, and should not be used.")' in text
 
 
 def test_main():

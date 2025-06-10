@@ -35,6 +35,7 @@ class OasField(str, Enum):
     TYPE = "type"
     URL = "url"
 
+    X_DEPRECATED = "x-deprecated"
     X_COLLECT = "x-collection"
     X_FIELD = "x-field"
     X_METHOD = "x-method"

@@ -157,6 +157,10 @@ if __name__ == "__main__":
             value = value.replace(v, '_')
         return value
 
+    def option_name(self, s: str) -> str:
+        """Returns the typer option name for the provided string."""
+        value = self.variable_name(s)
+        return "--" + value.replace("_", "-")
 
     def model_is_complex(self, model: dict[str, Any]) -> bool:
         """Determines if the model is complex, such that it would not work well with a list.
@@ -458,6 +462,8 @@ if __name__ == "__main__":
         var_name = self.variable_name(param.get(OasField.NAME))
         description = param.get(OasField.DESCRIPTION) or ""
         required = param.get(OasField.REQUIRED, False)
+        deprected = param.get(OasField.DEPRECATED, False)
+        x_deprecated = param.get(OasField.X_DEPRECATED, None)
         schema = param.get(OasField.SCHEMA, {})
         schema_default = schema.get(OasField.DEFAULT)
         arg_type = self.get_parameter_pytype(param)
@@ -492,6 +498,8 @@ if __name__ == "__main__":
         is_enum = bool(schema.get(OasField.ENUM))
         if is_enum:
             typer_args.append("case_sensitive=False")
+        if deprected or x_deprecated:
+            typer_args.append("hidden=True")
         typer_args.append(f'help="{simple_escape(description)}"')
         comma = ', '
 
@@ -535,6 +543,10 @@ if __name__ == "__main__":
             is_enum = bool(prop_data.get(OasField.ENUM))
             if is_enum:
                 t_args["case_sensitive"] = False
+            deprected = prop_data.get(OasField.DEPRECATED, False)
+            x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
+            if deprected or x_deprecated:
+                t_args["hidden"] = True
             help = prop_data.get(OasField.DESCRIPTION)
             if help:
                 t_args['help'] = f'"{simple_escape(help)}"'
@@ -570,15 +582,19 @@ if __name__ == "__main__":
         for param in query_params:
             param_name = param.get(OasField.NAME)
             var_name = self.variable_name(param_name)
+            option = self.option_name(param_name)
+            deprecated = param.get(OasField.DEPRECATED, False)
+            x_deprecated = param.get(OasField.X_DEPRECATED, None)
+            dep_warning = ""
+            if x_deprecated:
+                dep_warning = f'_l.logger().warning("{option} was deprecated in {x_deprecated}"){SEP2}'
+            elif deprecated:
+                dep_warning = f'_l.logger().warning("{option} is deprecated"){SEP2}'
             if param.get(OasField.REQUIRED, False):
-                result += f"""
-    params["{param_name}"] = {var_name}\
-"""
+                result += f'{SEP1}params[{quoted(param_name)}] = {var_name}'
             else:
-                result += f"""
-    if {var_name} is not None:
-        params["{param_name}"] = {var_name}\
-"""
+                result += f'{SEP1}if {var_name} is not None:'
+                result += f'{SEP2}{dep_warning}params[{quoted(param_name)}] = {var_name}'
         return result
 
     def op_content_header(self, operation: dict[str, Any]) -> str:
@@ -596,10 +612,20 @@ if __name__ == "__main__":
         lines = ["body = {}"]
         for prop_name, prop_data in body_params.items():
             var_name = self.variable_name(prop_name)
+            option = self.option_name(prop_name)
+            deprecated = prop_data.get(OasField.DEPRECATED, False)
+            x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
+            dep_msg = ""
+            if x_deprecated:
+                dep_msg = f"{option} was deprecated in {x_deprecated} and should not be used"
+            elif deprecated:
+                dep_msg = f"{option} is deprecated and should not be used"
             if prop_data.get(OasField.REQUIRED):
                 lines.append(f'body["{prop_name}"] = {var_name}')
             else:
                 lines.append(f'if {var_name} is not None:')
+                if dep_msg:
+                    lines.append(f'    _l.logger().warning("{dep_msg}")')
                 lines.append(f'    body["{prop_name}"] = {var_name}')
 
         return SEP1 + SEP1.join(lines)
@@ -613,14 +639,14 @@ if __name__ == "__main__":
         for param in query_params:
             if param.get(OasField.REQUIRED, False):
                 var_name = self.variable_name(param.get(OasField.NAME))
-                option = '--' + var_name.replace('_', '-')
+                option = self.option_name(var_name)
                 lines.append(f'if {var_name} is None:')
                 lines.append(f'    missing.append("{option}")')
 
         for prop_name, prop_data in body_params.items():
             if prop_data.get(OasField.REQUIRED):
                 var_name = self.variable_name(prop_name)
-                option = '--' + var_name.replace('_', '-')
+                option = self.option_name(prop_name)
                 lines.append(f'if {var_name} is None:')
                 lines.append(f'    missing.append("{option}")')
 
@@ -734,7 +760,12 @@ if __name__ == "__main__":
 
         deprecation_warning = ""
         deprecated = op.get(OasField.DEPRECATED, False)
-        if deprecated:
+        x_deprecated = op.get(OasField.X_DEPRECATED, None)
+        if x_deprecated:
+            command_args.append("hidden=True")
+            message = f"{node.identifier} was deprecated in {x_deprecated}, and should not be used."
+            deprecation_warning = SEP1 + f'_l.logger().warning("{message}")'
+        elif deprecated:
             command_args.append("hidden=True")
             message = f"{node.identifier} is deprecated and should not be used."
             deprecation_warning = SEP1 + f'_l.logger().warning("{message}")'
