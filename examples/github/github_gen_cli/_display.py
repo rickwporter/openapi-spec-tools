@@ -296,6 +296,10 @@ def display(obj: Any, fmt: OutputFormat, style: OutputStyle, indent: int = 2) ->
     highlight = style != OutputStyle.NONE
     console = console_factory(no_color=no_color, highlight=highlight)
 
+    if isinstance(obj, str):
+        console.print(_safe(obj))
+        return
+
     if fmt == OutputFormat.JSON:
         console.print_json(data=obj, indent=indent, highlight=highlight)
         return

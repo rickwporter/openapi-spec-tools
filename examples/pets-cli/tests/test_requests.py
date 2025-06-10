@@ -4,10 +4,13 @@
 #
 import importlib.metadata
 import json
+import os
+from tempfile import TemporaryDirectory
 from typing import Any
 from unittest import mock
 
 import pytest
+import yaml
 from requests import HTTPError
 from requests import Request
 from requests import Response
@@ -19,6 +22,11 @@ from pets_cli._requests import depaginate
 from pets_cli._requests import raise_for_error
 from pets_cli._requests import request
 from pets_cli._requests import request_headers
+
+APP_JSON = "application/json"
+APP_YAML = "application/yaml"
+TEXT_PLAIN = "text/plain"
+IMAGE_PNG = "image/png"
 
 
 @pytest.mark.parametrize(
@@ -88,11 +96,14 @@ def test_pretty_params(params, expected) -> None:
     assert expected == _pretty_params(params)
 
 
-def convert_body(data: Any) -> Any:
+def convert_body(data: Any, content_type: str) -> Any:
     if data is None:
         return None
     if isinstance(data, (dict, list)):
-        return bytes(json.dumps(data).encode("utf-8"))
+        if content_type == APP_JSON:
+            return bytes(json.dumps(data).encode("utf-8"))
+        if content_type == APP_YAML:
+            return bytes(yaml.dump(data).encode("utf-8"))
     return bytes(data.encode("utf-8"))
 
 
@@ -123,7 +134,7 @@ def test_raise_for_error_errors(status_code, reason, body, expected) -> None:
     response.status_code = status_code
     response.reason = reason
     response.request = Request("GET", "http://dr.com/abc").prepare()
-    response._content = convert_body(body)
+    response._content = convert_body(body, APP_JSON)
 
     with pytest.raises(HTTPError, match=expected):
         raise_for_error(response)
@@ -135,13 +146,14 @@ def success_response(
     status_code: int = 200,
     body: Any = None,
     headers: Any = None,
+    content_type: str = APP_JSON,
 ) -> Response:
     """Convenience method to set some fields."""
     response = Response()
     response.url = url
     response.status_code = status_code
     response.request = Request(method, url).prepare()
-    response._content = convert_body(body)
+    response._content = convert_body(body, content_type)
     if headers:
         response.headers.update(headers)
 
@@ -166,17 +178,25 @@ def test_raise_for_error_success(status_code) -> None:
     raise_for_error(response)
 
 @pytest.mark.parametrize(
-    ["method", "body", "params", "expected"],
+    ["method", "content_type", "body", "params", "expected"],
     [
-        pytest.param("GET", None, {}, None, id="get-no-body"),
-        pytest.param("POST", {}, {}, {}, id="post-empty-body"),
-        pytest.param("PATCH", {"message": "done"}, {}, {"message": "done"}, id="patch-body"),
-        pytest.param("PUT", "plain-text body", {}, None, id="plaintext"),
+        pytest.param("GET", APP_JSON, None, {}, None, id="get-no-body"),
+        pytest.param("POST", APP_JSON, {}, {}, {}, id="post-empty-body"),
+        pytest.param("PATCH", APP_JSON, {"message": "done"}, {}, {"message": "done"}, id="patch-body"),
+        pytest.param("PUT", APP_JSON, "plain-text body", {}, None, id="json-plain"),
+        pytest.param("PUT", TEXT_PLAIN, "plain-text body", {}, "plain-text body", id="text-plain"),
+        pytest.param("PATCH", APP_YAML, {"message": "done"}, {}, {"message": "done"}, id="good-yaml"),
+        pytest.param("PATCH", APP_YAML, "message:\n  other:\n bad:", {}, None, id="bad-yaml"),
+        pytest.param("GET", "text/csv", "a,b,c\n1,2,3\n", {}, "Wrote content to output.csv", id="save-csv"),
+        pytest.param("GET", "application/unknown", "content include, not returned", {}, None, id="unhandled")
     ]
 )
-def test_request(method, body, params, expected):
+def test_request(method, content_type, body, params, expected):
     url = "https://foo/path"
-    response = success_response(url=url, body=body)
+    headers = {"Content-type": content_type}
+    response = success_response(url=url, body=body, headers=headers, content_type=content_type)
+    directory = TemporaryDirectory()
+    os.chdir(directory.name)
 
     prefix = "pets_cli"
     with (
