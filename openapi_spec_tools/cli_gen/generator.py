@@ -138,24 +138,24 @@ if __name__ == "__main__":
 
         return None
 
+    def _unspecial(self, value: str, replacement: str = '_') -> str:
+        """Replaces the "special" characters with the replacement."""
+        for v in ['/', '*', '.', '-', '@']:
+            value = value.replace(v, replacement)
+        return value
+
     def class_name(self, s: str) -> str:
         """Returns the class name for provided string"""
-        value = to_camel_case(s.replace('.', '_'))
+        value = to_camel_case(self._unspecial(s))
         return value[0].upper() + value[1:]
 
     def function_name(self, s: str) -> str:
         """Returns the function name for the provided string"""
-        value = to_snake_case(s)
-        for v in ['/', '*', '.', '-', '@']:
-            value = value.replace(v, '_')
-        return value
+        return to_snake_case(self._unspecial(s))
 
     def variable_name(self, s: str) -> str:
         """Returns the variable name for the provided string"""
-        value = to_snake_case(s)
-        for v in ['/', '*', '.', '-', '@']:
-            value = value.replace(v, '_')
-        return value
+        return to_snake_case(self._unspecial(s))
 
     def option_name(self, s: str) -> str:
         """Returns the typer option name for the provided string."""
