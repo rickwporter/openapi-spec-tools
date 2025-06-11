@@ -447,6 +447,13 @@ class Simple(str, Enum):  # noqa: F811
 """
 
 FOOBAR_ENUM = SIMPLE_ENUM.replace("Simple", "FooBar")
+NUMBER_ENUM = """\
+class SimpleNumber(int, Enum):  # noqa: F811
+    VALUE_12 = 12
+    VALUE_37 = 37
+    VALUE_11 = 11
+
+"""
 
 NON_STR_ENUM = """\
 class anyThing_goes(int, Enum):  # noqa: F811
@@ -464,6 +471,7 @@ SIMPLE_PARAM = {
 }
 
 FOOBAR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}, "name": "fooBar"}
+NUMBER_PARAM = {SCHEMA: {TYPE: "integer", ENUM: [12, 37, 11]}, "name": "simple-number"}
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
@@ -495,6 +503,13 @@ def test_enum_declaration(name, enum_type, values, expected):
             {},
             f"\n{SIMPLE_ENUM}",
             id="ref-query",
+        ),
+        pytest.param(
+            [NUMBER_PARAM],
+            [],
+            {},
+            f"\n{NUMBER_ENUM}",
+            id="number",
         ),
         pytest.param(
             [],
@@ -544,7 +559,7 @@ def test_enum_declaration(name, enum_type, values, expected):
             {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}},
             f"\n{SIMPLE_ENUM}\n{FOOBAR_ENUM}",
             id="multiple",
-        )
+        ),
     ],
 )
 def test_enum_definitions(path_params, query_params, body_params, expected):

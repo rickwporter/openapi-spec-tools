@@ -401,6 +401,7 @@ if __name__ == "__main__":
             # TODO: uuid
             return "str"
 
+        self.logger.error(f"No Python type found for {schema}/{fmt}")
         return None
 
     def get_parameter_pytype(self, param_data: dict[str, Any]) -> str:
@@ -712,7 +713,7 @@ if __name__ == "__main__":
                 continue
 
             e_name = self.short_reference_name(schema.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
-            e_type = self.schema_to_type(param_data.get(OasField.TYPE), param_data.get(OasField.FORMAT)) or 'str'
+            e_type = self.schema_to_type(schema.get(OasField.TYPE), schema.get(OasField.FORMAT)) or 'str'
             enums[self.class_name(e_name)] = (e_type, values)
 
         for name, prop in body_params.items():
