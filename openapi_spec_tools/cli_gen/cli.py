@@ -347,7 +347,7 @@ def generate_cli(
 
     if include_tests:
         os.makedirs(test_dir, exist_ok=True)
-        copy_tests(test_dir,  package_name)
+        copy_tests(test_dir, package_name, start)
 
     typer.echo("Generated files")
 

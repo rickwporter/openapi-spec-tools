@@ -30,6 +30,7 @@ TEST_FILES = {
     "test_display.py": "test_display.py",
     "test_exceptions.py": "test_exceptions.py",
     "test_logging.py": "test_logging.py",
+    "test_main.py": "test_main.py",
     "test_requests.py": "test_requests.py",
     "test_tree.py": "test_tree.py",
 }
@@ -188,11 +189,12 @@ def copy_infrastructure(dst_dir: str, package_name: str):
         copy_and_update(sfile.as_posix(), dfile.as_posix(), replacements)
 
 
-def copy_tests(dst_dir: str, package_name: str):
+def copy_tests(dst_dir: str, package_name: str, main_module: str):
     """Iterates over the TEST_FILES, and copies from local to dst."""
     spath = Path(__file__).parent.parent.parent / "tests" / "cli_gen"
     dpath = Path(dst_dir)
     replacements = {
+        "from tests.assets.arg_test": f"from {package_name}.{main_module}",  # needed for test_main.py
         __package__: package_name,
         "tests.cli_gen": "tests",
     }
