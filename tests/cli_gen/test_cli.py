@@ -454,6 +454,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
             "test_display.py",
             "test_exceptions.py",
             "test_logging.py",
+            "test_main.py",
             "test_requests.py",
             "test_tree.py",
         }
@@ -510,6 +511,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
         "test_display.py",
         "test_exceptions.py",
         "test_logging.py",
+        "test_main.py",
         "test_requests.py",
         "test_tree.py",
     }

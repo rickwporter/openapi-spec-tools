@@ -292,7 +292,7 @@ def test_copy_tests():
     dst_path = Path(tempdir.name)
     package = "my.package"
 
-    copy_tests(dst_path.as_posix(), package)
+    copy_tests(dst_path.as_posix(), package, "foo")
 
     filenames = set(i.name for i in dst_path.iterdir())
     expected = {
@@ -301,6 +301,7 @@ def test_copy_tests():
         "test_display.py",
         "test_exceptions.py",
         "test_logging.py",
+        "test_main.py",
         "test_requests.py",
         "test_tree.py",
     }

@@ -1,9 +1,23 @@
 #!/usr/bin/env python3
+from pathlib import Path
+
 import typer
 
 import openapi_spec_tools.cli_gen._arguments as _a
+import openapi_spec_tools.cli_gen._tree as _t
 
 app = typer.Typer(no_args_is_help=True, help="Random help")
+
+
+@app.command("commands", short_help="Display commands tree for sub-commands")
+def show_commands(
+    display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
+    depth: _a.MaxDepthOption = 5,
+) -> None:
+    path = Path(__file__).parent / "tree_pets.yaml"
+    _t.tree(path.as_posix(), "main", display, depth)
+    return
+
 
 @app.command("get", help="Get pet")
 def get_pet(
