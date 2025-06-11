@@ -8,7 +8,7 @@ from typer.testing import CliRunner
 from pets_cli.main import app as program
 from tests.helpers import to_ascii
 
-runner = CliRunner()
+runner = CliRunner(charset="ascii")
 
 def test_main_help():
     app = typer.Typer()

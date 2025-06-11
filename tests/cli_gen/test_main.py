@@ -4,7 +4,7 @@ from typer.testing import CliRunner
 from tests.assets.arg_test import app as program
 from tests.cli_gen.helpers import to_ascii
 
-runner = CliRunner()
+runner = CliRunner(charset="ascii")
 
 def test_main_help():
     app = typer.Typer()
