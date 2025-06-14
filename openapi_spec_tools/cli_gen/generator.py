@@ -17,6 +17,7 @@ from openapi_spec_tools.cli_gen.utils import to_camel_case
 from openapi_spec_tools.cli_gen.utils import to_snake_case
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import NULL_TYPES
 from openapi_spec_tools.utils import map_operations
 
 NL = "\n"
@@ -404,6 +405,24 @@ if __name__ == "__main__":
         self.logger.error(f"No Python type found for {schema}/{fmt}")
         return None
 
+    def simplify_type(self, schema: Any) -> Any:
+        """
+        In OAS 3.1, the 'type' can be a list. When it is a nullable object, the 'null' value is one of the
+        items in the list. 
+        """
+        if schema is None:
+            return None
+        if isinstance(schema, (str, dict)):
+            return schema
+        if isinstance(schema, list):
+            reduced = set(schema) - NULL_TYPES
+            if len(reduced) == 1:
+                return reduced.pop()
+            return schema
+
+        self.logger.warning(f"Unable to simplify type for {schema}")
+        return None
+
     def get_parameter_pytype(self, param_data: dict[str, Any]) -> str:
         """
         Gets the "basic" Python type from a parameter object.
@@ -416,7 +435,9 @@ if __name__ == "__main__":
             name = self.short_reference_name(schema.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
             return self.class_name(name)
 
-        return self.schema_to_type(schema.get(OasField.TYPE), schema.get(OasField.FORMAT))
+        schema_type = self.simplify_type(schema.get(OasField.TYPE))
+        schema_format = schema.get(OasField.FORMAT)
+        return self.schema_to_type(schema_type, schema_format)
 
     def get_property_pytype(self, prop_name: str, prop_data: dict[str, Any]) -> Optional[str]:
         """
@@ -427,7 +448,9 @@ if __name__ == "__main__":
         if prop_data.get(OasField.ENUM):
             pytype = self.class_name(prop_data.get(OasField.X_REF) or prop_name)
         else:
-            pytype = self.schema_to_type(prop_data.get(OasField.TYPE), prop_data.get(OasField.FORMAT))
+            schema_type = self.simplify_type(prop_data.get(OasField.TYPE))
+            schema_format = prop_data.get(OasField.FORMAT)
+            pytype = self.schema_to_type(schema_type, schema_format)
             if not pytype:
                 return pytype
 
@@ -713,7 +736,9 @@ if __name__ == "__main__":
                 continue
 
             e_name = self.short_reference_name(schema.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
-            e_type = self.schema_to_type(schema.get(OasField.TYPE), schema.get(OasField.FORMAT)) or 'str'
+            schema_type = self.simplify_type(schema.get(OasField.TYPE))
+            schema_format = schema.get(OasField.FORMAT)
+            e_type = self.schema_to_type(schema_type, schema_format) or 'str'
             enums[self.class_name(e_name)] = (e_type, values)
 
         for name, prop in body_params.items():
@@ -721,7 +746,9 @@ if __name__ == "__main__":
             if not values:
                 continue
             e_name = prop.get(OasField.X_REF) or name
-            e_type = self.schema_to_type(prop.get(OasField.TYPE), prop.get(OasField.FORMAT)) or 'str'
+            schema_type = self.simplify_type(prop.get(OasField.TYPE))
+            schema_format = prop.get(OasField.FORMAT)
+            e_type = self.schema_to_type(schema_type, schema_format) or 'str'
             enums[self.class_name(e_name)] = (e_type, values)
 
         if not enums:
