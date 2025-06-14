@@ -183,6 +183,7 @@ def test_op_param_formation():
         pytest.param("boolean", None, "bool", id="boolean"),
         pytest.param("integer", None, "int", id="integer"),
         pytest.param("numeric", None, "float", id="numeric"),
+        pytest.param("number", None, "float", id="number"),
         pytest.param("string", None, "str", id="str"),
         pytest.param("string", "date-time", "datetime", id="datetime"),
         pytest.param("string", "date", "date", id="date"),
@@ -443,6 +444,7 @@ SIMPLE_ENUM = """\
 class Simple(str, Enum):  # noqa: F811
     A_OR_B = "aOrB"
     B_OR_C = "b_or_C"
+    _MINUS = "-minus"
 
 """
 
@@ -465,18 +467,18 @@ class anyThing_goes(int, Enum):  # noqa: F811
 
 SIMPLE_PARAM = {
     SCHEMA: {
-        TYPE: "string", ENUM: ["aOrB", "b_or_C"], "$ref": "#/components/schemas/Simple"
+        TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "$ref": "#/components/schemas/Simple"
     },
     "name": "fooBar",
 }
 
-FOOBAR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}, "name": "fooBar"}
+FOOBAR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}, "name": "fooBar"}
 NUMBER_PARAM = {SCHEMA: {TYPE: "integer", ENUM: [12, 37, 11]}, "name": "simple-number"}
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
     [
-        pytest.param("Simple", "str", ["aOrB", "b_or_C"], SIMPLE_ENUM, id="str"),
+        pytest.param("Simple", "str", ["aOrB", "b_or_C", "-minus"], SIMPLE_ENUM, id="str"),
         pytest.param("anyThing_goes", "int", [1, None, True], NON_STR_ENUM, id="non-str"),
     ]
 )
@@ -514,7 +516,7 @@ def test_enum_declaration(name, enum_type, values, expected):
         pytest.param(
             [],
             [],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"], "x-reference": "Simple"}},
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
             f"\n{SIMPLE_ENUM}",
             id="ref-body",
         ),
@@ -535,28 +537,28 @@ def test_enum_declaration(name, enum_type, values, expected):
         pytest.param(
             [],
             [],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}},
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}},
             f"\n{FOOBAR_ENUM}",
             id="unref-body",
         ),
         pytest.param(
             [],
             [],
-            {"foo.bar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}},
+            {"foo.bar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}},
             f"\n{FOOBAR_ENUM}",
             id="subprop-body",
         ),
         pytest.param(
             [SIMPLE_PARAM],
             [SIMPLE_PARAM],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"], "x-reference": "Simple"}},
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
             f"\n{SIMPLE_ENUM}",
             id="de-dup",
         ),
         pytest.param(
             [SIMPLE_PARAM],
             [FOOBAR_PARAM],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C"]}},
+            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}},
             f"\n{SIMPLE_ENUM}\n{FOOBAR_ENUM}",
             id="multiple",
         ),
