@@ -408,7 +408,7 @@ if __name__ == "__main__":
     def simplify_type(self, schema: Any) -> Any:
         """
         In OAS 3.1, the 'type' can be a list. When it is a nullable object, the 'null' value is one of the
-        items in the list. 
+        items in the list.
         """
         if schema is None:
             return None
