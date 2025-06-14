@@ -183,6 +183,7 @@ def test_op_param_formation():
         pytest.param("boolean", None, "bool", id="boolean"),
         pytest.param("integer", None, "int", id="integer"),
         pytest.param("numeric", None, "float", id="numeric"),
+        pytest.param("number", None, "float", id="number"),
         pytest.param("string", None, "str", id="str"),
         pytest.param("string", "date-time", "datetime", id="datetime"),
         pytest.param("string", "date", "date", id="date"),

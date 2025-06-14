@@ -391,7 +391,7 @@ if __name__ == "__main__":
             return "bool"
         if schema == "integer":
             return "int"
-        if schema == "numeric":
+        if schema in ("numeric", "number"):
             return "float"
         if schema == "string":
             if fmt == "date-time":
