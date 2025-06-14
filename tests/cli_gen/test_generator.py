@@ -264,6 +264,21 @@ def test_option_name(proposed, expected):
 
 
 @pytest.mark.parametrize(
+    ["schema", "expected"],
+    [
+        pytest.param(None, None, id="none"),
+        pytest.param("foo", "foo", id="str"),
+        pytest.param({"sna": "foo"}, {"sna": "foo"}, id="dict"),
+        pytest.param(["sna", "foo"], ["sna", "foo"], id="list-unmod"),
+        pytest.param(["null", "sna"], "sna", id="list-mod"),
+        pytest.param(1, None, id="error"),
+    ]
+)
+def test_simplify_type(schema, expected):
+    uut = Generator("", {})
+    assert expected == uut.simplify_type(schema)
+
+@pytest.mark.parametrize(
     ["param_data", "expected"],
     [
         pytest.param({}, None, id="unknown"),
