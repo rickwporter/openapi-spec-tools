@@ -690,7 +690,7 @@ if __name__ == "__main__":
         """Turns data into an enum declation"""
         prefix = "" if enum_type == "str" else "VALUE_"
         declarations = [
-            f"{prefix}{to_snake_case(str(v)).upper()} = {maybe_quoted(v)}"
+            f"{prefix}{self.variable_name(str(v)).upper()} = {maybe_quoted(v)}"
             for v in values
         ]
         # NOTE: the noqa is due to potentially same definition ahead of multiple functions
