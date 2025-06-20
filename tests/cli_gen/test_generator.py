@@ -19,6 +19,9 @@ REQUIRED = "required"
 COLLECT = "x-collection"
 ENUM = "enum"
 SCHEMA = "schema"
+ANY_OF = "anyOf"
+ONE_OF = "oneOf"
+ITEMS = "items"
 
 def test_shebang():
     uut = Generator("cli_package", {})
@@ -171,7 +174,9 @@ def test_op_param_formation():
         params["more"] = more
     if day_value is not None:
         _l.logger().warning("--day-value was deprecated in last-release")
-        params["dayValue"] = day_value\
+        params["dayValue"] = day_value
+    if str_list_prop is not None:
+        params["strListProp"] = str_list_prop\
 """
     text = uut.op_param_formation(query_params)
     assert expected == text
@@ -403,8 +408,9 @@ def test_op_query_arguments():
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
     query_params = uut.op_params(op, "query")
+    properties = uut.params_to_settable_properties(query_params)
 
-    lines = uut.op_query_arguments(query_params)
+    lines = uut.op_query_arguments(properties)
     text = "\n".join(lines)
 
     assert (
@@ -428,6 +434,10 @@ def test_op_query_arguments():
     )
     assert (
         'page_size: Annotated[int, typer.Option(help="Maximum items per page")] = 100'
+        in text
+    )
+    assert (
+        'str_list_prop: Annotated[Optional[list[str]], typer.Option(show_default=False, help="")] = None'
         in text
     )
 
@@ -583,6 +593,39 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
     uut = Generator("", {})
     definitions = uut.enum_definitions(path_params, query_params, body_params)
     assert expected == definitions
+
+
+@pytest.mark.parametrize(
+    ["parameter", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param(SIMPLE_PARAM, SIMPLE_PARAM, id="simple"),
+        pytest.param(
+            {SCHEMA: {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]}},
+            {SCHEMA: {TYPE: "foo", COLLECT: "array"}},
+            id="oneOf-collect-match"
+        ),
+        pytest.param(
+            {SCHEMA: {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "bar"}}]}},
+            {SCHEMA: {TYPE: "foo"}},
+            id="oneOf-collect-diff"
+        ),
+        pytest.param(
+            {SCHEMA: {TYPE: ["foo", "null"]}},
+            {SCHEMA: {TYPE: "foo"}, REQUIRED: False},
+            id="nullable"
+        ),
+        pytest.param(
+            {SCHEMA: {ANY_OF: [{TYPE: "array", ITEMS: {TYPE: "sna"}}, {TYPE: "foo"}]}},
+            {SCHEMA: {TYPE: "sna", COLLECT: "array"}},
+            id="anyOf"
+        ),
+    ],
+)
+def test_param_to_property(parameter, expected):
+    uut = Generator("", {})
+    prop = uut.param_to_property(parameter)
+    assert expected == prop
 
 
 @pytest.mark.parametrize(

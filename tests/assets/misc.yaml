@@ -97,6 +97,12 @@ paths:
             - Mon
             - Tue
             - Wed
+        - name: strListProp
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
       requestBody:
         content:
           application/json:

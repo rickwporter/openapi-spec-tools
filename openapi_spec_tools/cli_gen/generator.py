@@ -26,6 +26,10 @@ SEP2 = "\n        "
 SHEBANG = """\
 #!/usr/bin/env python3
 """
+# map of supported collections to their Python types
+COLLECTIONS = {
+    "array": "list",
+}
 
 
 class Generator:
@@ -217,8 +221,8 @@ if __name__ == "__main__":
 
     def model_collection_type(self, model: str) -> Optional[str]:
         """Determines the collection type (current just an array)"""
-        model_type = model.get(OasField.TYPE)
-        if model_type == "array":
+        model_type = self.simplify_type(model.get(OasField.TYPE))
+        if model_type in COLLECTIONS.keys():
             return model_type
 
         for parent in model.get(OasField.ALL_OF) or model.get(OasField.ANY_OF) or []:
@@ -425,16 +429,12 @@ if __name__ == "__main__":
 
 
     def schema_to_pytype(self, schema: dict[str, Any]) -> Optional[str]:
-        oas_type = schema.get(OasField.TYPE)
+        """
+        Determines the basic Python type from the schema object.
+        """
+        oas_type = self.simplify_type(schema.get(OasField.TYPE))
         oas_format = schema.get(OasField.FORMAT)
-        oas_type = self.simplify_type(oas_type)
         return self.schema_to_type(oas_type, oas_format)
-
-    def oas_to_py_collection(self, oas_type: Optional[str]) -> Optional[str]:
-        data = {
-            "array": "list",
-        }
-        return data.get(oas_type)
 
     def get_parameter_pytype(self, param_data: dict[str, Any]) -> str:
         """
@@ -463,7 +463,7 @@ if __name__ == "__main__":
             if not pytype:
                 return pytype
 
-        collection = self.oas_to_py_collection(prop_data.get(OasField.X_COLLECT))
+        collection = COLLECTIONS.get(prop_data.get(OasField.X_COLLECT))
         if collection:
             pytype = f"{collection}[{pytype}]"
         if not prop_data.get(OasField.REQUIRED):
@@ -500,6 +500,7 @@ if __name__ == "__main__":
         x_deprecated = param.get(OasField.X_DEPRECATED, None)
         schema = param.get(OasField.SCHEMA, {})
         schema_default = schema.get(OasField.DEFAULT)
+        collection = COLLECTIONS.get(schema.get(OasField.X_COLLECT))
         arg_type = self.get_parameter_pytype(param)
         if not arg_type:
             # log an error and use 'Any'
@@ -514,6 +515,8 @@ if __name__ == "__main__":
             schema_max = schema.get(OasField.MAX)
             if schema_max is not None:
                 typer_args.append(f"max={schema_max}")
+        if collection:
+            arg_type = f"{collection}[{arg_type}]"
         if allow_required and required and schema_default is None:
             typer_type = 'typer.Argument'
             typer_args.append('show_default=False')
@@ -560,6 +563,74 @@ if __name__ == "__main__":
             args.append(arg)
 
         return args
+
+    def condense_one_of(self, one_of: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """
+        Removes "duplicate" collection elements, and adds X_COLLECT to the schema.
+        """
+        condensed = []
+        for outer in one_of:
+            item = deepcopy(outer)
+            found = False
+            for inner in one_of:
+                if item.get(OasField.ITEMS) == inner:
+                    found = True
+                    break
+                if inner.get(OasField.ITEMS) == item:
+                    item[OasField.X_COLLECT.value] = inner.get(OasField.TYPE)
+            if not found:
+                condensed.append(item)
+
+        return condensed
+
+    def param_to_property(self, param: dict[str, Any]) -> dict[str, Any]:
+        prop = deepcopy(param)
+        schema = prop.get(OasField.SCHEMA, {})
+
+        one_of = schema.get(OasField.ONE_OF, [])
+        if one_of:
+            updated = self.condense_one_of(one_of)
+            if len(updated) == 1:
+                schema = updated[0]
+            else:
+                # just grab the first one... not sure this is the best choice, but need to do something
+                self.logger.warning(f"Grabbing oneOf[0] item from {updated}")
+                schema = updated[0]
+
+        any_of = schema.get(OasField.ANY_OF, [])
+        if any_of:
+            # just grab the first one...
+            self.logger.warning(f"Grabbing anyOf[0] item from {any_of}")
+            schema = any_of[0]
+
+        schema_type = schema.get(OasField.TYPE)
+        nullable = isinstance(schema_type, list) and any(nt in schema_type for nt in NULL_TYPES)
+        schema_type = self.simplify_type(schema_type)
+        if schema_type in COLLECTIONS.keys():
+            schema = schema.get(OasField.ITEMS)
+            schema[OasField.X_COLLECT.value] = schema_type
+        elif schema_type:
+            schema[OasField.TYPE.value] = schema_type
+
+        schema = self.simplify_type(schema)
+        if schema:
+            prop[OasField.SCHEMA.value] = schema
+        if nullable:
+            prop[OasField.REQUIRED.value] = False
+
+        return prop
+
+    def params_to_settable_properties(self, parameters: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """
+        Get a dictionary of settable parameter properties.
+
+        This expands the parameters into more basic types that allows for complex parameters.
+        """
+        properties = []
+        for param in parameters:
+            properties.append(self.param_to_property(param))
+
+        return properties
 
     def op_body_arguments(self, body_params: list[dict[str, Any]]) -> list[str]:
         args = []
@@ -772,7 +843,7 @@ if __name__ == "__main__":
         method = op.get(OasField.X_METHOD).upper()
         path = op.get(OasField.X_PATH)
         path_params = self.op_params(op, "path")
-        query_params = self.op_params(op, "query")
+        query_params = self.params_to_settable_properties(self.op_params(op, "query"))
         body_params = self.op_body_settable_properties(op)
         command_args = [quoted(node.command)]
 
