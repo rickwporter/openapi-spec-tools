@@ -103,6 +103,15 @@ paths:
             type: array
             items:
               type: string
+        - name: enumWithDefault
+          in: query
+          schema:
+            type: str
+            enum:
+            - This
+            - That
+            - TheOtherThing
+            default: TheOtherThing
       requestBody:
         content:
           application/json:

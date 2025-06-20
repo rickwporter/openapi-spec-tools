@@ -528,10 +528,7 @@ if __name__ == "__main__":
                 arg_default = " = None"
                 typer_args.append('show_default=False')
             else:
-                if arg_type in ("str", "datetime"):
-                    arg_default = f' = "{schema_default}"'
-                else:
-                    arg_default = f" = {schema_default}"
+                arg_default = f" = {maybe_quoted(schema_default)}"
         is_enum = bool(schema.get(OasField.ENUM))
         if is_enum:
             typer_args.append("case_sensitive=False")

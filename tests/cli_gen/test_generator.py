@@ -176,7 +176,9 @@ def test_op_param_formation():
         _l.logger().warning("--day-value was deprecated in last-release")
         params["dayValue"] = day_value
     if str_list_prop is not None:
-        params["strListProp"] = str_list_prop\
+        params["strListProp"] = str_list_prop
+    if enum_with_default is not None:
+        params["enumWithDefault"] = enum_with_default\
 """
     text = uut.op_param_formation(query_params)
     assert expected == text
@@ -438,6 +440,10 @@ def test_op_query_arguments():
     )
     assert (
         'str_list_prop: Annotated[Optional[list[str]], typer.Option(show_default=False, help="")] = None'
+        in text
+    )
+    assert (
+        'enum_with_default: Annotated[EnumWithDefault, typer.Option(case_sensitive=False, help="")] = "TheOtherThing"'
         in text
     )
 
