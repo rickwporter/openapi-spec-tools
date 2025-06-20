@@ -58,16 +58,16 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
-from typing import Optional
-from typing_extensions import Annotated
+from typing import Optional  # noqa: F401
+from typing_extensions import Annotated  # noqa: F401
 
 import typer
 
 from {self.package_name} import _arguments as _a
-from {self.package_name} import _display as _d
-from {self.package_name} import _exceptions as _e
-from {self.package_name} import _logging as _l
-from {self.package_name} import _requests as _r
+from {self.package_name} import _display as _d  # noqa: F401
+from {self.package_name} import _exceptions as _e  # noqa: F401
+from {self.package_name} import _logging as _l  # noqa: F401
+from {self.package_name} import _requests as _r  # noqa: F401
 from {self.package_name} import _tree as _t
 """
 
