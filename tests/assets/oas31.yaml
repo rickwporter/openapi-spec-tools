@@ -53,6 +53,7 @@ components:
         - consumers
         - websites
         - anotherProp
+        - untypedProp
       properties:
         id:
           type: integer
@@ -71,6 +72,10 @@ components:
               format: 'uri'
               maxLength: 255
             - type: 'null'
+        untypedProp:
+          oneOf:
+          - $ref: "#/components/schemas/Service"
+          - $ref: "#/components/schemas/Error"
         anotherProp:
           description: property with list of types, but nothing null
           type:
