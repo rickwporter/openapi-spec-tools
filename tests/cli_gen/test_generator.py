@@ -215,6 +215,7 @@ def test_schema_to_type(schema, fmt, expected):
         pytest.param("decimal.dot.value", "DecimalDotValue", id="dotted"),
         pytest.param("AlreadyClassName", "AlreadyClassName", id="class"),
         pytest.param("dash-or-bash", "DashOrBash", id="dash"),
+        pytest.param("space included", "SpaceIncluded", id="space"),
     ]
 )
 def test_class_name(proposed, expected):
@@ -231,6 +232,7 @@ def test_class_name(proposed, expected):
         pytest.param("decimal.dot.value", "decimal_dot_value", id="dotted"),
         pytest.param("users/list", "users_list", id="slash"),
         pytest.param("dash-or-bash", "dash_or_bash", id="dash"),
+        pytest.param("space included", "space_included", id="space"),
     ],
 )
 def test_function_name(proposed, expected):
@@ -247,6 +249,7 @@ def test_function_name(proposed, expected):
         pytest.param("decimal.dot.value", "decimal_dot_value", id="dotted"),
         pytest.param("users/list", "users_list", id="slash"),
         pytest.param("page-name", "page_name", id="dash"),
+        pytest.param("space included", "space_included", id="space"),
     ],
 )
 def test_variable_name(proposed, expected):
@@ -263,6 +266,7 @@ def test_variable_name(proposed, expected):
         pytest.param("decimal.dot.value", "--decimal-dot-value", id="dotted"),
         pytest.param("users/list", "--users-list", id="slash"),
         pytest.param("page-name", "--page-name", id="dash"),
+        pytest.param("space included", "--space-included", id="space"),
     ],
 )
 def test_option_name(proposed, expected):
