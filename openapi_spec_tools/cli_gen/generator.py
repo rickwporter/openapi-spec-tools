@@ -639,8 +639,8 @@ if __name__ == "__main__":
                 py_type = 'Any'
 
             t_args = {}
-            def_val = maybe_quoted(prop_data.get(OasField.DEFAULT))
-            if def_val is not None:
+            def_val = prop_data.get(OasField.DEFAULT)
+            if def_val is None:
                 t_args["show_default"] = False
             is_enum = bool(prop_data.get(OasField.ENUM))
             if is_enum:
@@ -653,7 +653,7 @@ if __name__ == "__main__":
             if help:
                 t_args['help'] = f'"{simple_escape(help)}"'
             t_decl = f"typer.Option({', '.join([f'{k}={v}' for k, v in t_args.items()])})"
-            arg = f"{self.variable_name(prop_name)}: Annotated[{py_type}, {t_decl}] = {def_val}"
+            arg = f"{self.variable_name(prop_name)}: Annotated[{py_type}, {t_decl}] = {maybe_quoted(def_val)}"
             args.append(arg)
 
         return args

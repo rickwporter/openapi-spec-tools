@@ -944,7 +944,7 @@ def test_op_body_arguments():
     assert 'name: Annotated[str, typer.Option(show_default=False, help="Pet name")] = None' in text
     assert 'tag: Annotated[Optional[str], typer.Option(show_default=False, help="Pet classification")] = None' in text
     assert (
-        'another_value: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, '
+        'another_value: Annotated[Optional[str], typer.Option(hidden=True, '
         'help="A string with a default")] = "Anything goes"'
         in text
     )
