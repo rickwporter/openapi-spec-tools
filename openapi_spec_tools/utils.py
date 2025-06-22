@@ -409,7 +409,7 @@ def _is_nullable(prop_data: dict[str, Any]) -> bool:
     # iterate through all the options in anyOf/oneOf
     for tag in [OasField.ANY_OF, OasField.ONE_OF]:
         for item in prop_data.get(tag, []):
-            if _includes_null(item.get(OasField.TYPE)):
+            if _includes_null(item.get(OasField.TYPE, [])):
                 return True
 
     return False
