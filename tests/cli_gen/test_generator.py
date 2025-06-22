@@ -178,7 +178,9 @@ def test_op_param_formation():
     if str_list_prop is not None:
         params["strListProp"] = str_list_prop
     if enum_with_default is not None:
-        params["enumWithDefault"] = enum_with_default\
+        params["enumWithDefault"] = enum_with_default
+    if str_enum_with_int_values is not None:
+        params["strEnumWithIntValues"] = str_enum_with_int_values\
 """
     text = uut.op_param_formation(query_params)
     assert expected == text
@@ -450,6 +452,10 @@ def test_op_query_arguments():
         'enum_with_default: Annotated[EnumWithDefault, typer.Option(case_sensitive=False, help="")] = "TheOtherThing"'
         in text
     )
+    assert (
+        'str_enum_with_int_values: Annotated[StrEnumWithIntValues, typer.Option(case_sensitive=False, help="")] = "1"'
+        in text
+    )
 
     # make sure path params not included
     assert 'num_feet: Annotated' not in text
@@ -499,6 +505,18 @@ class anyThing_goes(int, Enum):  # noqa: F811
     VALUE_TRUE = True
 
 """
+MIXED_ENUM = """\
+class MixedValues(str, Enum):  # noqa: F811
+    VALUE_A = "a"
+    VALUE_1 = "1"
+    VALUE_TRUE = "True"
+    VALUE_B = "b"
+"""
+INT_STR_ENUM = """\
+class IntStrings(str, Enum):  # noqa: F811
+    VALUE_10 = "10"
+    VALUE_10_1 = "10.1"
+"""
 
 SIMPLE_PARAM = {
     SCHEMA: {
@@ -509,6 +527,8 @@ SIMPLE_PARAM = {
 
 FOOBAR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}, "name": "fooBar"}
 NUMBER_PARAM = {SCHEMA: {TYPE: "integer", ENUM: [12, 37, 11]}, "name": "simple-number"}
+MIXED_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["a", 1, True, "b"]}, "name": "mixed-values"}
+INT_STR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["10", "10.1"]}, "name": "int-strings"}
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
@@ -597,6 +617,20 @@ def test_enum_declaration(name, enum_type, values, expected):
             f"\n{SIMPLE_ENUM}\n{FOOBAR_ENUM}",
             id="multiple",
         ),
+        pytest.param(
+            [],
+            [MIXED_PARAM],
+            {},
+            f"\n{MIXED_ENUM}\n",
+            id="mixed",
+        ),
+        pytest.param(
+            [],
+            [INT_STR_PARAM],
+            {},
+            f"\n{INT_STR_ENUM}\n",
+            id="int-str"
+        )
     ],
 )
 def test_enum_definitions(path_params, query_params, body_params, expected):
@@ -952,6 +986,10 @@ def test_op_body_arguments():
     assert (
         'flavor: Annotated[Optional[Species], '
         'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'
+        in text
+    )
+    assert (
+        'bin_string: Annotated[Optional[BinString], typer.Option(case_sensitive=False)] = "4"'
         in text
     )
 

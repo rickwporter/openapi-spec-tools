@@ -532,6 +532,9 @@ if __name__ == "__main__":
         is_enum = bool(schema.get(OasField.ENUM))
         if is_enum:
             typer_args.append("case_sensitive=False")
+            enum_type = schema.get(OasField.TYPE)
+            if enum_type == "string" and schema_default is not None:
+                arg_default = f" = {quoted(str(schema_default))}"
         if deprected or x_deprecated:
             typer_args.append("hidden=True")
         typer_args.append(f'help="{simple_escape(description)}"')
@@ -644,6 +647,9 @@ if __name__ == "__main__":
                 t_args["show_default"] = False
             is_enum = bool(prop_data.get(OasField.ENUM))
             if is_enum:
+                if prop_data.get(OasField.TYPE) == "string" and def_val is not None:
+                    # convert the default value to a string so it gets quoted
+                    def_val = str(def_val)
                 t_args["case_sensitive"] = False
             deprected = prop_data.get(OasField.DEPRECATED, False)
             x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
@@ -787,13 +793,30 @@ if __name__ == "__main__":
         arg_text = ', '.join([f"{k}={v}" for k, v in args.items()])
         return f"{SEP1}page_info = _r.PageParams({arg_text})"
 
+    def clean_enum_name(self, value: str) -> bool:
+        if not isinstance(value, str):
+            return False
+        try:
+            float(value)
+            return False
+        except ValueError:
+            pass
+
+        return True
+
     def enum_declaration(self, name: str, enum_type: str, values: list[Any]) -> str:
         """Turns data into an enum declation"""
         prefix = "" if enum_type == "str" else "VALUE_"
-        declarations = [
-            f"{prefix}{self.variable_name(str(v)).upper()} = {maybe_quoted(v)}"
-            for v in values
-        ]
+        if not all(self.clean_enum_name(v) for v in values):
+            prefix = "VALUE_"
+
+        declarations = []
+        for v in values:
+            base_name = self.variable_name(str(v)).upper()
+            item_name = f"{prefix}{base_name}"
+            value = quoted(str(v)) if enum_type == "str" else maybe_quoted(v)
+            declarations.append(f"{item_name} = {value}")
+
         # NOTE: the noqa is due to potentially same definition ahead of multiple functions
         return f"class {name}({enum_type}, Enum):  # noqa: F811{SEP1}{SEP1.join(declarations)}{NL * 2}"
 

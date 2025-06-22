@@ -112,6 +112,16 @@ paths:
             - That
             - TheOtherThing
             default: TheOtherThing
+        - name: strEnumWithIntValues
+          in: query
+          schema:
+            type: string
+            enum:
+            - 1
+            - two
+            - 3
+            - four
+            default: 1
       requestBody:
         content:
           application/json:
@@ -206,6 +216,15 @@ components:
             x-deprecated: 7.8.9
           flavor:
             $ref: "#/components/schemas/Species"
+          binString:
+            type: string
+            enum:
+            - 1
+            - 2
+            - 4
+            - 8
+            default: 4
+
     Pets:
       type: array
       maxItems: 100
