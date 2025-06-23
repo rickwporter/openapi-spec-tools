@@ -218,6 +218,7 @@ def test_schema_to_type(schema, fmt, expected):
         pytest.param("AlreadyClassName", "AlreadyClassName", id="class"),
         pytest.param("dash-or-bash", "DashOrBash", id="dash"),
         pytest.param("space included", "SpaceIncluded", id="space"),
+        pytest.param("more%special<chars:that>cause;problems", "MoreSpecialCharsThatCauseProblems", id="more"),
     ]
 )
 def test_class_name(proposed, expected):
@@ -235,6 +236,7 @@ def test_class_name(proposed, expected):
         pytest.param("users/list", "users_list", id="slash"),
         pytest.param("dash-or-bash", "dash_or_bash", id="dash"),
         pytest.param("space included", "space_included", id="space"),
+        pytest.param("more%special<chars:that>cause;problems", "more_special_chars_that_cause_problems", id="more"),
     ],
 )
 def test_function_name(proposed, expected):
@@ -252,6 +254,7 @@ def test_function_name(proposed, expected):
         pytest.param("users/list", "users_list", id="slash"),
         pytest.param("page-name", "page_name", id="dash"),
         pytest.param("space included", "space_included", id="space"),
+        pytest.param("more%special<chars:that>cause;problems", "more_special_chars_that_cause_problems", id="more"),
     ],
 )
 def test_variable_name(proposed, expected):
@@ -269,6 +272,7 @@ def test_variable_name(proposed, expected):
         pytest.param("users/list", "--users-list", id="slash"),
         pytest.param("page-name", "--page-name", id="dash"),
         pytest.param("space included", "--space-included", id="space"),
+        pytest.param("more%special<chars:that>cause;problems", "--more-special-chars-that-cause-problems", id="more"),
     ],
 )
 def test_option_name(proposed, expected):
