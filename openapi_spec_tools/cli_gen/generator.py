@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
     def _unspecial(self, value: str, replacement: str = '_') -> str:
         """Replaces the "special" characters with the replacement."""
-        for v in ['/', '*', '.', '-', '@', ' ']:
+        for v in ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';']:
             value = value.replace(v, replacement)
         return value
 
