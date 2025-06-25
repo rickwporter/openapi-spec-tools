@@ -900,7 +900,7 @@ if __name__ == "__main__":
             "headers=headers",
             "params=params",
         ])
-        if self.op_get_content_type(op):
+        if body_params:
             req_args.append("body=body")
         req_args.append("timemout=_api_timeout")
 

@@ -175,6 +175,14 @@ paths:
       responses:
         '204':
           description: This is an empty response
+    post:
+      operationId: snaFooCreate
+      summary: Create a normally messed up situation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplexList'
 components:
   parameters:
     PageSize:
@@ -582,3 +590,10 @@ components:
           oneOf:
           - $ref: '#/components/schemas/RoleEnum'
           description: The role that the user has in the organization.
+    ComplexList:
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
