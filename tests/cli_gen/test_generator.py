@@ -386,6 +386,10 @@ def test_op_body_formation():
     assert 'if bogus is not None:' in text
     assert '_l.logger().warning("--bogus was deprecated in 7.8.9 and should not be used")' in text
     assert 'body["bogus"] = bogus' in text
+    assert 'if optional_list is not None:' in text
+    assert 'body["optionalList"] = optional_list' in text
+    assert 'if first_choice is not None:' in text
+    assert 'body["firstChoice"] = first_choice' in text
 
 
 def test_op_path_arguments():
@@ -994,6 +998,14 @@ def test_op_body_arguments():
     )
     assert (
         'bin_string: Annotated[Optional[BinString], typer.Option(case_sensitive=False)] = "4"'
+        in text
+    )
+    assert(
+        'optional_list: Annotated[Optional[list[str]], typer.Option(show_default=False)] = None'
+        in text
+    )
+    assert(
+        'first_choice: Annotated[Optional[int], typer.Option(show_default=False)] = None'
         in text
     )
 

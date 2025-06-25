@@ -289,6 +289,18 @@ if __name__ == "__main__":
             if prop_data.get(OasField.READ_ONLY, False):
                 continue
 
+            one_of = prop_data.get(OasField.ONE_OF)
+            if one_of:
+                prop_data = deepcopy(prop_data)
+                prop_data.pop(OasField.ONE_OF)
+                updated = self.condense_one_of(one_of)
+                if len(updated) == 1:
+                    prop_data.update(updated[0])
+                else:
+                    # just grab the first one... not sure this is the best choice, but need to do something
+                    self.logger.warning(f"Grabbing oneOf[0] item from body {updated}")
+                    prop_data.update(updated[0])
+
             reference = self.prop_find_reference(prop_data)
             short_refname = self.short_reference_name(reference)
             if not reference:
@@ -637,6 +649,7 @@ if __name__ == "__main__":
         for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_name, prop_data)
             if not py_type:
+                # breakpoint()
                 # log an error and use 'Any'
                 self.logger.error(f"Unable to determine Python type for {prop_name}={prop_data}")
                 py_type = 'Any'
