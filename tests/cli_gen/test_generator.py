@@ -1160,6 +1160,44 @@ def test_function_definition_item():
     assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
 
 
+def test_function_definition_bad_body():
+    oas = open_oas(asset_filename("misc.yaml"))
+    item = LayoutNode(command="create", identifier="snaFooCreate")
+    uut = Generator("cli_package", oas)
+    text = uut.function_definition(item)
+    assert '@app.command("create", short_help="Create a normally messed up situation")' in text
+    assert 'def sna_foo_create(' in text
+    assert '# handler for snaFooCreate: POST /sna/foo' in text
+
+    # check standard arguments
+    assert "_api_host: _a.ApiHostOption" in text
+    assert "_api_key: _a.ApiKeyOption" in text
+    assert "_api_timeout: _a.ApiTimeoutOption" in text
+    assert "_log_level: _a.LogLevelOption" in text
+    assert "_out_fmt: _a.OutputFormatOption" in text
+    assert "_out_style: _a.OutputStyleOption" in text
+
+    # no summary field, so no details flag
+    assert "_details: _a.DetailsOption" not in text
+
+    # body is just a complex list, so not added
+    assert "body = " not in text
+
+    # check the body of the function
+    assert "_l.init_logging(_log_level)" in text
+    assert 'headers = _r.request_headers(_api_key, content_type="application/json")' in text
+    assert 'url = _r.create_url(_api_host, "sna/foo")' in text
+    assert 'params = {}' in text
+    assert 'data = _r.request("POST", url, headers=headers, params=params, timemout=_api_timeout)' in text
+    assert '_d.display(data, _out_fmt, _out_style)' in text
+    assert '_e.handle_exceptions(ex)' in text
+
+    # make sure the missing parameter checks are present
+    assert 'missing.append("--api-key")'
+    assert 'missing.append("--name")'
+    assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
+
+
 def test_function_definition_paged():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets.yaml"))
