@@ -224,6 +224,19 @@ components:
             - 4
             - 8
             default: 4
+          optionalList:
+            oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          firstChoice:
+            oneOf:
+            - type: integer
+            - type: array
+              items:
+                type: string
+          
 
     Pets:
       type: array
