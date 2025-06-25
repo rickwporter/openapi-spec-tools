@@ -30,6 +30,7 @@ SHEBANG = """\
 COLLECTIONS = {
     "array": "list",
 }
+SPECIAL_CHARS = ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';', '(', ')', '{', '}', '[', ']']
 
 
 class Generator:
@@ -145,7 +146,7 @@ if __name__ == "__main__":
 
     def _unspecial(self, value: str, replacement: str = '_') -> str:
         """Replaces the "special" characters with the replacement."""
-        for v in ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';']:
+        for v in SPECIAL_CHARS:
             value = value.replace(v, replacement)
         return value
 
