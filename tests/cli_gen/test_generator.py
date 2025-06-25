@@ -390,6 +390,8 @@ def test_op_body_formation():
     assert 'body["optionalList"] = optional_list' in text
     assert 'if first_choice is not None:' in text
     assert 'body["firstChoice"] = first_choice' in text
+    assert 'if list_various is not None:' in text
+    assert 'body["listVarious"] = list_various' in text
 
 
 def test_op_path_arguments():
@@ -1006,6 +1008,10 @@ def test_op_body_arguments():
     )
     assert(
         'first_choice: Annotated[Optional[int], typer.Option(show_default=False)] = None'
+        in text
+    )
+    assert (
+        'list_various: Annotated[Optional[list[bool]], typer.Option(show_default=False)] = None'
         in text
     )
 

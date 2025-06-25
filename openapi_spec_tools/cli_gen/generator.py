@@ -210,6 +210,13 @@ if __name__ == "__main__":
     def get_items_model(self, prop_data: dict[str, Any]) -> tuple[str, dict]:
         """Determines if the property data references complex items"""
         items = prop_data.get(OasField.ITEMS, {})
+        one_of = items.get(OasField.ONE_OF)
+        if one_of:
+            updated = self.condense_one_of(one_of)
+            if len(updated) != 1:
+                self.logger.info(f"Using updated[0] item from sub-model {updated}")
+            items = updated[0]
+
         item_ref = items.get(OasField.REFS, "")
         item_short = self.short_reference_name(item_ref)
         if item_ref:
@@ -314,12 +321,13 @@ if __name__ == "__main__":
 
             collection_type = self.model_collection_type(submodel)
             if collection_type:
+                collect_name = f"{short_refname}." if short_refname else "" + prop_name
                 item_name, item_model = self.get_items_model(submodel)
                 if not item_model:
-                    self.logger.error(f"Could not find {short_refname}.{prop_name} item model")
+                    self.logger.error(f"Could not find {collect_name} item model")
                     continue
                 if self.model_is_complex(item_model):
-                    self.logger.error(f"Ignoring {short_refname}.{prop_name} -- cannot handle lists of complex")
+                    self.logger.error(f"Ignoring {collect_name} -- cannot handle lists of complex")
                     continue
                 if item_name:
                     set_missing(submodel, OasField.X_REF.value, item_name)

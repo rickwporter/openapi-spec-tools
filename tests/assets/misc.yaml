@@ -236,7 +236,13 @@ components:
             - type: array
               items:
                 type: string
-          
+          listVarious:
+            type: array
+            items:
+              oneOf:
+              - type: boolean
+              - type: integer
+              - type: string
 
     Pets:
       type: array
