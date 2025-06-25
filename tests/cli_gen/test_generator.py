@@ -219,6 +219,11 @@ def test_schema_to_type(schema, fmt, expected):
         pytest.param("dash-or-bash", "DashOrBash", id="dash"),
         pytest.param("space included", "SpaceIncluded", id="space"),
         pytest.param("more%special<chars:that>cause;problems", "MoreSpecialCharsThatCauseProblems", id="more"),
+        pytest.param(
+            "some{brace}and[bracket]and(paren)testing",
+            "SomeBraceAndBracketAndParenTesting",
+            id="parens",
+        ),
     ]
 )
 def test_class_name(proposed, expected):
@@ -237,6 +242,11 @@ def test_class_name(proposed, expected):
         pytest.param("dash-or-bash", "dash_or_bash", id="dash"),
         pytest.param("space included", "space_included", id="space"),
         pytest.param("more%special<chars:that>cause;problems", "more_special_chars_that_cause_problems", id="more"),
+        pytest.param(
+            "some{brace}and[bracket]and(paren)testing",
+            "some_brace_and_bracket_and_paren_testing",
+            id="parens",
+        ),
     ],
 )
 def test_function_name(proposed, expected):
@@ -255,6 +265,11 @@ def test_function_name(proposed, expected):
         pytest.param("page-name", "page_name", id="dash"),
         pytest.param("space included", "space_included", id="space"),
         pytest.param("more%special<chars:that>cause;problems", "more_special_chars_that_cause_problems", id="more"),
+        pytest.param(
+            "some{brace}and[bracket]and(paren)testing",
+            "some_brace_and_bracket_and_paren_testing",
+            id="parens",
+        ),
     ],
 )
 def test_variable_name(proposed, expected):
@@ -273,6 +288,11 @@ def test_variable_name(proposed, expected):
         pytest.param("page-name", "--page-name", id="dash"),
         pytest.param("space included", "--space-included", id="space"),
         pytest.param("more%special<chars:that>cause;problems", "--more-special-chars-that-cause-problems", id="more"),
+        pytest.param(
+            "some{brace}and[bracket]and(paren)testing",
+            "--some-brace-and-bracket-and-paren-testing",
+            id="parens",
+        ),
     ],
 )
 def test_option_name(proposed, expected):
