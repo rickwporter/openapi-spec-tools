@@ -649,7 +649,6 @@ if __name__ == "__main__":
         for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_name, prop_data)
             if not py_type:
-                # breakpoint()
                 # log an error and use 'Any'
                 self.logger.error(f"Unable to determine Python type for {prop_name}={prop_data}")
                 py_type = 'Any'
