@@ -306,8 +306,8 @@ def test_option_name(proposed, expected):
         pytest.param(None, None, id="none"),
         pytest.param("foo", "foo", id="str"),
         pytest.param({"sna": "foo"}, {"sna": "foo"}, id="dict"),
-        pytest.param(["sna", "foo"], ["sna", "foo"], id="list-unmod"),
-        pytest.param(["null", "sna"], "sna", id="list-mod"),
+        pytest.param(["sna", "foo"], "sna", id="list-no-null"),
+        pytest.param(["null", "sna"], "sna", id="list-null"),
         pytest.param(1, None, id="error"),
     ]
 )
