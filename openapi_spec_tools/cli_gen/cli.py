@@ -289,7 +289,7 @@ def generate_cli(
     ] = None,
     include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
     start: StartPointOption = DEFAULT_START,
-    log_level: LogLevelOption = "DEBUG",
+    log_level: LogLevelOption = "info",
 ) -> None:
     """
     Generates CLI code based on the provided parameters.
