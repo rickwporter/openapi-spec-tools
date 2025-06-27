@@ -1,3 +1,4 @@
+"""Implementation for displaying data in a user-friendly fashion."""
 from enum import Enum
 from gettext import gettext
 from typing import Any
@@ -41,7 +42,7 @@ URL_MAX_LEN = 100
 
 
 class TableConfig:
-    """This data class provides a means for customizing the table outputs.
+    """Configuration for customizing the table outputs.
 
     The defaults provide a standard look and feel, but can be overridden to all customization.
     """
@@ -78,9 +79,7 @@ class TableConfig:
 
 
 class RichTable(Table):
-    """
-    This is wrapper around the rich.Table to provide some methods for adding complex items.
-    """
+    """Wrapper for the rich.Table to provide some methods for adding complex items."""
 
     def __init__(
         self,
@@ -110,14 +109,14 @@ class RichTable(Table):
 
 
 def _truncate(s: str, max_length: int) -> str:
-    """Truncates the provided string to a maximum of max_length (including elipsis)"""
+    """Truncate the provided string to a maximum of max_length (including elipsis)."""
     if len(s) < max_length:
         return s
     return s[: max_length - 3] + ELLIPSIS
 
 
 def _get_name_key(item: dict[Any, Any], key_fields: list[str]) -> Optional[str]:
-    """Attempts to find an identifying value."""
+    """Attempt to find an identifying value."""
     for k in key_fields:
         key = str(k)
         if key in item:
@@ -127,19 +126,19 @@ def _get_name_key(item: dict[Any, Any], key_fields: list[str]) -> Optional[str]:
 
 
 def _is_url(s: str, url_prefixes: list[str]) -> bool:
-    """Rudimentary check for somethingt starting with URL prefix"""
+    """Rudimentary check for somethingt starting with URL prefix."""
     return any(s.startswith(p) for p in url_prefixes)
 
 
 def _safe(v: Any) -> str:
-    """Converts 'v' to a string that is properly escaped."""
+    """Convert 'v' to a string that is properly escaped."""
     return escape(str(v))
 
 
 def _create_list_table(
     items: list[dict[Any, Any]], outer: bool, config: TableConfig
 ) -> RichTable:
-    """Creates a table from a list of dictionary items.
+    """Create a table from a list of dictionary items.
 
     If an identifying "name key" is found (in the first entry), the table will have 2 columns: name, Properties
     If no identifying "name key" is found, the table will be a single column table with the properties.
@@ -183,7 +182,7 @@ def _create_list_table(
 def _create_object_table(
     obj: dict[Any, Any], outer: bool, config: TableConfig
 ) -> RichTable:
-    """Creates a table of a dictionary object.
+    """Create a table of a dictionary object.
 
     NOTE: nesting is done in the right column as needed.
     """
@@ -199,7 +198,7 @@ def _create_object_table(
 
 
 def _table_cell_value(obj: Any, config: TableConfig) -> Any:
-    """Creates the "inner" value for a table cell.
+    """Create the "inner" value for a table cell.
 
     Depending on the input value type, the cell may look different. If a dict, or list[dict],
     an inner table is created. Otherwise, the object is converted to a printable value.
@@ -261,19 +260,23 @@ def rich_table_factory(obj: Any, config: TableConfig = TableConfig()) -> RichTab
 # Below will remain even after the code from https://github.com/fastapi/typer/pull/1099 merges.
 ###################################################################################################
 class OutputFormat(str, Enum):
+    """Output text format for received data."""
+
     TABLE = "table"
     JSON = "json"
     YAML = "yaml"
 
 
 class OutputStyle(str, Enum):
+    """Text style options for none, bold-only, or bold-and-color."""
+
     NONE = "none"
     BOLD = "bold"
     ALL = "all"
 
 
 def summary(obj: Any, properties: list[str]) -> Any:
-    """Gets the item with just the specified properties."""
+    """Get the item with just the specified properties."""
     if obj is None:
         return None
 
@@ -285,9 +288,7 @@ def summary(obj: Any, properties: list[str]) -> Any:
 
 
 def display(obj: Any, fmt: OutputFormat, style: OutputStyle, indent: int = 2) -> None:
-    """
-    This function handles display of the data provided in obj, according to the formating arguments.
-    """
+    """Display the data provided in obj, according to the formating arguments."""
     no_color = style != OutputStyle.ALL
     highlight = style != OutputStyle.NONE
     console = console_factory(no_color=no_color, highlight=highlight)

@@ -1,3 +1,8 @@
+"""Implementation for sending/receiving REST requests.
+
+Uses standard Python requests module, but provids a unfied interface with consistent
+logging, etc.
+"""
 import importlib.metadata
 import json
 from copy import deepcopy
@@ -58,6 +63,8 @@ logger = logger()
 
 @dataclass
 class PageParams:
+    """Holds optional pagination parameter names and values."""
+
     # page_size_* dictate the limit per request
     page_size_value: Optional[int] = None
     page_size_name: Optional[str] = None
@@ -82,8 +89,7 @@ class PageParams:
 
 
 def create_url(host_or_base_url: str, *args) -> str:
-    """
-    Creates a URL from the arguements.
+    """Create a URL from the arguements.
 
     Takes care of the slash manipulations.
     """
@@ -103,8 +109,7 @@ def request_headers(
     content_type: Optional[str] = None,
     **kwargs,
 ) -> dict[str, str]:
-    """
-    Creates a set of request headers based on the arguments.
+    """Create a set of request headers based on the arguments.
 
     The API Key and content type are optional, but likely desired.
     """
@@ -123,7 +128,10 @@ def request_headers(
 
 
 def raise_for_error(response: requests.Response) -> None:
-    """On a bad response, attempts to get more details for the exception."""
+    """Raise an exception for a bad response.
+
+    Provide meaningful details for the exception.
+    """
     if response.ok:
         return
 
@@ -155,6 +163,7 @@ def request(
     timeout: Optional[int] = None,
     **kwargs, # allows passing through additional named parameters
 ) -> Any:
+    """Perform the specified REST request."""
     pretty_url = url + _pretty_params(params)
     logger.debug(f"Requesting {method} {pretty_url}")
     start = datetime.now()
@@ -205,9 +214,7 @@ def depaginate(
     params: Optional[dict[str, Any]] = None,
     timeout: Optional[int] = None,
 ) -> Any:
-    """
-    Gets a list of items that may be chunked across several pages.
-    """
+    """Get a list of items that may be chunked across several pages."""
     items = []
     total_time = timedelta()
     _url = url

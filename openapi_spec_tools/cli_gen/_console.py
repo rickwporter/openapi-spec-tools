@@ -6,7 +6,7 @@ TEST_TERMINAL_WIDTH = 100
 
 
 def console_factory(*args, **kwargs) -> Console:
-    """Utility to consolidate creation/initialization of Console.
+    """Create/initialize a Console object.
 
     A little hacky here... Allow terminal width to be set directly by an environment variable, or
     when detecting that we're testing use a wide terminal to avoid line wrap issues.

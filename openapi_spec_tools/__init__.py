@@ -1,3 +1,4 @@
+"""Implementation for several utilities for analyzing and modifying OpenAPI specifications."""
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths

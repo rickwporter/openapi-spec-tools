@@ -28,10 +28,14 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = [
+    "D",  # pydocstyle
     "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
     "F",  # pyflakes
     "I",  # isort
+    "W",  # pycodestyle warnings
+]
+fixable = [
+    "D", "I",
 ]
 
 [tool.ruff.lint.isort]
@@ -48,6 +52,19 @@ max-statements = 75
 # ignore the unused imports in init
 "__init__.py" = ["F401"]
 "tests/cli_gen/cli_output.py" = ["W291"]
+"tests/*" = [
+     # no need for docstrings on tests
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106",
+    "D200",
+    "D300", "D301",
+    "D400", "D401", "D402", "D403", "D404", "D415",
+]
+"openapi_spec_tools/oas.py" = [
+    "D103", # CLI functions don't need docstrings
+]
+"openapi_spec_tools/cli_gen/cli.py" = [
+    "D103", # CLI functions don't need docstrings
+]
 
 [tool.pytest.ini_options]
 addopts = [

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Implementation of the CLI generation CLI."""
 import os
 from copy import deepcopy
 from enum import Enum
@@ -54,9 +55,9 @@ StartPointOption = Annotated[str, typer.Option(help="Start point for CLI in layo
 #################################################
 # Utilities
 def open_oas_with_error_handling(filename: str) -> Any:
-    """
-    Performs error handling around opening an OpenAPI spec, and avoids the standard Typer
-    error handling that is quite verbose.
+    """Perform error handling around opening an OpenAPI spec.
+
+    Avoids the standard Typer error handling that is quite verbose.
     """
     try:
         return open_oas(filename)
@@ -70,9 +71,9 @@ def open_oas_with_error_handling(filename: str) -> Any:
 
 
 def open_layout_with_error_handling(filename: str) -> Any:
-    """
-    Performs error handling around opening a layout file, and avoids the standard Typer
-    error handling that is quite verbose.
+    """Perform error handling around opening a layout file.
+
+    Avoids the standard Typer error handling that is quite verbose.
     """
     try:
         return open_layout(filename)
@@ -86,9 +87,9 @@ def open_layout_with_error_handling(filename: str) -> Any:
 
 
 def layout_tree_with_error_handling(filename: str, start: str) -> LayoutNode:
-    """
-    Performs error handling around opening a layout file, and avoids the standard Typer
-    error handling that is quite verbose.
+    """Perform error handling around opening a layout file.
+
+    Avoids the standard Typer error handling that is quite verbose.
     """
     try:
         return file_to_tree(filename, start)
@@ -188,6 +189,8 @@ def layout_check_format(
 
 
 class TreeFormat(str, Enum):
+    """Display options for show the tree output."""
+
     TEXT = "text"
     JSON = "json"
     YAML = "yaml"
@@ -260,6 +263,7 @@ def layout_operations(
 # Generate stuff
 
 def render_missing(missing: dict[str, list[str]]) -> str:
+    """Pretty-print string of dictionary of missing items."""
     return (
         f"Commands with missing operations:{SEP}" +
         SEP.join(f"{cmd}: {', '.join(ops)}" for cmd, ops in missing.items())
@@ -291,8 +295,7 @@ def generate_cli(
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "DEBUG",
 ) -> None:
-    """
-    Generates CLI code based on the provided parameters.
+    """Generate CLI code based on the provided parameters.
 
     Use either `--project-dir` to set both relative code and test directories, or
     set the paths specifically using `--code-dir` and `--test-dir`.
@@ -462,8 +465,10 @@ def trim_oas(
         typer.Option(min=1, max=10, help="Number of characters to indent on YAML display"),
     ] = 2,
 ) -> None:
-    """Create a version of the OpenAPI spec with only the data associated with the operations and paths
-    required for use with the provide layout file."""
+    """Create a version of the OpenAPI spec with limited data.
+
+    The data is focused on the operations and paths required for use with the provide layout file.
+    """
     def _operations(_node: LayoutNode) -> set[str]:
         ops = set([op.identifier for op in _node.operations()])
         for sub in _node.subcommands():
