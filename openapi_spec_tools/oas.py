@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Implement the 'oas' CLI with options for analyzing and modifying OpenAPI specs."""
 import os
 from copy import deepcopy
 from enum import Enum
@@ -42,7 +43,7 @@ def short_filename(long: str) -> str:
 
 
 def console_factory() -> Console:
-    """Utility to consolidate creation/initialization of Console.
+    """Consolidate creation/initialization of Console.
 
     A little hacky here... Allow terminal width to be set directly by an environment variable, or
     when detecting that we're testing use a wide terminal to avoid line wrap issues.
@@ -57,9 +58,7 @@ def console_factory() -> Console:
 
 
 def remove_list_prefix(items: list[str]) -> list[str]:
-    """
-    Remove a common model prefix. This typically happens when everything is in schemas/
-    """
+    """Remove a common model prefix. This typically happens when everything is in schemas/."""
     prefix = items[0].split('/')[0] + '/'
     if not all(_.startswith(prefix) for _ in items):
         return items
@@ -68,8 +67,9 @@ def remove_list_prefix(items: list[str]) -> list[str]:
 
 
 def remove_dict_prefix(map: dict[str, Any]) -> dict[str, Any]:
-    """
-    If all the keys of the provided map start with the same prefix (before /), it removes the prefix from the keys
+    """Remove common prefix segements (delineated by /'s) from dictionary keys.
+
+    If all the keys of the provided map start with the same prefix (before /), it removes the prefix from the keys.
     """
     keys = list(map.keys())
     prefix = keys[0].split('/')[0] + '/'
@@ -80,9 +80,9 @@ def remove_dict_prefix(map: dict[str, Any]) -> dict[str, Any]:
 
 
 def open_oas_with_error_handling(filename: str) -> Any:
-    """
-    Performs error handling around opening an OpenAPI spec, and avoids the standard Typer
-    error handling that is quite verbose.
+    """Perform error handling around opening an OpenAPI spec.
+
+    Avoids the standard Typer error handling that is quite verbose.
     """
     try:
         return open_oas(filename)
@@ -183,6 +183,8 @@ def diff(
 
 
 class DisplayOption(str, Enum):
+    """Options for displaying the output."""
+
     NONE = "none"
     SUMMARY = "summary"
     DIFF = "diff"

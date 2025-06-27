@@ -1,3 +1,4 @@
+"""Field enums and class definitions for objects used by the layout file."""
 import dataclasses
 from enum import Enum
 from typing import Any
@@ -5,6 +6,8 @@ from typing import Optional
 
 
 class LayoutField(str, Enum):
+    """Field names in the layout file, mostly inside the operations section."""
+
     NAME = "name"
     BUG_IDS = "bugIds"
     DESCRIPTION = "description"
@@ -16,6 +19,8 @@ class LayoutField(str, Enum):
 
 
 class PaginationField(str, Enum):
+    """Field names expected in the pagination parameters of the layout."""
+
     ITEM_PROP = "itemProperty"
     ITEM_START = "itemStart"
     NEXT_HEADER = "nextHeader"
@@ -25,7 +30,10 @@ class PaginationField(str, Enum):
 
     @classmethod
     def contains(cls, value: str) -> bool:
-        """This is a fix because `x in PaginationField` is not supported in Python 3.9."""
+        """Check wither the value is a class member (aka enum value).
+
+        This is a fix because `x in PaginationField` is not supported in Python 3.9.
+        """
         try:
             cls(value)
             return True
@@ -35,6 +43,8 @@ class PaginationField(str, Enum):
 
 @dataclasses.dataclass
 class PaginationNames:
+    """Data structure for holding info related to pagination parameters."""
+
     # page_size - dictates the limit per request
     page_size: Optional[str] = None
 
@@ -54,6 +64,8 @@ class PaginationNames:
 
 @dataclasses.dataclass
 class LayoutNode:
+    """Info for handling the layout file in a hierachical fashion."""
+
     command: str
     identifier: str
     description: str = ""
@@ -64,23 +76,23 @@ class LayoutNode:
     pagination: Optional[PaginationNames] = None
 
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
-        """Convenience method to convert to dictionary"""
+        """Convert object to dictionary."""
         def filter_empty_or_none(d: list[tuple[str, Any]]) -> dict[str, Any]:
-            """Skips keys whose value is None, or an empty list/dict/set"""
+            """Skip keys whose value is None, or an empty list/dict/set."""
             return {k: v for (k, v) in d if v is not None and v != [] and v != {}}
 
         return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
 
     def subcommands(self, include_bugged: bool = False) -> list["LayoutNode"]:
-        """Return a list of LayoutNodes that have children."""
+        """List of LayoutNodes that have children."""
         return [n for n in self.children if n.children and (include_bugged or not n.bugs)]
 
     def operations(self, include_bugged: bool = False) -> list["LayoutNode"]:
-        """Return a list of LayoutNodes without any children."""
+        """List of LayoutNodes without any children."""
         return [n for n in self.children if not n.children and (include_bugged or not n.bugs)]
 
     def find(self, *args) -> Optional["LayoutNode"]:
-        """Search for the provided commands"""
+        """Search for the provided commands."""
         for child in self.children:
             if child.command == args[0]:
                 if len(args) == 1:

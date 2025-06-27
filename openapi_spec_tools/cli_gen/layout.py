@@ -1,3 +1,4 @@
+"""Collection of functions for working the layout files."""
 from pathlib import Path
 from typing import Any
 from typing import Optional
@@ -13,9 +14,7 @@ DEFAULT_START = "main"
 
 
 def open_layout(filename: str) -> Any:
-    """
-    Open the specified filename, and return the dictionary.
-    """
+    """Open the specified filename, and return the dictionary."""
     file = Path(filename)
     if not file.exists():
         raise FileNotFoundError(filename)
@@ -25,7 +24,7 @@ def open_layout(filename: str) -> Any:
 
 
 def field_to_list(data: dict[str, Any], field: str) -> list[str]:
-    """Gets the field value and turns CSV text into a list"""
+    """Get the field value and turns CSV text into a list."""
     value = data.get(field)
     if not value:
         return []
@@ -41,7 +40,7 @@ def field_to_list(data: dict[str, Any], field: str) -> list[str]:
 
 
 def parse_extras(data: dict[str, Any]) -> dict[str, Any]:
-    """Pass through extra user data -- ignore the keys already in the LayoutFields"""
+    """Pass through extra user data -- ignore the keys already in the LayoutFields."""
     return {
         k: v
         for k, v in data.items()
@@ -50,7 +49,7 @@ def parse_extras(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames]:
-    """Parses the data into pagination parameters"""
+    """Parse the data into pagination parameters."""
     if not data:
         return None
 
@@ -65,7 +64,7 @@ def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames
 
 
 def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
-    """Recursively converts elements from data to LayoutNodes"""
+    """Recursively convert elements from data to LayoutNodes."""
     description = item.get(LayoutField.DESCRIPTION, "")
     # identifier = item.get(LayoutField.OP_ID) or identifier
     # parse bugs and summary fields into a list
@@ -100,7 +99,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
 
 
 def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> LayoutNode:
-    """Puts the data into a tree structure starting at start."""
+    """Put the data into a tree structure starting at start."""
     top = data.get(start, {})
     if not top:
         raise ValueError(f"No start value found for '{start}'")
@@ -109,7 +108,7 @@ def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> LayoutNod
 
 
 def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:
-    """Looks for missing properties in the sub-commands"""
+    """Look for missing properties in the sub-commands."""
     errors = {}
     for sub_name, sub_data in data.items():
         sub_data = sub_data or {}
@@ -135,7 +134,7 @@ def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:
 
 
 def operation_duplicates(data: dict[str, Any]) -> dict[str, Any]:
-    """Look for command operations with redundant names (within each command)"""
+    """Look for command operations with redundant names (within each command)."""
     errors = {}
 
     for sub_name, sub_data in data.items():
@@ -162,7 +161,7 @@ def operation_duplicates(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def operation_order(data: dict[str, Any]) -> dict[str, Any]:
-    """Checks the operations order for each subcommand"""
+    """Check the operations order for each subcommand."""
     errors = {}
 
     for sub_name, sub_data in data.items():
@@ -194,7 +193,7 @@ def subcommand_references(data: dict[str, Any], start: str = DEFAULT_START) -> t
 
 
 def subcommand_order(data: dict[str, Any], start: str = DEFAULT_START) -> list[str]:
-    """Checks the order of the sub-commands"""
+    """Check the order of the sub-commands."""
     misordered = []
     names = list(data.keys())
     if not names:
@@ -222,7 +221,7 @@ def subcommand_order(data: dict[str, Any], start: str = DEFAULT_START) -> list[s
 
 
 def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
-    """Checks for issues with the pagnination parameters that would potentially cause confusion."""
+    """Check for issues with the pagnination parameters that would potentially cause confusion."""
     errors = {}
 
     for sub_name, sub_data in data.items():
@@ -249,6 +248,6 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
     return errors
 
 def file_to_tree(filename: str, start: str = DEFAULT_START) -> LayoutNode:
-    """Utility to open filename and parse to a LayoutNode tree."""
+    """Open filename and parse to a LayoutNode tree."""
     data = open_layout(filename)
     return parse_to_tree(data, start)

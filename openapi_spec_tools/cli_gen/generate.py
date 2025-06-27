@@ -1,3 +1,4 @@
+"""Implementation for creating/copying CLI files."""
 import os
 from datetime import datetime
 from pathlib import Path
@@ -46,19 +47,19 @@ logger = logger(GENERATOR_LOG_CLASS)
 
 
 def set_copyright(copyright: str = DEFAULT_COPYRIGHT) -> None:
-    """Set the global copyright value"""
+    """Set the global copyright value."""
     global _copyright
     _copyright = copyright
 
 
 def copyright() -> str:
-    """Gets the global copyright value"""
+    """Get the global copyright value."""
     global _copyright
     return _copyright
 
 
 def generate_node(generator: Generator, node: LayoutNode, directory: str) -> None:
-    """Creates a file/module for the current node, and recursively goes through sub-commands."""
+    """Create a file/module for the current node, and recursively goes through sub-commands."""
     module_name = to_snake_case(node.identifier)
     logger.info(f"Generating {module_name} module")
     text = generator.shebang()
@@ -110,7 +111,7 @@ def generate_tree_node(generator: Generator, node: LayoutNode) -> TreeNode:
 
 
 def generate_tree_file(generator: Generator, node: LayoutNode, directory: str) -> None:
-    """Creates the YAML file"""
+    """Create the YAML file."""
     filename = os.path.join(directory, "tree.yaml")
     with open(filename, "w", encoding="utf-8", newline="\n") as fp:
         fp.write(copyright())
@@ -118,7 +119,7 @@ def generate_tree_file(generator: Generator, node: LayoutNode, directory: str) -
 
 
 def check_for_missing(node: LayoutNode, oas: dict[str, Any]) -> dict[str, list[str]]:
-    """Look for operations in node (and children) that are NOT in the OpenAPI spec"""
+    """Look for operations in node (and children) that are NOT in the OpenAPI spec."""
     def _check_missing(node: LayoutNode, ops: dict[str, Any]) -> dict[str, list[str]]:
         current = []
         for op in node.operations():
@@ -141,9 +142,9 @@ def check_for_missing(node: LayoutNode, oas: dict[str, Any]) -> dict[str, list[s
 
 
 def find_unreferenced(node: LayoutNode, oas: dict[str, Any]) -> dict[str, Any]:
-    """Finds the operations in the OAS that are unrerenced by the commands."""
+    """Find the operations in the OAS that are unrerenced by the commands."""
     def _find_operations(_node: LayoutNode) -> set[str]:
-        """Recursively finds all the operations for this node and it's children"""
+        """Recursively finds all the operations for this node and it's children."""
         current = set()
         for op in _node.operations(include_bugged=True):
             current.add(op.identifier)
@@ -163,7 +164,7 @@ def find_unreferenced(node: LayoutNode, oas: dict[str, Any]) -> dict[str, Any]:
 
 
 def copy_and_update(src_filename: str, dst_filename: str, replacements: dict[str, str]):
-    """Copies text from src to dst with replacements of current package name to the supplied value."""
+    """Copy text from src to dst with replacements of current package name to the supplied value."""
     with (
         open(src_filename, "r", encoding="utf-8", newline="\n") as src_fp,
         open(dst_filename, "w", encoding="utf-8", newline="\n") as dst_fp,
@@ -177,7 +178,7 @@ def copy_and_update(src_filename: str, dst_filename: str, replacements: dict[str
 
 
 def copy_infrastructure(dst_dir: str, package_name: str):
-    """Iterates over the INFRASTRUCTURE_FILES, and copies from local to dst."""
+    """Iterate over the INFRASTRUCTURE_FILES, and copies from local to dst."""
     spath = Path(__file__).parent
     dpath = Path(dst_dir)
     replacements = {
@@ -190,7 +191,7 @@ def copy_infrastructure(dst_dir: str, package_name: str):
 
 
 def copy_tests(dst_dir: str, package_name: str, main_module: str):
-    """Iterates over the TEST_FILES, and copies from local to dst."""
+    """Iterate over the TEST_FILES, and copies from local to dst."""
     spath = Path(__file__).parent.parent.parent / "tests" / "cli_gen"
     dpath = Path(dst_dir)
     replacements = {

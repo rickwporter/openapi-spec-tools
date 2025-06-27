@@ -35,11 +35,12 @@ class TreeField(str, Enum):
 
 @dataclasses.dataclass
 class TreeNode:
-    """Represents the relationship between the CLI and OAS
+    """Represention of the relationship between the CLI and OAS.
 
     The structure is picked up from the layout file, and details about help, path, etc
     come from the OAS.
     """
+
     name: str
     help: Optional[str] = None
     operation: Optional[str] = None
@@ -61,7 +62,7 @@ class TreeNode:
 
 
 def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> Optional[TreeNode]:
-    """Parses the specified file into a tree."""
+    """Parse the specified file into a tree."""
     item = data.get(identifier)
     children = []
     for operation in item.get(TreeField.OPERATIONS, []):
@@ -90,7 +91,7 @@ def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> Optional
 
 
 def create_node_table(node: TreeNode) -> Table:
-    """Creates the "inner" table for an individual node."""
+    """Create the "inner" table for an individual node."""
     table = Table(
         highlight=True,
         show_header=False,
@@ -116,7 +117,7 @@ def create_node_table(node: TreeNode) -> Table:
 
 
 def add_node_to_table(table: Table, node: TreeNode, display: TreeDisplay, depth: int, max_depth: int) -> None:
-    """Adds a node (with children) to the table"""
+    """Add a node (with children) to the table."""
     indent = INDENT * depth
     if display != TreeDisplay.ALL:
         content = node.get(display)
@@ -130,7 +131,7 @@ def add_node_to_table(table: Table, node: TreeNode, display: TreeDisplay, depth:
 
 
 def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> Table:
-    """Creates the tree table.
+    """Create the tree table.
 
     It is a "flat" table where the left column is the commands with each child being
     indented another level beyond the parent. The right column is either a single property,
@@ -157,7 +158,7 @@ def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> T
 
 
 def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int) -> None:
-    """Prints the tree table for the specified command."""
+    """Print the tree table for the specified command."""
     with open(filename, "r", encoding="utf-8", newline="\n") as fp:
         data = yaml.safe_load(fp)
 

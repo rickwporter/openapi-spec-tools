@@ -1,7 +1,10 @@
+"""Collection of types used throughout the project."""
 from enum import Enum
 
 
 class OasField(str, Enum):
+    """Collection of OpenAPI specification fields."""
+
     ALL_OF = "allOf"
     ANY_OF = "anyOf"
     COMPONENTS = "components"
@@ -46,6 +49,8 @@ class OasField(str, Enum):
 
 
 class ContentType(str, Enum):
+    """Common HTTP content types."""
+
     APP_JSON = "application/json"
     APP_OCTETS = "application/octet-stream"
     APP_PDF = "application/pdf"

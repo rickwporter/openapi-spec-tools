@@ -1,3 +1,4 @@
+"""Utilties for analyzing and manipulating OpenAPI specifications."""
 import json
 from copy import deepcopy
 from itertools import zip_longest
@@ -14,9 +15,7 @@ NULL_TYPES = {'null', '"null"', "'null'"}
 
 
 def open_oas(filename: str) -> Any:
-    """
-    Open the specified filename, and return the dictionary.
-    """
+    """Open the specified filename, and return the dictionary."""
     path = Path(filename)
     if not path.exists():
         raise FileNotFoundError(filename)
@@ -28,15 +27,14 @@ def open_oas(filename: str) -> Any:
 
 
 def unroll(full_set: dict[str, set[str]], items: set[str]) -> set[str]:
-    """
-    Utility to unroll all the references from items.
+    """Unroll all the references from items.
 
     The 'full_set' is a mapping of names to references, and the 'items' is
     the initial set of names to look for.
 
     The return is the set of all items of the referenced from the inputs.
 
-    Example
+    Example:
     =======
        full_set = {
                     a: {b},
@@ -48,6 +46,7 @@ def unroll(full_set: dict[str, set[str]], items: set[str]) -> set[str]:
         items = {b, c}
 
        result = {b, c, d, e}
+
     """
     result = deepcopy(items)
 
@@ -60,10 +59,9 @@ def unroll(full_set: dict[str, set[str]], items: set[str]) -> set[str]:
 
 
 def find_dict_prop(obj: dict[str, Any], prop_name: str) -> set[str]:
-    """
-    Used to get the string values of all the 'prop_name' properties in the 'obj'. This
-    works recursively, so it can be used to walk everything in 'obj' (and not just the
-    top level).
+    """Get the string values of all the 'prop_name' properties in the 'obj'.
+
+    This works recursively, so it can be used to walk everything in 'obj' (and not just the top level).
     """
     result = set()
     for name, data in obj.items():
@@ -78,9 +76,7 @@ def find_dict_prop(obj: dict[str, Any], prop_name: str) -> set[str]:
 
 
 def find_list_prop(items: list[Any], prop_name: str) -> set[str]:
-    """
-    Used to get the string values of all the 'prop_name' properties in the list of dictionaries 'items'.
-    """
+    """Get the string values of all the 'prop_name' properties in the list of dictionaries 'items'."""
     result = set()
     for item in items:
         if isinstance(item, dict):
@@ -90,17 +86,14 @@ def find_list_prop(items: list[Any], prop_name: str) -> set[str]:
 
 
 def shorten_text(text: str, max_len: int = 16) -> str:
-    """
-    Shortens 'text' to a maximum length of 'max_len' (including the elipsis)
-    """
+    """Shorten 'text' to a maximum length of 'max_len' (including the elipsis)."""
     if len(text) >= max_len:
         text = text[:max_len - 3] + "..."
     return text
 
 
 def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
-    """
-    Provides a summary of the differences between the left and right hand-side dictionaries.
+    """Provide a summary of the differences between the left and right hand-side dictionaries.
 
     Generally, the lefthand side ('lhs') is the original, and the righthand side ('rhs') is
     the updated dictionary. Generally, this tells you which items have been added or removed
@@ -167,8 +160,7 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
 
 
 def count_values(obj: dict[str, Any]) -> int:
-    """
-    Recursively walks the 'obj' dictionary to count the simple values (e.g. int, float, bool).
+    """Recursively walk the 'obj' dictionary to count the simple values (e.g. int, float, bool).
 
     This is useful for counting the number of differences as determined by 'find_diffs()'.
     """
@@ -191,7 +183,7 @@ def count_values(obj: dict[str, Any]) -> int:
 
 
 def short_ref(full_name: str) -> str:
-    """Get the shorter reference name (drops the '#/component')"""
+    """Get the shorter reference name (drops the '#/component')."""
     values = [
         part for part in full_name.split('/')
         if part and part not in ('#', OasField.COMPONENTS.value)
@@ -200,25 +192,21 @@ def short_ref(full_name: str) -> str:
 
 
 def find_references(obj: dict[str, Any]) -> set[str]:
-    """
-    Walks the 'obj' dictionary to find all the reference values (e.g. "$ref").
-    """
+    """Walk the 'obj' dictionary to find all the reference values (e.g. "$ref")."""
     refs = find_dict_prop(obj, OasField.REFS)
     return set([short_ref(_) for _ in refs])
 
 
 
 def model_references(models: dict[str, Any]) -> set[str]:
-    """
-    Creates a complete map of model names to their references.
-    """
+    """Create a complete map of model names to their references."""
     return {name: find_references(body) for name, body in models.items()}
 
 
 def model_filter(models: dict[str, Any], references: set[str]) -> dict[str, Any]:
-    """
-    Filters the models to those which are referenced. This includes direct and
-    indirect references.
+    """Filter the models to those which are referenced.
+
+    Includes direct and indirect references.
     """
     model_ref_map = model_references(models)
     used_models = unroll(model_ref_map, references)
@@ -227,9 +215,7 @@ def model_filter(models: dict[str, Any], references: set[str]) -> dict[str, Any]
 
 
 def models_referenced_by(models: dict[str, Any], model_name: str) -> set[str]:
-    """
-    Finds a list of other models which reference the provided model.
-    """
+    """Find a list of other models which reference the provided model."""
     referenced_by = {}
     for name, body in models.items():
         refs = find_references(body)
@@ -242,9 +228,7 @@ def models_referenced_by(models: dict[str, Any], model_name: str) -> set[str]:
 
 
 def map_models(comonents: dict[str, Any]) -> dict[str, Any]:
-    """
-    Flattens the components into a 1 layer map.
-    """
+    """Flatten the components into a 1 layer map."""
     models = {}
     for component, values in comonents.items():
         for name, data in values.items():
@@ -254,9 +238,7 @@ def map_models(comonents: dict[str, Any]) -> dict[str, Any]:
 
 
 def unmap_models(models: dict[str, Any]) -> dict[str, Any]:
-    """
-    Reconstitutes the components section.
-    """
+    """Reconstitutes the components section."""
     # re-organize models into sub-sections
     components = {}
     for full_name, model_def in models.items():
@@ -271,7 +253,7 @@ def unmap_models(models: dict[str, Any]) -> dict[str, Any]:
 
 
 def model_full_name(models: dict[str, Any], name: str) -> Optional[str]:
-    """Searches for a model matching the specified name. The name may be a partial name."""
+    """Search for a model matching the specified name. The name may be a partial name."""
     if name in models:
         return name
 
@@ -283,14 +265,15 @@ def model_full_name(models: dict[str, Any], name: str) -> Optional[str]:
 
 
 def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
-    """
+    """Create map of operationId to path data.
+
     Takes the 'paths' dictionary and transforms into an dictionary with the 'operationId'
     as the key. It puts the path, path paramters, and method into the individual items
     of the new dictionary.
 
     The resulting map is useful for dealing with operations (e.g. filtering).
 
-    Example
+    Example:
     =======
 
     Input:
@@ -330,6 +313,7 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
         x-path-params: [{name: petId, in: path, type: string}],
       },
     }
+
     """
     result = {}
     for path, path_data in paths.items():
@@ -346,9 +330,7 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
 
 
 def find_paths(paths: dict[str, Any], search: Optional[str] = None, sub_paths: bool = False) -> dict[str, Any]:
-    """
-    Searches the 'paths' dictionary for path names including the 'search' string (if provided).
-    """
+    """Search the 'paths' dictionary for path names including the 'search' string (if provided)."""
     def anon(s: str) -> str:
         return s.lower().rstrip("/")
 
@@ -367,8 +349,7 @@ def find_paths(paths: dict[str, Any], search: Optional[str] = None, sub_paths: b
 
 
 def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
-    """
-    Removes all 'tags' from the output schema.
+    """Remove all 'tags' from the output schema.
 
     Using code generation, the 'tags' values often group operations into different. This will cause
     extra classes to be required for only a handful of operations. For this reason, it can be
@@ -392,7 +373,7 @@ def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
 
 
 def _is_nullable(prop_data: dict[str, Any]) -> bool:
-    """Determine if a property is nullable"""
+    """Determine if a property is nullable."""
     # this handles the OAS 3.0 style where it is denoted by a `nullable: true`
     if prop_data.get(OasField.NULLABLE, False):
         return True
@@ -416,14 +397,13 @@ def _is_nullable(prop_data: dict[str, Any]) -> bool:
 
 
 def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
-    """
-    Removes any 'nullable: true' property from the 'required' list.
+    """Remove any 'nullable: true' property from the 'required' list.
 
     Some generated clients have a difficult time distinguishing between a property
     that is 'null', and one that is not present. By removing the property from
     the required list, you can avoid some of these issues.
 
-    Example
+    Example:
     =======
 
     Input:
@@ -460,6 +440,7 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
       required:
         - id
         - name
+
     """
     result = deepcopy(schema)
 
@@ -483,8 +464,7 @@ def schema_operations_filter(
     remove: Optional[set[str]] = None,
     allow: Optional[set[str]] = None,
 ) -> dict[str, Any]:
-    """
-    Filters the schema operations to either the 'allow_ops' or those not in the 'remove_ops'.
+    """Filter the schema operations to either the 'allow_ops' or those not in the 'remove_ops'.
 
     This operation also removes unreferenced components and tags. For example, removing a
     'listPets' operation would remove the '#/components/schemas/Pets' object that was only
@@ -555,7 +535,7 @@ def schema_operations_filter(
 
 
 def map_content_types(schema: dict[str, Any]) -> dict[str, set]:
-    """Gets map of content-types to operation-id's."""
+    """Get map of content-types to operation-id's."""
     content = {}
     for path_data in schema.get(OasField.PATHS, {}).values():
         for method, op_data in path_data.items():

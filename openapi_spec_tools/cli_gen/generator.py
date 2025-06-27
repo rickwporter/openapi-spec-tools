@@ -1,3 +1,4 @@
+"""Declares the Generator class that is used for most of the CLi generation capability."""
 import textwrap
 from copy import deepcopy
 from typing import Any
@@ -34,7 +35,15 @@ SPECIAL_CHARS = ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';', '(', ')'
 
 
 class Generator:
+    """Provides the majority of the CLI generation functions.
+
+    Store a few key things to avoid the need for passing them all around, but most of the "action"
+    is driven by an outside actor. This was done in an object-oriented fashion so pieces can be
+    overridden by consumers.
+    """
+
     def __init__(self, package_name: str, oas: dict[str, Any]):
+        """Initialize with the OpenAPI spec and other data for generating multiple modules."""
         self.package_name = package_name
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
@@ -50,10 +59,11 @@ class Generator:
         self.logger = logger(GENERATOR_LOG_CLASS)
 
     def shebang(self) -> str:
-        """Returns the shebang line that goes at the top of each file."""
+        """Get the shebang line that goes at the top of each file."""
         return SHEBANG
 
     def standard_imports(self) -> str:
+        """Get the standard imports for all CLI modules."""
         return f"""
 from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
@@ -73,12 +83,14 @@ from {self.package_name} import _tree as _t
 """
 
     def subcommand_imports(self, subcommands: list[LayoutNode]) -> str:
+        """Get the imports needed for the subcommands/children."""
         return NL.join(
             f"from {self.package_name}.{to_snake_case(n.identifier)} import app as {to_snake_case(n.identifier)}"
             for n in subcommands
         )
 
     def app_definition(self, node: LayoutNode) -> str:
+        """Get the main typer application/start point, and "overhead" of dealing with children."""
         result = f"""
 
 app = typer.Typer(no_args_is_help=True, help="{simple_escape(node.description)}")
@@ -91,6 +103,7 @@ app.add_typer({to_snake_case(child.identifier)}, name="{child.command}")
         return result
 
     def main(self) -> str:
+        """Get the text for the main function in the CLI file."""
         return """
 
 if __name__ == "__main__":
@@ -98,7 +111,7 @@ if __name__ == "__main__":
 """
 
     def op_short_help(self, operation: dict[str, Any]) -> str:
-        """Gets the short help for the operation."""
+        """Get the short help for the operation."""
         summary = operation.get(OasField.SUMMARY)
         if summary:
             return simple_escape(summary.strip())
@@ -107,6 +120,11 @@ if __name__ == "__main__":
         return simple_escape(description.strip().split(". ")[0])
 
     def op_long_help(self, operation: dict[str, Any]) -> str:
+        """Get the docstring for the CLI function.
+
+        This is the summary/description that gets reformatted to be a bit more readable, and
+        adds the triple quotes.
+        """
         text = operation.get(OasField.DESCRIPTION) or operation.get(OasField.SUMMARY) or ""
         if not text:
             return text
@@ -145,31 +163,31 @@ if __name__ == "__main__":
         return None
 
     def _unspecial(self, value: str, replacement: str = '_') -> str:
-        """Replaces the "special" characters with the replacement."""
+        """Replace the "special" characters with the replacement."""
         for v in SPECIAL_CHARS:
             value = value.replace(v, replacement)
         return value
 
     def class_name(self, s: str) -> str:
-        """Returns the class name for provided string"""
+        """Get the class name for provided string."""
         value = to_camel_case(self._unspecial(s))
         return value[0].upper() + value[1:]
 
     def function_name(self, s: str) -> str:
-        """Returns the function name for the provided string"""
+        """Get the function name for the provided string."""
         return to_snake_case(self._unspecial(s))
 
     def variable_name(self, s: str) -> str:
-        """Returns the variable name for the provided string"""
+        """Get the variable name for the provided string."""
         return to_snake_case(self._unspecial(s))
 
     def option_name(self, s: str) -> str:
-        """Returns the typer option name for the provided string."""
+        """Get the typer option name for the provided string."""
         value = self.variable_name(s)
         return "--" + value.replace("_", "-")
 
     def model_is_complex(self, model: dict[str, Any]) -> bool:
-        """Determines if the model is complex, such that it would not work well with a list.
+        """Determine if the model is complex, such that it would not work well with a list.
 
         Basically, anything with more than one property is considered complex. This logic is
         not perfect -- it does not expand everything (or wait for "final" answers), but is
@@ -209,7 +227,7 @@ if __name__ == "__main__":
         return False
 
     def get_items_model(self, prop_data: dict[str, Any]) -> tuple[str, dict]:
-        """Determines if the property data references complex items"""
+        """Determine if the property data references complex items."""
         items = prop_data.get(OasField.ITEMS, {})
         one_of = items.get(OasField.ONE_OF)
         if one_of:
@@ -228,7 +246,7 @@ if __name__ == "__main__":
         return item_short, item_model
 
     def model_collection_type(self, model: str) -> Optional[str]:
-        """Determines the collection type (current just an array)"""
+        """Determine the collection type (current just an array)."""
         model_type = self.simplify_type(model.get(OasField.TYPE))
         if model_type in COLLECTIONS.keys():
             return model_type
@@ -263,7 +281,7 @@ if __name__ == "__main__":
         return ""
 
     def model_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
-        """Expand the model into a dictionary of properties"""
+        """Expand the model into a dictionary of properties."""
         properties = {}
 
         # start with the base-classes in allOf
@@ -360,7 +378,7 @@ if __name__ == "__main__":
         return properties
 
     def op_body_settable_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
-        """Get a dictionary of settable body properties"""
+        """Get a dictionary of settable body properties."""
         body = self.op_get_body(operation)
         if not body:
             return {}
@@ -372,11 +390,11 @@ if __name__ == "__main__":
         return self.model_settable_properties(schema)
 
     def short_reference_name(self, full_name: str) -> str:
-        """Transforms the '#/components/schemas/Xxx' to 'Xxx'"""
+        """Transform the '#/components/schemas/Xxx' to 'Xxx'."""
         return full_name.split('/')[-1]
 
     def get_model(self, full_name: str) -> dict[str, Any]:
-        """Returns the reference"""
+        """Get the model from reference name."""
         keys = [
             item for item in full_name.split('/')
             if item and item not in ['#', OasField.COMPONENTS.value]
@@ -393,6 +411,7 @@ if __name__ == "__main__":
         return value
 
     def command_infra_arguments(self, command: LayoutNode) -> list[str]:
+        """Get the standard CLI function arguments to the command."""
         args = [
             f'_api_host: _a.ApiHostOption = "{self.default_host}"',
             '_api_key: _a.ApiKeyOption = None',
@@ -408,8 +427,7 @@ if __name__ == "__main__":
         return args
 
     def schema_to_type(self, schema: str, fmt: Optional[str]) -> Optional[str]:
-        """
-        Gets the base Python type for simple schema types.
+        """Get the base Python type for simple schema types.
 
         The fmt is really the "format" field, but renamed to avoid masking builtin.
         """
@@ -431,7 +449,8 @@ if __name__ == "__main__":
         return None
 
     def simplify_type(self, schema: Any) -> Any:
-        """
+        """Simplfy the schema type.
+
         In OAS 3.1, the 'type' can be a list. When it is a nullable object, the 'null' value is one of the
         items in the list.
         """
@@ -454,16 +473,13 @@ if __name__ == "__main__":
 
 
     def schema_to_pytype(self, schema: dict[str, Any]) -> Optional[str]:
-        """
-        Determines the basic Python type from the schema object.
-        """
+        """Determine the basic Python type from the schema object."""
         oas_type = self.simplify_type(schema.get(OasField.TYPE))
         oas_format = schema.get(OasField.FORMAT)
         return self.schema_to_type(oas_type, oas_format)
 
     def get_parameter_pytype(self, param_data: dict[str, Any]) -> str:
-        """
-        Gets the "basic" Python type from a parameter object.
+        """Get the "basic" Python type from a parameter object.
 
         Parameters have a schema sub-object that contains the 'type' and 'format' fields.
         """
@@ -476,8 +492,7 @@ if __name__ == "__main__":
         return self.schema_to_pytype(schema)
 
     def get_property_pytype(self, prop_name: str, prop_data: dict[str, Any]) -> Optional[str]:
-        """
-        Gets the "basic" Python type from a property object.
+        """Get the "basic" Python type from a property object.
 
         Each property potentially has 'type' and 'format' fields.
         """
@@ -497,9 +512,7 @@ if __name__ == "__main__":
         return pytype
 
     def op_params(self, operation: dict[str, Any], location: str) -> list[dict[str, Any]]:
-        """
-        Gets a complete list of operation parameters matching location.
-        """
+        """Get a complete list of operation parameters matching location."""
         params = []
         # NOTE: start with "higher level" path params, since they're more likely to be required
         total_params = (operation.get(OasField.X_PATH_PARAMS) or []) + (operation.get(OasField.PARAMS) or [])
@@ -515,9 +528,7 @@ if __name__ == "__main__":
         return params
 
     def op_param_to_argument(self, param: dict[str, Any], allow_required: bool) -> str:
-        """
-        Converts a parameter into a typer argument.
-        """
+        """Convert a parameter into a typer argument."""
         var_name = self.variable_name(param.get(OasField.NAME))
         description = param.get(OasField.DESCRIPTION) or ""
         required = param.get(OasField.REQUIRED, False)
@@ -568,9 +579,7 @@ if __name__ == "__main__":
         return f'{var_name}: Annotated[{arg_type}, {typer_type}({comma.join(typer_args)})]{arg_default}'
 
     def op_path_arguments(self, path_params: list[dict[str, Any]]) -> list[str]:
-        """
-        Converts all path parameters into typer arguments.
-        """
+        """Convert all path parameters into typer arguments."""
         args = []
         for param in path_params:
             arg = self.op_param_to_argument(param, allow_required=True)
@@ -579,9 +588,7 @@ if __name__ == "__main__":
         return args
 
     def op_query_arguments(self, query_params: list[dict[str, Any]]) -> list[str]:
-        """
-        Converts query parameters to typer arguments
-        """
+        """Convert query parameters to typer arguments."""
         args = []
         for param in query_params:
             arg = self.op_param_to_argument(param, allow_required=False)
@@ -590,9 +597,7 @@ if __name__ == "__main__":
         return args
 
     def condense_one_of(self, one_of: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """
-        Removes "duplicate" collection elements, and adds X_COLLECT to the schema.
-        """
+        """Remove "duplicate" collection elements, and adds X_COLLECT to the schema."""
         condensed = []
         for outer in one_of:
             item = deepcopy(outer)
@@ -609,6 +614,11 @@ if __name__ == "__main__":
         return condensed
 
     def param_to_property(self, param: dict[str, Any]) -> dict[str, Any]:
+        """Convert parameter data to property data.
+
+        Resolves parameter data to make it easier to digest (e.g. choosing any oneOf,
+        collection information, required).
+        """
         prop = deepcopy(param)
         schema = prop.get(OasField.SCHEMA, {})
 
@@ -646,8 +656,7 @@ if __name__ == "__main__":
         return prop
 
     def params_to_settable_properties(self, parameters: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """
-        Get a dictionary of settable parameter properties.
+        """Get a dictionary of settable parameter properties.
 
         This expands the parameters into more basic types that allows for complex parameters.
         """
@@ -658,6 +667,7 @@ if __name__ == "__main__":
         return properties
 
     def op_body_arguments(self, body_params: list[dict[str, Any]]) -> list[str]:
+        """Convert the body parameters dictionary into a list of CLI function arguments."""
         args = []
         for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_name, prop_data)
@@ -710,7 +720,7 @@ if __name__ == "__main__":
         return f"_api_host, {', '.join(items)}"
 
     def op_param_formation(self, query_params: list[dict[str, Any]]) -> str:
-        """Create the query parameters that go into the request"""
+        """Create the query parameters that go into the request."""
         result = "{}"
         for param in query_params:
             param_name = param.get(OasField.NAME)
@@ -731,14 +741,14 @@ if __name__ == "__main__":
         return result
 
     def op_content_header(self, operation: dict[str, Any]) -> str:
-        """Returns the content-type with variable name prefix (when appropriate)"""
+        """Content-type with variable name prefix (when appropriate)."""
         content_type = self.op_get_content_type(operation)
         if not content_type:
             return ""
         return f', content_type="{content_type}"'
 
     def op_body_formation(self, body_params: dict[str, Any]) -> str:
-        """Creates a body parameter and poulates it when there are body paramters."""
+        """Create body parameter and poulates it when there are body paramters."""
         if not body_params:
             return ""
 
@@ -764,7 +774,7 @@ if __name__ == "__main__":
         return SEP1 + SEP1.join(lines)
 
     def op_check_missing(self, query_params: list[dict[str, Any]], body_params: dict[str, Any]) -> str:
-        """Checks for missing required parameters"""
+        """Check for missing required parameters."""
         lines = ["[]"]
         lines.append("if _api_key is None:")
         lines.append('    missing.append("--api-key")')
@@ -786,6 +796,7 @@ if __name__ == "__main__":
         return SEP1.join(lines)
 
     def summary_display(self, node: LayoutNode) -> str:
+        """Add the call to summarize the return value when there are summary fields."""
         if not node.summary_fields:
             return ""
 
@@ -795,6 +806,7 @@ if __name__ == "__main__":
         return SEP2 + SEP2.join(lines)
 
     def pagination_creation(self, command: LayoutNode) -> str:
+        """Create the 'page_info' variable."""
         if not command.pagination:
             return ''
         args = {"max_count": "_max_count"}
@@ -819,6 +831,7 @@ if __name__ == "__main__":
         return f"{SEP1}page_info = _r.PageParams({arg_text})"
 
     def clean_enum_name(self, value: str) -> bool:
+        """Check to see if value can be directly used as a variable name."""
         if not isinstance(value, str):
             return False
         try:
@@ -830,7 +843,7 @@ if __name__ == "__main__":
         return True
 
     def enum_declaration(self, name: str, enum_type: str, values: list[Any]) -> str:
-        """Turns data into an enum declation"""
+        """Turn data into an enum declation."""
         prefix = "" if enum_type == "str" else "VALUE_"
         if not all(self.clean_enum_name(v) for v in values):
             prefix = "VALUE_"
@@ -851,8 +864,7 @@ if __name__ == "__main__":
         query_params: list[dict[str, Any]],
         body_params: dict[str, Any],
     ) -> str:
-        """Creates enum class definitions need to support the provided"""
-
+        """Create enum class definitions need to support the provided."""
         # collect all the enum types (mapped by name to avoid duplicates)
         enums = {}
         for param_data in path_params + query_params:
@@ -884,6 +896,7 @@ if __name__ == "__main__":
         return NL + NL.join(declarations)
 
     def function_definition(self, node: LayoutNode) -> str:
+        """Generate the function text for the provided LayoutNode."""
         op = self.operations.get(node.identifier)
         method = op.get(OasField.X_METHOD).upper()
         path = op.get(OasField.X_PATH)
@@ -955,7 +968,7 @@ def {func_name}({args_str}) -> None:
 """
 
     def tree_data(self, node: LayoutNode) -> dict[str, Any]:
-        """Gets the tree data for the specifed node"""
+        """Get the tree data for the specifed node."""
         data = {
             TreeField.NAME.value: node.command,
             TreeField.DESCRIPTION.value: node.description
@@ -982,19 +995,19 @@ def {func_name}({args_str}) -> None:
         return data
 
     def get_tree_map(self, node: LayoutNode) -> dict[str, Any]:
-        """Gets the tree data in a "flat" format for more readable representation in file"""
+        """Get the tree data in a "flat" format for more readable representation in file."""
         result = {node.identifier: self.tree_data(node)}
         for sub in node.subcommands():
             result.update(self.get_tree_map(sub))
         return result
 
     def get_tree_yaml(self, node: LayoutNode) -> str:
-        """Gets the layout YAML text for the node (including children)"""
+        """Get the layout YAML text for the node (including children)."""
         data = self.get_tree_map(node)
         return yaml.dump(data, indent=2, sort_keys=True)
 
     def tree_function(self, node: LayoutNode) -> str:
-        """Generates the function to show subcommands"""
+        """Generate the function to show subcommands."""
         return f"""
 @app.command("commands", short_help="Display commands tree for sub-commands")
 def show_commands(

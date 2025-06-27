@@ -30,9 +30,7 @@ def get_pet(
     _details: _a.DetailsOption = False,
     _max_count: _a.MaxCountOption = None,
 ):
-    """
-    This is to show that openapi_spec_tools.cli_gen is obliterated.
-    """
+    """This is to show that openapi_spec_tools.cli_gen is obliterated."""
     print(f"""\
 _api_host={_api_host}
 _api_key={_api_key}
