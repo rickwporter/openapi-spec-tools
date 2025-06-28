@@ -424,7 +424,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     text = file.read_text()
     assert "#!/usr/bin/env python3" in text
     assert f"Copyright {datetime.now().year}" in text
-    assert "from typing_extensions import Annotated" in text
+    assert "from typing import Annotated" in text
     assert 'app = typer.Typer(no_args_is_help=True, help="Manage pets")' in text
     assert 'if __main__ == "__main__":'
 

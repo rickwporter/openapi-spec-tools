@@ -34,7 +34,7 @@ def test_standard_imports():
     uut = Generator("cli_package", {})
     text = uut.standard_imports()
     assert "import typer" in text
-    assert "from typing_extensions import Annotated" in text
+    assert "from typing import Annotated" in text
 
 
 def test_subcommand_imports():
