@@ -224,6 +224,10 @@ def test_schema_to_type(schema, fmt, expected):
             "SomeBraceAndBracketAndParenTesting",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "Any", id="any"),
+        pytest.param("input", "Input", id="input"),
+        pytest.param("list", "List", id="list"),
     ]
 )
 def test_class_name(proposed, expected):
@@ -247,6 +251,10 @@ def test_class_name(proposed, expected):
             "some_brace_and_bracket_and_paren_testing",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "gen_any", id="any"),
+        pytest.param("input", "gen_input", id="input"),
+        pytest.param("list", "gen_list", id="list"),
     ],
 )
 def test_function_name(proposed, expected):
@@ -270,6 +278,10 @@ def test_function_name(proposed, expected):
             "some_brace_and_bracket_and_paren_testing",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "gen_any", id="any"),
+        pytest.param("input", "gen_input", id="input"),
+        pytest.param("list", "gen_list", id="list"),
     ],
 )
 def test_variable_name(proposed, expected):
@@ -293,6 +305,10 @@ def test_variable_name(proposed, expected):
             "--some-brace-and-bracket-and-paren-testing",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "--any", id="any"),
+        pytest.param("input", "--input", id="input"),
+        pytest.param("list", "--list", id="list"),
     ],
 )
 def test_option_name(proposed, expected):

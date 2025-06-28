@@ -33,6 +33,10 @@ COLLECTIONS = {
 }
 SPECIAL_CHARS = ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';', '(', ')', '{', '}', '[', ']']
 
+# This is an incomplete list of Python builtins that should avoided in variable names
+NAME_CONFLICTS = {"all", "any", "bool", "class", "dict", "float", "input", "int", "list", "type"}
+CONFLICT_PREFIX = "gen_"
+
 
 class Generator:
     """Provides the majority of the CLI generation functions.
@@ -175,15 +179,23 @@ if __name__ == "__main__":
 
     def function_name(self, s: str) -> str:
         """Get the function name for the provided string."""
-        return to_snake_case(self._unspecial(s))
+        vname = to_snake_case(self._unspecial(s))
+        if vname in NAME_CONFLICTS:
+            return f"{CONFLICT_PREFIX}{vname}"
+
+        return vname
 
     def variable_name(self, s: str) -> str:
         """Get the variable name for the provided string."""
-        return to_snake_case(self._unspecial(s))
+        vname = to_snake_case(self._unspecial(s))
+        if vname in NAME_CONFLICTS:
+            return f"{CONFLICT_PREFIX}{vname}"
+
+        return vname
 
     def option_name(self, s: str) -> str:
         """Get the typer option name for the provided string."""
-        value = self.variable_name(s)
+        value = to_snake_case(self._unspecial(s))
         return "--" + value.replace("_", "-")
 
     def model_is_complex(self, model: dict[str, Any]) -> bool:
