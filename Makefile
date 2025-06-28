@@ -7,6 +7,9 @@ help: ## This message
 
 TEST_TARGET ?= tests
 poetry_run ?= poetry run
+EXAMPLE_DIRS := examples/pets-cli
+EXAMPLE_DIRS += examples/cloudtruth-gen-cli
+EXAMPLE_DIRS += examples/github
 
 default: help
 
@@ -22,6 +25,12 @@ clean: ## Remove build/test artifacts
 	rm -rf `find . -name .coverage`
 	rm -rf `find . -name htmlcov`
 	rm -rf `find . -name dist`
+
+poetry-update: ## Update poetry in top-level, and then all examples (part of release)
+	poetry update
+	@for dname in $(EXAMPLE_DIRS); do \
+		echo "Entering $${dname}" && cd $${dname} && poetry update && cd - > /dev/null || exit 1; \
+	done
 
 ###########
 ##@ Build
@@ -56,18 +65,12 @@ cov: ## Run unit tests with code coverage measurments (use TEST_TARGET to scope)
 
 ###########
 ##@ Examples
-examples: pets-cli ct-cli gh-cli ## Complete cycle on all examples
+example: ## Complete cycle on all examples
+	@for dname in $(EXAMPLE_DIRS); do \
+		echo "Entering $${dname}" && make -C $${dname} all || exit 1; \
+	done
 
 example-gen: ## Generate example code (no tests)
-	make -C examples/pets-cli gen
-	make -C examples/cloudtruth-gen-cli gen
-	make -C examples/github gen
-
-pets-cli: ## Generate pets-cli
-	make -C examples/pets-cli all
-
-ct-cli: ## Generate the cloudtruth-cli
-	make -C examples/cloudtruth-gen-cli all
-
-gh-cli: ## Generate the Github CLI
-	make -C examples/cloudtruth-gen-cli all
+	@for dname in $(EXAMPLE_DIRS); do \
+		echo "Entering $${dname}" && make -C $${dname} gen || exit 1; \
+	done
