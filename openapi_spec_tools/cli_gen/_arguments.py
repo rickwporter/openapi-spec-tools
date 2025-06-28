@@ -1,7 +1,7 @@
+from typing import Annotated
 from typing import Optional
 
 import typer
-from typing_extensions import Annotated
 
 from openapi_spec_tools.cli_gen._display import OutputFormat
 from openapi_spec_tools.cli_gen._display import OutputStyle

@@ -4,13 +4,13 @@ import os
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
+from typing import Annotated
 from typing import Any
 from typing import Optional
 
 import typer
 import yaml
 from rich.console import Console
-from typing_extensions import Annotated
 
 from openapi_spec_tools._typer import OasFilenameArgument
 from openapi_spec_tools._typer import error_out

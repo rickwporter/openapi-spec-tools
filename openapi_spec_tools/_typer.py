@@ -1,8 +1,9 @@
 """Common extensions to Typer for local CLI use."""
 
+from typing import Annotated
+
 import typer
 from rich import print
-from typing_extensions import Annotated
 
 # Common argument definition
 OasFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification file")]

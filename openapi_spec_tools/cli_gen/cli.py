@@ -4,6 +4,7 @@ import os
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
+from typing import Annotated
 from typing import Any
 from typing import Optional
 
@@ -12,7 +13,6 @@ import yaml
 from rich import print_json
 from rich.console import Console
 from rich.table import Table
-from typing_extensions import Annotated
 
 from openapi_spec_tools.cli_gen._arguments import LogLevelOption
 from openapi_spec_tools.cli_gen._logging import init_logging

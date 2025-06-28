@@ -69,8 +69,8 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
+from typing import Annotated  # noqa: F401
 from typing import Optional  # noqa: F401
-from typing_extensions import Annotated  # noqa: F401
 
 import typer
 
