@@ -2,6 +2,7 @@
 """Implementation of the CLI generation CLI."""
 import os
 from copy import deepcopy
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Annotated
@@ -16,6 +17,7 @@ from rich.table import Table
 
 from openapi_spec_tools.cli_gen._arguments import LogLevelOption
 from openapi_spec_tools.cli_gen._logging import init_logging
+from openapi_spec_tools.cli_gen._logging import logger
 from openapi_spec_tools.cli_gen._tree import TreeDisplay
 from openapi_spec_tools.cli_gen._tree import create_tree_table
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
@@ -60,7 +62,11 @@ def open_oas_with_error_handling(filename: str) -> Any:
     Avoids the standard Typer error handling that is quite verbose.
     """
     try:
-        return open_oas(filename)
+        starttime = datetime.now()
+        data = open_oas(filename)
+        delta = datetime.now() - starttime
+        logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
+        return data
     except FileNotFoundError:
         message = f"failed to find {filename}"
     except Exception as ex:
@@ -76,7 +82,11 @@ def open_layout_with_error_handling(filename: str) -> Any:
     Avoids the standard Typer error handling that is quite verbose.
     """
     try:
-        return open_layout(filename)
+        starttime = datetime.now()
+        data = open_layout(filename)
+        delta = datetime.now() - starttime
+        logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
+        return data
     except FileNotFoundError:
         message = f"failed to find {filename}"
     except Exception as ex:
@@ -92,7 +102,11 @@ def layout_tree_with_error_handling(filename: str, start: str) -> LayoutNode:
     Avoids the standard Typer error handling that is quite verbose.
     """
     try:
-        return file_to_tree(filename, start)
+        starttime = datetime.now()
+        tree = file_to_tree(filename, start)
+        delta = datetime.now() - starttime
+        logger(GENERATOR_LOG_CLASS).info(f"Parsing {filename} into tree took {delta.total_seconds()} seconds")
+        return tree
     except FileNotFoundError:
         message = f"failed to find {filename}"
     except ValueError as ex:
@@ -360,7 +374,9 @@ def generate_check_missing(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
     start: StartPointOption = DEFAULT_START,
+    log_level: LogLevelOption = "info",
 ) -> None:
+    init_logging(log_level, GENERATOR_LOG_CLASS)
     commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
@@ -378,7 +394,9 @@ def generate_unreferenced(
     openapi_file: OpenApiFilenameArgument,
     start: StartPointOption = DEFAULT_START,
     full_path: Annotated[bool, typer.Option(help="Use full URL path that included variables")] = False,
+    log_level: LogLevelOption = "info",
 ) -> None:
+    init_logging(log_level, GENERATOR_LOG_CLASS)
     commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
@@ -419,7 +437,9 @@ def show_cli_tree(
         typer.Option(case_sensitive=False, help="Details to show about tree")
     ] = TreeDisplay.ALL,
     max_depth: Annotated[int, typer.Option(help="Maximum tree depth to show")] = 10,
+    log_level: LogLevelOption = "info",
 ) -> None:
+    init_logging(log_level, GENERATOR_LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
     generator = Generator("", oas)
@@ -464,6 +484,7 @@ def trim_oas(
         int,
         typer.Option(min=1, max=10, help="Number of characters to indent on YAML display"),
     ] = 2,
+    log_level: LogLevelOption = "info",
 ) -> None:
     """Create a version of the OpenAPI spec with limited data.
 
@@ -475,6 +496,7 @@ def trim_oas(
             ops.update(_operations(sub))
         return ops
 
+    init_logging(log_level, GENERATOR_LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
     updated = deepcopy(oas)
