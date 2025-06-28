@@ -21,9 +21,8 @@ from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
 from openapi_spec_tools.utils import short_ref
-
-from .helpers import asset_filename
-from .helpers import open_test_oas
+from tests.helpers import asset_filename
+from tests.helpers import open_test_oas
 
 
 def test_open_oas() -> None:

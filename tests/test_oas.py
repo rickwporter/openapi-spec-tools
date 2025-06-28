@@ -31,9 +31,8 @@ from openapi_spec_tools.oas import summary
 from openapi_spec_tools.oas import tags_list
 from openapi_spec_tools.oas import tags_show
 from openapi_spec_tools.oas import update
-
-from .helpers import StringIo
-from .helpers import asset_filename
+from tests.helpers import StringIo
+from tests.helpers import asset_filename
 
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
