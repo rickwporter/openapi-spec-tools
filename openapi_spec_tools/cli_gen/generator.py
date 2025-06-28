@@ -35,7 +35,7 @@ SPECIAL_CHARS = ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';', '(', ')'
 
 # This is an incomplete list of Python builtins that should avoided in variable names
 NAME_CONFLICTS = {"all", "any", "bool", "class", "dict", "float", "input", "int", "list", "type"}
-CONFLICT_PREFIX = "gen_"
+CONFLICT_SUFFIX = "_"
 
 
 class Generator:
@@ -181,7 +181,7 @@ if __name__ == "__main__":
         """Get the function name for the provided string."""
         vname = to_snake_case(self._unspecial(s))
         if vname in NAME_CONFLICTS:
-            return f"{CONFLICT_PREFIX}{vname}"
+            return f"{vname}{CONFLICT_SUFFIX}"
 
         return vname
 
@@ -189,7 +189,7 @@ if __name__ == "__main__":
         """Get the variable name for the provided string."""
         vname = to_snake_case(self._unspecial(s))
         if vname in NAME_CONFLICTS:
-            return f"{CONFLICT_PREFIX}{vname}"
+            return f"{vname}{CONFLICT_SUFFIX}"
 
         return vname
 

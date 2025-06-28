@@ -252,9 +252,9 @@ def test_class_name(proposed, expected):
             id="parens",
         ),
         # these are the items that conflict with builtins
-        pytest.param("any", "gen_any", id="any"),
-        pytest.param("input", "gen_input", id="input"),
-        pytest.param("list", "gen_list", id="list"),
+        pytest.param("any", "any_", id="any"),
+        pytest.param("input", "input_", id="input"),
+        pytest.param("list", "list_", id="list"),
     ],
 )
 def test_function_name(proposed, expected):
@@ -279,9 +279,9 @@ def test_function_name(proposed, expected):
             id="parens",
         ),
         # these are the items that conflict with builtins
-        pytest.param("any", "gen_any", id="any"),
-        pytest.param("input", "gen_input", id="input"),
-        pytest.param("list", "gen_list", id="list"),
+        pytest.param("any", "any_", id="any"),
+        pytest.param("input", "input_", id="input"),
+        pytest.param("list", "list_", id="list"),
     ],
 )
 def test_variable_name(proposed, expected):
