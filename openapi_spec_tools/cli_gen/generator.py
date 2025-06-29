@@ -557,7 +557,8 @@ if __name__ == "__main__":
 
     def op_param_to_argument(self, param: dict[str, Any], allow_required: bool) -> str:
         """Convert a parameter into a typer argument."""
-        var_name = self.variable_name(param.get(OasField.NAME))
+        param_name = param.get(OasField.NAME)
+        var_name = self.variable_name(param_name)
         description = param.get(OasField.DESCRIPTION) or ""
         required = param.get(OasField.REQUIRED, False)
         deprected = param.get(OasField.DEPRECATED, False)
@@ -587,6 +588,9 @@ if __name__ == "__main__":
             arg_default = ""
         else:
             typer_type = 'typer.Option'
+            if param_name.lower() in RESERVED:
+                # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
+                typer_args.insert(0, quoted(self.option_name(param_name)))
             if schema_default is None:
                 arg_type = f"Optional[{arg_type}]"
                 arg_default = " = None"
@@ -704,24 +708,27 @@ if __name__ == "__main__":
                 self.logger.error(f"Unable to determine Python type for {prop_name}={prop_data}")
                 py_type = 'Any'
 
-            t_args = {}
+            t_args = []
+            if prop_name.lower() in RESERVED:
+                # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
+                t_args.append(quoted(self.option_name(prop_name)))
             def_val = prop_data.get(OasField.DEFAULT)
             if def_val is None:
-                t_args["show_default"] = False
+                t_args.append("show_default=False")
             is_enum = bool(prop_data.get(OasField.ENUM))
             if is_enum:
                 if prop_data.get(OasField.TYPE) == "string" and def_val is not None:
                     # convert the default value to a string so it gets quoted
                     def_val = str(def_val)
-                t_args["case_sensitive"] = False
+                t_args.append("case_sensitive=False")
             deprected = prop_data.get(OasField.DEPRECATED, False)
             x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
             if deprected or x_deprecated:
-                t_args["hidden"] = True
+                t_args.append("hidden=True")
             help = prop_data.get(OasField.DESCRIPTION)
             if help:
-                t_args['help'] = f'"{simple_escape(help)}"'
-            t_decl = f"typer.Option({', '.join([f'{k}={v}' for k, v in t_args.items()])})"
+                t_args.append(f"help={quoted(simple_escape(help))}")
+            t_decl = f"typer.Option({', '.join(t_args)})"
             arg = f"{self.variable_name(prop_name)}: Annotated[{py_type}, {t_decl}] = {maybe_quoted(def_val)}"
             args.append(arg)
 

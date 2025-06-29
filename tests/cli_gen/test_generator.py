@@ -180,7 +180,9 @@ def test_op_param_formation():
     if enum_with_default is not None:
         params["enumWithDefault"] = enum_with_default
     if str_enum_with_int_values is not None:
-        params["strEnumWithIntValues"] = str_enum_with_int_values\
+        params["strEnumWithIntValues"] = str_enum_with_int_values
+    if type_ is not None:
+        params["type"] = type_\
 """
     text = uut.op_param_formation(query_params)
     assert expected == text
@@ -428,6 +430,7 @@ def test_op_body_formation():
     assert 'body["firstChoice"] = first_choice' in text
     assert 'if list_various is not None:' in text
     assert 'body["listVarious"] = list_various' in text
+    assert 'body["format"] = format_' in text
 
 
 def test_op_path_arguments():
@@ -500,6 +503,10 @@ def test_op_query_arguments():
     )
     assert (
         'str_enum_with_int_values: Annotated[StrEnumWithIntValues, typer.Option(case_sensitive=False, help="")] = "1"'
+        in text
+    )
+    assert (
+        'type_: Annotated[Optional[int], typer.Option("--type", show_default=False, help="")] = None'
         in text
     )
 
@@ -1048,6 +1055,10 @@ def test_op_body_arguments():
     )
     assert (
         'list_various: Annotated[Optional[list[bool]], typer.Option(show_default=False)] = None'
+        in text
+    )
+    assert (
+        'format_: Annotated[Optional[str], typer.Option("--format")] = "text"'
         in text
     )
 
