@@ -38,10 +38,13 @@ RESERVED = {
     "all",
     "any",
     "bool",
+    "breakpoint",
     "class",
+    "continue",
     "dict",
     "except",
     "float",
+    "for",
     "format",
     "in",
     "input",
@@ -49,7 +52,11 @@ RESERVED = {
     "list",
     "max",
     "min",
+    "print",
+    "set",
     "type",
+    "try",
+    "while",
 }
 CONFLICT_SUFFIX = "_"
 
