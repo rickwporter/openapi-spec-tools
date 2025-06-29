@@ -122,6 +122,10 @@ paths:
             - 3
             - four
             default: 1
+        - name: type
+          in: query
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -251,6 +255,9 @@ components:
               - type: boolean
               - type: integer
               - type: string
+          format:
+            type: string
+            default: text
 
     Pets:
       type: array

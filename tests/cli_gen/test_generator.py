@@ -180,7 +180,9 @@ def test_op_param_formation():
     if enum_with_default is not None:
         params["enumWithDefault"] = enum_with_default
     if str_enum_with_int_values is not None:
-        params["strEnumWithIntValues"] = str_enum_with_int_values\
+        params["strEnumWithIntValues"] = str_enum_with_int_values
+    if type_ is not None:
+        params["type"] = type_\
 """
     text = uut.op_param_formation(query_params)
     assert expected == text
@@ -224,6 +226,10 @@ def test_schema_to_type(schema, fmt, expected):
             "SomeBraceAndBracketAndParenTesting",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "Any", id="any"),
+        pytest.param("input", "Input", id="input"),
+        pytest.param("list", "List", id="list"),
     ]
 )
 def test_class_name(proposed, expected):
@@ -247,6 +253,10 @@ def test_class_name(proposed, expected):
             "some_brace_and_bracket_and_paren_testing",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "any_", id="any"),
+        pytest.param("input", "input_", id="input"),
+        pytest.param("list", "list_", id="list"),
     ],
 )
 def test_function_name(proposed, expected):
@@ -270,6 +280,10 @@ def test_function_name(proposed, expected):
             "some_brace_and_bracket_and_paren_testing",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "any_", id="any"),
+        pytest.param("input", "input_", id="input"),
+        pytest.param("list", "list_", id="list"),
     ],
 )
 def test_variable_name(proposed, expected):
@@ -293,6 +307,10 @@ def test_variable_name(proposed, expected):
             "--some-brace-and-bracket-and-paren-testing",
             id="parens",
         ),
+        # these are the items that conflict with builtins
+        pytest.param("any", "--any", id="any"),
+        pytest.param("input", "--input", id="input"),
+        pytest.param("list", "--list", id="list"),
     ],
 )
 def test_option_name(proposed, expected):
@@ -412,6 +430,7 @@ def test_op_body_formation():
     assert 'body["firstChoice"] = first_choice' in text
     assert 'if list_various is not None:' in text
     assert 'body["listVarious"] = list_various' in text
+    assert 'body["format"] = format_' in text
 
 
 def test_op_path_arguments():
@@ -484,6 +503,10 @@ def test_op_query_arguments():
     )
     assert (
         'str_enum_with_int_values: Annotated[StrEnumWithIntValues, typer.Option(case_sensitive=False, help="")] = "1"'
+        in text
+    )
+    assert (
+        'type_: Annotated[Optional[int], typer.Option("--type", show_default=False, help="")] = None'
         in text
     )
 
@@ -1032,6 +1055,10 @@ def test_op_body_arguments():
     )
     assert (
         'list_various: Annotated[Optional[list[bool]], typer.Option(show_default=False)] = None'
+        in text
+    )
+    assert (
+        'format_: Annotated[Optional[str], typer.Option("--format")] = "text"'
         in text
     )
 
