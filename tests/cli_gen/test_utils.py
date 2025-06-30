@@ -45,6 +45,8 @@ def test_camel_case(text, expected):
         pytest.param(1, "1", id="int"),
         pytest.param(None, "None", id="none"),
         pytest.param(True, "True", id="bool"),
+        pytest.param("It's mine", '"It\\\'s mine"', id="single-quote"),
+        pytest.param('It is "mine"', '"It is \\\"mine\\\""', id="double-quote"),
     ]
 )
 def test_maybe_quoted(item, expected):

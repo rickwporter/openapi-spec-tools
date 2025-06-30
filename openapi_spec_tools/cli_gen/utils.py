@@ -26,14 +26,14 @@ def to_camel_case(text: str) -> str:
 def maybe_quoted(item: Any) -> str:
     """Add leading/trailing quotes to an item of type string, otherwise just convert item to a string."""
     if isinstance(item, str):
-        return f'"{item}"'
+        return quoted(item)
 
     return str(item)
 
 
 def quoted(s: str) -> str:
-    """Double quoted version of the provided string."""
-    return f'"{s}"'
+    """Double quote the provided string (and escape properly)."""
+    return f'"{s.translate(SIMPLE_TRANSLATIONS)}"'
 
 
 def simple_escape(text: str) -> str:
