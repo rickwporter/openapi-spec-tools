@@ -87,7 +87,7 @@ def environments_tags_create(
 @app.command("delete", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_destroy(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -191,7 +191,7 @@ def environments_tags_list(
 @app.command("set", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
     name: Annotated[str, typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
     description: Annotated[Optional[str], typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
     timestamp: Annotated[Optional[datetime], typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,
@@ -243,7 +243,7 @@ def environments_tags_update(
 @app.command("show", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_retrieve(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -281,7 +281,7 @@ def environments_tags_retrieve(
 @app.command("update", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_partial_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
     name: Annotated[Optional[str], typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
     description: Annotated[Optional[str], typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
     timestamp: Annotated[Optional[datetime], typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,

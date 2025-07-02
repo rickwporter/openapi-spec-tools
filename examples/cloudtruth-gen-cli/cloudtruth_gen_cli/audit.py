@@ -114,7 +114,7 @@ def audit_list(
 
 @app.command("show", short_help="Retrieve one record from the audit log.")
 def audit_retrieve(
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the audit record.")],
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
