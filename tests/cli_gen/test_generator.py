@@ -337,12 +337,12 @@ def test_simplify_type(schema, expected):
     ["param_data", "expected"],
     [
         pytest.param({}, None, id="unknown"),
-        pytest.param({SCHEMA: {TYPE: "string"}}, "str", id="str"),
-        pytest.param({SCHEMA: {TYPE: "integer"}}, "int", id="int"),
-        pytest.param({SCHEMA: {TYPE: "numeric"}}, "float", id="float"),
-        pytest.param({SCHEMA: {TYPE: "string", ENUM: ["a", "b"]}, "name": "sna_foo"}, "SnaFoo", id="unref-enum"),
+        pytest.param({TYPE: "string"}, "str", id="str"),
+        pytest.param({TYPE: "integer"}, "int", id="int"),
+        pytest.param({TYPE: "numeric"}, "float", id="float"),
+        pytest.param({TYPE: "string", ENUM: ["a", "b"], "name": "sna_foo"}, "SnaFoo", id="unref-enum"),
         pytest.param(
-            {SCHEMA: {TYPE: "string", ENUM: ["a", "b"], "$ref": "#/comp/Schema/FooBar"}, "name": "sna_foo"},
+            {TYPE: "string", ENUM: ["a", "b"], "$ref": "#/comp/Schema/FooBar", "name": "sna_foo"},
             "FooBar",
             id="ref-enum",
         ),
@@ -572,16 +572,15 @@ class IntStrings(str, Enum):  # noqa: F811
 """
 
 SIMPLE_PARAM = {
-    SCHEMA: {
-        TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "$ref": "#/components/schemas/Simple"
-    },
+    TYPE: "string",
+    ENUM: ["aOrB", "b_or_C", "-minus"], "$ref": "#/components/schemas/Simple",
     "name": "fooBar",
 }
 
-FOOBAR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}, "name": "fooBar"}
-NUMBER_PARAM = {SCHEMA: {TYPE: "integer", ENUM: [12, 37, 11]}, "name": "simple-number"}
-MIXED_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["a", 1, True, "b"]}, "name": "mixed-values"}
-INT_STR_PARAM = {SCHEMA: {TYPE: "string", ENUM: ["10", "10.1"]}, "name": "int-strings"}
+FOOBAR_PARAM = {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "name": "fooBar"}
+NUMBER_PARAM = {TYPE: "integer", ENUM: [12, 37, 11], "name": "simple-number"}
+MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], "name": "mixed-values"}
+INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], "name": "int-strings"}
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
@@ -698,23 +697,23 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
         pytest.param({}, {}, id="empty"),
         pytest.param(SIMPLE_PARAM, SIMPLE_PARAM, id="simple"),
         pytest.param(
-            {SCHEMA: {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]}},
-            {SCHEMA: {TYPE: "foo", COLLECT: "array"}},
+            {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]},
+            {TYPE: "foo", COLLECT: "array"},
             id="oneOf-collect-match"
         ),
         pytest.param(
-            {SCHEMA: {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "bar"}}]}},
-            {SCHEMA: {TYPE: "foo"}},
+            {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "bar"}}]},
+            {TYPE: "foo"},
             id="oneOf-collect-diff"
         ),
         pytest.param(
-            {SCHEMA: {TYPE: ["foo", "null"]}},
-            {SCHEMA: {TYPE: "foo"}, REQUIRED: False},
+            {TYPE: ["foo", "null"]},
+            {TYPE: "foo", REQUIRED: False},
             id="nullable"
         ),
         pytest.param(
-            {SCHEMA: {ANY_OF: [{TYPE: "array", ITEMS: {TYPE: "sna"}}, {TYPE: "foo"}]}},
-            {SCHEMA: {TYPE: "sna", COLLECT: "array"}},
+            {ANY_OF: [{TYPE: "array", ITEMS: {TYPE: "sna"}}, {TYPE: "foo"}]},
+            {TYPE: "sna", COLLECT: "array"},
             id="anyOf"
         ),
     ],
