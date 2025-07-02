@@ -518,13 +518,12 @@ if __name__ == "__main__":
 
         Parameters have a schema sub-object that contains the 'type' and 'format' fields.
         """
-        schema = param_data.get(OasField.SCHEMA, {})
-        values = schema.get(OasField.ENUM)
+        values = param_data.get(OasField.ENUM)
         if values:
-            name = self.short_reference_name(schema.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
+            name = self.short_reference_name(param_data.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
             return self.class_name(name)
 
-        return self.schema_to_pytype(schema)
+        return self.schema_to_pytype(param_data)
 
     def get_property_pytype(self, prop_name: str, prop_data: dict[str, Any]) -> Optional[str]:
         """Get the "basic" Python type from a property object.
@@ -559,6 +558,10 @@ if __name__ == "__main__":
                 item[OasField.X_REF] = self.short_reference_name(ref)
             if item.get(OasField.IN) != location:
                 continue
+
+            # promote the schema items into item
+            schema = item.pop(OasField.SCHEMA, {})
+            item.update(schema)
             params.append(item)
         return params
 
@@ -570,9 +573,8 @@ if __name__ == "__main__":
         required = param.get(OasField.REQUIRED, False)
         deprected = param.get(OasField.DEPRECATED, False)
         x_deprecated = param.get(OasField.X_DEPRECATED, None)
-        schema = param.get(OasField.SCHEMA, {})
-        schema_default = schema.get(OasField.DEFAULT)
-        collection = COLLECTIONS.get(schema.get(OasField.X_COLLECT))
+        schema_default = param.get(OasField.DEFAULT)
+        collection = COLLECTIONS.get(param.get(OasField.X_COLLECT))
         arg_type = self.get_parameter_pytype(param)
         if not arg_type:
             # log an error and use 'Any'
@@ -581,10 +583,10 @@ if __name__ == "__main__":
 
         typer_args = []
         if arg_type in ("int", "float"):
-            schema_min = schema.get(OasField.MIN)
+            schema_min = param.get(OasField.MIN)
             if schema_min is not None:
                 typer_args.append(f"min={schema_min}")
-            schema_max = schema.get(OasField.MAX)
+            schema_max = param.get(OasField.MAX)
             if schema_max is not None:
                 typer_args.append(f"max={schema_max}")
         if collection:
@@ -604,10 +606,10 @@ if __name__ == "__main__":
                 typer_args.append('show_default=False')
             else:
                 arg_default = f" = {maybe_quoted(schema_default)}"
-        is_enum = bool(schema.get(OasField.ENUM))
+        is_enum = bool(param.get(OasField.ENUM))
         if is_enum:
             typer_args.append("case_sensitive=False")
-            enum_type = schema.get(OasField.TYPE)
+            enum_type = param.get(OasField.TYPE)
             if enum_type == "string" and schema_default is not None:
                 arg_default = f" = {quoted(str(schema_default))}"
         if deprected or x_deprecated:
@@ -659,36 +661,35 @@ if __name__ == "__main__":
         collection information, required).
         """
         prop = deepcopy(param)
-        schema = prop.get(OasField.SCHEMA, {})
 
-        one_of = schema.get(OasField.ONE_OF, [])
+        one_of = prop.pop(OasField.ONE_OF, [])
         if one_of:
             updated = self.condense_one_of(one_of)
             if len(updated) == 1:
-                schema = updated[0]
+                prop.update(updated[0])
             else:
                 # just grab the first one... not sure this is the best choice, but need to do something
                 self.logger.warning(f"Grabbing oneOf[0] item from {updated}")
-                schema = updated[0]
+                prop.update(updated[0])
 
-        any_of = schema.get(OasField.ANY_OF, [])
+        any_of = prop.pop(OasField.ANY_OF, [])
         if any_of:
             # just grab the first one...
             self.logger.warning(f"Grabbing anyOf[0] item from {any_of}")
-            schema = any_of[0]
+            prop.update(any_of[0])
 
-        schema_type = schema.get(OasField.TYPE)
+        schema_type = prop.get(OasField.TYPE)
         nullable = isinstance(schema_type, list) and any(nt in schema_type for nt in NULL_TYPES)
         schema_type = self.simplify_type(schema_type)
         if schema_type in COLLECTIONS.keys():
-            schema = schema.get(OasField.ITEMS)
-            schema[OasField.X_COLLECT.value] = schema_type
+            prop.update(prop.pop(OasField.ITEMS, {}))
+            prop[OasField.X_COLLECT.value] = schema_type
         elif schema_type:
-            schema[OasField.TYPE.value] = schema_type
+            prop[OasField.TYPE.value] = schema_type
 
-        schema = self.simplify_type(schema)
+        schema = self.simplify_type(prop)
         if schema:
-            prop[OasField.SCHEMA.value] = schema
+            prop.update(schema)
         if nullable:
             prop[OasField.REQUIRED.value] = False
 
@@ -910,13 +911,12 @@ if __name__ == "__main__":
         # collect all the enum types (mapped by name to avoid duplicates)
         enums = {}
         for param_data in path_params + query_params:
-            schema = param_data.get(OasField.SCHEMA, {})
-            values = schema.get(OasField.ENUM)
+            values = param_data.get(OasField.ENUM)
             if not values:
                 continue
 
-            e_name = self.short_reference_name(schema.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
-            e_type = self.schema_to_pytype(schema) or 'str'
+            e_name = self.short_reference_name(param_data.get(OasField.REFS, "")) or param_data.get(OasField.NAME)
+            e_type = self.schema_to_pytype(param_data) or 'str'
             enums[self.class_name(e_name)] = (e_type, values)
 
         for name, prop in body_params.items():

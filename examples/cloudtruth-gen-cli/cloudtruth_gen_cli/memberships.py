@@ -81,7 +81,7 @@ def memberships_create(
 
 @app.command("delete", short_help="")
 def memberships_destroy(
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the membership.")],
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -173,7 +173,7 @@ class RoleEnum(str, Enum):  # noqa: F811
 
 @app.command("set", short_help="")
 def memberships_update(
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the membership.")],
     user: Annotated[str, typer.Option(show_default=False, help="The user of the membership.")] = None,
     organization: Annotated[str, typer.Option(show_default=False, help="The organization that the user is a member of.")] = None,
     role: Annotated[RoleEnum, typer.Option(show_default=False, case_sensitive=False)] = None,
@@ -217,7 +217,7 @@ def memberships_update(
 
 @app.command("show", short_help="")
 def memberships_retrieve(
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the membership.")],
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -255,7 +255,7 @@ class RoleEnum(str, Enum):  # noqa: F811
 
 @app.command("update", short_help="")
 def memberships_partial_update(
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the membership.")],
     user: Annotated[Optional[str], typer.Option(show_default=False, help="The user of the membership.")] = None,
     organization: Annotated[Optional[str], typer.Option(show_default=False, help="The organization that the user is a member of.")] = None,
     role: Annotated[Optional[RoleEnum], typer.Option(show_default=False, case_sensitive=False)] = None,

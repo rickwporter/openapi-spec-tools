@@ -68,7 +68,7 @@ def users_current_retrieve(
 
 @app.command("delete", short_help="Delete the specified user.")
 def users_destroy(
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="The unique identifier of a user.")],
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -155,7 +155,7 @@ def users_list(
 
 @app.command("show", short_help="")
 def users_retrieve(
-    id: Annotated[str, typer.Argument(show_default=False, help="")],
+    id: Annotated[str, typer.Argument(show_default=False, help="The unique identifier of a user.")],
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
