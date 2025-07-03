@@ -1,6 +1,6 @@
 import pytest
 
-from openapi_spec_tools.cli_gen.generate import set_copyright
+from openapi_spec_tools.cli_gen.files import set_copyright
 
 
 @pytest.fixture
