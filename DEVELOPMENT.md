@@ -62,7 +62,7 @@ Now, your development environment is ready for coding and testing.
 
 The project has been setup with `make` as a driver for most commands a develop may want. The `make help` is intended to provide a quick reference for those commands. Close variants of many of these commands are used in the CI pipeline.
 
-The `make` targets will likely evolved, but here's a snapshot of the help. 
+The `make` targets will likely change, but here's a snapshot of the help. 
 
 ```terminal
 (.env) % make help
@@ -77,6 +77,7 @@ Usage:
 General
   all              Complete cycle: generate/lint/test everything
   clean            Remove build/test artifacts
+  poetry-update    Update poetry in top-level, and then all examples (part of release)
 
 Build
   wheel            Build the wheel file
@@ -92,11 +93,8 @@ Test
   cov              Run unit tests with code coverage measurments (use TEST_TARGET to scope)
 
 Examples
-  examples         Complete cycle on all examples
+  example          Complete cycle on all examples
   example-gen      Generate example code (no tests)
-  pets-cli         Generate pets-cli
-  ct-cli           Generate the cloudtruth-cli
-  gh-cli           Generate the Github CLI
 (.env) % 
 ```
 
