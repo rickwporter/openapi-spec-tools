@@ -702,7 +702,25 @@ if __name__ == "__main__":
         """
         properties = []
         for param in parameters:
-            properties.append(self.param_to_property(param))
+            items = param.get(OasField.ITEMS, {})
+            ref = param.get(OasField.REFS) or items.get(OasField.REFS)
+            if not ref:
+                properties.append(self.param_to_property(param))
+                continue
+
+            model = deepcopy(self.get_model(ref))
+            if not model.get(OasField.PROPS):
+                param.update(model)
+                properties.append(param)
+                continue
+
+            param_name = param.get(OasField.NAME)
+            settable = self.model_settable_properties(model)
+            for prop_name, prop_data in settable.items():
+                prop_data[OasField.NAME.value] = f"{param_name}.{prop_name}"
+                schema = self.param_to_property(prop_data)
+                prop_data.update(schema)
+                properties.append(prop_data)
 
         return properties
 

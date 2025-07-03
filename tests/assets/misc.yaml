@@ -126,6 +126,15 @@ paths:
           in: query
           schema:
             type: integer
+        - name: paramWithEnumRef
+          in: query
+          schema:
+            $ref: '#/components/schemas/Species'
+            default: frog
+        - name: addr
+          in: query
+          schema:
+            $ref: '#/components/schemas/Address'
       requestBody:
         content:
           application/json:

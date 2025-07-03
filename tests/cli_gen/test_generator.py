@@ -160,6 +160,7 @@ def test_op_param_formation():
     op = operations.get("testPathParams")
     uut = Generator("cli_package", oas)
     query_params = uut.op_params(op, "query")
+    properties = uut.params_to_settable_properties(query_params)
 
     expected = """\
 {}
@@ -182,9 +183,18 @@ def test_op_param_formation():
     if str_enum_with_int_values is not None:
         params["strEnumWithIntValues"] = str_enum_with_int_values
     if type_ is not None:
-        params["type"] = type_\
+        params["type"] = type_
+    if param_with_enum_ref is not None:
+        params["paramWithEnumRef"] = param_with_enum_ref
+    if addr_street is not None:
+        params["addr.street"] = addr_street
+    if addr_city is not None:
+        params["addr.city"] = addr_city
+    if addr_state is not None:
+        params["addr.state"] = addr_state
+    params["addr.zipCode"] = addr_zip_code\
 """
-    text = uut.op_param_formation(query_params)
+    text = uut.op_param_formation(properties)
     assert expected == text
 
 
@@ -507,6 +517,27 @@ def test_op_query_arguments():
     )
     assert (
         'type_: Annotated[Optional[int], typer.Option("--type", show_default=False, help="")] = None'
+        in text
+    )
+    assert (
+        'param_with_enum_ref: Annotated[Species, typer.Option(case_sensitive=False, help="Species type")] = "frog"'
+        in text
+    )
+    assert (
+        'addr_street: Annotated[Optional[str], typer.Option(show_default=False, '
+        'help="Street address (e.g. 123 Main Street, POBox 507)")] = None'
+        in text
+    )
+    assert (
+        'addr_city: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
+        in text
+    )
+    assert (
+        'addr_state: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
+        in text
+    )
+    assert (
+        'addr_zip_code: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
         in text
     )
 
