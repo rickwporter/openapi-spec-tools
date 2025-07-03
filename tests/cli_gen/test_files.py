@@ -4,16 +4,16 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from openapi_spec_tools.cli_gen.generate import DEFAULT_COPYRIGHT
-from openapi_spec_tools.cli_gen.generate import check_for_missing
-from openapi_spec_tools.cli_gen.generate import copy_and_update
-from openapi_spec_tools.cli_gen.generate import copy_infrastructure
-from openapi_spec_tools.cli_gen.generate import copy_tests
-from openapi_spec_tools.cli_gen.generate import copyright
-from openapi_spec_tools.cli_gen.generate import find_unreferenced
-from openapi_spec_tools.cli_gen.generate import generate_node
-from openapi_spec_tools.cli_gen.generate import generate_tree_node
-from openapi_spec_tools.cli_gen.generate import set_copyright
+from openapi_spec_tools.cli_gen.files import DEFAULT_COPYRIGHT
+from openapi_spec_tools.cli_gen.files import check_for_missing
+from openapi_spec_tools.cli_gen.files import copy_and_update
+from openapi_spec_tools.cli_gen.files import copy_infrastructure
+from openapi_spec_tools.cli_gen.files import copy_tests
+from openapi_spec_tools.cli_gen.files import copyright
+from openapi_spec_tools.cli_gen.files import find_unreferenced
+from openapi_spec_tools.cli_gen.files import generate_node
+from openapi_spec_tools.cli_gen.files import generate_tree_node
+from openapi_spec_tools.cli_gen.files import set_copyright
 from openapi_spec_tools.cli_gen.generator import Generator
 from openapi_spec_tools.cli_gen.layout import file_to_tree
 from openapi_spec_tools.utils import open_oas
