@@ -4,9 +4,38 @@ Welcome to OpenAPI specification (OAS) tools!
 
 This is a collection of tools for using OpenAPI specifications. The OpenAPI community has a plethora of tools, and this is intended to supplement those. The tools here provide functionality that has not been readily available elsewhere.
 
+## Getting started
+
+The project has been published to PyPi, so you should be able to install it with something like one of the following (depending on how you do Python package management):
+```terminal
+% pip install openapi-spec-tools
+% poetry add openapi-spec-tools
+```
+
+Generally, there are two intended ways to utilize this package:
+* Use `oas` and `cli-gen` as CLI tools to perform actions
+* Use the code in the Python modules for your own purpose
+
+The sections below provide a brief description with links to more examples and details.
+
 ## OAS
 
 The `oas` script provides a tool for analyzing and modifying an OpenAPI spec. See [OAS.md](OAS.md) for more info.
+
+Here's a trivial example:
+```terminal
+(.env) % oas analyze models list pet.yaml 
+Found 3 models:
+    Error
+    Pet
+    Pets
+(.env) % oas analyze models ops pet.yaml Pet
+Found Pet is used by 3 operations:
+    createPets
+    listPets
+    showPetById
+(.env) % 
+```
 
 ## CLI Generation
 
