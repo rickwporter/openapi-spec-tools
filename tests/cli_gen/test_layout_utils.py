@@ -284,6 +284,25 @@ def test_parse_pagination(data, expected) -> None:
             ),
             id="sub-cmds",
         ),
+        pytest.param(
+            "sna",
+            {
+                OPS: [
+                    {NAME: "foo", SUB_ID: "sub1"}, {NAME: "bar", SUB_ID: "sub2", "bugIds": "x, y"}
+                ],
+            },
+            LayoutNode(
+                command="sna",
+                identifier="sna",
+                children=[
+                    LayoutNode(command="foo", identifier="sub1", description="sub-command desc", children=[
+                        LayoutNode(command="dazed", identifier="confused"),
+                    ]),
+                    LayoutNode(command="bar", identifier="sub2", description="more help", bugs=["a", "bc", "x", "y"]),
+                ],
+            ),
+            id="sub-cmd-bug",
+        ),
     ],
 )
 def test_data_to_node_basic(name, item, expected) -> None:

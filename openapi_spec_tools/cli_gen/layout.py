@@ -79,7 +79,9 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         sub_id = op_data.get(LayoutField.SUB_ID)
         if sub_id:
             # recursively go through this
-            children.append(data_to_node(data, sub_id, op_name, data.get(sub_id, {})))
+            subcommand = data_to_node(data, sub_id, op_name, data.get(sub_id, {}))
+            subcommand.bugs.extend(field_to_list(op_data, LayoutField.BUG_IDS))
+            children.append(subcommand)
             continue
 
         # use the current op-data to create a node -- it will be short
