@@ -319,6 +319,8 @@ if __name__ == "__main__":
         """Expand the model into a dictionary of properties."""
         properties = {}
 
+        model = deepcopy(model)
+
         # start with the base-classes in allOf
         for parent in model.get(OasField.ALL_OF, []):
             reference = parent.get(OasField.REFS, "")
@@ -344,6 +346,16 @@ if __name__ == "__main__":
                 updated[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED.value) and sub_name in required_sub
                 properties[sub_name] = updated
 
+        one_of = model.get(OasField.ONE_OF)
+        if one_of:
+            updated = self.condense_one_of(one_of)
+            if len(updated) == 1:
+                model.update(updated[0])
+            else:
+                # just grab the first one... not sure this is the best choice, but need to do something
+                self.logger.warning(f"Grabbing oneOf[0] item from body {updated}")
+                model.update(updated[0])
+
         required_props = model.get(OasField.REQUIRED, [])
         # then, copy the individual properties
         for prop_name, prop_data in model.get(OasField.PROPS, {}).items():
@@ -359,7 +371,7 @@ if __name__ == "__main__":
                     prop_data.update(updated[0])
                 else:
                     # just grab the first one... not sure this is the best choice, but need to do something
-                    self.logger.warning(f"Grabbing oneOf[0] item from body {updated}")
+                    self.logger.warning(f"Grabbing oneOf[0] item from body property {updated}")
                     prop_data.update(updated[0])
 
             reference = self.prop_find_reference(prop_data)
