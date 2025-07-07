@@ -97,6 +97,12 @@ paths:
             - Mon
             - Tue
             - Wed
+        - name: hasParam
+          in: header
+          description: Parameter in header
+          required: true
+          schema:
+            type: integer
         - name: strListProp
           in: query
           schema:
