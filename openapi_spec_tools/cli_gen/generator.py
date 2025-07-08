@@ -962,6 +962,7 @@ if __name__ == "__main__":
         path = op.get(OasField.X_PATH)
         path_params = self.op_params(op, "path")
         query_params = self.params_to_settable_properties(self.op_params(op, "query"))
+        header_params = self.params_to_settable_properties(self.op_params(op, "header"))
         body_params = self.op_body_settable_properties(op)
         command_args = [quoted(node.command)]
 
@@ -997,6 +998,7 @@ if __name__ == "__main__":
         func_args = []
         func_args.extend(self.op_path_arguments(path_params))
         func_args.extend(self.op_query_arguments(query_params))
+        func_args.extend(self.op_query_arguments(header_params))
         func_args.extend(self.op_body_arguments(body_params))
         func_args.extend(self.command_infra_arguments(node))
         args_str = SEP1 + f",{SEP1}".join(func_args) + "," + NL
@@ -1004,15 +1006,27 @@ if __name__ == "__main__":
         command_args.append(f'short_help="{self.op_short_help(op)}"')
         self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
 
+        user_header_init = ""
+        user_header_arg = ""
+        if header_params:
+            user_header_arg = ", **user_headers"
+            lines = ["user_headers = {}"]
+            for p in header_params:
+                name = p.get(OasField.NAME)
+                var_name = self.variable_name(name)
+                lines.append(f"if {var_name} is not None:")
+                lines.append(f"   user_headers[{quoted(name)}] = {var_name}")
+            user_header_init = NL + SEP1 + SEP1.join(lines) + NL
+
         return f"""
 {self.enum_definitions(path_params, query_params, body_params)}
 @app.command({', '.join(command_args)})
 def {func_name}({args_str}) -> None:
     {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
-    _l.init_logging(_log_level){deprecation_warning}
-    headers = _r.request_headers(_api_key{self.op_content_header(op)})
+    _l.init_logging(_log_level){deprecation_warning}{user_header_init}
+    headers = _r.request_headers(_api_key{self.op_content_header(op)}{user_header_arg})
     url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}
-    missing = {self.op_check_missing(query_params, body_params)}
+    missing = {self.op_check_missing(query_params + header_params, body_params)}
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 

@@ -1238,8 +1238,8 @@ def test_function_definition_item():
     assert 'data = _d.summary(data, "name")'
 
     # make sure the missing parameter checks are present
-    assert 'missing.append("--api-key")'
-    assert 'missing.append("--name")'
+    assert 'missing.append("--api-key")' in text
+    assert 'missing.append("--name")' in text
     assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
 
 
@@ -1338,6 +1338,33 @@ def test_function_x_deprecated():
 
     # check the warning log
     assert '_l.logger().warning("snafooDelete was deprecated in 3.2.1, and should not be used.")' in text
+
+
+def test_function_header_params():
+    oas = open_oas(asset_filename("misc.yaml"))
+    item = LayoutNode(command='sna', identifier='testPathParams')
+    uut = Generator("cli_package", oas)
+    text = uut.function_definition(item)
+
+    # check function argument (aka CLI option)
+    assert (
+        'has_param: Annotated[Optional[int], typer.Option(show_default=False, help="Parameter in header")] = None'
+        in text
+    )
+
+    # make sure we add to headers
+    assert 'user_headers = {}' in text
+    assert 'if has_param is None:' in text
+    assert 'user_headers["hasParam"] = has_param' in text
+    assert (
+        'headers = _r.request_headers(_api_key, content_type="application/json", **user_headers)'
+        in text
+    )
+
+    # make sure the missing parameter checks are present
+    assert 'if has_param is None:' in text
+    assert 'missing.append("--has-param")' in text
+    assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
 
 
 def test_main():
