@@ -613,3 +613,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Attachment"
+    MultipleAnyOf:
+      anyOf:
+      - $ref: '#/components/schemas/Pet'
+      - $ref: '#/components/schemas/MissingItemsModel'
+      type: object

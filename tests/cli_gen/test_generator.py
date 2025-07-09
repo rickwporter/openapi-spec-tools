@@ -836,6 +836,32 @@ def test_param_to_property(parameter, expected):
             id="allOf-multi"
         ),
         pytest.param(
+            "MultipleAnyOf",
+            {
+                'anotherValue': {
+                    'default': 'Anything goes',
+                    'deprecated': True,
+                    'description': 'A string with a default',
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Pet',
+                },
+                'name': {
+                    'description': 'Pet name',
+                    'required': True,
+                    'type': 'string',
+                    'x-reference': 'Pet',
+                },
+                'tag': {
+                    'description': 'Pet classification',
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Pet',
+                },
+            },
+            id="anyOf-multi",
+        ),
+        pytest.param(
             "GeoJsonFeatureCollection",
             {
                 'type': {
@@ -931,12 +957,14 @@ def test_param_to_property(parameter, expected):
                     'nullable': True,
                     'required': False,
                     'type': 'string',
+                    '$ref': '#/components/schemas/Color',
                     'x-reference': 'Color',
                 },
                 'id': {
                     'pattern': '^[0-9a-fA-F]{24}$',
                     'type': 'string',
                     'required': False,
+                    '$ref': '#/components/schemas/TrelloID',
                     'x-reference': 'TrelloID',
                 },
                 'idMember': {'required': False, 'type': 'string'},
@@ -959,6 +987,7 @@ def test_param_to_property(parameter, expected):
                     'nullable': True,
                     'x-field': 'color',
                     'x-reference': 'Color',
+                    '$ref': '#/components/schemas/Color'
                 },
             },
             id="list-all-of"
@@ -972,6 +1001,7 @@ def test_param_to_property(parameter, expected):
             "EnumListProperty",
             {
                 'rainbow': {
+                    '$ref': '#/components/schemas/Color',
                     'type': 'string',
                     'enum': ['yellow', 'purple', 'blue'],
                     'required': True,
@@ -1005,6 +1035,8 @@ def test_param_to_property(parameter, expected):
                     'required': True,
                     'type': 'string',
                     'x-reference': 'RoleEnum',
+                    '$ref': '#/components/schemas/RoleEnum',
+                    'description': 'The role that the user has in the organization.',
                 },
                 'user': {
                     'description': 'The user of the membership.',
@@ -1023,6 +1055,8 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-reference': 'RoleEnum',
+                    '$ref': '#/components/schemas/RoleEnum',
+                    'description': 'The role that the user has in the organization.',
                 },
             },
             id="enum-any-of"
@@ -1035,6 +1069,8 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-reference': 'RoleEnum',
+                    '$ref': '#/components/schemas/RoleEnum',
+                    'description': 'The role that the user has in the organization.',
                 },
             },
             id="enum-one-of"

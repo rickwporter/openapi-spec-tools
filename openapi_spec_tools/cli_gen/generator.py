@@ -261,25 +261,6 @@ if __name__ == "__main__":
 
         return False
 
-    def get_items_model(self, prop_data: dict[str, Any]) -> tuple[str, dict]:
-        """Determine if the property data references complex items."""
-        items = prop_data.get(OasField.ITEMS, {})
-        one_of = items.get(OasField.ONE_OF)
-        if one_of:
-            updated = self.condense_one_of(one_of)
-            if len(updated) != 1:
-                self.logger.info(f"Using updated[0] item from sub-model {updated}")
-            items = updated[0]
-
-        item_ref = items.get(OasField.REFS, "")
-        item_short = self.short_reference_name(item_ref)
-        if item_ref:
-            item_model = deepcopy(self.get_model(item_ref))
-        else:
-            item_model = deepcopy(items)
-
-        return item_short, item_model
-
     def model_collection_type(self, model: str) -> Optional[str]:
         """Determine the collection type (current just an array)."""
         model_type = self.simplify_type(model.get(OasField.TYPE))
@@ -299,116 +280,114 @@ if __name__ == "__main__":
 
         return None
 
-    def prop_find_reference(self, prop_data: dict[str, Any]) -> str:
-        """Properties may have a reference buried inside an anyOf, allOf, or oneOf."""
-        reference = prop_data.get(OasField.REFS)
-        if reference:
-            return reference
+    def expand_references(self, model: dict[str, Any]) -> dict[str, Any]:
+        """Expand all the references.
 
-        parents = prop_data.get(OasField.ALL_OF, [])
-        parents.extend(prop_data.get(OasField.ANY_OF, []))
-        parents.extend(prop_data.get(OasField.ONE_OF, []))
-        for parent in parents:
-            reference = parent.get(OasField.REFS)
-            if reference:
-                return reference
+        This is a brute force method to recursively look for any `$ref` keys, and update
+        those dictionaries in place.
+        """
+        # start at this level
+        updated = deepcopy(model)
 
-        return ""
+        full_ref = model.get(OasField.REFS)
+        if full_ref:
+            updated[OasField.X_REF.value] = self.short_reference_name(full_ref)
+            submodel = self.get_model(full_ref)
+            if not submodel:
+                self.logger.warning(f"Unable to find model for {full_ref}")
+                return {}
 
-    def model_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
-        """Expand the model into a dictionary of properties."""
+            updated.update(submodel)
+
+        # then, loop thru all the sub-items
+        result = {}
+        for key, value in updated.items():
+            if isinstance(value, dict):
+                # recursively update
+                resolved = self.expand_references(value)
+                if resolved:
+                    result[key] = resolved
+            elif isinstance(value, list):
+                items = [
+                    self.expand_references(v) if isinstance(v, dict) else v
+                    for v in value
+                ]
+                if items:
+                    result[key] = items
+            else:
+                result[key] = value
+
+        return result
+
+    def expanded_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
+        """Turn an expanded model (all references expanded) into a dictionary of properties."""
         properties = {}
-
-        model = deepcopy(model)
 
         # start with the base-classes in allOf
         for parent in model.get(OasField.ALL_OF, []):
+            required_sub = parent.get(OasField.REQUIRED, [])
             reference = parent.get(OasField.REFS, "")
             short_refname = self.short_reference_name(reference)
-            if not reference:
-                # this is an unnamed sub-reference
-                submodel = deepcopy(parent)
-            else:
-                submodel = deepcopy(self.get_model(reference))
-
-            if not submodel:
-                self.logger.warning(f"Failed to find {short_refname} model")
-                continue
-
-            required_sub = submodel.get(OasField.REQUIRED, [])
-            sub_properties = self.model_settable_properties(submodel)
+            sub_properties = self.expanded_settable_properties(parent)
             for sub_name, sub_data in sub_properties.items():
-                # NOTE: no "name mangling" since using inheritance
-                updated = deepcopy(sub_data)
                 if short_refname:
-                    set_missing(updated, OasField.X_REF.value, short_refname)
-                set_missing(updated, OasField.X_FIELD.value, sub_name)
-                updated[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED.value) and sub_name in required_sub
-                properties[sub_name] = updated
+                    set_missing(sub_data, OasField.X_REF.value, short_refname)
+                set_missing(sub_data, OasField.X_FIELD.value, sub_name)
+                sub_data[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED.value) and sub_name in required_sub
+                properties[sub_name] = sub_data
+
+        any_of = model.get(OasField.ANY_OF)
+        if any_of:
+            if len(any_of) != 1:
+                self.logger.warning(f"Grabbing anyOf[0] item from body {any_of}")
+            # just grab the first one... not sure this is the best choice, but need to do something
+            model.update(any_of[0])
 
         one_of = model.get(OasField.ONE_OF)
         if one_of:
             updated = self.condense_one_of(one_of)
-            if len(updated) == 1:
-                model.update(updated[0])
-            else:
-                # just grab the first one... not sure this is the best choice, but need to do something
+            if len(updated) != 1:
                 self.logger.warning(f"Grabbing oneOf[0] item from body {updated}")
-                model.update(updated[0])
+            # just grab the first one... not sure this is the best choice, but need to do something
+            model.update(updated[0])
 
+        reference = model.get(OasField.REFS, "")
+        short_refname = self.short_reference_name(reference)
         required_props = model.get(OasField.REQUIRED, [])
-        # then, copy the individual properties
+
+        # copy the individual properties
         for prop_name, prop_data in model.get(OasField.PROPS, {}).items():
             if prop_data.get(OasField.READ_ONLY, False):
                 continue
 
-            one_of = prop_data.get(OasField.ONE_OF)
-            if one_of:
-                prop_data = deepcopy(prop_data)
-                prop_data.pop(OasField.ONE_OF)
-                updated = self.condense_one_of(one_of)
-                if len(updated) == 1:
-                    prop_data.update(updated[0])
-                else:
-                    # just grab the first one... not sure this is the best choice, but need to do something
-                    self.logger.warning(f"Grabbing oneOf[0] item from body property {updated}")
-                    prop_data.update(updated[0])
-
-            reference = self.prop_find_reference(prop_data)
-            short_refname = self.short_reference_name(reference)
-            if not reference:
-                submodel = deepcopy(prop_data)
-            else:
-                submodel = deepcopy(self.get_model(reference))
-
-            if not submodel:
-                self.logger.warning(f"Failed to find {short_refname} model")
-                continue
-
-            collection_type = self.model_collection_type(submodel)
+            collection_type = self.model_collection_type(prop_data)
             if collection_type:
                 collect_name = f"{short_refname}." if short_refname else "" + prop_name
-                item_name, item_model = self.get_items_model(submodel)
+                item_model = prop_data.get(OasField.ITEMS, {})
                 if not item_model:
                     self.logger.error(f"Could not find {collect_name} item model")
                     continue
                 if self.model_is_complex(item_model):
                     self.logger.error(f"Ignoring {collect_name} -- cannot handle lists of complex")
                     continue
-                if item_name:
-                    set_missing(submodel, OasField.X_REF.value, item_name)
-                submodel.pop(OasField.ITEMS.value, None)
-                submodel[OasField.X_COLLECT.value] = collection_type
-                submodel.update(item_model)
+                prop_data.pop(OasField.ITEMS.value, None)
+                prop_data[OasField.X_COLLECT.value] = collection_type
+                prop_data.update(item_model)
 
-            required_sub = submodel.get(OasField.REQUIRED, [])
-            sub_properties = self.model_settable_properties(submodel)
+            required_sub = prop_data.get(OasField.REQUIRED, [])
+            sub_properties = self.expanded_settable_properties(prop_data)
             if not sub_properties:
-                updated = deepcopy(submodel)
+                # kind of a corner case where an enum has no properties
+                for key in (OasField.ALL_OF, OasField.ANY_OF, OasField.ONE_OF):
+                    items = prop_data.pop(key, None)
+                    if not items:
+                        continue
+                    prop_data.update(items[0])
+
                 if short_refname:
-                    set_missing(updated, OasField.X_REF.value, short_refname)
-                updated[OasField.REQUIRED.value] = prop_name in required_props
-                properties[prop_name] = updated
+                    set_missing(prop_data, OasField.X_REF.value, short_refname)
+                prop_data[OasField.REQUIRED.value] = prop_name in required_props
+                properties[prop_name] = prop_data
                 continue
 
             for sub_name, sub_data in sub_properties.items():
@@ -423,6 +402,12 @@ if __name__ == "__main__":
                 properties[full_name] = updated
 
         return properties
+
+    def model_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
+        """Expand the model into a dictionary of properties."""
+        expanded = self.expand_references(model)
+
+        return self.expanded_settable_properties(expanded)
 
     def op_body_settable_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
         """Get a dictionary of settable body properties."""
