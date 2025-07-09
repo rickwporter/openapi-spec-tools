@@ -267,6 +267,10 @@ components:
           format:
             type: string
             default: text
+          gone:
+            description: To be removed
+            x-deprecated: 5.6
+            type: string
 
     Pets:
       type: array

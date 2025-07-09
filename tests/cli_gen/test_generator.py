@@ -431,9 +431,7 @@ def test_op_body_formation():
     assert 'if another_value is not None:' in text  # not required, so check if not None
     assert '_l.logger().warning("--another-value is deprecated and should not be used")' in text
     assert 'body["anotherValue"] = another_value' in text  # check prop vs variable name
-    assert 'if bogus is not None:' in text
-    assert '_l.logger().warning("--bogus was deprecated in 7.8.9 and should not be used")' in text
-    assert 'body["bogus"] = bogus' in text
+    assert 'if bogus is not None:' not in text
     assert 'if optional_list is not None:' in text
     assert 'body["optionalList"] = optional_list' in text
     assert 'if first_choice is not None:' in text
@@ -441,6 +439,9 @@ def test_op_body_formation():
     assert 'if list_various is not None:' in text
     assert 'body["listVarious"] = list_various' in text
     assert 'body["format"] = format_' in text
+    assert 'if gone is not None:' in text
+    assert '_l.logger().warning("--gone was deprecated in 5.6 and should not be used")' in text
+    assert 'body["gone"] = gone' in text
 
 
 def test_op_path_arguments():
@@ -1081,7 +1082,7 @@ def test_model_settable_properties(model_name, expected):
     oas = open_oas(asset_filename("misc.yaml"))
     uut = Generator("cli_package", oas)
     model = uut.get_model(f"#/components/schemas/{model_name}")
-    properties = uut.model_settable_properties(model)
+    properties = uut.model_settable_properties(model_name, model)
     assert expected == properties
 
 
@@ -1101,7 +1102,6 @@ def test_op_body_arguments():
         'help="A string with a default")] = "Anything goes"'
         in text
     )
-    assert 'bogus: Annotated[Any, typer.Option(show_default=False, hidden=True, help="Misleading help")] = None' in text
     assert (
         'flavor: Annotated[Optional[Species], '
         'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'
@@ -1127,6 +1127,14 @@ def test_op_body_arguments():
         'format_: Annotated[Optional[str], typer.Option("--format")] = "text"'
         in text
     )
+    assert (
+        'gone: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, '
+        'help="To be removed")] = None'
+        in text
+    )
+
+    # this is filtered out bu the op_body_settable_properties
+    assert 'bogus: Annodated' not in text
 
     # make sure read-only not included
     assert 'id: Annotated' not in text

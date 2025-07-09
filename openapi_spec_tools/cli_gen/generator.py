@@ -13,6 +13,7 @@ from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
 from openapi_spec_tools.cli_gen.utils import quoted
 from openapi_spec_tools.cli_gen.utils import set_missing
+from openapi_spec_tools.cli_gen.utils import shallow
 from openapi_spec_tools.cli_gen.utils import simple_escape
 from openapi_spec_tools.cli_gen.utils import to_camel_case
 from openapi_spec_tools.cli_gen.utils import to_snake_case
@@ -319,16 +320,16 @@ if __name__ == "__main__":
 
         return result
 
-    def expanded_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
+    def expanded_settable_properties(self, name: str, model: dict[str, Any]) -> dict[str, Any]:
         """Turn an expanded model (all references expanded) into a dictionary of properties."""
         properties = {}
 
         # start with the base-classes in allOf
-        for parent in model.get(OasField.ALL_OF, []):
+        for index, parent in enumerate(model.get(OasField.ALL_OF, [])):
             required_sub = parent.get(OasField.REQUIRED, [])
             reference = parent.get(OasField.REFS, "")
             short_refname = self.short_reference_name(reference)
-            sub_properties = self.expanded_settable_properties(parent)
+            sub_properties = self.expanded_settable_properties(f"{name}.anyOf[{index}]", parent)
             for sub_name, sub_data in sub_properties.items():
                 if short_refname:
                     set_missing(sub_data, OasField.X_REF.value, short_refname)
@@ -339,7 +340,8 @@ if __name__ == "__main__":
         any_of = model.get(OasField.ANY_OF)
         if any_of:
             if len(any_of) != 1:
-                self.logger.warning(f"Grabbing anyOf[0] item from body {any_of}")
+                self.logger.info(f"Grabbing anyOf[0] item from {name}")
+                self.logger.debug(f"{name} anyOf selected: {shallow(any_of[0])}")
             # just grab the first one... not sure this is the best choice, but need to do something
             model.update(any_of[0])
 
@@ -347,7 +349,8 @@ if __name__ == "__main__":
         if one_of:
             updated = self.condense_one_of(one_of)
             if len(updated) != 1:
-                self.logger.warning(f"Grabbing oneOf[0] item from body {updated}")
+                self.logger.info(f"Grabbing oneOf[0] item from {name}")
+                self.logger.debug(f"{name} oneOf selected: {shallow(updated[0])}")
             # just grab the first one... not sure this is the best choice, but need to do something
             model.update(updated[0])
 
@@ -375,7 +378,7 @@ if __name__ == "__main__":
                 prop_data.update(item_model)
 
             required_sub = prop_data.get(OasField.REQUIRED, [])
-            sub_properties = self.expanded_settable_properties(prop_data)
+            sub_properties = self.expanded_settable_properties(f"{name}.{prop_name}", prop_data)
             if not sub_properties:
                 # kind of a corner case where an enum has no properties
                 for key in (OasField.ALL_OF, OasField.ANY_OF, OasField.ONE_OF):
@@ -383,6 +386,11 @@ if __name__ == "__main__":
                     if not items:
                         continue
                     prop_data.update(items[0])
+
+                pytype = self.get_property_pytype(prop_name, prop_data)
+                if not pytype:
+                    self.logger.warning(f"Unable to determine pytype for {name}.{prop_name}")
+                    continue
 
                 if short_refname:
                     set_missing(prop_data, OasField.X_REF.value, short_refname)
@@ -393,21 +401,20 @@ if __name__ == "__main__":
             for sub_name, sub_data in sub_properties.items():
                 # these properties are "name mangled" to include the parent property name
                 full_name = f"{prop_name}.{sub_name}"
-                updated = deepcopy(sub_data)
-                updated[OasField.REQUIRED.value] = prop_name in required_props and sub_name in required_sub
+                sub_data[OasField.REQUIRED.value] = prop_name in required_props and sub_name in required_sub
                 if reference:
-                    set_missing(updated, OasField.X_REF.value, self.short_reference_name(reference))
-                set_missing(updated, OasField.X_FIELD.value, sub_name)
-                set_missing(updated, OasField.X_PARENT.value, prop_name)
-                properties[full_name] = updated
+                    set_missing(sub_data, OasField.X_REF.value, self.short_reference_name(reference))
+                set_missing(sub_data, OasField.X_FIELD.value, sub_name)
+                set_missing(sub_data, OasField.X_PARENT.value, prop_name)
+                properties[full_name] = sub_data
 
         return properties
 
-    def model_settable_properties(self, model: dict[str, Any]) -> dict[str, Any]:
+    def model_settable_properties(self, name: str, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties."""
         expanded = self.expand_references(model)
 
-        return self.expanded_settable_properties(expanded)
+        return self.expanded_settable_properties(name, expanded)
 
     def op_body_settable_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
         """Get a dictionary of settable body properties."""
@@ -416,10 +423,12 @@ if __name__ == "__main__":
             return {}
 
         schema = body.get(OasField.SCHEMA, {})
+        name = "body"
         ref = schema.get(OasField.REFS)
         if ref:
+            name = self.short_reference_name(ref)
             schema = self.get_model(ref)
-        return self.model_settable_properties(schema)
+        return self.model_settable_properties(name, schema)
 
     def short_reference_name(self, full_name: str) -> str:
         """Transform the '#/components/schemas/Xxx' to 'Xxx'."""
@@ -477,7 +486,6 @@ if __name__ == "__main__":
             # TODO: uuid
             return "str"
 
-        self.logger.error(f"No Python type found for {schema}/{fmt}")
         return None
 
     def simplify_type(self, schema: Any) -> Any:
@@ -666,13 +674,13 @@ if __name__ == "__main__":
                 prop.update(updated[0])
             else:
                 # just grab the first one... not sure this is the best choice, but need to do something
-                self.logger.warning(f"Grabbing oneOf[0] item from {updated}")
+                self.logger.warning(f"Grabbing oneOf[0] item from {shallow(updated[0])}")
                 prop.update(updated[0])
 
         any_of = prop.pop(OasField.ANY_OF, [])
         if any_of:
             # just grab the first one...
-            self.logger.warning(f"Grabbing anyOf[0] item from {any_of}")
+            self.logger.warning(f"Grabbing anyOf[0] item from {shallow(any_of[0])}")
             prop.update(any_of[0])
 
         schema_type = prop.get(OasField.TYPE)
@@ -712,7 +720,7 @@ if __name__ == "__main__":
                 continue
 
             param_name = param.get(OasField.NAME)
-            settable = self.model_settable_properties(model)
+            settable = self.model_settable_properties(param_name, model)
             for prop_name, prop_data in settable.items():
                 prop_data[OasField.NAME.value] = f"{param_name}.{prop_name}"
                 schema = self.param_to_property(prop_data)
@@ -726,10 +734,6 @@ if __name__ == "__main__":
         args = []
         for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_name, prop_data)
-            if not py_type:
-                # log an error and use 'Any'
-                self.logger.error(f"Unable to determine Python type for {prop_name}={prop_data}")
-                py_type = 'Any'
 
             t_args = []
             if prop_name.lower() in RESERVED:
