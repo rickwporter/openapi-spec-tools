@@ -48,3 +48,20 @@ def set_missing(obj: dict[str, Any], key: str, value: Any) -> None:
     """Set key/value into obj if the key is NOT already in the object."""
     if key not in obj:
         obj[key] = value
+
+
+def shallow(obj: dict[str, Any], max_len: int = 50) -> str:
+    """Convert the obj into a string of just the first level of object."""
+    values = []
+    for k, v in obj.items():
+        if isinstance(v, list):
+            item = "[...]"
+        elif isinstance(v, dict):
+            item = "{...}"
+        else:
+            item = str(v)
+            if len(item) > max_len:
+                item = item[:max_len - 3] + "..."
+        values.append(f"{k}: {item}")
+
+    return "{" + ", ".join(values) + "}"
