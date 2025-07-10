@@ -45,7 +45,8 @@ class OasField(str, Enum):
     X_PARENT = "x-parent"
     X_PATH = "x-path"
     X_PATH_PARAMS = "x-path-params"
-    X_REF = 'x-reference'
+    X_REF = "x-reference"
+    X_CASE_SENSITIVE = "x-case-sensitive"
 
 
 class ContentType(str, Enum):
