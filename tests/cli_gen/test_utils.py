@@ -1,6 +1,7 @@
 import pytest
 
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
+from openapi_spec_tools.cli_gen.utils import shallow
 from openapi_spec_tools.cli_gen.utils import to_camel_case
 from openapi_spec_tools.cli_gen.utils import to_snake_case
 
@@ -52,3 +53,20 @@ def test_camel_case(text, expected):
 def test_maybe_quoted(item, expected):
     assert expected == maybe_quoted(item)
 
+
+@pytest.mark.parametrize(
+    ["obj", "expected"],
+    [
+        pytest.param({}, "{}", id="empty"),
+        pytest.param({"single": "value"}, "{single: value}", id="single"),
+        pytest.param({"a": 1, "B": True, "c": "foo"}, "{a: 1, B: True, c: foo}", id="simple"),
+        pytest.param({"a": ["a", "b"], "z": {"a": 1, "b": 2}}, "{a: [...], z: {...}}", id="collections"),
+        pytest.param(
+            {"a": "this is a long text value that goes more than the specified"},
+            "{a: this is a long text value that goes more than t...}",
+            id="long",
+        ),
+    ]
+)
+def test_shallow(obj, expected):
+    assert expected == shallow(obj)
