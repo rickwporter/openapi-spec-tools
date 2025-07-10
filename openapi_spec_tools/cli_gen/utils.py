@@ -65,3 +65,10 @@ def shallow(obj: dict[str, Any], max_len: int = 50) -> str:
         values.append(f"{k}: {item}")
 
     return "{" + ", ".join(values) + "}"
+
+
+def is_case_sensitive(values: list[Any]) -> bool:
+    """Determine if the provided values are case-sensitive."""
+    native = set(values)
+    lower = set(str(v).lower() for v in values)
+    return len(native) != len(lower)

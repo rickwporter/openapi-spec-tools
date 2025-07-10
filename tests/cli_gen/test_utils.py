@@ -1,5 +1,6 @@
 import pytest
 
+from openapi_spec_tools.cli_gen.utils import is_case_sensitive
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
 from openapi_spec_tools.cli_gen.utils import shallow
 from openapi_spec_tools.cli_gen.utils import to_camel_case
@@ -70,3 +71,16 @@ def test_maybe_quoted(item, expected):
 )
 def test_shallow(obj, expected):
     assert expected == shallow(obj)
+
+
+@pytest.mark.parametrize(
+    ["items", "expected"],
+    [
+        pytest.param([], False, id="empty"),
+        pytest.param(["a", "B", 1, False], False, id="simple"),
+        pytest.param(["a", "B", "A"], True, id="overlap"),
+        pytest.param(["a", "a"], False, id="duplicate"),
+    ]
+)
+def test_is_case_sensitive(items, expected):
+    assert expected == is_case_sensitive(items)
