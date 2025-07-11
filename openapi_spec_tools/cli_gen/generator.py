@@ -33,7 +33,7 @@ SHEBANG = """\
 COLLECTIONS = {
     "array": "list",
 }
-SPECIAL_CHARS = ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';', '(', ')', '{', '}', '[', ']']
+SPECIAL_CHARS = ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';', '(', ')', '{', '}', '[', ']', '+']
 
 # This is an incomplete list of Python builtins that should avoided in variable names
 RESERVED = {
@@ -913,10 +913,17 @@ if __name__ == "__main__":
         if not all(self.clean_enum_name(v) for v in values):
             prefix = "VALUE_"
 
+        names = [self.variable_name(str(v)).upper() for v in values]
+        duplicates = set(x for x in names if names.count(x) > 1)
+        dup_counts = {x: 0 for x in duplicates}
         declarations = []
         for v in values:
             base_name = self.variable_name(str(v)).upper()
-            item_name = f"{prefix}{base_name}"
+            suffix = ""
+            if base_name in dup_counts:
+                suffix = dup_counts[base_name]
+                dup_counts[base_name] = suffix + 1
+            item_name = f"{prefix}{base_name}{suffix}"
             value = quoted(str(v)) if enum_type == "str" else maybe_quoted(v)
             declarations.append(f"{item_name} = {value}")
 

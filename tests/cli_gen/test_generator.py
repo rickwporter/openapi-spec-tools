@@ -602,6 +602,18 @@ class IntStrings(str, Enum):  # noqa: F811
     VALUE_10 = "10"
     VALUE_10_1 = "10.1"
 """
+CASE_SENSE_ENUM = """\
+class Sna(str, Enum):  # noqa: F811
+    FOO0 = "foo"
+    FOO1 = "FOO"
+
+"""
+SPECIAL_ENUM = """\
+class Special(str, Enum):  # noqa: F811
+    _TIME0 = "-time"
+    _TIME1 = "+time"
+
+"""
 
 SIMPLE_PARAM = {
     TYPE: "string",
@@ -620,6 +632,8 @@ INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], "name": "int-strings"}
     [
         pytest.param("Simple", "str", ["aOrB", "b_or_C", "-minus"], SIMPLE_ENUM, id="str"),
         pytest.param("anyThing_goes", "int", [1, None, True], NON_STR_ENUM, id="non-str"),
+        pytest.param("Sna", "str", ["foo", "FOO"], CASE_SENSE_ENUM, id="case-sense"),
+        pytest.param("Special", "str", ["-time", "+time"], SPECIAL_ENUM, id="special"),
     ]
 )
 def test_enum_declaration(name, enum_type, values, expected):
