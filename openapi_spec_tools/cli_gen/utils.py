@@ -44,6 +44,13 @@ def simple_escape(text: str) -> str:
     return lines[0].translate(SIMPLE_TRANSLATIONS)
 
 
+def prepend(obj: dict[str, Any], key: str, value: Any) -> None:
+    """Prepend the value into the object/key list of items."""
+    items = obj.get(key) or []
+    items.insert(0, value)
+    obj[key] = items
+
+
 def set_missing(obj: dict[str, Any], key: str, value: Any) -> None:
     """Set key/value into obj if the key is NOT already in the object."""
     if key not in obj:
