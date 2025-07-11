@@ -42,10 +42,10 @@ class OasField(str, Enum):
     X_COLLECT = "x-collection"
     X_FIELD = "x-field"
     X_METHOD = "x-method"
-    X_PARENT = "x-parent"
+    X_PARENTS = "x-parents"
     X_PATH = "x-path"
     X_PATH_PARAMS = "x-path-params"
-    X_REF = 'x-reference'
+    X_REF = "x-reference"
 
 
 class ContentType(str, Enum):

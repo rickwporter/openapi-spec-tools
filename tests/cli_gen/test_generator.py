@@ -798,14 +798,14 @@ def test_param_to_property(parameter, expected):
                     'type': 'string',
                     'required': False,
                     'x-reference': 'Address',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                     'x-field': 'street',
                 },
                 'home.city': {
                     'type': 'string',
                     'required': False,
                     'x-reference': 'Address',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                     'x-field': 'city',
                 },
                 'home.state': {
@@ -813,14 +813,14 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'x-reference': 'Address',
                     'x-field': 'state',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                 },
                 'home.zipCode': {
                     'type': 'string',
                     'required': False,
                     'x-reference': 'Address',
                     'x-field': 'zipCode',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                 },
                 'iceCream': {
                     'type': 'string',
@@ -847,7 +847,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'next',
-                    'x-parent': 'pagination',
+                    'x-parents': ['pagination'],
                     'x-reference': 'PaginationInfo',
                 },
                 'observationStations': {
@@ -912,14 +912,14 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'city',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.home.state': {
                     'required': False,
                     'type': 'string',
                     'x-field': 'state',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.home.street': {
@@ -927,14 +927,14 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'street',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.home.zipCode': {
                     'required': False,
                     'type': 'string',
                     'x-field': 'zipCode',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.iceCream': {
@@ -942,7 +942,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'iceCream',
-                    'x-parent': 'owner',
+                    'x-parents': ['owner'],
                     'x-reference': 'Owner',
                 },
                 'owner.name': {
@@ -950,7 +950,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'name',
-                    'x-parent': 'owner',
+                    'x-parents': ['owner'],
                     'x-reference': 'Person',
                 },
                 'pagination.next': {
@@ -959,7 +959,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'next',
-                    'x-parent': 'pagination',
+                    'x-parents': ['pagination'],
                     'x-reference': 'PaginationInfo',
                 },
                 'type': {

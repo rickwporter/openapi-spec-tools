@@ -12,6 +12,7 @@ from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.cli_gen.utils import is_case_sensitive
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
+from openapi_spec_tools.cli_gen.utils import prepend
 from openapi_spec_tools.cli_gen.utils import quoted
 from openapi_spec_tools.cli_gen.utils import set_missing
 from openapi_spec_tools.cli_gen.utils import shallow
@@ -406,7 +407,7 @@ if __name__ == "__main__":
                 if reference:
                     set_missing(sub_data, OasField.X_REF.value, self.short_reference_name(reference))
                 set_missing(sub_data, OasField.X_FIELD.value, sub_name)
-                set_missing(sub_data, OasField.X_PARENT.value, prop_name)
+                prepend(sub_data, OasField.X_PARENTS.value, prop_name)
                 properties[full_name] = sub_data
 
         return properties
