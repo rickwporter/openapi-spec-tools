@@ -1,4 +1,3 @@
-from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -615,8 +614,6 @@ NUMBER_PARAM = {TYPE: "integer", ENUM: [12, 37, 11], "name": "simple-number"}
 MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], "name": "mixed-values"}
 INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], "name": "int-strings"}
 
-SIMPLE_PROP = deepcopy(SIMPLE_PARAM)
-SIMPLE_PROP.update({"x-case-sensitive": False})
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
@@ -731,7 +728,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
     ["parameter", "expected"],
     [
         pytest.param({}, {}, id="empty"),
-        pytest.param(SIMPLE_PARAM, SIMPLE_PROP, id="simple"),
+        pytest.param(SIMPLE_PARAM, SIMPLE_PARAM, id="simple"),
         pytest.param(
             {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]},
             {TYPE: "foo", COLLECT: "array"},
@@ -819,7 +816,6 @@ def test_param_to_property(parameter, expected):
                     'required': True,
                     'x-reference': 'GeoJsonFeatureCollection',
                     'x-field': 'type',
-                    'x-case-sensitive': False,
                 },
                 'pagination.next':
                 {
@@ -874,7 +870,6 @@ def test_param_to_property(parameter, expected):
                     'enum': ['FeatureCollection'],
                     'type': 'string',
                     'required': True,
-                    'x-case-sensitive': False,
                 },
             },
             id="unnested",
@@ -950,7 +945,6 @@ def test_param_to_property(parameter, expected):
                     'type': 'string',
                     'x-field': 'type',
                     'x-reference': 'GeoJsonFeatureCollection',
-                    'x-case-sensitive': False,
                 },
             },
             id="nesting",
@@ -967,7 +961,6 @@ def test_param_to_property(parameter, expected):
                     'type': 'string',
                     '$ref': '#/components/schemas/Color',
                     'x-reference': 'Color',
-                    'x-case-sensitive': False,
                 },
                 'id': {
                     'pattern': '^[0-9a-fA-F]{24}$',
@@ -997,7 +990,6 @@ def test_param_to_property(parameter, expected):
                     'x-field': 'color',
                     'x-reference': 'Color',
                     '$ref': '#/components/schemas/Color',
-                    'x-case-sensitive': False,
                 },
             },
             id="list-all-of"
@@ -1018,7 +1010,6 @@ def test_param_to_property(parameter, expected):
                     'nullable': True,
                     'x-reference': 'Color',
                     'x-collection': 'array',
-                    'x-case-sensitive': False,
                 }
             },
             id="list-enum",

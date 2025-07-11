@@ -378,10 +378,6 @@ if __name__ == "__main__":
                 prop_data[OasField.X_COLLECT.value] = collection_type
                 prop_data.update(item_model)
 
-            enum_values = prop_data.get(OasField.ENUM)
-            if enum_values:
-                prop_data[OasField.X_CASE_SENSITIVE.value] = is_case_sensitive(enum_values)
-
             required_sub = prop_data.get(OasField.REQUIRED, [])
             sub_properties = self.expanded_settable_properties(f"{name}.{prop_name}", prop_data)
             if not sub_properties:
@@ -618,7 +614,8 @@ if __name__ == "__main__":
                 arg_default = f" = {maybe_quoted(schema_default)}"
         is_enum = bool(param.get(OasField.ENUM))
         if is_enum:
-            typer_args.append(f"case_sensitive={param.get(OasField.X_CASE_SENSITIVE)}")
+            case_sensitive = is_case_sensitive(param.get(OasField.ENUM))
+            typer_args.append(f"case_sensitive={case_sensitive}")
             enum_type = param.get(OasField.TYPE)
             if enum_type == "string" and schema_default is not None:
                 arg_default = f" = {quoted(str(schema_default))}"
@@ -703,10 +700,6 @@ if __name__ == "__main__":
         if nullable:
             prop[OasField.REQUIRED.value] = False
 
-        enum_values = prop.get(OasField.ENUM)
-        if enum_values:
-            prop[OasField.X_CASE_SENSITIVE.value] = is_case_sensitive(enum_values)
-
         return prop
 
     def params_to_settable_properties(self, parameters: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -725,9 +718,6 @@ if __name__ == "__main__":
             model = deepcopy(self.get_model(ref))
             if not model.get(OasField.PROPS):
                 param.update(model)
-                enum_values = param.get(OasField.ENUM)
-                if enum_values:
-                    param[OasField.X_CASE_SENSITIVE.value] = is_case_sensitive(enum_values)
                 properties.append(param)
                 continue
 
@@ -759,7 +749,8 @@ if __name__ == "__main__":
                 if prop_data.get(OasField.TYPE) == "string" and def_val is not None:
                     # convert the default value to a string so it gets quoted
                     def_val = str(def_val)
-                t_args.append(f"case_sensitive={prop_data.get(OasField.X_CASE_SENSITIVE)}")
+                case_sensitive = is_case_sensitive(prop_data.get(OasField.ENUM))
+                t_args.append(f"case_sensitive={case_sensitive}")
             deprected = prop_data.get(OasField.DEPRECATED, False)
             x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
             if deprected or x_deprecated:
