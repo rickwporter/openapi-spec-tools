@@ -141,6 +141,10 @@ paths:
           in: query
           schema:
             $ref: '#/components/schemas/Address'
+        - name: favoriteDay
+          in: query
+          schema:
+            $ref: '#/components/schemas/DayOfWeek'
       requestBody:
         content:
           application/json:
@@ -277,6 +281,10 @@ components:
             description: To be removed
             x-deprecated: 5.6
             type: string
+          bestDay:
+            allOf:
+            - $ref: '#/components/schemas/DayOfWeek'
+            description: enum buried in all-of
 
     Pets:
       type: array
@@ -628,3 +636,11 @@ components:
       - $ref: '#/components/schemas/Pet'
       - $ref: '#/components/schemas/MissingItemsModel'
       type: object
+    DayOfWeek:
+      enum:
+        - FRIDAY
+        - friday
+        - SATURDAY
+        - saturday
+        - SUNDAY
+        - sunday

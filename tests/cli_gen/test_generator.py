@@ -192,7 +192,9 @@ def test_op_param_formation():
         params["addr.city"] = addr_city
     if addr_state is not None:
         params["addr.state"] = addr_state
-    params["addr.zipCode"] = addr_zip_code\
+    params["addr.zipCode"] = addr_zip_code
+    if favorite_day is not None:
+        params["favoriteDay"] = favorite_day\
 """
     text = uut.op_param_formation(properties)
     assert expected == text
@@ -442,6 +444,8 @@ def test_op_body_formation():
     assert 'if gone is not None:' in text
     assert '_l.logger().warning("--gone was deprecated in 5.6 and should not be used")' in text
     assert 'body["gone"] = gone' in text
+    assert 'if best_day is not None' in text
+    assert 'body["bestDay"] = best_day' in text
 
 
 def test_op_path_arguments():
@@ -541,6 +545,11 @@ def test_op_query_arguments():
         'addr_zip_code: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
         in text
     )
+    assert (
+        'favorite_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
+        'case_sensitive=True, help="")] = None'
+        in text
+    )
 
     # make sure path params not included
     assert 'num_feet: Annotated' not in text
@@ -602,6 +611,18 @@ class IntStrings(str, Enum):  # noqa: F811
     VALUE_10 = "10"
     VALUE_10_1 = "10.1"
 """
+CASE_SENSE_ENUM = """\
+class Sna(str, Enum):  # noqa: F811
+    FOO0 = "foo"
+    FOO1 = "FOO"
+
+"""
+SPECIAL_ENUM = """\
+class Special(str, Enum):  # noqa: F811
+    _TIME0 = "-time"
+    _TIME1 = "+time"
+
+"""
 
 SIMPLE_PARAM = {
     TYPE: "string",
@@ -614,11 +635,14 @@ NUMBER_PARAM = {TYPE: "integer", ENUM: [12, 37, 11], "name": "simple-number"}
 MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], "name": "mixed-values"}
 INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], "name": "int-strings"}
 
+
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
     [
         pytest.param("Simple", "str", ["aOrB", "b_or_C", "-minus"], SIMPLE_ENUM, id="str"),
         pytest.param("anyThing_goes", "int", [1, None, True], NON_STR_ENUM, id="non-str"),
+        pytest.param("Sna", "str", ["foo", "FOO"], CASE_SENSE_ENUM, id="case-sense"),
+        pytest.param("Special", "str", ["-time", "+time"], SPECIAL_ENUM, id="special"),
     ]
 )
 def test_enum_declaration(name, enum_type, values, expected):
@@ -988,7 +1012,7 @@ def test_param_to_property(parameter, expected):
                     'nullable': True,
                     'x-field': 'color',
                     'x-reference': 'Color',
-                    '$ref': '#/components/schemas/Color'
+                    '$ref': '#/components/schemas/Color',
                 },
             },
             id="list-all-of"
@@ -1130,6 +1154,11 @@ def test_op_body_arguments():
     assert (
         'gone: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, '
         'help="To be removed")] = None'
+        in text
+    )
+    assert (
+        'best_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
+        'case_sensitive=True, help="enum buried in all-of")] = None'
         in text
     )
 
