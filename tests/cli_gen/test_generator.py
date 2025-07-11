@@ -192,7 +192,9 @@ def test_op_param_formation():
         params["addr.city"] = addr_city
     if addr_state is not None:
         params["addr.state"] = addr_state
-    params["addr.zipCode"] = addr_zip_code\
+    params["addr.zipCode"] = addr_zip_code
+    if favorite_day is not None:
+        params["favoriteDay"] = favorite_day\
 """
     text = uut.op_param_formation(properties)
     assert expected == text
@@ -442,6 +444,8 @@ def test_op_body_formation():
     assert 'if gone is not None:' in text
     assert '_l.logger().warning("--gone was deprecated in 5.6 and should not be used")' in text
     assert 'body["gone"] = gone' in text
+    assert 'if best_day is not None' in text
+    assert 'body["bestDay"] = best_day' in text
 
 
 def test_op_path_arguments():
@@ -539,6 +543,11 @@ def test_op_query_arguments():
     )
     assert (
         'addr_zip_code: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
+        in text
+    )
+    assert (
+        'favorite_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
+        'case_sensitive=True, help="")] = None'
         in text
     )
 
@@ -1145,6 +1154,11 @@ def test_op_body_arguments():
     assert (
         'gone: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, '
         'help="To be removed")] = None'
+        in text
+    )
+    assert (
+        'best_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
+        'case_sensitive=True, help="enum buried in all-of")] = None'
         in text
     )
 
