@@ -447,6 +447,21 @@ def test_op_body_formation():
     assert 'if best_day is not None' in text
     assert 'body["bestDay"] = best_day' in text
 
+    # this is for the sub-object -- just check the infra and a couple properties
+    assert 'owner = {}' in text
+    assert 'home = {}' in text
+    assert 'if owner_home_street is not None' in text
+    assert 'home["street"] = owner_home_street' in text
+    assert 'if owner_home_zip_code is not None' in text
+    assert 'home["zipCode"] = owner_home_zip_code' in text
+    assert 'if home:' in text
+    assert 'owner["home"] = home' in text
+    assert 'if owner:' in text
+    assert 'body["owner"] = owner' in text
+
+    # make sure sub-object is populated before checking if it is populated
+    assert text.find('if home:') < text.find('if owner:')
+
 
 def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
@@ -798,14 +813,14 @@ def test_param_to_property(parameter, expected):
                     'type': 'string',
                     'required': False,
                     'x-reference': 'Address',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                     'x-field': 'street',
                 },
                 'home.city': {
                     'type': 'string',
                     'required': False,
                     'x-reference': 'Address',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                     'x-field': 'city',
                 },
                 'home.state': {
@@ -813,14 +828,14 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'x-reference': 'Address',
                     'x-field': 'state',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                 },
                 'home.zipCode': {
                     'type': 'string',
                     'required': False,
                     'x-reference': 'Address',
                     'x-field': 'zipCode',
-                    'x-parent': 'home',
+                    'x-parents': ['home'],
                 },
                 'iceCream': {
                     'type': 'string',
@@ -847,7 +862,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'next',
-                    'x-parent': 'pagination',
+                    'x-parents': ['pagination'],
                     'x-reference': 'PaginationInfo',
                 },
                 'observationStations': {
@@ -912,14 +927,14 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'city',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.home.state': {
                     'required': False,
                     'type': 'string',
                     'x-field': 'state',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.home.street': {
@@ -927,14 +942,14 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'street',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.home.zipCode': {
                     'required': False,
                     'type': 'string',
                     'x-field': 'zipCode',
-                    'x-parent': 'home',
+                    'x-parents': ['owner', 'home'],
                     'x-reference': 'Address',
                 },
                 'owner.iceCream': {
@@ -942,7 +957,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'iceCream',
-                    'x-parent': 'owner',
+                    'x-parents': ['owner'],
                     'x-reference': 'Owner',
                 },
                 'owner.name': {
@@ -950,7 +965,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'name',
-                    'x-parent': 'owner',
+                    'x-parents': ['owner'],
                     'x-reference': 'Person',
                 },
                 'pagination.next': {
@@ -959,7 +974,7 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-field': 'next',
-                    'x-parent': 'pagination',
+                    'x-parents': ['pagination'],
                     'x-reference': 'PaginationInfo',
                 },
                 'type': {

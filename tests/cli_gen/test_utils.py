@@ -2,6 +2,8 @@ import pytest
 
 from openapi_spec_tools.cli_gen.utils import is_case_sensitive
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
+from openapi_spec_tools.cli_gen.utils import prepend
+from openapi_spec_tools.cli_gen.utils import set_missing
 from openapi_spec_tools.cli_gen.utils import shallow
 from openapi_spec_tools.cli_gen.utils import to_camel_case
 from openapi_spec_tools.cli_gen.utils import to_snake_case
@@ -53,6 +55,30 @@ def test_camel_case(text, expected):
 )
 def test_maybe_quoted(item, expected):
     assert expected == maybe_quoted(item)
+
+
+@pytest.mark.parametrize(
+    ["obj", "name", "value", "expected"],
+    [
+        pytest.param({"a": "b"}, "c", "d", {"a": "b", "c": ["d"]}, id="added"),
+        pytest.param({"a": "b", "c": ["d"]}, "c", "e", {"a": "b", "c": ["e", "d"]}, id="inserted"),
+        pytest.param({"a": "b", "c": None}, "c", "e", {"a": "b", "c": ["e"]}, id="none"),
+    ]
+)
+def test_prepend(obj, name, value, expected):
+    prepend(obj, name, value)
+    assert expected == obj
+
+@pytest.mark.parametrize(
+    ["obj", "name", "value", "expected"],
+    [
+        pytest.param({"a": "b"}, "c", True, {"a": "b", "c": True}, id="missing"),
+        pytest.param({"a": "b"}, "a", 1, {"a": "b"}, id="exists"),
+    ],
+)
+def test_set_missing(obj, name, value, expected):
+    set_missing(obj, name, value)
+    assert expected == obj
 
 
 @pytest.mark.parametrize(

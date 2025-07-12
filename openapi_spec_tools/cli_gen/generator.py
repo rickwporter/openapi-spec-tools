@@ -12,6 +12,7 @@ from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.cli_gen.utils import is_case_sensitive
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
+from openapi_spec_tools.cli_gen.utils import prepend
 from openapi_spec_tools.cli_gen.utils import quoted
 from openapi_spec_tools.cli_gen.utils import set_missing
 from openapi_spec_tools.cli_gen.utils import shallow
@@ -406,7 +407,7 @@ if __name__ == "__main__":
                 if reference:
                     set_missing(sub_data, OasField.X_REF.value, self.short_reference_name(reference))
                 set_missing(sub_data, OasField.X_FIELD.value, sub_name)
-                set_missing(sub_data, OasField.X_PARENT.value, prop_name)
+                prepend(sub_data, OasField.X_PARENTS.value, prop_name)
                 properties[full_name] = sub_data
 
         return properties
@@ -817,7 +818,20 @@ if __name__ == "__main__":
         if not body_params:
             return ""
 
+        # initialize all "parent" objects
         lines = ["body = {}"]
+        found = set()
+        lineage = []
+        for prop_name, prop_data in body_params.items():
+            parents = prop_data.get(OasField.X_PARENTS, [])
+            if parents and parents not in lineage:
+                lineage.append(parents)
+
+            for parent in parents:
+                if parent not in found:
+                    lines.append(f"{self.variable_name(parent)} = {{}}")
+                    found.add(parent)
+
         for prop_name, prop_data in body_params.items():
             var_name = self.variable_name(prop_name)
             option = self.option_name(prop_name)
@@ -828,13 +842,50 @@ if __name__ == "__main__":
                 dep_msg = f"{option} was deprecated in {x_deprecated} and should not be used"
             elif deprecated:
                 dep_msg = f"{option} is deprecated and should not be used"
+
+            obj_name = "body"
+            field = prop_name
+            parents = prop_data.get(OasField.X_PARENTS)
+            if parents:
+                obj_name = self.variable_name(parents[-1])
+            x_field = prop_data.get(OasField.X_FIELD)
+            if x_field:
+                field = x_field
             if prop_data.get(OasField.REQUIRED):
-                lines.append(f'body["{prop_name}"] = {var_name}')
+                lines.append(f'{obj_name}["{field}"] = {var_name}')
             else:
                 lines.append(f'if {var_name} is not None:')
                 if dep_msg:
                     lines.append(f'    _l.logger().warning("{dep_msg}")')
-                lines.append(f'    body["{prop_name}"] = {var_name}')
+                lines.append(f'    {obj_name}["{field}"] = {var_name}')
+
+        if lineage:
+            lines.append('# stitch together the sub-objects')
+            depends = {}  # name to set of items
+            for parents in lineage:
+                prev = "body"
+                for curr in parents:
+                    items = depends.get(prev, [])
+                    if curr not in items:
+                        items.append(curr)
+                    depends[prev] = items
+                    prev = curr
+
+            while depends:
+                # this walks the tree backwards, so sub-objects get populated before
+                # being checked if there's data in them
+                removal = set()
+                for parent, dependents in depends.items():
+                    # look for a parent whose's dependents don't have any dependents
+                    if all(d not in depends for d in dependents):
+                        for child in dependents:
+                            lines.append(f'if {self.variable_name(child)}:')
+                            lines.append(f'    {self.variable_name(parent)}["{child}"] = {self.variable_name(child)}')
+                        removal.add(parent)
+
+                # remove items that were processed
+                for r in removal:
+                    depends.pop(r)
 
         return SEP1 + SEP1.join(lines)
 
