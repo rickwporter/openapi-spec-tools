@@ -3,6 +3,7 @@ import pytest
 from openapi_spec_tools.cli_gen.utils import is_case_sensitive
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
 from openapi_spec_tools.cli_gen.utils import prepend
+from openapi_spec_tools.cli_gen.utils import replace_special
 from openapi_spec_tools.cli_gen.utils import set_missing
 from openapi_spec_tools.cli_gen.utils import shallow
 from openapi_spec_tools.cli_gen.utils import to_camel_case
@@ -68,6 +69,21 @@ def test_maybe_quoted(item, expected):
 def test_prepend(obj, name, value, expected):
     prepend(obj, name, value)
     assert expected == obj
+
+
+@pytest.mark.parametrize(
+    ["orig", "replacement", "expected"],
+    [
+        pytest.param("", "_", "", id="empty"),
+        pytest.param("a+b", "_", "a_b", id="underscore"),
+        pytest.param("a+b", "*", "a*b", id="star"),
+        pytest.param("a*b", None, "ab", id="none"),
+    ]
+)
+def test_replace_special(orig, replacement, expected):
+    actual = replace_special(orig, replacement)
+    assert expected == actual
+
 
 @pytest.mark.parametrize(
     ["obj", "name", "value", "expected"],
