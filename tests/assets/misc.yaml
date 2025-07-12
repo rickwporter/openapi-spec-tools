@@ -285,6 +285,8 @@ components:
             allOf:
             - $ref: '#/components/schemas/DayOfWeek'
             description: enum buried in all-of
+          owner:
+            $ref: '#/components/schemas/Owner'
 
     Pets:
       type: array

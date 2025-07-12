@@ -818,7 +818,20 @@ if __name__ == "__main__":
         if not body_params:
             return ""
 
+        # initialize all "parent" objects
         lines = ["body = {}"]
+        found = set()
+        lineage = []
+        for prop_name, prop_data in body_params.items():
+            parents = prop_data.get(OasField.X_PARENTS, [])
+            if parents and parents not in lineage:
+                lineage.append(parents)
+
+            for parent in parents:
+                if parent not in found:
+                    lines.append(f"{self.variable_name(parent)} = {{}}")
+                    found.add(parent)
+
         for prop_name, prop_data in body_params.items():
             var_name = self.variable_name(prop_name)
             option = self.option_name(prop_name)
@@ -829,13 +842,37 @@ if __name__ == "__main__":
                 dep_msg = f"{option} was deprecated in {x_deprecated} and should not be used"
             elif deprecated:
                 dep_msg = f"{option} is deprecated and should not be used"
+
+            obj_name = "body"
+            field = prop_name
+            parents = prop_data.get(OasField.X_PARENTS)
+            if parents:
+                obj_name = self.variable_name(parents[-1])
+            x_field = prop_data.get(OasField.X_FIELD)
+            if x_field:
+                field = x_field
             if prop_data.get(OasField.REQUIRED):
-                lines.append(f'body["{prop_name}"] = {var_name}')
+                lines.append(f'{obj_name}["{field}"] = {var_name}')
             else:
                 lines.append(f'if {var_name} is not None:')
                 if dep_msg:
                     lines.append(f'    _l.logger().warning("{dep_msg}")')
-                lines.append(f'    body["{prop_name}"] = {var_name}')
+                lines.append(f'    {obj_name}["{field}"] = {var_name}')
+
+        if lineage:
+            lines.append('# stitch together the sub-objects')
+            combos = set()
+            for parents in lineage:
+                prev = "body"
+                for curr in parents:
+                    combo = f"{prev}/{curr}"
+                    if combo in combos:
+                        prev = curr
+                        continue
+                    combos.add(combo)
+                    lines.append(f'if {self.variable_name(curr)}:')
+                    lines.append(f'    {self.variable_name(prev)}["{curr}"] = {self.variable_name(curr)}')
+                    prev = curr
 
         return SEP1 + SEP1.join(lines)
 

@@ -447,6 +447,18 @@ def test_op_body_formation():
     assert 'if best_day is not None' in text
     assert 'body["bestDay"] = best_day' in text
 
+    # this is for the sub-object -- just check the infra and a couple properties
+    assert 'owner = {}' in text
+    assert 'home = {}' in text
+    assert 'if owner_home_street is not None' in text
+    assert 'home["street"] = owner_home_street' in text
+    assert 'if owner_home_zip_code is not None' in text
+    assert 'home["zipCode"] = owner_home_zip_code' in text
+    assert 'if home:' in text
+    assert 'owner["home"] = home' in text
+    assert 'if owner:' in text
+    assert 'body["owner"] = owner' in text
+
 
 def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
