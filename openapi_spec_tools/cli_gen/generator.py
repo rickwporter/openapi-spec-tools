@@ -861,18 +861,31 @@ if __name__ == "__main__":
 
         if lineage:
             lines.append('# stitch together the sub-objects')
-            combos = set()
+            depends = {}  # name to set of items
             for parents in lineage:
                 prev = "body"
                 for curr in parents:
-                    combo = f"{prev}/{curr}"
-                    if combo in combos:
-                        prev = curr
-                        continue
-                    combos.add(combo)
-                    lines.append(f'if {self.variable_name(curr)}:')
-                    lines.append(f'    {self.variable_name(prev)}["{curr}"] = {self.variable_name(curr)}')
+                    items = depends.get(prev, [])
+                    if curr not in items:
+                        items.append(curr)
+                    depends[prev] = items
                     prev = curr
+
+            while depends:
+                # this walks the tree backwards, so sub-objects get populated before
+                # being checked if there's data in them
+                removal = set()
+                for parent, dependents in depends.items():
+                    # look for a parent whose's dependents don't have any dependents
+                    if all(d not in depends for d in dependents):
+                        for child in dependents:
+                            lines.append(f'if {self.variable_name(child)}:')
+                            lines.append(f'    {self.variable_name(parent)}["{child}"] = {self.variable_name(child)}')
+                        removal.add(parent)
+
+                # remove items that were processed
+                for r in removal:
+                    depends.pop(r)
 
         return SEP1 + SEP1.join(lines)
 

@@ -459,6 +459,9 @@ def test_op_body_formation():
     assert 'if owner:' in text
     assert 'body["owner"] = owner' in text
 
+    # make sure sub-object is populated before checking if it is populated
+    assert text.find('if home:') < text.find('if owner:')
+
 
 def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
