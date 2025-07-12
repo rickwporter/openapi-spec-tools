@@ -9,6 +9,14 @@ SIMPLE_TRANSLATIONS = str.maketrans(
         '"': r"\"",
     },
 )
+SPECIAL_CHARS = [
+    # mathematical
+    '/', '*', '+', '-', '^', '%', '&', '|', '~', '<', '>','=',
+    # operators/punctional
+    '.', '@', ' ', ':', ';', '#', ',', '!', '`', '?', '\'', '"',
+    # parenthesis/brackets
+    '(', ')', '{', '}', '[', ']',
+]
 
 
 def to_snake_case(text: str) -> str:
@@ -34,6 +42,14 @@ def maybe_quoted(item: Any) -> str:
 def quoted(s: str) -> str:
     """Double quote the provided string (and escape properly)."""
     return f'"{s.translate(SIMPLE_TRANSLATIONS)}"'
+
+
+def replace_special(value: str, replacement: str = '_') -> str:
+    """Replace the "special" characters with the replacement."""
+    _replacement = '' if replacement is None else replacement
+    for v in SPECIAL_CHARS:
+        value = value.replace(v, _replacement)
+    return value
 
 
 def simple_escape(text: str) -> str:

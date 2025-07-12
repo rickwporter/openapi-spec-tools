@@ -14,6 +14,7 @@ from openapi_spec_tools.cli_gen.utils import is_case_sensitive
 from openapi_spec_tools.cli_gen.utils import maybe_quoted
 from openapi_spec_tools.cli_gen.utils import prepend
 from openapi_spec_tools.cli_gen.utils import quoted
+from openapi_spec_tools.cli_gen.utils import replace_special
 from openapi_spec_tools.cli_gen.utils import set_missing
 from openapi_spec_tools.cli_gen.utils import shallow
 from openapi_spec_tools.cli_gen.utils import simple_escape
@@ -34,7 +35,6 @@ SHEBANG = """\
 COLLECTIONS = {
     "array": "list",
 }
-SPECIAL_CHARS = ['/', '*', '.', '-', '@', ' ', '%', '<', '>', ':', ';', '(', ')', '{', '}', '[', ']', '+']
 
 # This is an incomplete list of Python builtins that should avoided in variable names
 RESERVED = {
@@ -192,20 +192,14 @@ if __name__ == "__main__":
 
         return None
 
-    def _unspecial(self, value: str, replacement: str = '_') -> str:
-        """Replace the "special" characters with the replacement."""
-        for v in SPECIAL_CHARS:
-            value = value.replace(v, replacement)
-        return value
-
     def class_name(self, s: str) -> str:
         """Get the class name for provided string."""
-        value = to_camel_case(self._unspecial(s))
+        value = to_camel_case(replace_special(s))
         return value[0].upper() + value[1:]
 
     def function_name(self, s: str) -> str:
         """Get the function name for the provided string."""
-        vname = to_snake_case(self._unspecial(s))
+        vname = to_snake_case(replace_special(s))
         if vname in RESERVED:
             return f"{vname}{CONFLICT_SUFFIX}"
 
@@ -213,7 +207,7 @@ if __name__ == "__main__":
 
     def variable_name(self, s: str) -> str:
         """Get the variable name for the provided string."""
-        vname = to_snake_case(self._unspecial(s))
+        vname = to_snake_case(replace_special(s))
         if vname in RESERVED:
             return f"{vname}{CONFLICT_SUFFIX}"
 
@@ -221,7 +215,7 @@ if __name__ == "__main__":
 
     def option_name(self, s: str) -> str:
         """Get the typer option name for the provided string."""
-        value = to_snake_case(self._unspecial(s))
+        value = to_snake_case(replace_special(s))
         return "--" + value.replace("_", "-")
 
     def model_is_complex(self, model: dict[str, Any]) -> bool:
