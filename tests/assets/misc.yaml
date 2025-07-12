@@ -145,6 +145,10 @@ paths:
           in: query
           schema:
             $ref: '#/components/schemas/DayOfWeek'
+        - name: color
+          in: header
+          schema:
+            $ref: '#/components/schemas/Color'
       requestBody:
         content:
           application/json:

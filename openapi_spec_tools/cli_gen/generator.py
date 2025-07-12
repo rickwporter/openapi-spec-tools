@@ -1075,7 +1075,7 @@ if __name__ == "__main__":
             user_header_init = NL + SEP1 + SEP1.join(lines) + NL
 
         return f"""
-{self.enum_definitions(path_params, query_params, body_params)}
+{self.enum_definitions(path_params, query_params + header_params, body_params)}
 @app.command({', '.join(command_args)})
 def {func_name}({args_str}) -> None:
     {self.op_long_help(op)}# handler for {node.identifier}: {method} {path}
