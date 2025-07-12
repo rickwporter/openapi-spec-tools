@@ -76,6 +76,7 @@ def test_prepend(obj, name, value, expected):
     [
         pytest.param("", "_", "", id="empty"),
         pytest.param("a+b", "_", "a_b", id="underscore"),
+        pytest.param("a+b", "*", "a*b", id="star"),
         pytest.param("a*b", None, "ab", id="none"),
     ]
 )
