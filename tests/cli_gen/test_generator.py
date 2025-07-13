@@ -1434,9 +1434,16 @@ def test_function_header_params():
     uut = Generator("cli_package", oas)
     text = uut.function_definition(item)
 
+    # check that the header enums are defined -- no need to check all the fields of each enum
+    assert 'class Color(str, Enum):' in text
+
     # check function argument (aka CLI option)
     assert (
         'has_param: Annotated[Optional[int], typer.Option(show_default=False, help="Parameter in header")] = None'
+        in text
+    )
+    assert (
+        'color: Annotated[Optional[Color], typer.Option(show_default=False, case_sensitive=False, help="")] = None'
         in text
     )
 
