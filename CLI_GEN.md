@@ -98,3 +98,24 @@ There were a couple reasons that drove development in the direction of not using
 The runtime performance suffered when using OpenAPI generated apis/models. The models were loaded from each module which took a lot of time on each user command. As there got to be 500+ operations/models, the load time just to get help from the CLI took upwards of 4 seconds.
 
 Not all services do a good job of adhering to their OpenAPI specification. For example, some provide an integer in cases when the OAS says they will return a string. Failures to parse server responses due to non-conformant data caused a bad users experience (leading users to blame the CLI). The CLI is not the tool to test adherence to the OAS.
+
+### Modules
+
+The modules whose names start with an underscore (`_`) are modules that get "copied" to the projects using the CLI generation. These modules can refer to other modules with the leading underscore in the name, but should not refer to the modules without the leading underscore. 
+
+Here are some quick explanations of the modules:
+* `cli` - code for the `cli-gen` commands. This should remain rather thin -- most utility functions should live (and be tested) elsewhere such that other developers can use them
+* `constants` - only current use-case is the `cli-gen` log class name (avoids circular dependencies)
+* `files` - utilities to create/copy files
+* `generator` - contains the `Generator` class with bulk of logic for generating CLI
+* `layout_types` - enumeration and data class definitions for layout object
+* `layout` - functions for reading `layout.yaml` and parsing into tree of layout objects
+* `utils` - small utility functions which should be language agnotstic
+
+### Extension
+
+The `Generator` was done an an object-oriented fashion to allow for easier exentions by others if they decide to fork the repository. Some utility functions were left out of the object-oriented, but those should not be anything where an override is need.
+
+The OpenAPI spec objects are treated as dictionaries to allow for easier extension. This means your additional properties should be forwarded to the point where you can use those in CLI generation.
+
+There are a few `OasField` values that are added to when changing bodies and parameters into a flat list of properties that are used to create the CLI. For example, the `x-path` is added to avoid the need for maintainng the OpenAPI specification hierarchy when creating the CLI. The `*_settable_properties` functions flatten the body/parameter properties and sub-objects into one list of properties -- this avoids all the need to walk the hierachy several times.
