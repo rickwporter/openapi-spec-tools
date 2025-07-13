@@ -134,7 +134,11 @@ def list_pets(
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key)
     url = _r.create_url(_api_host, "pets")
-    page_info = _r.PageParams(max_count=_max_count, page_size_name="limit", page_size_value=limit)
+    page_info = _r.PageParams(
+        max_count=_max_count,
+        page_size_name="limit",
+        page_size_value=limit,
+    )
     missing = []
     if _api_key is None:
         missing.append("--api-key")

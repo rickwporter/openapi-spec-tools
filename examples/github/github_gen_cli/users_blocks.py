@@ -52,7 +52,13 @@ def users_list_blocked_by_authenticated_user(
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key)
     url = _r.create_url(_api_host, "user/blocks")
-    page_info = _r.PageParams(max_count=_max_count, page_size_name="per-page", page_size_value=per_page, page_start_name="page", page_start_value=page)
+    page_info = _r.PageParams(
+        max_count=_max_count,
+        page_size_name="per-page",
+        page_size_value=per_page,
+        page_start_name="page",
+        page_start_value=page,
+    )
     missing = []
     if _api_key is None:
         missing.append("--api-key")
