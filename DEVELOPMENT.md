@@ -149,4 +149,6 @@ The project has been setup with CI pipelines to help verify that coding and test
 
 ## Releasing
 
-The release process is still a work in progress, and this section will be updated later.
+So far, the `openapi-spec-tools` version has been updated just prior to the release. When updating the version in `pyproject.toml`, the example projects need update, too! It is also a good time to udpate the project dependencies. After update the project version, run `make poetry-update` to update the main and example projects.
+
+Creating a new release is done using the Releases page from GitHub. The best way to generate release notes is using the button to do so. Upon creating a new release, it is automatically published to PyPi for consumption by others.
