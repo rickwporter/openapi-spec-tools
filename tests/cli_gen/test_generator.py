@@ -23,6 +23,9 @@ ANY_OF = "anyOf"
 ONE_OF = "oneOf"
 ITEMS = "items"
 
+S1 = '\n    '
+S2 = f"{S1}    "
+
 def test_shebang():
     uut = Generator("cli_package", {})
     text = uut.shebang()
@@ -1188,35 +1191,38 @@ def test_op_body_arguments():
     ["names", "expected"],
     [
         pytest.param(None, "", id="None"),
-        pytest.param(PaginationNames(), "page_info = _r.PageParams(max_count=_max_count)", id="empty"),
+        pytest.param(PaginationNames(), f"page_info = _r.PageParams({S2}max_count=_max_count,{S1})", id="empty"),
         pytest.param(
             PaginationNames(page_size="fooBar"),
-            'page_info = _r.PageParams(max_count=_max_count, page_size_name="fooBar", page_size_value=foo_bar)',
+            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}page_size_name="fooBar",'
+            f'{S2}page_size_value=foo_bar,{S1})',
             id="page_size",
         ),
         pytest.param(
             PaginationNames(page_start="snaFoo"),
-            'page_info = _r.PageParams(max_count=_max_count, page_start_name="snaFoo", page_start_value=sna_foo)',
+            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}page_start_name="snaFoo",'
+            f'{S2}page_start_value=sna_foo,{S1})',
             id="page_start",
         ),
         pytest.param(
             PaginationNames(item_start="eastWest"),
-            'page_info = _r.PageParams(max_count=_max_count, item_start_name="eastWest", item_start_value=east_west)',
+            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}item_start_name="eastWest",'
+            f'{S2}item_start_value=east_west,{S1})',
             id="item_start",
         ),
         pytest.param(
             PaginationNames(items_property="northSouth"),
-            'page_info = _r.PageParams(max_count=_max_count, item_property_name="northSouth")',
+            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}item_property_name="northSouth",{S1})',
             id="items_property",
         ),
         pytest.param(
             PaginationNames(next_header="upDown"),
-            'page_info = _r.PageParams(max_count=_max_count, next_header_name="upDown")',
+            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}next_header_name="upDown",{S1})',
             id="next_header",
         ),
         pytest.param(
             PaginationNames(next_property="leftRight"),
-            'page_info = _r.PageParams(max_count=_max_count, next_property_name="leftRight")',
+            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}next_property_name="leftRight",{S1})',
             id="next_property",
         ),
     ]
@@ -1390,7 +1396,10 @@ def test_function_definition_paged():
     assert '_max_count: _a.MaxCountOption' in text
 
     # double check a few important body differences
-    assert 'page_info = _r.PageParams(max_count=_max_count, page_size_name="limit", page_size_value=limit)' in text
+    assert (
+        f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}page_size_name="limit",{S2}page_size_value=limit,{S1})'
+        in text
+    )
     assert 'data = _r.depaginate(page_info, url, headers=headers, params=params, timemout=_api_timeout)' in text
 
 

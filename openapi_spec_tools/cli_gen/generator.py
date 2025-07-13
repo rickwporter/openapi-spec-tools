@@ -937,8 +937,8 @@ if __name__ == "__main__":
         if names.next_property:
             args["next_property_name"] = quoted(names.next_property)
 
-        arg_text = ', '.join([f"{k}={v}" for k, v in args.items()])
-        return f"{SEP1}page_info = _r.PageParams({arg_text})"
+        arg_text = ','.join([f"{SEP2}{k}={v}" for k, v in args.items()])
+        return f"{SEP1}page_info = _r.PageParams({arg_text},{SEP1})"
 
     def clean_enum_name(self, value: str) -> bool:
         """Check to see if value can be directly used as a variable name."""
