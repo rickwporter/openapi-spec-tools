@@ -126,7 +126,15 @@ def environments_list(
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key)
     url = _r.create_url(_api_host, "api/v1/environments/")
-    page_info = _r.PageParams(max_count=_max_count, page_size_name="page_size", page_size_value=page_size, page_start_name="page", page_start_value=page, item_property_name="result", next_property_name="next")
+    page_info = _r.PageParams(
+        max_count=_max_count,
+        page_size_name="page_size",
+        page_size_value=page_size,
+        page_start_name="page",
+        page_start_value=page,
+        item_property_name="result",
+        next_property_name="next",
+    )
     missing = []
     if _api_key is None:
         missing.append("--api-key")
@@ -177,7 +185,15 @@ def environments_pushes_list(
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key)
     url = _r.create_url(_api_host, "api/v1/environments", environment_pk, "pushes/")
-    page_info = _r.PageParams(max_count=_max_count, page_size_name="page_size", page_size_value=page_size, page_start_name="page", page_start_value=page, item_property_name="result", next_property_name="next")
+    page_info = _r.PageParams(
+        max_count=_max_count,
+        page_size_name="page_size",
+        page_size_value=page_size,
+        page_start_name="page",
+        page_start_value=page,
+        item_property_name="result",
+        next_property_name="next",
+    )
     missing = []
     if _api_key is None:
         missing.append("--api-key")

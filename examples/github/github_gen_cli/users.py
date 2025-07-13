@@ -70,7 +70,11 @@ def users_list_attestations(
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key)
     url = _r.create_url(_api_host, "users", username, "attestations", subject_digest)
-    page_info = _r.PageParams(max_count=_max_count, page_size_name="per-page", page_size_value=per_page)
+    page_info = _r.PageParams(
+        max_count=_max_count,
+        page_size_name="per-page",
+        page_size_value=per_page,
+    )
     missing = []
     if _api_key is None:
         missing.append("--api-key")
@@ -154,7 +158,11 @@ def users_list(
     _l.init_logging(_log_level)
     headers = _r.request_headers(_api_key)
     url = _r.create_url(_api_host, "users")
-    page_info = _r.PageParams(max_count=_max_count, page_size_name="per-page", page_size_value=per_page)
+    page_info = _r.PageParams(
+        max_count=_max_count,
+        page_size_name="per-page",
+        page_size_value=per_page,
+    )
     missing = []
     if _api_key is None:
         missing.append("--api-key")
