@@ -4,6 +4,10 @@ version = "0.4.0"
 description = "OpenAPI specification tools for analyzing, updating, and generating a CLI."
 authors = ["Rick Porter <rickwporter@gmail.com>"]
 readme = "README.md"
+# NOTE: including all cli_gen tests... some are copied when generating code with tests
+include = [
+    { path = "tests/cli_gen", format = ["sdist", "wheel"] },
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
