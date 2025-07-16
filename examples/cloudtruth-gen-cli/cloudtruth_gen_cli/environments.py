@@ -24,6 +24,7 @@ from cloudtruth_gen_cli.environments_tags import app as environments_tags
 app = typer.Typer(no_args_is_help=True, help="Manage CloudTruth environments")
 app.add_typer(environments_tags, name="tags")
 
+
 @app.command("commands", short_help="Display commands tree for sub-commands")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,

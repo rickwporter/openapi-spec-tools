@@ -23,6 +23,7 @@ from pets_cli import _tree as _t
 
 app = typer.Typer(no_args_is_help=True, help="Manage pets")
 
+
 @app.command("commands", short_help="Display commands tree for sub-commands")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,

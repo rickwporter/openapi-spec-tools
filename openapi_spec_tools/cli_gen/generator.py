@@ -129,6 +129,7 @@ app = typer.Typer(no_args_is_help=True, help="{simple_escape(node.description)}"
             result += f"""\
 app.add_typer({to_snake_case(child.identifier)}, name="{child.command}")
 """
+        result += "\n"
 
         return result
 
@@ -1071,7 +1072,7 @@ if __name__ == "__main__":
                 name = p.get(OasField.NAME)
                 var_name = self.variable_name(name)
                 lines.append(f"if {var_name} is not None:")
-                lines.append(f"   user_headers[{quoted(name)}] = {var_name}")
+                lines.append(f"    user_headers[{quoted(name)}] = {var_name}")
             user_header_init = NL + SEP1 + SEP1.join(lines) + NL
 
         return f"""

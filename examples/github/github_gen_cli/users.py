@@ -24,6 +24,7 @@ from github_gen_cli.users_blocks import app as users_blocks
 app = typer.Typer(no_args_is_help=True, help="Manage GitHub users")
 app.add_typer(users_blocks, name="blocks")
 
+
 @app.command("commands", short_help="Display commands tree for sub-commands")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
