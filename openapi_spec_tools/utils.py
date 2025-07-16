@@ -194,7 +194,7 @@ def short_ref(full_name: str) -> str:
 def find_references(obj: dict[str, Any]) -> set[str]:
     """Walk the 'obj' dictionary to find all the reference values (e.g. "$ref")."""
     refs = find_dict_prop(obj, OasField.REFS)
-    return set([short_ref(_) for _ in refs])
+    return {short_ref(_) for _ in refs}
 
 
 
@@ -454,7 +454,7 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
             if _is_nullable(prop_data) and prop_name in required:
                 required.remove(prop_name)
         if required:
-            schema_value[OasField.REQUIRED.value] = sorted(list(required))
+            schema_value[OasField.REQUIRED.value] = sorted(required)
 
     return result
 
@@ -493,7 +493,7 @@ def schema_operations_filter(
 
     # reconstruct the paths
     paths = {}
-    for op_name, op_data in op_map.items():
+    for op_data in op_map.values():
         path = op_data.pop(OasField.X_PATH)
         params = op_data.pop(OasField.X_PATH_PARAMS, None)
         method = op_data.pop(OasField.X_METHOD)

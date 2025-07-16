@@ -262,7 +262,7 @@ def layout_operations(
 ) -> None:
     """Get a list of opertionId's used in the specified layout file."""
     def _operations(_node: LayoutNode) -> set[str]:
-        ops = set([op.identifier for op in _node.operations()])
+        ops = {op.identifier for op in _node.operations()}
         for sub in _node.subcommands():
             ops.update(_operations(sub))
         return ops
@@ -471,9 +471,9 @@ def trim_oas(
         ),
     ] = None,
     remove_properties: Annotated[
-        list[str],
+        Optional[list[str]],
         typer.Option("--remove", show_default=False, help="List of properties to remove."),
-    ] = [],
+    ] = None,
     start: StartPointOption = DEFAULT_START,
     nullable_not_required: Annotated[
         bool,
@@ -491,7 +491,7 @@ def trim_oas(
     The data is focused on the operations and paths required for use with the provide layout file.
     """
     def _operations(_node: LayoutNode) -> set[str]:
-        ops = set([op.identifier for op in _node.operations()])
+        ops = {op.identifier for op in _node.operations()}
         for sub in _node.subcommands():
             ops.update(_operations(sub))
         return ops
@@ -502,8 +502,9 @@ def trim_oas(
     updated = deepcopy(oas)
 
     operations = _operations(layout)
-    for prop_name in remove_properties:
-        updated = remove_property(updated, prop_name)
+    if remove_properties:
+        for prop_name in remove_properties:
+            updated = remove_property(updated, prop_name)
 
     updated = schema_operations_filter(updated, allow=operations)
     if remove_all_tags:

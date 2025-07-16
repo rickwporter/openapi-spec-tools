@@ -157,13 +157,15 @@ def _pretty_params(params: Optional[dict[str, Any]]) -> str:
 def request(
     method: str,
     url: str,
-    headers: dict[str, Any] = {},
-    params: dict[str, Any] = {},
+    headers: Optional[dict[str, Any]] = None,
+    params: Optional[dict[str, Any]] = None,
     body: Optional[dict[str, Any]] = None,
     timeout: Optional[int] = None,
     **kwargs, # allows passing through additional named parameters
 ) -> Any:
     """Perform the specified REST request."""
+    headers = headers or {}
+    params = params or {}
     pretty_url = url + _pretty_params(params)
     logger.debug(f"Requesting {method} {pretty_url}")
     start = datetime.now()

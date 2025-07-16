@@ -188,7 +188,7 @@ def subcommand_references(data: dict[str, Any], start: str = DEFAULT_START) -> t
         referenced.update(refs)
 
     names = set(data.keys())
-    unused = names - referenced - set([start])
+    unused = names - referenced - {start}
     missing = referenced - names
 
     return unused, missing

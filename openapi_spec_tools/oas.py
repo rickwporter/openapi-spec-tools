@@ -209,9 +209,9 @@ def update(
         typer.Option("--allow-op", show_default=False, help="List of operations to keep"),
     ] = None,
     remove_properties: Annotated[
-        list[str],
+        Optional[list[str]],
         typer.Option("--remove", show_default=False, help="List of properties to remove."),
-    ] = [],
+    ] = None,
     display_option: Annotated[
         DisplayOption,
         typer.Option("--display", help="Shown on console at conclusion", case_sensitive=False),
@@ -230,8 +230,9 @@ def update(
     if remove_all_tags:
         updated = remove_schema_tags(updated)
 
-    for prop_name in remove_properties:
-        updated = remove_property(updated, prop_name)
+    if remove_properties:
+        for prop_name in remove_properties:
+            updated = remove_property(updated, prop_name)
 
     if nullable_not_required:
         updated = set_nullable_not_required(updated)
@@ -502,7 +503,7 @@ def models_show(
     if not include_referenced:
         models = {full_name: model}
     else:
-        models = model_filter(models, set([full_name]))
+        models = model_filter(models, {full_name})
     models = remove_dict_prefix(models)
 
     console = console_factory()
@@ -692,7 +693,7 @@ def content_type_list(
 
     for name, operations in content.items():
         console.print(name)
-        for op_id in sorted(list(operations))[:max_size]:
+        for op_id in sorted(operations)[:max_size]:
             console.print(f"    {op_id}")
         if len(operations) > max_size:
             console.print("    ...")
