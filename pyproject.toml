@@ -37,6 +37,9 @@ select = [
     "F",  # pyflakes
     "I",  # isort
     "W",  # pycodestyle warnings
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "N",  # PEP8 naming conventions
 ]
 fixable = [
     "D", "I",
