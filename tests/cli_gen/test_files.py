@@ -275,7 +275,7 @@ def test_copy_infrastructure():
 
     copy_infrastructure(dst_path.as_posix(), package)
 
-    filenames = set(i.name for i in dst_path.iterdir())
+    filenames = {i.name for i in dst_path.iterdir()}
     expected = {
         "_arguments.py",
         "_console.py",
@@ -294,7 +294,7 @@ def test_copy_tests():
 
     copy_tests(dst_path.as_posix(), package, "foo")
 
-    filenames = set(i.name for i in dst_path.iterdir())
+    filenames = {i.name for i in dst_path.iterdir()}
     expected = {
         "helpers.py",
         "test_console.py",

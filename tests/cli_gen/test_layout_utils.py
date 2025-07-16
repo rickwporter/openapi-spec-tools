@@ -119,19 +119,19 @@ def test_shadow_operations(data, expected) -> None:
         pytest.param(
             {"main": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}},
             set(),
-            set(["sub1"]),
+            {"sub1"},
             id="missing",
         ),
         pytest.param(
             {"main": {OPS: [{SUB_ID: "sub1"}]}, "sub1": {}, "sub2": {} },
-            set(["sub2"]),
+            {"sub2"},
             set(),
             id="unused",
         ),
         pytest.param(
             {"main": {OPS: [{SUB_ID: "sub1"}, {SUB_ID: "sub2"}]}, "sub2": {}, "sub3": {}},
-            set(["sub3"]),
-            set(["sub1"]),
+            {"sub3"},
+            {"sub1"},
             id="both",
         ),
         pytest.param(
@@ -144,8 +144,8 @@ def test_shadow_operations(data, expected) -> None:
                 "sub4": {},
                 "sub6": {},
             },
-            set(["sub3", "sub6"]),
-            set(["sub1", "sub5"]),
+            {"sub3", "sub6"},
+            {"sub1", "sub5"},
             id="multiples",
         ),
     ]
@@ -515,11 +515,11 @@ def test_file_to_tree() -> None:
     filename = asset_filename("layout_pets2.yaml")
     tree = file_to_tree(filename)
     assert "main" == tree.command
-    assert set({"owners", "pet", "vets"}) == set(p.command for p in tree.subcommands())
+    assert set({"owners", "pet", "vets"}) == {p.command for p in tree.subcommands()}
 
     tree = file_to_tree(filename, "owners")
     assert "owners" == tree.command
-    assert set() == set(p.command for p in tree.subcommands())
+    assert set() == {p.command for p in tree.subcommands()}
 
 
 @pytest.mark.parametrize(
