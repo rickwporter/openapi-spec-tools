@@ -428,7 +428,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     assert 'app = typer.Typer(no_args_is_help=True, help="Manage pets")' in text
     assert 'if __main__ == "__main__":'
 
-    filenames = set(i.name for i in path.iterdir())
+    filenames = {i.name for i in path.iterdir()}
     expected = {
         "__init__.py",
         "_arguments.py",
@@ -447,7 +447,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     if not include_tests:
         assert not path.exists()
     else:
-        filenames = set(i.name for i in path.iterdir())
+        filenames = {i.name for i in path.iterdir()}
         expected = {
             "helpers.py",
             "test_console.py",

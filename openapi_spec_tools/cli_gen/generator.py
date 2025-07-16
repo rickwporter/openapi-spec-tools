@@ -816,7 +816,7 @@ if __name__ == "__main__":
         lines = ["body = {}"]
         found = set()
         lineage = []
-        for prop_name, prop_data in body_params.items():
+        for prop_data in body_params.values():
             parents = prop_data.get(OasField.X_PARENTS, [])
             if parents and parents not in lineage:
                 lineage.append(parents)
@@ -959,8 +959,8 @@ if __name__ == "__main__":
             prefix = "VALUE_"
 
         names = [self.variable_name(str(v)).upper() for v in values]
-        duplicates = set(x for x in names if names.count(x) > 1)
-        dup_counts = {x: 0 for x in duplicates}
+        duplicates = {x for x in names if names.count(x) > 1}
+        dup_counts = dict.fromkeys(duplicates, 0)
         declarations = []
         for v in values:
             base_name = self.variable_name(str(v)).upper()

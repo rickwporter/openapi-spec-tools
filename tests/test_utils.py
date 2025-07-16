@@ -161,7 +161,7 @@ def test_find_diffs_list_dicts_item() -> None:
         pytest.param({"my-list": []}, 0, id="empty-list"),
         pytest.param({"my-list": ["a", 1, True, 2.5]}, 4, id="list-simple"),
         pytest.param({"my-list": [{"a": 1, "b": 2}, {"c": 2}]}, 3, id="list-dict"),
-        pytest.param({"my-list": set([1, 2, 3, 4, 5])}, 5, id="set-simple"),
+        pytest.param({"my-list": {1, 2, 3, 4, 5}}, 5, id="set-simple"),
     ],
 )
 def test_count_values_success(obj, count) -> None:
@@ -183,7 +183,7 @@ def test_model_references() -> None:
     oas = open_test_oas("pet2.yaml")
     models = map_models(oas.get(OasField.COMPONENTS, {}))
     expected = {
-        "schemas/Pets": set(["schemas/Pet"]),
+        "schemas/Pets": {"schemas/Pet"},
         "schemas/Pet": set(),
         "schemas/Error": set(),
     }
@@ -204,7 +204,7 @@ def test_model_filter(
 ) -> None:
     schema = open_test_oas(asset)
     models = map_models(schema.get(OasField.COMPONENTS, {}))
-    filtered = model_filter(models, set([model_name]))
+    filtered = model_filter(models, {model_name})
     assert set(keys) == set(filtered)
 
 
@@ -246,21 +246,21 @@ def test_map_models() -> None:
     oas = open_test_oas("misc.yaml")
     models = map_models(oas.get(OasField.COMPONENTS))
     keys = models.keys()
-    expected = set([
+    expected = {
         "parameters/PageSize",
         "schemas/Pets",
         "schemas/Address",
         "schemas/Owner",
         "schemas/Species",
-    ])
+    }
     assert expected.issubset(keys)
 
 
 def test_map_operations() -> None:
     oas = open_test_oas("pet2.yaml")
     ops = map_operations(oas.get(OasField.PATHS))
-    assert set(["listPets", "createPets", "showPetById", "deletePetById"]) == ops.keys()
-    baseline_keys = set([
+    assert {"listPets", "createPets", "showPetById", "deletePetById"} == ops.keys()
+    baseline_keys = {
         OasField.OP_ID,
         OasField.RESPONSES,
         OasField.SUMMARY,
@@ -268,9 +268,9 @@ def test_map_operations() -> None:
         OasField.X_PATH,
         OasField.X_PATH_PARAMS,
         OasField.X_METHOD,
-    ])
+    }
 
-    expected_keys = baseline_keys | set([OasField.PARAMS])
+    expected_keys = baseline_keys | {OasField.PARAMS}
     item = ops["listPets"]
     assert expected_keys == set(item.keys())
     assert item[OasField.OP_ID] == "listPets"
@@ -278,7 +278,7 @@ def test_map_operations() -> None:
     assert item[OasField.X_METHOD] == "get"
     assert item[OasField.X_PATH_PARAMS] is None
 
-    expected_keys = baseline_keys | set(["requestBody"])
+    expected_keys = baseline_keys | {"requestBody"}
     item = ops["createPets"]
     assert expected_keys == set(item.keys())
     assert item[OasField.OP_ID] == "createPets"
@@ -430,7 +430,7 @@ def test_set_nullable_not_required(filename: str, expected: dict[str, Any]) -> N
 
 def test_schema_operations_filter_remove() -> None:
     original = open_test_oas("pet2.yaml")
-    updated = schema_operations_filter(original, remove=set(["deletePetById"]))
+    updated = schema_operations_filter(original, remove={"deletePetById"})
 
     diff = find_diffs(original, updated)
     assert diff == {
@@ -440,9 +440,9 @@ def test_schema_operations_filter_remove() -> None:
 
     # make sure we throw an exception when operation is not found
     with pytest.raises(ValueError, match="schema is missing: deletePetById"):
-        schema_operations_filter(updated, remove=set(["deletePetById", "listPets"]))
+        schema_operations_filter(updated, remove={"deletePetById", "listPets"})
 
-    third = schema_operations_filter(updated, remove=set(["listPets"]))
+    third = schema_operations_filter(updated, remove={"listPets"})
     diff = find_diffs(updated, third)
     assert diff == {
         OasField.COMPONENTS.value: {OasField.SCHEMAS: {"Pets": "removed"}},
@@ -452,7 +452,7 @@ def test_schema_operations_filter_remove() -> None:
 
 def test_schema_operations_filter_allow() -> None:
     original = open_test_oas("pet2.yaml")
-    updated = schema_operations_filter(original, allow=set(["showPetById", "deletePetById"]))
+    updated = schema_operations_filter(original, allow={"showPetById", "deletePetById"})
 
     diff = find_diffs(original, updated)
     assert diff == {
@@ -464,9 +464,9 @@ def test_schema_operations_filter_allow() -> None:
 
     # make sure we throw an exception when operation is not found
     with pytest.raises(ValueError, match="schema is missing: createPets"):
-        schema_operations_filter(updated, allow=set(["createPets", "showPetById"]))
+        schema_operations_filter(updated, allow={"createPets", "showPetById"})
 
-    third = schema_operations_filter(updated, allow=set(["deletePetById"]))
+    third = schema_operations_filter(updated, allow={"deletePetById"})
     diff = find_diffs(updated, third)
     assert diff == {
         OasField.PATHS.value: {"/pets/{petId}": {"get": "removed"}},
