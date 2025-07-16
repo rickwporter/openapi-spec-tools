@@ -32,6 +32,7 @@ app.add_typer(grants, name="grants")
 app.add_typer(memberships, name="membership")
 app.add_typer(users, name="user")
 
+
 @app.command("commands", short_help="Display commands tree for sub-commands")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
