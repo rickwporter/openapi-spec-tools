@@ -24,11 +24,15 @@ from github_gen_cli import _tree as _t
 app = typer.Typer(no_args_is_help=True, help="Managed blocked users")
 
 
-@app.command("commands", short_help="Display commands tree for sub-commands")
+@app.command("commands", short_help="Display commands tree for blocks sub-commands")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
     depth: _a.MaxDepthOption = 5,
 ) -> None:
+    """Show blocks sub-commands.
+    
+    The '*' denotes a sub-command with other sub-commands, but no direct actions.
+    """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "users_blocks", display, depth)
     return
