@@ -13,7 +13,7 @@ LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 
 class LogLevel(str, Enum):
     CRITICAL = "critical"
-    ERROR  = "error"
+    ERROR = "error"
     WARN = "warn"
     INFO = "info"
     DEBUG = "debug"

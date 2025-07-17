@@ -10,6 +10,7 @@ from tests.helpers import to_ascii
 
 runner = CliRunner(charset="ascii")
 
+
 def test_main_help():
     app = typer.Typer()
     app.add_typer(program)
