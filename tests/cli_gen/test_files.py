@@ -296,6 +296,7 @@ def test_copy_tests():
 
     filenames = {i.name for i in dst_path.iterdir()}
     expected = {
+        "__init__.py",
         "helpers.py",
         "test_console.py",
         "test_display.py",

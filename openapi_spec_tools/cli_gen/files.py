@@ -26,6 +26,7 @@ INFRASTRUCTURE_FILES = {
 }
 
 TEST_FILES = {
+    "__init__.py": "__init__.py",
     "helpers.py": "helpers.py",
     "test_console.py": "test_console.py",
     "test_display.py": "test_display.py",
