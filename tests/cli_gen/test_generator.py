@@ -245,6 +245,7 @@ def test_schema_to_type(schema, fmt, expected):
         pytest.param("any", "Any", id="any"),
         pytest.param("input", "Input", id="input"),
         pytest.param("list", "List", id="list"),
+        pytest.param("@foo@&bar", "FooBar", id="pep-underscore"),
     ]
 )
 def test_class_name(proposed, expected):
