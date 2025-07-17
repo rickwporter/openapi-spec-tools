@@ -25,11 +25,15 @@ app = typer.Typer(no_args_is_help=True, help="Manage CloudTruth environments")
 app.add_typer(environments_tags, name="tags")
 
 
-@app.command("commands", short_help="Display commands tree for sub-commands")
+@app.command("commands", short_help="Display commands tree for environment sub-commands")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
     depth: _a.MaxDepthOption = 5,
 ) -> None:
+    """Show environment sub-commands.
+    
+    The '*' denotes a sub-command with other sub-commands, but no direct actions.
+    """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "environments", display, depth)
     return
