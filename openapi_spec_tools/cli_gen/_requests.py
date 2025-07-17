@@ -148,11 +148,13 @@ def raise_for_error(response: requests.Response) -> None:
 
     raise requests.HTTPError(message, response=response)
 
+
 def _pretty_params(params: Optional[dict[str, Any]]) -> str:
     if not params:
         return ""
 
     return "?" + "&".join(f"{k}={v}" for k, v in params.items())
+
 
 def request(
     method: str,
@@ -161,7 +163,7 @@ def request(
     params: Optional[dict[str, Any]] = None,
     body: Optional[dict[str, Any]] = None,
     timeout: Optional[int] = None,
-    **kwargs, # allows passing through additional named parameters
+    **kwargs,  # allows passing through additional named parameters
 ) -> Any:
     """Perform the specified REST request."""
     headers = headers or {}

@@ -21,5 +21,3 @@ def console_factory(*args, **kwargs) -> Console:
     elif pytest_version is not None:
         width = TEST_TERMINAL_WIDTH
     return Console(*args, width=width, **kwargs)
-
-

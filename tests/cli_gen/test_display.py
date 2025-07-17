@@ -437,6 +437,7 @@ def test_unsafe_table():
     assert dc0._cells[0] == "body"
     assert dc1._cells[0] == "\\[//]contains escape"
 
+
 SIMPLE_TABLE = """\
 ┏━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Property ┃ Value         ┃
@@ -449,6 +450,8 @@ SIMPLE_TABLE = """\
 │ yxa      │ None          │
 └──────────┴───────────────┘
 """
+
+
 @pytest.mark.parametrize(
     ["data", "fmt", "expected"],
     [
