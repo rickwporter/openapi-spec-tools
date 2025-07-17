@@ -63,15 +63,16 @@ CT = "Content-Type"
 AUTH = "Authorization"
 VER = _find_version()
 
+
 @pytest.mark.parametrize(
     ["api_key", "content_type", "kwargs", "expected"],
     [
         pytest.param(None, None, {}, {UA: VER}, id="no-args"),
-        pytest.param("foo",  "", {}, {UA: VER, AUTH: "Bearer foo"}, id="key"),
+        pytest.param("foo", "", {}, {UA: VER, AUTH: "Bearer foo"}, id="key"),
         pytest.param("", "sna", {}, {UA: VER, CT: "sna"}, id="content"),
         pytest.param(None, None, {"extra": "value"}, {UA: VER, "extra": "value"}, id="kwargs"),
-        pytest.param("sna",  "foo", {}, {UA: VER, AUTH: "Bearer sna", CT: "foo"}, id="both"),
-        pytest.param("sna",  "foo", {"bar": "5pm"}, {UA: VER, AUTH: "Bearer sna", CT: "foo", "bar": "5pm"}, id="all"),
+        pytest.param("sna", "foo", {}, {UA: VER, AUTH: "Bearer sna", CT: "foo"}, id="both"),
+        pytest.param("sna", "foo", {"bar": "5pm"}, {UA: VER, AUTH: "Bearer sna", CT: "foo", "bar": "5pm"}, id="all"),
     ]
 )
 def test_request_headers(api_key, content_type, kwargs, expected) -> None:
@@ -83,7 +84,7 @@ def test_request_headers(api_key, content_type, kwargs, expected) -> None:
     [
         pytest.param(None, "", id="none"),
         pytest.param({}, "", id="empty"),
-        pytest.param({"a":"B"}, "?a=B", id="simple"),
+        pytest.param({"a": "B"}, "?a=B", id="simple"),
         pytest.param({"A": "b", "c": "D"}, "?A=b&c=D", id="multiple"),
         pytest.param({"x y z": 1, "b": True}, "?x y z=1&b=True", id="non-string")
     ]
@@ -173,6 +174,7 @@ def test_raise_for_error_success(status_code) -> None:
     # NOTE: not need to check anything, it just raises an exception
     raise_for_error(response)
 
+
 @pytest.mark.parametrize(
     ["method", "content_type", "body", "params", "expected"],
     [
@@ -229,11 +231,13 @@ def test_request(method, content_type, body, params, expected):
 
         assert expected == actual
 
+
 ITEMS = [
     {"a": 1, "b": True, "c": "some str", "d": None},
     {"a": 2, "b": False, "c": "", "d": False},
     {"a": 3, "b": True, "c": "anoterh", "d": 3},
 ]
+
 
 @pytest.mark.parametrize(
     ["page_params", "resp_body", "expected"],
