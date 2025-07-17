@@ -1570,8 +1570,9 @@ def test_tree_function():
     uut = Generator("cli", {})
 
     text = uut.tree_function(node)
-    assert '@app.command("commands", short_help="Display commands tree for sub-commands")' in text
+    assert '@app.command("commands", short_help="Display commands tree for bar sub-commands")' in text
     assert 'def show_commands' in text
+    assert '"""Show bar sub-commands.' in text
     assert 'display: _a.TreeDisplayOption = _a.TreeDisplay.HELP' in text
     assert 'depth: _a.MaxDepthOption = 5' in text
     assert '_t.tree(path.as_posix(), "foo_bar", display, depth)' in text
