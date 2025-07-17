@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
     def class_name(self, s: str) -> str:
         """Get the class name for provided string."""
-        value = to_camel_case(replace_special(s))
+        value = to_camel_case(replace_special(s)).replace("_", "")
         return value[0].upper() + value[1:]
 
     def function_name(self, s: str) -> str:
