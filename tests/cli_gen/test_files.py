@@ -287,6 +287,7 @@ def test_copy_infrastructure():
     }
     assert filenames == expected
 
+
 def test_copy_tests():
     tempdir = TemporaryDirectory()
     dst_path = Path(tempdir.name)
@@ -307,3 +308,17 @@ def test_copy_tests():
         "test_tree.py",
     }
     assert filenames == expected
+
+
+def test_copy_tests_long_path():
+    tempdir = TemporaryDirectory()
+    dst_path = Path(tempdir.name) / "tests" / "foo" / "bar"
+    dst_path.mkdir(parents=True)
+    package = "my.package"
+
+    copy_tests(dst_path.as_posix(), package, "foo")
+
+    # spot check the package name updates
+    dst_file = dst_path / "test_display.py"
+    text = dst_file.read_text()
+    assert 'from tests.foo.bar.helpers import to_ascii' in text
