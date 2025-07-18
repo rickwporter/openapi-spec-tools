@@ -320,5 +320,5 @@ def test_copy_tests_long_path():
 
     # spot check the package name updates
     dst_file = dst_path / "test_display.py"
-    text = dst_file.read_text()
+    text = dst_file.read_text(encoding="utf-8", errors="ignore")
     assert 'from tests.foo.bar.helpers import to_ascii' in text
