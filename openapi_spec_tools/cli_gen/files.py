@@ -196,7 +196,7 @@ def copy_tests(dst_dir: str, package_name: str, main_module: str):
     spath = Path(__file__).parent.parent.parent / "tests" / "cli_gen"
     dpath = Path(dst_dir)
     test_package = "tests"
-    parts = dst_dir.split("tests/", 1)
+    parts = dpath.as_posix().split("tests/", 1)
     if len(parts) > 1:
         test_package += '.' + parts[1].replace('/', '.').rstrip('.')
 
