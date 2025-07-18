@@ -449,6 +449,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     else:
         filenames = {i.name for i in path.iterdir()}
         expected = {
+            "__init__.py",
             "helpers.py",
             "test_console.py",
             "test_display.py",

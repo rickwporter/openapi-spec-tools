@@ -26,6 +26,7 @@ INFRASTRUCTURE_FILES = {
 }
 
 TEST_FILES = {
+    "__init__.py": "__init__.py",
     "helpers.py": "helpers.py",
     "test_console.py": "test_console.py",
     "test_display.py": "test_display.py",
@@ -194,10 +195,15 @@ def copy_tests(dst_dir: str, package_name: str, main_module: str):
     """Iterate over the TEST_FILES, and copies from local to dst."""
     spath = Path(__file__).parent.parent.parent / "tests" / "cli_gen"
     dpath = Path(dst_dir)
+    test_package = "tests"
+    parts = dpath.as_posix().split("tests/", 1)
+    if len(parts) > 1:
+        test_package += '.' + parts[1].replace('/', '.').rstrip('.')
+
     replacements = {
         "from tests.assets.arg_test": f"from {package_name}.{main_module}",  # needed for test_main.py
         __package__: package_name,
-        "tests.cli_gen": "tests",
+        "tests.cli_gen": test_package,
     }
     for src, dst in TEST_FILES.items():
         sfile = spath / src
