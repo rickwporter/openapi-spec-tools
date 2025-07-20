@@ -30,7 +30,7 @@ def show_commands(
     depth: _a.MaxDepthOption = 5,
 ) -> None:
     """Show user sub-commands.
-    
+
     The '*' denotes a sub-command with other sub-commands, but no direct actions.
     """
     path = Path(__file__).parent / "tree.yaml"

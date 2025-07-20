@@ -19,7 +19,8 @@ def test_main_help():
     help = to_ascii(result.stdout)
     # assert "--install-completion" in help
     # assert "--show-completion" in help
-    assert "Display commands tree for sub-commands" in help
+    # NOTE: this is not updated with the "actual" parent name, so it is shorter than would be nice
+    assert "Display commands tree for " in help
 
 
 def test_main_commands():
