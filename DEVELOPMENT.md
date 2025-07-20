@@ -152,3 +152,8 @@ The project has been setup with CI pipelines to help verify that coding and test
 So far, the `openapi-spec-tools` version has been updated just prior to the release. When updating the version in `pyproject.toml`, the example projects need update, too! It is also a good time to udpate the project dependencies. After update the project version, run `make poetry-update` to update the main and example projects.
 
 Creating a new release is done using the Releases page from GitHub. The best way to generate release notes is using the button to do so. Upon creating a new release, it is automatically published to PyPi for consumption by others.
+
+## client.mk
+
+The `client.mk` file is an example of a `Makefile` to invoke the [OpenAPI generator](https://github.com/OpenAPITools/openapi-generator) via a container. The file can be copied/modified to be invoked with an OpenAPI specfication (other than `openapi.yaml`) and a real package name. For a more complete list of generator options, look at the [OpenAPI generator usage documentation](https://openapi-generator.tech/docs/usage#generate).
+

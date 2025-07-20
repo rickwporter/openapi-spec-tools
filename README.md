@@ -1,7 +1,5 @@
 # openapi-spec-tools
 
-Welcome to OpenAPI specification (OAS) tools!
-
 This is a collection of tools for using OpenAPI specifications. The OpenAPI community has a plethora of tools, and this is intended to supplement those. The tools here provide functionality that has not been readily available elsewhere.
 
 ## Getting started
@@ -75,10 +73,6 @@ Into code that produces a CLI that has commands like:
 ```
 
 See the examples in `examples/` for some more complete works.
-
-## client.mk
-
-The `client.mk` file is an example of a `Makefile` to invoke the [OpenAPI generator](https://github.com/OpenAPITools/openapi-generator) via a container. The file can be copied/modified to be invoked with an OpenAPI specfication (other than `openapi.yaml`) and a real package name. For a more complete list of generator options, look at the [OpenAPI generator usage documentation](https://openapi-generator.tech/docs/usage#generate).
 
 ## Contributing
 
