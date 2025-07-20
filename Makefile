@@ -65,7 +65,7 @@ cov: ## Run unit tests with code coverage measurments (use TEST_TARGET to scope)
 
 ###########
 ##@ Examples
-example: ## Complete cycle on all examples
+example-all: ## Complete cycle on all examples
 	@for dname in $(EXAMPLE_DIRS); do \
 		echo "Entering $${dname}" && make -C $${dname} all || exit 1; \
 	done
