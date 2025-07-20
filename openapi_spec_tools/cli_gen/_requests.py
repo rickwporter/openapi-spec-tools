@@ -15,7 +15,7 @@ from typing import Optional
 import requests
 import yaml
 
-from openapi_spec_tools.cli_gen._logging import logger
+from openapi_spec_tools.cli_gen._logging import get_logger
 
 GET = "GET"
 EXTENSION_MAP = {
@@ -58,7 +58,7 @@ EXTENSION_MAP = {
     "application/vnd.mozilla.xul+xml": "xml",
 }
 
-logger = logger()
+logger = get_logger()
 
 
 @dataclass

@@ -6,7 +6,7 @@ from typing import Optional
 
 import yaml
 
-from openapi_spec_tools.cli_gen._logging import logger
+from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
@@ -86,7 +86,7 @@ class Generator:
             ContentType.APP_JSON,
         ]
         self.max_help_length = 120
-        self.logger = logger(GENERATOR_LOG_CLASS)
+        self.logger = get_logger(GENERATOR_LOG_CLASS)
 
     def shebang(self) -> str:
         """Get the shebang line that goes at the top of each file."""

@@ -4,15 +4,15 @@ import pytest
 
 from openapi_spec_tools.cli_gen._logging import LOG_CLASS
 from openapi_spec_tools.cli_gen._logging import LogLevel
+from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._logging import init_logging
-from openapi_spec_tools.cli_gen._logging import logger
 
 
 def test_get_logger() -> None:
-    log = logger()
+    log = get_logger()
     assert log.name == LOG_CLASS
 
-    req_logger = logger("requests")
+    req_logger = get_logger("requests")
     assert req_logger.name == "requests"
 
 
@@ -28,6 +28,6 @@ def test_get_logger() -> None:
 )
 def test_init_logging(level: LogLevel, expected: int) -> None:
     init_logging(level)
-    log = logger()
+    log = get_logger()
     assert LOG_CLASS == log.name
     assert expected == log.level

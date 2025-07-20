@@ -16,8 +16,8 @@ from rich.console import Console
 from rich.table import Table
 
 from openapi_spec_tools.cli_gen._arguments import LogLevelOption
+from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._logging import init_logging
-from openapi_spec_tools.cli_gen._logging import logger
 from openapi_spec_tools.cli_gen._tree import TreeDisplay
 from openapi_spec_tools.cli_gen._tree import create_tree_table
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
@@ -65,7 +65,7 @@ def open_oas_with_error_handling(filename: str) -> Any:
         starttime = datetime.now()
         data = open_oas(filename)
         delta = datetime.now() - starttime
-        logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
+        get_logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
         return data
     except FileNotFoundError:
         message = f"failed to find {filename}"
@@ -85,7 +85,7 @@ def open_layout_with_error_handling(filename: str) -> Any:
         starttime = datetime.now()
         data = open_layout(filename)
         delta = datetime.now() - starttime
-        logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
+        get_logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
         return data
     except FileNotFoundError:
         message = f"failed to find {filename}"
@@ -105,7 +105,7 @@ def layout_tree_with_error_handling(filename: str, start: str) -> LayoutNode:
         starttime = datetime.now()
         tree = file_to_tree(filename, start)
         delta = datetime.now() - starttime
-        logger(GENERATOR_LOG_CLASS).info(f"Parsing {filename} into tree took {delta.total_seconds()} seconds")
+        get_logger(GENERATOR_LOG_CLASS).info(f"Parsing {filename} into tree took {delta.total_seconds()} seconds")
         return tree
     except FileNotFoundError:
         message = f"failed to find {filename}"
