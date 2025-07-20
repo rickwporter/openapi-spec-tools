@@ -19,7 +19,7 @@ from typing import Optional
 import requests
 import yaml
 
-from pets_cli._logging import logger
+from pets_cli._logging import get_logger
 
 GET = "GET"
 EXTENSION_MAP = {
@@ -62,7 +62,7 @@ EXTENSION_MAP = {
     "application/vnd.mozilla.xul+xml": "xml",
 }
 
-logger = logger()
+logger = get_logger()
 
 
 @dataclass

@@ -15,10 +15,10 @@ class LogLevel(str, Enum):
     DEBUG = "debug"
 
 
-def logger(name: Optional[str] = LOG_CLASS) -> logging.Logger:
+def get_logger(name: Optional[str] = LOG_CLASS) -> logging.Logger:
     return logging.getLogger(name=name)
 
 
-def init_logging(level: LogLevel, name: Optional[str] = LOG_CLASS):
+def init_logging(level: LogLevel, name: Optional[str] = LOG_CLASS) -> logging.Logger:
     logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FMT)
-    logger(name).setLevel(level.upper())
+    return get_logger(name).setLevel(level.upper())

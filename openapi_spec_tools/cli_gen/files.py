@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from openapi_spec_tools.cli_gen._logging import logger
+from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen._tree import TreeNode
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
@@ -44,7 +44,7 @@ DEFAULT_COPYRIGHT = f"""\
 """
 
 _copyright = DEFAULT_COPYRIGHT
-logger = logger(GENERATOR_LOG_CLASS)
+logger = get_logger(GENERATOR_LOG_CLASS)
 
 
 def set_copyright(copyright: str = DEFAULT_COPYRIGHT) -> None:
