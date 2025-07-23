@@ -283,14 +283,11 @@ def depaginate(
         item_count += curr_len
         logger.debug(f"Got {curr_len} items in {delta.total_seconds()}")
 
-        if curr_len == 0:
-            # no items provided (even when no page size or max count)
-            break
-        if page_size and curr_len < page_size:
-            # did not get a full page
-            break
-        if max_count and item_count >= max_count:
-            # reached max items
+        if (
+            curr_len == 0  # no items provided (even when no page size or max count)
+            or (page_size and curr_len < page_size)  # did not get a full page
+            or (max_count and item_count >= max_count)  # reached max items
+        ):
             break
 
     logger.info(f"Got {len(items)} items using {page_count} requests in {total_time.total_seconds()}")
