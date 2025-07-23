@@ -92,6 +92,55 @@ def shorten_text(text: str, max_len: int = 16) -> str:
     return text
 
 
+def _result_add_message(result: dict[str, Any], keys: set[str], msg: str) -> None:
+    """Add the provided message to the result for the provided keys."""
+    for k in keys:
+        result[k] = msg
+
+    return
+
+
+def _result_is_none(result: dict[str, Any], key: str, left: Any, right: Any) -> None:
+    """Update result with a message if one of the two values is None."""
+    if left == right:
+        return
+    if left is None:
+        result[key] = "original is None"
+    if right is None:
+        result[key] = "updated is None"
+
+    return
+
+
+def _result_complex_list_diff(result: dict[str, Any], key: str, left: list[Any], right: list[Any]) -> None:
+    """Update result with message about differences between lists of complex items."""
+    for index, (lvalue, rvalue) in enumerate(zip_longest(left, right)):
+        # call into find_diffs to obtain list item object deltas
+        vdiff = find_diffs(lvalue, rvalue)
+        if vdiff:
+            item_key = f"{key}[{index}]"
+            result[item_key] = vdiff
+
+    return
+
+
+def _result_simple_list_diff(result: dict[str, Any], key: str, left: list[Any], right: list[Any]) -> None:
+    """Update result with message about differences between lists of simple items."""
+    lvalues = set(left)
+    rvalues = set(right)
+    deltas = []
+    added = rvalues - lvalues
+    if added:
+        deltas.append(f"added {', '.join(sorted(added))}")
+    removed = lvalues - rvalues
+    if removed:
+        deltas.append(f"removed {', '.join(sorted(removed))}")
+    if deltas:
+        result[key] = "; ".join(deltas)
+
+    return
+
+
 def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
     """Provide a summary of the differences between the left and right hand-side dictionaries.
 
@@ -105,13 +154,8 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
     lkeys = set(lhs.keys())
     rkeys = set(rhs.keys())
 
-    added = rkeys - lkeys
-    for k in added:
-        result[k] = "added"
-
-    removed = lkeys - rkeys
-    for k in removed:
-        result[k] = "removed"
+    _result_add_message(result, rkeys - lkeys, "added")
+    _result_add_message(result, lkeys - rkeys, "removed")
 
     common = lkeys & rkeys
     for k in common:
@@ -119,12 +163,7 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
         right = rhs[k]
         if left is None or right is None:
             # avoids failures due to trying to treat right as dict/list
-            if left == right:
-                pass
-            elif left is None:
-                result[k] = "original is None"
-            elif right is None:
-                result[k] = "updated is None"
+            _result_is_none(result, k, left, right)
         elif isinstance(left, dict):
             # recursive call to find sub-object deltas
             diffs = find_diffs(left, right)
@@ -134,25 +173,9 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
             if len(left) != len(right):
                 result[k] = f"different lengths: {len(left)} != {len(right)}"
             else:
-                for index, (lvalue, rvalue) in enumerate(zip_longest(left, right)):
-                    # recursive call to find sub-object deltas
-                    vdiff = find_diffs(lvalue, rvalue)
-                    if vdiff:
-                        item_key = f"{k}[{index}]"
-                        result[item_key] = vdiff
+                _result_complex_list_diff(result, k, left, right)
         elif isinstance(left, list) and left:
-            # simple list items here
-            lvalues = set(left)
-            rvalues = set(right)
-            deltas = []
-            added = rvalues - lvalues
-            if added:
-                deltas.append(f"added {', '.join(sorted(added))}")
-            removed = lvalues - rvalues
-            if removed:
-                deltas.append(f"removed {', '.join(sorted(removed))}")
-            if deltas:
-                result[k] = "; ".join(deltas)
+            _result_simple_list_diff(result, k, left, right)
         elif left != right:
             result[k] = f"{shorten_text(str(left))} != {shorten_text(str(right))}"
 
