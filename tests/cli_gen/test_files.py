@@ -49,7 +49,7 @@ def test_generate_node_single():
     assert f"Copyright {datetime.now().year}" in text
     assert "from typing import Annotated" in text
     assert 'app = typer.Typer(no_args_is_help=True, help="Manage pets")' in text
-    assert 'if __main__ == "__main__":'
+    assert 'if __name__ == "__main__":' in text
 
     expected = [
         # app.command stuff
@@ -119,7 +119,7 @@ def test_generate_node_multiple():
         assert f"Copyright {datetime.now().year}" in text
         assert "from typing import Annotated" in text
         assert 'app = typer.Typer(no_args_is_help=True, ' in text
-        assert 'if __main__ == "__main__":'
+        assert 'if __name__ == "__main__":' in text
 
         for v in expected:
             assert v in text
@@ -165,7 +165,7 @@ def test_generate_node_skip_bugged():
         assert f"Copyright {datetime.now().year}" in text
         assert "from typing import Annotated" in text
         assert 'app = typer.Typer(no_args_is_help=True, ' in text
-        assert 'if __main__ == "__main__":'
+        assert 'if __name__ == "__main__":' in text
 
         for v in unexpected:
             assert v not in text

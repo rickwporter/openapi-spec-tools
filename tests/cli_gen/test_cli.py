@@ -426,7 +426,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     assert f"Copyright {datetime.now().year}" in text
     assert "from typing import Annotated" in text
     assert 'app = typer.Typer(no_args_is_help=True, help="Manage pets")' in text
-    assert 'if __main__ == "__main__":'
+    assert 'if __name__ == "__main__":' in text
 
     filenames = {i.name for i in path.iterdir()}
     expected = {

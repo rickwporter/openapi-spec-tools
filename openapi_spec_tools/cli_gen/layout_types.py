@@ -79,7 +79,7 @@ class LayoutNode:
         """Convert object to dictionary."""
         def filter_empty_or_none(d: list[tuple[str, Any]]) -> dict[str, Any]:
             """Skip keys whose value is None, or an empty list/dict/set."""
-            return {k: v for (k, v) in d if v is not None and v != [] and v != {}}
+            return {k: v for (k, v) in d if v is not None and v not in ([], {})}
 
         return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
 

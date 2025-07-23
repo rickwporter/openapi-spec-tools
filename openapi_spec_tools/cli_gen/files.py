@@ -49,13 +49,12 @@ logger = get_logger(GENERATOR_LOG_CLASS)
 
 def set_copyright(copyright: str = DEFAULT_COPYRIGHT) -> None:
     """Set the global copyright value."""
-    global _copyright
+    global _copyright  # noqa: PLW0603
     _copyright = copyright
 
 
 def copyright() -> str:
     """Get the global copyright value."""
-    global _copyright
     return _copyright
 
 
@@ -173,9 +172,10 @@ def copy_and_update(src_filename: str, dst_filename: str, replacements: dict[str
         # NOTE: ignore the shebangs for now... not used to copy over executable files
         dst_fp.write(copyright())
         for line in src_fp.readlines():
+            updated = line
             for old, new in replacements.items():
-                line = line.replace(old, new)
-            dst_fp.write(line)
+                updated = updated.replace(old, new)
+            dst_fp.write(updated)
 
 
 def copy_infrastructure(dst_dir: str, package_name: str):

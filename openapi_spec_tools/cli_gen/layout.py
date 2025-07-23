@@ -1,4 +1,5 @@
 """Collection of functions for working the layout files."""
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 from typing import Optional
@@ -112,8 +113,8 @@ def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> LayoutNod
 def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:
     """Look for missing properties in the sub-commands."""
     errors = {}
-    for sub_name, sub_data in data.items():
-        sub_data = sub_data or {}
+    for sub_name, _sub_data in data.items():
+        sub_data = deepcopy(_sub_data or {})
         missing = []
 
         # check top-level fields
@@ -139,10 +140,10 @@ def operation_duplicates(data: dict[str, Any]) -> dict[str, Any]:
     """Look for command operations with redundant names (within each command)."""
     errors = {}
 
-    for sub_name, sub_data in data.items():
+    for sub_name, _sub_data in data.items():
         # check each operations
         values = {}
-        sub_data = sub_data or {}
+        sub_data = deepcopy(_sub_data or {})
         for index, op_data in enumerate(sub_data.get(LayoutField.OPERATIONS, [])):
             name = op_data.get(LayoutField.NAME)
             if not name:
@@ -166,8 +167,8 @@ def operation_order(data: dict[str, Any]) -> dict[str, Any]:
     """Check the operations order for each subcommand."""
     errors = {}
 
-    for sub_name, sub_data in data.items():
-        sub_data = sub_data or {}
+    for sub_name, _sub_data in data.items():
+        sub_data = deepcopy(_sub_data or {})
         op_names = [op.get(LayoutField.NAME) for op in sub_data.get(LayoutField.OPERATIONS, [])]
         if op_names != sorted(op_names):
             errors[sub_name] = ", ".join(sorted(op_names))
@@ -178,8 +179,8 @@ def operation_order(data: dict[str, Any]) -> dict[str, Any]:
 def subcommand_references(data: dict[str, Any], start: str = DEFAULT_START) -> tuple[set[str], set[str]]:
     """Find missing and unused subcommand refeferences."""
     referenced = set()
-    for sub_data in data.values():
-        sub_data = sub_data or {}
+    for _sub_data in data.values():
+        sub_data = deepcopy(_sub_data or {})
         refs = [
             op.get(LayoutField.SUB_ID)
             for op in sub_data.get(LayoutField.OPERATIONS, [])
@@ -207,7 +208,7 @@ def subcommand_order(data: dict[str, Any], start: str = DEFAULT_START) -> list[s
         # the remainer of the list
         names = names[1:]
 
-    if len(names) < 2:
+    if len(names) < 2:  # noqa: PLR2004
         return misordered
 
     # start by populting the last
@@ -226,8 +227,8 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
     """Check for issues with the pagnination parameters that would potentially cause confusion."""
     errors = {}
 
-    for sub_name, sub_data in data.items():
-        sub_data = sub_data or {}
+    for sub_name, _sub_data in data.items():
+        sub_data = deepcopy(_sub_data or {})
         for op in sub_data.get(LayoutField.OPERATIONS, []):
             page_params = op.get(LayoutField.PAGINATION)
             if not page_params:
