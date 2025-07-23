@@ -38,11 +38,16 @@ select = [
     "I",  # isort
     "W",  # pycodestyle warnings
     "B",  # flake8-bugbear
+    "PL",  # pylint
     "C4",  # flake8-comprehensions
     "N",  # PEP8 naming conventions
 ]
 fixable = [
     "D", "E", "I",
+]
+ignore = [
+    "PLR1711",  # "useless" returns make the code more readable
+    "PLR0912", # TODO: remove this temporary 
 ]
 
 [tool.ruff.lint.isort]
@@ -60,8 +65,8 @@ max-statements = 75
 "__init__.py" = ["F401"]
 "tests/cli_gen/cli_output.py" = ["W291"]
 "tests/*" = [
-     # no need for docstrings on tests
-    "D",
+    "D",  # no need for docstrings on tests
+    "PLR2004",  # magic numbers allowed in tests
 ]
 "openapi_spec_tools/oas.py" = [
     "D103", # CLI functions don't need docstrings

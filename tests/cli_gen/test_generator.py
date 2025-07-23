@@ -1324,7 +1324,7 @@ def test_summary_display():
     command = LayoutNode("foo", "foo", summary_fields=["abc", "defGhi"])
     text = uut.summary_display(command)
     assert 'if not _details:' in text
-    assert 'data = summary(data, ["abc", "defGhi"])' in text
+    assert 'data = _d.summary(data, ["abc", "defGhi"])' in text
 
     command = LayoutNode("foo", "foo")
     text = uut.summary_display(command)
@@ -1358,7 +1358,7 @@ def test_function_definition_item():
     assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timemout=_api_timeout)' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
-    assert 'data = _d.summary(data, "name")'
+    assert 'data = _d.summary(data, ["name"])' in text
 
     # make sure the missing parameter checks are present
     assert 'missing.append("--api-key")' in text
@@ -1399,8 +1399,7 @@ def test_function_definition_bad_body():
     assert '_e.handle_exceptions(ex)' in text
 
     # make sure the missing parameter checks are present
-    assert 'missing.append("--api-key")'
-    assert 'missing.append("--name")'
+    assert 'missing.append("--api-key")' in text
     assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
 
 

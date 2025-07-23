@@ -562,7 +562,8 @@ if __name__ == "__main__":
         params = []
         # NOTE: start with "higher level" path params, since they're more likely to be required
         total_params = (operation.get(OasField.X_PATH_PARAMS) or []) + (operation.get(OasField.PARAMS) or [])
-        for item in total_params:
+        for _item in total_params:
+            item = deepcopy(_item)
             ref = item.get(OasField.REFS, "")
             model = self.get_model(ref)
             if model:
@@ -926,7 +927,7 @@ if __name__ == "__main__":
 
         lines = ["if not _details:"]
         args = [quoted(v) for v in node.summary_fields]
-        lines.append(f"    data = summary(data, [{', '.join(args)}])")
+        lines.append(f"    data = _d.summary(data, [{', '.join(args)}])")
         return SEP2 + SEP2.join(lines)
 
     def pagination_creation(self, command: LayoutNode) -> str:
