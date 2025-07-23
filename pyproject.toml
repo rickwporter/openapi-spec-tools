@@ -47,7 +47,6 @@ fixable = [
 ]
 ignore = [
     "PLR1711",  # "useless" returns make the code more readable
-    "PLR0912", # TODO: remove this temporary 
 ]
 
 [tool.ruff.lint.isort]
@@ -70,9 +69,14 @@ max-statements = 75
 ]
 "openapi_spec_tools/oas.py" = [
     "D103", # CLI functions don't need docstrings
+    "PLR0912",  # it is intentional to have CLI functions with lots of options
 ]
 "openapi_spec_tools/cli_gen/cli.py" = [
     "D103", # CLI functions don't need docstrings
+    "PLR0912",  # it is intentional to have CLI functions with lots of options
+]
+"openapi_spec_tools/cli_gen/generator.py" = [
+    "PLR0912",  # should reduce the complexity, but it is difficult
 ]
 
 [tool.pytest.ini_options]

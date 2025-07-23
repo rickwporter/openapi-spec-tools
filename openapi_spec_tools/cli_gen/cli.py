@@ -139,7 +139,7 @@ app.add_typer(layout)
     "check",
     short_help="Check formatting of layout file"
 )
-def layout_check_format(  # noqa: PLR0912
+def layout_check_format(
     filename: LayoutFilenameArgument,
     start: StartPointOption = DEFAULT_START,
     references: Annotated[bool, typer.Option(help="Check for missing and unused subcommands")] = True,
