@@ -192,7 +192,7 @@ class DisplayOption(str, Enum):
 
 
 @app.command("update", short_help="Update the OpenAPI spec")
-def update(
+def update(  # noqa: PLR0912
     original_filename: OasFilenameArgument,
     updated_filename: Annotated[Optional[str], typer.Option(help="Filename for update OpenAPI spec")] = None,
     nullable_not_required: Annotated[
