@@ -92,7 +92,7 @@ paths:
           in: query
           x-deprecated: last-release
           schema:
-            type: str
+            type: string
             enum:
             - Mon
             - Tue
@@ -112,7 +112,7 @@ paths:
         - name: enumWithDefault
           in: query
           schema:
-            type: str
+            type: string
             enum:
             - This
             - That
@@ -149,6 +149,17 @@ paths:
           in: header
           schema:
             $ref: '#/components/schemas/Color'
+        - name: crazyEnum
+          in: query
+          schema:
+            type:
+            - numeric
+            - string
+            enum:
+            - 1.0
+            - 3.14159
+            - pi
+          default: 1.0
       requestBody:
         content:
           application/json:
@@ -291,6 +302,15 @@ components:
             description: enum buried in all-of
           owner:
             $ref: '#/components/schemas/Owner'
+          inconsistent:
+            type:
+            - integer
+            - string
+            enum:
+            - 1
+            - 2
+            - infinity-and-beyond
+            default: 2
 
     Pets:
       type: array
@@ -643,6 +663,7 @@ components:
       - $ref: '#/components/schemas/MissingItemsModel'
       type: object
     DayOfWeek:
+      type: string
       enum:
         - FRIDAY
         - friday

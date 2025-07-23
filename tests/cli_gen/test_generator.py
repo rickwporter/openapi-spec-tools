@@ -197,7 +197,9 @@ def test_op_param_formation():
         params["addr.state"] = addr_state
     params["addr.zipCode"] = addr_zip_code
     if favorite_day is not None:
-        params["favoriteDay"] = favorite_day\
+        params["favoriteDay"] = favorite_day
+    if crazy_enum is not None:
+        params["crazyEnum"] = crazy_enum\
 """
     text = uut.op_param_formation(properties)
     assert expected == text
@@ -450,6 +452,8 @@ def test_op_body_formation():
     assert 'body["gone"] = gone' in text
     assert 'if best_day is not None' in text
     assert 'body["bestDay"] = best_day' in text
+    assert 'if inconsistent is not None' in text
+    assert 'body["inconsistent"] = inconsistent' in text
 
     # this is for the sub-object -- just check the infra and a couple properties
     assert 'owner = {}' in text
@@ -569,6 +573,10 @@ def test_op_query_arguments():
         'case_sensitive=True, help="")] = None'
         in text
     )
+    assert (
+        'crazy_enum: Annotated[CrazyEnum, typer.Option(case_sensitive=False, help="")] = "1.0"'
+        in text
+    )
 
     # make sure path params not included
     assert 'num_feet: Annotated' not in text
@@ -593,6 +601,22 @@ def test_model_is_complex(reference, expected):
     model = uut.get_model(f"#/components/schemas/{reference}")
     assert expected == uut.model_is_complex(model)
 
+
+@pytest.mark.parametrize(
+    ["enum_type", "values", "expected"],
+    [
+        pytest.param('string', [1, "*"], True, id="str-match"),
+        pytest.param('integer', [-1, 0, 1, 2, 3], True, id="int-match"),
+        pytest.param('integer', [-1, 0.1, 1, 2, 3], False, id="int-diff"),
+        pytest.param('numeric', [-1, 0, 1, 2, 3.14159], True, id="float-match"),
+        pytest.param('numeric', [-1, 0.1, 1, 2, 3, '*'], False, id="float-diff"),
+        pytest.param('boolean', [True, False, True, True], True, id='bool-match'),
+        pytest.param('boolean', [False, 0, True], False, id="bool-diff")
+    ]
+)
+def test_enum_values_match_type(enum_type, values, expected):
+    uut = Generator("cli_package", {})
+    assert expected == uut.enum_values_match_type(enum_type, values)
 
 SIMPLE_ENUM = """\
 class Simple(str, Enum):  # noqa: F811
@@ -1178,6 +1202,10 @@ def test_op_body_arguments():
     assert (
         'best_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
         'case_sensitive=True, help="enum buried in all-of")] = None'
+        in text
+    )
+    assert (
+        'inconsistent: Annotated[Optional[Inconsistent], typer.Option(case_sensitive=False)] = "2"'
         in text
     )
 
