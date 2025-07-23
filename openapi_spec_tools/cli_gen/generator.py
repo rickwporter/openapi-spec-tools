@@ -425,7 +425,17 @@ if __name__ == "__main__":
         if ref:
             name = self.short_reference_name(ref)
             schema = self.get_model(ref)
-        return self.model_settable_properties(name, schema)
+
+        # attempt to simplify enum types to a single type to something that matches
+        properties = self.model_settable_properties(name, schema)
+        for prop_data in properties.values():
+            enum_values = prop_data.get(OasField.ENUM)
+            schema_type = prop_data.get(OasField.TYPE)
+            if enum_values and isinstance(schema_type, list):
+                schema_list = self.enum_find_schema(schema_type, enum_values)
+                prop_data[OasField.TYPE.value] = schema_list[0]
+
+        return properties
 
     def short_reference_name(self, full_name: str) -> str:
         """Transform the '#/components/schemas/Xxx' to 'Xxx'."""
@@ -683,6 +693,9 @@ if __name__ == "__main__":
 
         schema_type = prop.get(OasField.TYPE)
         nullable = isinstance(schema_type, list) and any(nt in schema_type for nt in NULL_TYPES)
+        enum_values = prop.get(OasField.ENUM)
+        if enum_values and isinstance(schema_type, list):
+            schema_type = self.enum_find_schema(schema_type, enum_values)
         schema_type = self.simplify_type(schema_type)
         if schema_type in COLLECTIONS.keys():
             prop.update(prop.pop(OasField.ITEMS, {}))
@@ -952,6 +965,28 @@ if __name__ == "__main__":
             pass
 
         return True
+
+    def enum_values_match_type(self, enum_type: str, values: list[Any]) -> bool:
+        """Check if all values align with the proposed enum_type."""
+        if enum_type in ('str', 'string'):
+            return True  # everything can be expressed as a string
+
+        supported = str
+        if enum_type == 'integer':
+            supported = int
+        elif enum_type in ('numeric', 'number'):
+            supported = (float, int)
+        elif enum_type == 'boolean':
+            supported = bool
+
+        return all(isinstance(v, supported) for v in values)
+
+    def enum_find_schema(self, schema_types: list[str], enum_values: list[Any]) -> list[str]:
+        """Resolve to single schema type (if possible)."""
+        # take the first schema_type item where the values match the type
+        return [
+            enum_type for enum_type in schema_types if self.enum_values_match_type(enum_type, enum_values)
+        ]
 
     def enum_declaration(self, name: str, enum_type: str, values: list[Any]) -> str:
         """Turn data into an enum declation."""
