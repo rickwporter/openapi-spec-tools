@@ -15,7 +15,7 @@ default: help
 
 ###########
 ##@ General
-all: example-gen lint cov wheel ## Complete cycle: generate/lint/test everything
+all: lint example-gen lint cov wheel ## Complete cycle: generate/lint/test everything
 
 # NOTE: due to example sub-projects, clean up all occurrances of these files/directories
 clean: ## Remove build/test artifacts
