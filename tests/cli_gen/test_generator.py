@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -22,6 +23,7 @@ SCHEMA = "schema"
 ANY_OF = "anyOf"
 ONE_OF = "oneOf"
 ITEMS = "items"
+DEF = "default"
 
 S1 = '\n    '
 S2 = f"{S1}    "
@@ -199,7 +201,11 @@ def test_op_param_formation():
     if favorite_day is not None:
         params["favoriteDay"] = favorite_day
     if crazy_enum is not None:
-        params["crazyEnum"] = crazy_enum\
+        params["crazyEnum"] = crazy_enum
+    if list_enum_def_list is not None:
+        params["listEnumDefList"] = list_enum_def_list
+    if list_int_enum is not None:
+        params["listIntEnum"] = list_int_enum\
 """
     text = uut.op_param_formation(properties)
     assert expected == text
@@ -577,6 +583,15 @@ def test_op_query_arguments():
         'crazy_enum: Annotated[CrazyEnum, typer.Option(case_sensitive=False, help="")] = "1.0"'
         in text
     )
+    assert (
+        'list_enum_def_list: Annotated[list[ListEnumDefList], typer.Option(case_sensitive=False, help="")] '
+        "= ['1', '8']"
+        in text
+    )
+    assert (
+        'list_int_enum: Annotated[list[ListIntEnum], typer.Option(case_sensitive=False, help="")] = [7]'
+        in text
+    )
 
     # make sure path params not included
     assert 'num_feet: Annotated' not in text
@@ -677,7 +692,8 @@ FOOBAR_PARAM = {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "name": "foo
 NUMBER_PARAM = {TYPE: "integer", ENUM: [12, 37, 11], "name": "simple-number"}
 MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], "name": "mixed-values"}
 INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], "name": "int-strings"}
-
+SIMPLE_PROP = deepcopy(SIMPLE_PARAM)
+SIMPLE_PROP[DEF] = None
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
@@ -794,7 +810,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
     ["parameter", "expected"],
     [
         pytest.param({}, {}, id="empty"),
-        pytest.param(SIMPLE_PARAM, SIMPLE_PARAM, id="simple"),
+        pytest.param(SIMPLE_PARAM, SIMPLE_PROP, id="simple"),
         pytest.param(
             {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]},
             {TYPE: "foo", COLLECT: "array"},
@@ -815,6 +831,30 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
             {TYPE: "sna", COLLECT: "array"},
             id="anyOf"
         ),
+        pytest.param(
+            # enum and default values converted to strings
+            {TYPE: "array", ITEMS: {ENUM: ['*', 0], DEF: 0, TYPE: 'string'}},
+            {TYPE: "string", COLLECT: "array", ENUM: ['*', '0'], DEF: '0'},
+            id="enum-str-list",
+        ),
+        pytest.param(
+            # enum and default values stay as integers
+            {TYPE: "array", ITEMS: {TYPE: "integer", ENUM: [1, 5, 9], DEF: 5}},
+            {TYPE: "integer", COLLECT: "array", ENUM: [1, 5, 9], DEF: 5},
+            id="enum-int-list",
+        ),
+        pytest.param(
+            # multiple types converted to string for compatability, and enum/default values converted
+            {TYPE: ["integer", "string"], ENUM: ['*', 1, 3], DEF: 1},
+            {TYPE: "string", ENUM: ['*', '1', '3'], DEF: '1'},
+            id="enum-multi-type",
+        ),
+        pytest.param(
+            # default value list converted to strings
+            {TYPE: "array", ITEMS: {TYPE: ["integer", "string"], ENUM: ["-inf", "pi", 3], DEF: ["pi", 3]}},
+            {TYPE: "string", ENUM: ["-inf", "pi", "3"], COLLECT: "array", DEF: ["pi", "3"]},
+            id="enum-list-default"
+        )
     ],
 )
 def test_param_to_property(parameter, expected):
@@ -1206,6 +1246,10 @@ def test_op_body_arguments():
     )
     assert (
         'inconsistent: Annotated[Optional[Inconsistent], typer.Option(case_sensitive=False)] = "2"'
+        in text
+    )
+    assert (
+        'non_list_def: Annotated[Optional[list[NonListDef]], typer.Option(case_sensitive=False)] = [\'1.1\']'
         in text
     )
 

@@ -160,6 +160,33 @@ paths:
             - 3.14159
             - pi
           default: 1.0
+        - name: listEnumDefList
+          in: query
+          schema:
+            type: array
+            items:
+              type:
+              - integer
+              - string
+              enum:
+              - '*'
+              - 1
+              - 8
+            default:
+            - 1
+            - 8 
+        - name: listIntEnum
+          in: query
+          schema:
+            type: array
+            items:
+              type:
+              - integer
+              enum:
+              - 8
+              - 6
+              - 7
+            default: 7
       requestBody:
         content:
           application/json:
@@ -311,6 +338,18 @@ components:
             - 2
             - infinity-and-beyond
             default: 2
+          nonListDef:
+            type: array
+            items:
+              type:
+              - numeric
+              - string
+              enum:
+              - 0
+              - 1.1
+              - pi
+              - inf
+            default: 1.1
 
     Pets:
       type: array

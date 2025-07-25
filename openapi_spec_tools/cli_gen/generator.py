@@ -433,7 +433,11 @@ if __name__ == "__main__":
             schema_type = prop_data.get(OasField.TYPE)
             if enum_values and isinstance(schema_type, list):
                 schema_list = self.enum_find_schema(schema_type, enum_values)
-                prop_data[OasField.TYPE.value] = schema_list[0]
+                schema_type = schema_list[0]
+                prop_data[OasField.TYPE.value] = schema_type
+            # make sure the enumeration and default values align with the type
+            if enum_values and schema_type == "string":
+                self.enum_stringify(prop_data)
 
         return properties
 
@@ -617,15 +621,14 @@ if __name__ == "__main__":
                 arg_type = f"Optional[{arg_type}]"
                 arg_default = " = None"
                 typer_args.append('show_default=False')
+            elif collection and not isinstance(schema_default, list):
+                arg_default = f" = [{maybe_quoted(schema_default)}]"
             else:
                 arg_default = f" = {maybe_quoted(schema_default)}"
         is_enum = bool(param.get(OasField.ENUM))
         if is_enum:
             case_sensitive = is_case_sensitive(param.get(OasField.ENUM))
             typer_args.append(f"case_sensitive={case_sensitive}")
-            enum_type = param.get(OasField.TYPE)
-            if enum_type == "string" and schema_default is not None:
-                arg_default = f" = {quoted(str(schema_default))}"
         if deprected or x_deprecated:
             typer_args.append("hidden=True")
         typer_args.append(f'help="{simple_escape(description)}"')
@@ -692,17 +695,33 @@ if __name__ == "__main__":
             self.logger.warning(f"Grabbing anyOf[0] item from {shallow(any_of[0])}")
             prop.update(any_of[0])
 
+        nullable = False
         schema_type = prop.get(OasField.TYPE)
-        nullable = isinstance(schema_type, list) and any(nt in schema_type for nt in NULL_TYPES)
+        if isinstance(schema_type, list):
+            nullable = any(nt in schema_type for nt in NULL_TYPES)
+            schema_list = [v for v in schema_type if v not in NULL_TYPES]
+            nullable = schema_type != schema_list
+            if len(schema_list) == 1:
+                schema_type = schema_list[0]
+            else:
+                schema_type = schema_list
+            prop[OasField.TYPE.value] = schema_type
+
+        if isinstance(schema_type, str) and schema_type in COLLECTIONS.keys():
+            items = prop.pop(OasField.ITEMS, {})
+            prop.update(items)
+            prop[OasField.X_COLLECT.value] = schema_type
+            schema_type = items.get(OasField.TYPE)
+
         enum_values = prop.get(OasField.ENUM)
         if enum_values and isinstance(schema_type, list):
-            schema_type = self.enum_find_schema(schema_type, enum_values)
-        schema_type = self.simplify_type(schema_type)
-        if schema_type in COLLECTIONS.keys():
-            prop.update(prop.pop(OasField.ITEMS, {}))
-            prop[OasField.X_COLLECT.value] = schema_type
-        elif schema_type:
+            schema_list = self.enum_find_schema(schema_type, enum_values)
+            schema_type = schema_list[0]
             prop[OasField.TYPE.value] = schema_type
+
+        # make sure the enumeration and default values align with the type
+        if enum_values and schema_type == "string":
+            self.enum_stringify(prop)
 
         schema = self.simplify_type(prop)
         if schema:
@@ -746,19 +765,23 @@ if __name__ == "__main__":
         args = []
         for prop_name, prop_data in body_params.items():
             py_type = self.get_property_pytype(prop_name, prop_data)
+            var_name = self.variable_name(prop_name)
+            collection = COLLECTIONS.get(prop_data.get(OasField.X_COLLECT, ""))
+            schema_default = prop_data.get(OasField.DEFAULT)
 
             t_args = []
             if prop_name.lower() in RESERVED:
                 # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
                 t_args.append(quoted(self.option_name(prop_name)))
-            def_val = prop_data.get(OasField.DEFAULT)
-            if def_val is None:
+            if schema_default is None:
                 t_args.append("show_default=False")
+                def_val = None
+            elif collection and not isinstance(schema_default, list):
+                def_val = [schema_default]
+            else:
+                def_val = schema_default
             is_enum = bool(prop_data.get(OasField.ENUM))
             if is_enum:
-                if prop_data.get(OasField.TYPE) == "string" and def_val is not None:
-                    # convert the default value to a string so it gets quoted
-                    def_val = str(def_val)
                 case_sensitive = is_case_sensitive(prop_data.get(OasField.ENUM))
                 t_args.append(f"case_sensitive={case_sensitive}")
             deprected = prop_data.get(OasField.DEPRECATED, False)
@@ -769,7 +792,7 @@ if __name__ == "__main__":
             if help:
                 t_args.append(f"help={quoted(simple_escape(help))}")
             t_decl = f"typer.Option({', '.join(t_args)})"
-            arg = f"{self.variable_name(prop_name)}: Annotated[{py_type}, {t_decl}] = {maybe_quoted(def_val)}"
+            arg = f"{var_name}: Annotated[{py_type}, {t_decl}] = {maybe_quoted(def_val)}"
             args.append(arg)
 
         return args
@@ -988,6 +1011,22 @@ if __name__ == "__main__":
         return [
             enum_type for enum_type in schema_types if self.enum_values_match_type(enum_type, enum_values)
         ]
+
+    def enum_stringify(self, schema: dict[str, Any]) -> None:
+        """Update the schema to have string values for enum and default values."""
+        enum_values = schema.get(OasField.ENUM)
+        if isinstance(enum_values, list):
+            enum_values = [str(v) for v in enum_values]
+        schema[OasField.ENUM.value] = enum_values
+
+        def_val = schema.get(OasField.DEFAULT)
+        if isinstance(def_val, list):
+            def_val = [str(v) for v in def_val]
+        elif def_val is not None:
+            def_val = str(def_val)
+        schema[OasField.DEFAULT.value] = def_val
+
+        return
 
     def enum_declaration(self, name: str, enum_type: str, values: list[Any]) -> str:
         """Turn data into an enum declation."""
