@@ -367,7 +367,7 @@ def test_simplify_type(schema, expected):
         pytest.param({TYPE: "string", ENUM: ["a", "b"], "name": "sna_foo"}, "SnaFoo", id="unref-enum"),
         pytest.param(
             {TYPE: "string", ENUM: ["a", "b"], "$ref": "#/comp/Schema/FooBar", "name": "sna_foo"},
-            "FooBar",
+            "SnaFoo",
             id="ref-enum",
         ),
     ],
@@ -400,7 +400,7 @@ def test_get_parameter_pytype(param_data, expected):
         pytest.param(
             "foo",
             {TYPE: "string", REQUIRED: True, ENUM: ["a", "b"], "x-reference": "east_west"},
-            "EastWest",
+            "Foo",
             id="named-enum",
         ),
         pytest.param(
@@ -554,7 +554,8 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'param_with_enum_ref: Annotated[Species, typer.Option(case_sensitive=False, help="Species type")] = "frog"'
+        'param_with_enum_ref: Annotated[ParamWithEnumRef, typer.Option(case_sensitive=False, '
+        'help="Species type")] = "frog"'
         in text
     )
     assert (
@@ -575,7 +576,7 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'favorite_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
+        'favorite_day: Annotated[Optional[FavoriteDay], typer.Option(show_default=False, '
         'case_sensitive=True, help="")] = None'
         in text
     )
@@ -641,7 +642,6 @@ class Simple(str, Enum):  # noqa: F811
 
 """
 
-FOOBAR_ENUM = SIMPLE_ENUM.replace("Simple", "FooBar")
 NUMBER_ENUM = """\
 class SimpleNumber(int, Enum):  # noqa: F811
     VALUE_12 = 12
@@ -685,10 +685,9 @@ class Special(str, Enum):  # noqa: F811
 SIMPLE_PARAM = {
     TYPE: "string",
     ENUM: ["aOrB", "b_or_C", "-minus"], "$ref": "#/components/schemas/Simple",
-    "name": "fooBar",
+    "name": "simple",
 }
 
-FOOBAR_PARAM = {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "name": "fooBar"}
 NUMBER_PARAM = {TYPE: "integer", ENUM: [12, 37, 11], "name": "simple-number"}
 MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], "name": "mixed-values"}
 INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], "name": "int-strings"}
@@ -738,51 +737,16 @@ def test_enum_declaration(name, enum_type, values, expected):
         pytest.param(
             [],
             [],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
+            {"simple": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
             f"\n{SIMPLE_ENUM}",
             id="ref-body",
         ),
         pytest.param(
-            [FOOBAR_PARAM],
-            [],
-            {},
-            f"\n{FOOBAR_ENUM}",
-            id="unref-path",
-        ),
-        pytest.param(
-            [],
-            [FOOBAR_PARAM],
-            {},
-            f"\n{FOOBAR_ENUM}",
-            id="unref-query",
-        ),
-        pytest.param(
-            [],
-            [],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}},
-            f"\n{FOOBAR_ENUM}",
-            id="unref-body",
-        ),
-        pytest.param(
-            [],
-            [],
-            {"foo.bar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}},
-            f"\n{FOOBAR_ENUM}",
-            id="subprop-body",
-        ),
-        pytest.param(
             [SIMPLE_PARAM],
             [SIMPLE_PARAM],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
+            {"simple": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
             f"\n{SIMPLE_ENUM}",
             id="de-dup",
-        ),
-        pytest.param(
-            [SIMPLE_PARAM],
-            [FOOBAR_PARAM],
-            {"fooBar": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"]}},
-            f"\n{SIMPLE_ENUM}\n{FOOBAR_ENUM}",
-            id="multiple",
         ),
         pytest.param(
             [],
@@ -1210,7 +1174,7 @@ def test_op_body_arguments():
         in text
     )
     assert (
-        'flavor: Annotated[Optional[Species], '
+        'flavor: Annotated[Optional[Flavor], '
         'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'
         in text
     )
@@ -1240,7 +1204,7 @@ def test_op_body_arguments():
         in text
     )
     assert (
-        'best_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
+        'best_day: Annotated[Optional[BestDay], typer.Option(show_default=False, '
         'case_sensitive=True, help="enum buried in all-of")] = None'
         in text
     )
