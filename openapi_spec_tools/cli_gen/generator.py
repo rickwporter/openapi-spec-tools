@@ -592,14 +592,15 @@ if __name__ == "__main__":
         x_deprecated = param.get(OasField.X_DEPRECATED, None)
         schema_default = param.get(OasField.DEFAULT)
         collection = COLLECTIONS.get(param.get(OasField.X_COLLECT))
-        arg_type = self.get_parameter_pytype(param)
-        if not arg_type:
+        enum_values = param.get(OasField.ENUM)
+        py_type = self.get_parameter_pytype(param)
+        if not py_type:
             # log an error and use 'Any'
             self.logger.error(f"Unable to determine Python type for {param}")
-            arg_type = 'Any'
+            py_type = 'Any'
 
         typer_args = []
-        if arg_type in ("int", "float"):
+        if py_type in ("int", "float"):
             schema_min = param.get(OasField.MIN)
             if schema_min is not None:
                 typer_args.append(f"min={schema_min}")
@@ -607,7 +608,7 @@ if __name__ == "__main__":
             if schema_max is not None:
                 typer_args.append(f"max={schema_max}")
         if collection:
-            arg_type = f"{collection}[{arg_type}]"
+            py_type = f"{collection}[{py_type}]"
         if allow_required and required and schema_default is None:
             typer_type = 'typer.Argument'
             typer_args.append('show_default=False')
@@ -618,23 +619,23 @@ if __name__ == "__main__":
                 # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
                 typer_args.insert(0, quoted(self.option_name(param_name)))
             if schema_default is None:
-                arg_type = f"Optional[{arg_type}]"
+                py_type = f"Optional[{py_type}]"
                 arg_default = " = None"
                 typer_args.append('show_default=False')
             elif collection and not isinstance(schema_default, list):
                 arg_default = f" = [{maybe_quoted(schema_default)}]"
             else:
                 arg_default = f" = {maybe_quoted(schema_default)}"
-        is_enum = bool(param.get(OasField.ENUM))
-        if is_enum:
-            case_sensitive = is_case_sensitive(param.get(OasField.ENUM))
+        if enum_values:
+            case_sensitive = is_case_sensitive(enum_values)
             typer_args.append(f"case_sensitive={case_sensitive}")
         if deprected or x_deprecated:
             typer_args.append("hidden=True")
         typer_args.append(f'help="{simple_escape(description)}"')
         comma = ', '
 
-        return f'{var_name}: Annotated[{arg_type}, {typer_type}({comma.join(typer_args)})]{arg_default}'
+        typer_decl = f"{typer_type}({comma.join(typer_args)}"
+        return f'{var_name}: Annotated[{py_type}, {typer_decl})]{arg_default}'
 
     def op_path_arguments(self, path_params: list[dict[str, Any]]) -> list[str]:
         """Convert all path parameters into typer arguments."""
