@@ -582,29 +582,29 @@ if __name__ == "__main__":
             params.append(item)
         return params
 
-    def op_param_to_argument(self, param: dict[str, Any], allow_required: bool) -> str:
-        """Convert a parameter into a typer argument."""
-        param_name = param.get(OasField.NAME)
-        var_name = self.variable_name(param_name)
-        description = param.get(OasField.DESCRIPTION) or ""
-        required = param.get(OasField.REQUIRED, False)
-        deprected = param.get(OasField.DEPRECATED, False)
-        x_deprecated = param.get(OasField.X_DEPRECATED, None)
-        schema_default = param.get(OasField.DEFAULT)
-        collection = COLLECTIONS.get(param.get(OasField.X_COLLECT))
-        enum_values = param.get(OasField.ENUM)
-        py_type = self.get_parameter_pytype(param)
+    def property_to_argument(self, prop: dict[str, Any], allow_required: bool) -> str:
+        """Convert a property into a typer argument."""
+        prop_name = prop.get(OasField.NAME)
+        var_name = self.variable_name(prop_name)
+        description = prop.get(OasField.DESCRIPTION) or ""
+        required = prop.get(OasField.REQUIRED, False)
+        deprected = prop.get(OasField.DEPRECATED, False)
+        x_deprecated = prop.get(OasField.X_DEPRECATED, None)
+        schema_default = prop.get(OasField.DEFAULT)
+        collection = COLLECTIONS.get(prop.get(OasField.X_COLLECT))
+        enum_values = prop.get(OasField.ENUM)
+        py_type = self.get_parameter_pytype(prop)
         if not py_type:
             # log an error and use 'Any'
-            self.logger.error(f"Unable to determine Python type for {param}")
+            self.logger.error(f"Unable to determine Python type for {prop}")
             py_type = 'Any'
 
         typer_args = []
         if py_type in ("int", "float"):
-            schema_min = param.get(OasField.MIN)
+            schema_min = prop.get(OasField.MIN)
             if schema_min is not None:
                 typer_args.append(f"min={schema_min}")
-            schema_max = param.get(OasField.MAX)
+            schema_max = prop.get(OasField.MAX)
             if schema_max is not None:
                 typer_args.append(f"max={schema_max}")
         if collection:
@@ -615,9 +615,9 @@ if __name__ == "__main__":
             arg_default = ""
         else:
             typer_type = 'typer.Option'
-            if param_name.lower() in RESERVED:
+            if prop_name.lower() in RESERVED:
                 # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
-                typer_args.insert(0, quoted(self.option_name(param_name)))
+                typer_args.insert(0, quoted(self.option_name(prop_name)))
             if schema_default is None:
                 py_type = f"Optional[{py_type}]"
                 arg_default = " = None"
@@ -642,7 +642,7 @@ if __name__ == "__main__":
         """Convert all path parameters into typer arguments."""
         args = []
         for param in path_params:
-            arg = self.op_param_to_argument(param, allow_required=True)
+            arg = self.property_to_argument(param, allow_required=True)
             args.append(arg)
 
         return args
@@ -651,7 +651,7 @@ if __name__ == "__main__":
         """Convert query parameters to typer arguments."""
         args = []
         for param in query_params:
-            arg = self.op_param_to_argument(param, allow_required=False)
+            arg = self.property_to_argument(param, allow_required=False)
             args.append(arg)
 
         return args
