@@ -40,8 +40,8 @@ def show_commands(
 
 @app.command("list", short_help="List users blocked by the authenticated user")
 def users_list_blocked_by_authenticated_user(
-    per_page: Annotated[int, typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
-    page: Annotated[int, typer.Option(help="The page number of the results to fetch. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 1,
+    per_page: Annotated[Optional[int], typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
+    page: Annotated[Optional[int], typer.Option(help="The page number of the results to fetch. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 1,
     _api_host: _a.ApiHostOption = "https://api.github.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
