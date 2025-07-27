@@ -113,9 +113,9 @@ def environments_destroy(
 
 @app.command("list", short_help="")
 def environments_list(
-    description__icontains: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None,
-    name: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None,
-    name__icontains: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None,
+    description__icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    name: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    name__icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
@@ -171,7 +171,7 @@ def environments_list(
 
 @app.command("pushes", short_help="List push operations.")
 def environments_pushes_list(
-    environment_pk: Annotated[str, typer.Argument(show_default=False, help="")],
+    environment_pk: Annotated[str, typer.Argument(show_default=False)],
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,

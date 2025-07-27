@@ -119,7 +119,7 @@ def users_list(
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
-    type_: Annotated[Optional[str], typer.Option("--type", show_default=False, help="")] = None,
+    type_: Annotated[Optional[str], typer.Option("--type", show_default=False)] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

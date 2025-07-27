@@ -631,7 +631,8 @@ if __name__ == "__main__":
             typer_args.append(f"case_sensitive={case_sensitive}")
         if deprected or x_deprecated:
             typer_args.append("hidden=True")
-        typer_args.append(f'help="{simple_escape(description)}"')
+        if description:
+            typer_args.append(f'help="{simple_escape(description)}"')
         comma = ', '
 
         typer_decl = f"{typer_type}({comma.join(typer_args)}"
