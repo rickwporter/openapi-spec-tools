@@ -488,15 +488,18 @@ def test_op_path_arguments():
     text = "\n".join(lines)
 
     assert 'num_feet: Annotated[Optional[int], typer.Option(show_default=False, help="Number of feet")] = None' in text
-    assert 'species: Annotated[str, typer.Option(help="Species name in Latin without spaces")] = "monkey"' in text
-    assert 'neutered: Annotated[bool, typer.Option(hidden=True, help="Ouch")] = True' in text
+    assert (
+        'species: Annotated[Optional[str], typer.Option(help="Species name in Latin without spaces")] = "monkey"'
+        in text
+    )
+    assert 'neutered: Annotated[Optional[bool], typer.Option(hidden=True, help="Ouch")] = True' in text
     assert (
         'birthday: Annotated[Optional[datetime], typer.Option(show_default=False, help="When is the party?")] = None'
         in text
     )
-    assert 'must_have: Annotated[str, typer.Argument(show_default=False, help="")]' in text
+    assert 'must_have: Annotated[str, typer.Argument(show_default=False)]' in text
     assert 'your_boat: Annotated[float, typer.Option(help="Pi is always good")] = 3.14159' in text
-    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, hidden=True, help="")] = None' in text
+    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, hidden=True)] = None' in text
 
     # make sure we ignore the query params
     assert 'situation: Annotated' not in text
@@ -524,37 +527,37 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'another_qparam: Annotated[Optional[str], typer.Option(show_default=False, help="Query parameter")] = None'
+        'another_qparam: Annotated[str, typer.Option(show_default=False, help="Query parameter")] = None'
         in text
     )
-    assert 'more: Annotated[bool, typer.Option(hidden=True, help="")] = False' in text
+    assert 'more: Annotated[Optional[bool], typer.Option(hidden=True)] = False' in text
     assert (
         'day_value: Annotated[Optional[DayValue], '
-        'typer.Option(show_default=False, case_sensitive=False, hidden=True, help="")] = None'
+        'typer.Option(show_default=False, case_sensitive=False, hidden=True)] = None'
         in text
     )
     assert (
-        'page_size: Annotated[int, typer.Option(help="Maximum items per page")] = 100'
+        'page_size: Annotated[Optional[int], typer.Option(help="Maximum items per page")] = 100'
         in text
     )
     assert (
-        'str_list_prop: Annotated[Optional[list[str]], typer.Option(show_default=False, help="")] = None'
+        'str_list_prop: Annotated[Optional[list[str]], typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'enum_with_default: Annotated[EnumWithDefault, typer.Option(case_sensitive=False, help="")] = "TheOtherThing"'
+        'enum_with_default: Annotated[Optional[EnumWithDefault], typer.Option(case_sensitive=False)] = "TheOtherThing"'
         in text
     )
     assert (
-        'str_enum_with_int_values: Annotated[StrEnumWithIntValues, typer.Option(case_sensitive=False, help="")] = "1"'
+        'str_enum_with_int_values: Annotated[Optional[StrEnumWithIntValues], typer.Option(case_sensitive=False)] = "1"'
         in text
     )
     assert (
-        'type_: Annotated[Optional[int], typer.Option("--type", show_default=False, help="")] = None'
+        'type_: Annotated[Optional[int], typer.Option("--type", show_default=False)] = None'
         in text
     )
     assert (
-        'param_with_enum_ref: Annotated[ParamWithEnumRef, typer.Option(case_sensitive=False, '
+        'param_with_enum_ref: Annotated[Optional[ParamWithEnumRef], typer.Option(case_sensitive=False, '
         'help="Species type")] = "frog"'
         in text
     )
@@ -564,33 +567,33 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'addr_city: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
+        'addr_city: Annotated[Optional[str], typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'addr_state: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
+        'addr_state: Annotated[Optional[str], typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'addr_zip_code: Annotated[Optional[str], typer.Option(show_default=False, help="")] = None'
+        'addr_zip_code: Annotated[str, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
         'favorite_day: Annotated[Optional[FavoriteDay], typer.Option(show_default=False, '
-        'case_sensitive=True, help="")] = None'
+        'case_sensitive=True)] = None'
         in text
     )
     assert (
-        'crazy_enum: Annotated[CrazyEnum, typer.Option(case_sensitive=False, help="")] = "1.0"'
+        'crazy_enum: Annotated[Optional[CrazyEnum], typer.Option(case_sensitive=False)] = "1.0"'
         in text
     )
     assert (
-        'list_enum_def_list: Annotated[list[ListEnumDefList], typer.Option(case_sensitive=False, help="")] '
+        'list_enum_def_list: Annotated[Optional[list[ListEnumDefList]], typer.Option(case_sensitive=False)] '
         "= ['1', '8']"
         in text
     )
     assert (
-        'list_int_enum: Annotated[list[ListIntEnum], typer.Option(case_sensitive=False, help="")] = [7]'
+        'list_int_enum: Annotated[Optional[list[ListIntEnum]], typer.Option(case_sensitive=False)] = [7]'
         in text
     )
 
@@ -1213,7 +1216,7 @@ def test_op_body_arguments():
         in text
     )
     assert (
-        'non_list_def: Annotated[Optional[list[NonListDef]], typer.Option(case_sensitive=False)] = [\'1.1\']'
+        'non_list_def: Annotated[Optional[list[NonListDef]], typer.Option(case_sensitive=False)] = ["1.1"]'
         in text
     )
 
@@ -1484,11 +1487,11 @@ def test_function_header_params():
 
     # check function argument (aka CLI option)
     assert (
-        'has_param: Annotated[Optional[int], typer.Option(show_default=False, help="Parameter in header")] = None'
+        'has_param: Annotated[int, typer.Option(show_default=False, help="Parameter in header")] = None'
         in text
     )
     assert (
-        'color: Annotated[Optional[Color], typer.Option(show_default=False, case_sensitive=False, help="")] = None'
+        'color: Annotated[Optional[Color], typer.Option(show_default=False, case_sensitive=False)] = None'
         in text
     )
 

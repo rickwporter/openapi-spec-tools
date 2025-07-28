@@ -582,65 +582,68 @@ if __name__ == "__main__":
             params.append(item)
         return params
 
-    def op_param_to_argument(self, param: dict[str, Any], allow_required: bool) -> str:
-        """Convert a parameter into a typer argument."""
-        param_name = param.get(OasField.NAME)
-        var_name = self.variable_name(param_name)
-        description = param.get(OasField.DESCRIPTION) or ""
-        required = param.get(OasField.REQUIRED, False)
-        deprected = param.get(OasField.DEPRECATED, False)
-        x_deprecated = param.get(OasField.X_DEPRECATED, None)
-        schema_default = param.get(OasField.DEFAULT)
-        collection = COLLECTIONS.get(param.get(OasField.X_COLLECT))
-        arg_type = self.get_parameter_pytype(param)
-        if not arg_type:
+    def property_to_argument(self, prop: dict[str, Any], allow_required: bool) -> str:
+        """Convert a property into a typer argument."""
+        prop_name = prop.get(OasField.NAME)
+        var_name = self.variable_name(prop_name)
+        description = prop.get(OasField.DESCRIPTION) or ""
+        required = prop.get(OasField.REQUIRED, False)
+        deprected = prop.get(OasField.DEPRECATED, False)
+        x_deprecated = prop.get(OasField.X_DEPRECATED, None)
+        schema_default = prop.get(OasField.DEFAULT)
+        collection = COLLECTIONS.get(prop.get(OasField.X_COLLECT))
+        enum_values = prop.get(OasField.ENUM)
+        py_type = self.get_parameter_pytype(prop)
+        if not py_type:
             # log an error and use 'Any'
-            self.logger.error(f"Unable to determine Python type for {param}")
-            arg_type = 'Any'
+            self.logger.error(f"Unable to determine Python type for {prop}")
+            py_type = 'Any'
 
         typer_args = []
-        if arg_type in ("int", "float"):
-            schema_min = param.get(OasField.MIN)
+        if py_type in ("int", "float"):
+            schema_min = prop.get(OasField.MIN)
             if schema_min is not None:
                 typer_args.append(f"min={schema_min}")
-            schema_max = param.get(OasField.MAX)
+            schema_max = prop.get(OasField.MAX)
             if schema_max is not None:
                 typer_args.append(f"max={schema_max}")
         if collection:
-            arg_type = f"{collection}[{arg_type}]"
+            py_type = f"{collection}[{py_type}]"
         if allow_required and required and schema_default is None:
             typer_type = 'typer.Argument'
             typer_args.append('show_default=False')
             arg_default = ""
         else:
             typer_type = 'typer.Option'
-            if param_name.lower() in RESERVED:
+            if prop_name.lower() in RESERVED:
                 # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
-                typer_args.insert(0, quoted(self.option_name(param_name)))
+                typer_args.insert(0, quoted(self.option_name(prop_name)))
+            if not required:
+                py_type = f"Optional[{py_type}]"
             if schema_default is None:
-                arg_type = f"Optional[{arg_type}]"
                 arg_default = " = None"
                 typer_args.append('show_default=False')
             elif collection and not isinstance(schema_default, list):
                 arg_default = f" = [{maybe_quoted(schema_default)}]"
             else:
                 arg_default = f" = {maybe_quoted(schema_default)}"
-        is_enum = bool(param.get(OasField.ENUM))
-        if is_enum:
-            case_sensitive = is_case_sensitive(param.get(OasField.ENUM))
+        if enum_values:
+            case_sensitive = is_case_sensitive(enum_values)
             typer_args.append(f"case_sensitive={case_sensitive}")
         if deprected or x_deprecated:
             typer_args.append("hidden=True")
-        typer_args.append(f'help="{simple_escape(description)}"')
+        if description:
+            typer_args.append(f'help="{simple_escape(description)}"')
         comma = ', '
 
-        return f'{var_name}: Annotated[{arg_type}, {typer_type}({comma.join(typer_args)})]{arg_default}'
+        typer_decl = f"{typer_type}({comma.join(typer_args)}"
+        return f'{var_name}: Annotated[{py_type}, {typer_decl})]{arg_default}'
 
     def op_path_arguments(self, path_params: list[dict[str, Any]]) -> list[str]:
         """Convert all path parameters into typer arguments."""
         args = []
         for param in path_params:
-            arg = self.op_param_to_argument(param, allow_required=True)
+            arg = self.property_to_argument(param, allow_required=True)
             args.append(arg)
 
         return args
@@ -649,7 +652,7 @@ if __name__ == "__main__":
         """Convert query parameters to typer arguments."""
         args = []
         for param in query_params:
-            arg = self.op_param_to_argument(param, allow_required=False)
+            arg = self.property_to_argument(param, allow_required=False)
             args.append(arg)
 
         return args
@@ -764,35 +767,8 @@ if __name__ == "__main__":
         """Convert the body parameters dictionary into a list of CLI function arguments."""
         args = []
         for prop_name, prop_data in body_params.items():
-            py_type = self.get_property_pytype(prop_name, prop_data)
-            var_name = self.variable_name(prop_name)
-            collection = COLLECTIONS.get(prop_data.get(OasField.X_COLLECT, ""))
-            schema_default = prop_data.get(OasField.DEFAULT)
-
-            t_args = []
-            if prop_name.lower() in RESERVED:
-                # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
-                t_args.append(quoted(self.option_name(prop_name)))
-            if schema_default is None:
-                t_args.append("show_default=False")
-                def_val = None
-            elif collection and not isinstance(schema_default, list):
-                def_val = [schema_default]
-            else:
-                def_val = schema_default
-            is_enum = bool(prop_data.get(OasField.ENUM))
-            if is_enum:
-                case_sensitive = is_case_sensitive(prop_data.get(OasField.ENUM))
-                t_args.append(f"case_sensitive={case_sensitive}")
-            deprected = prop_data.get(OasField.DEPRECATED, False)
-            x_deprecated = prop_data.get(OasField.X_DEPRECATED, None)
-            if deprected or x_deprecated:
-                t_args.append("hidden=True")
-            help = prop_data.get(OasField.DESCRIPTION)
-            if help:
-                t_args.append(f"help={quoted(simple_escape(help))}")
-            t_decl = f"typer.Option({', '.join(t_args)})"
-            arg = f"{var_name}: Annotated[{py_type}, {t_decl}] = {maybe_quoted(def_val)}"
+            prop_data[OasField.NAME.value] = prop_name
+            arg = self.property_to_argument(prop_data, allow_required=False)
             args.append(arg)
 
         return args
