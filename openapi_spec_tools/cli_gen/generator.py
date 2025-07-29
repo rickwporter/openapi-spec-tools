@@ -1089,7 +1089,7 @@ if __name__ == "__main__":
         ])
         if body_params:
             req_args.append("body=body")
-        req_args.append("timemout=_api_timeout")
+        req_args.append("timeout=_api_timeout")
 
         deprecation_warning = ""
         deprecated = op.get(OasField.DEPRECATED, False)
