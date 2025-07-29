@@ -114,10 +114,12 @@ from {self.package_name} import _tree as _t
 
     def subcommand_imports(self, subcommands: list[LayoutNode]) -> str:
         """Get the imports needed for the subcommands/children."""
-        return NL.join(
+        imports = [
             f"from {self.package_name}.{to_snake_case(n.identifier)} import app as {to_snake_case(n.identifier)}"
             for n in subcommands
-        )
+        ]
+        # NOTE: use sorted to avoid issue if user has used unsorted sub-commands
+        return NL.join(sorted(imports))
 
     def app_definition(self, node: LayoutNode) -> str:
         """Get the main typer application/start point, and "overhead" of dealing with children."""
