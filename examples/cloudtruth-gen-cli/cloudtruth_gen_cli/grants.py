@@ -87,7 +87,7 @@ def grants_create(
     body["role"] = role
 
     try:
-        data = _r.request("POST", url, headers=headers, params=params, body=body, timemout=_api_timeout)
+        data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -125,7 +125,7 @@ def grants_destroy(
     params = {}
 
     try:
-        data = _r.request("DELETE", url, headers=headers, params=params, timemout=_api_timeout)
+        data = _r.request("DELETE", url, headers=headers, params=params, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -161,7 +161,7 @@ def grants_multi_destroy(
     params = {}
 
     try:
-        data = _r.request("DELETE", url, headers=headers, params=params, timemout=_api_timeout)
+        data = _r.request("DELETE", url, headers=headers, params=params, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -233,7 +233,7 @@ def grants_list(
         params["scope"] = scope
 
     try:
-        data = _r.depaginate(page_info, url, headers=headers, params=params, timemout=_api_timeout)
+        data = _r.depaginate(page_info, url, headers=headers, params=params, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -291,7 +291,7 @@ def grants_update(
     body["role"] = role
 
     try:
-        data = _r.request("PUT", url, headers=headers, params=params, body=body, timemout=_api_timeout)
+        data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -329,7 +329,7 @@ def grants_retrieve(
     params = {}
 
     try:
-        data = _r.request("GET", url, headers=headers, params=params, timemout=_api_timeout)
+        data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -384,7 +384,7 @@ def grants_partial_update(
         body["role"] = role
 
     try:
-        data = _r.request("PATCH", url, headers=headers, params=params, body=body, timemout=_api_timeout)
+        data = _r.request("PATCH", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)

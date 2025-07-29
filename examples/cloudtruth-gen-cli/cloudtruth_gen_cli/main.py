@@ -72,7 +72,7 @@ def backup_snapshot_create(
     params = {}
 
     try:
-        data = _r.request("POST", url, headers=headers, params=params, timemout=_api_timeout)
+        data = _r.request("POST", url, headers=headers, params=params, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -127,7 +127,7 @@ def utils_generate_password_create(
         params["require_uppercase"] = require_uppercase
 
     try:
-        data = _r.request("POST", url, headers=headers, params=params, timemout=_api_timeout)
+        data = _r.request("POST", url, headers=headers, params=params, timeout=_api_timeout)
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
