@@ -1366,7 +1366,7 @@ def test_function_definition_item():
     assert 'headers = _r.request_headers(_api_key, content_type="application/json")' in text
     assert 'url = _r.create_url(_api_host, "pets")' in text
     assert 'params = {}' in text
-    assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timemout=_api_timeout)' in text
+    assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
     assert 'data = _d.summary(data, ["name"])' in text
@@ -1405,7 +1405,7 @@ def test_function_definition_bad_body():
     assert 'headers = _r.request_headers(_api_key, content_type="application/json")' in text
     assert 'url = _r.create_url(_api_host, "sna/foo")' in text
     assert 'params = {}' in text
-    assert 'data = _r.request("POST", url, headers=headers, params=params, timemout=_api_timeout)' in text
+    assert 'data = _r.request("POST", url, headers=headers, params=params, timeout=_api_timeout)' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
 
@@ -1439,7 +1439,7 @@ def test_function_definition_paged():
         f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}page_size_name="limit",{S2}page_size_value=limit,{S1})'
         in text
     )
-    assert 'data = _r.depaginate(page_info, url, headers=headers, params=params, timemout=_api_timeout)' in text
+    assert 'data = _r.depaginate(page_info, url, headers=headers, params=params, timeout=_api_timeout)' in text
 
 
 def test_function_deprecated():
