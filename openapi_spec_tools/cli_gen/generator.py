@@ -163,6 +163,15 @@ if __name__ == "__main__":
             return text
 
         lines = [_.rstrip() for _ in text.splitlines()]
+        # remove leading blank lines
+        while lines and not lines[0]:
+            lines.pop(0)
+        # remove trailing blank lines
+        while lines and not lines[-1]:
+            lines.pop()
+        if not lines:
+            return ""
+
         result = "'''"
         for line in lines:
             if not line:

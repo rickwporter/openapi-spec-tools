@@ -93,6 +93,7 @@ def test_op_short_help(op, expected):
     ["op", "expected"],
     [
         pytest.param({}, "", id="empty"),
+        pytest.param({SUM: "  \n "}, "", id="whitespace"),
         pytest.param(
             {SUM: "Short summary"},
             "'''\n    Short summary\n    '''\n    ",
@@ -116,17 +117,17 @@ def test_op_short_help(op, expected):
         pytest.param(
             {DESC: 'Trailing whitespace  \t\nNext "line" with quotes'},
             """'''\n    Trailing whitespace\n    Next "line" with quotes\n    '''\n    """,
-            id='multi-line',
+            id='multi-line-quotes',
         ),
         pytest.param(
             {DESC: 'First\n  Leading whitespace'},
             """'''\n    First\n      Leading whitespace\n    '''\n    """,
-            id='multi-line',
+            id='multi-line-leading',
         ),
         pytest.param(
             {DESC: 'First\n\n  \n  After blanks'},
             """'''\n    First\n\n\n      After blanks\n    '''\n    """,
-            id='multi-line',
+            id='multi-line-trailing',
         ),
         pytest.param(
             {DESC: 'First\n  This is more than the alloted 30 characters so will be wrapped\nnext line'},
@@ -135,6 +136,16 @@ def test_op_short_help(op, expected):
                 "so will\n    be wrapped\n    next line\n    '''\n    "
             ),
             id='wrapped-line',
+        ),
+        pytest.param(
+            {DESC: 'Trailing blank lines  \t\n\t\n  \n '},
+            """'''\n    Trailing blank lines\n    '''\n    """,
+            id='blank-line-end',
+        ),
+        pytest.param(
+            {DESC: '\n\t  \nLeading blank lines'},
+            """'''\n    Leading blank lines\n    '''\n    """,
+            id='blank-line-start',
         ),
     ]
 )
