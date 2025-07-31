@@ -956,7 +956,7 @@ if __name__ == "__main__":
             args["item_start_name"] = quoted(names.item_start)
             args["item_start_value"] = self.variable_name(names.item_start)
         if names.items_property:
-            args["item_property_name"] = quoted(names.items_property)
+            args["items_property_name"] = quoted(names.items_property)
         if names.next_header:
             args["next_header_name"] = quoted(names.next_header)
         if names.next_property:

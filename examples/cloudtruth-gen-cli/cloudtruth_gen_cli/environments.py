@@ -137,7 +137,7 @@ def environments_list(
         page_size_value=page_size,
         page_start_name="page",
         page_start_value=page,
-        item_property_name="result",
+        items_property_name="result",
         next_property_name="next",
     )
     missing = []
@@ -196,7 +196,7 @@ def environments_pushes_list(
         page_size_value=page_size,
         page_start_name="page",
         page_start_value=page,
-        item_property_name="result",
+        items_property_name="result",
         next_property_name="next",
     )
     missing = []
