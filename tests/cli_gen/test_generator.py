@@ -1263,7 +1263,7 @@ def test_op_body_arguments():
         ),
         pytest.param(
             PaginationNames(items_property="northSouth"),
-            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}item_property_name="northSouth",{S1})',
+            f'page_info = _r.PageParams({S2}max_count=_max_count,{S2}items_property_name="northSouth",{S1})',
             id="items_property",
         ),
         pytest.param(
