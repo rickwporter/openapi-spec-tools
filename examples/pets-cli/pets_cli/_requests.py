@@ -229,8 +229,11 @@ def depaginate(
     _params = deepcopy(params or {})
     _headers = deepcopy(headers or {})
     pretty_url = None
+    next_url = None
 
+    page_start = page_params.page_start_value or 0
     page_count = 0
+    item_start = page_params.item_start_value or 0
     item_count = 0
     page_size = page_params.page_size_value or 0
     max_count = page_params.max_count
@@ -240,17 +243,15 @@ def depaginate(
     if page_params.page_size_name and page_params.page_size_value is not None:
         _params[page_params.page_size_name] = page_size
 
-    if page_params.item_start_name and page_params.item_start_value is not None:
-        offset = page_params.item_start_value
-        _params[page_params.item_start_name] = page_params.item_start_value
-
     while _url:
-        if page_params.page_start_name:
-            _params[page_params.page_start_name] = page_count
-        if page_params.item_start_name:
-            _params[page_params.item_start_name] = offset
-
-        if pretty_url != _url:
+        if next_url:
+            pretty_url = next_url
+            _params = {}
+        else:
+            if page_params.page_start_name:
+                _params[page_params.page_start_name] = page_start + page_count
+            if page_params.item_start_name:
+                _params[page_params.item_start_name] = item_start + item_count
             pretty_url = _url + _pretty_params(_params)
 
         logger.debug(f"Requesting {GET} {pretty_url} count={page_count + 1}")
@@ -269,12 +270,10 @@ def depaginate(
         # update the URL from the provided info
         if page_params.next_header_name:
             _url = response.headers.get(page_params.next_header_name)
-            pretty_url = _url
+            next_url = _url
         elif page_params.next_property_name:
             _url = response.json().get(page_params.next_property_name)
-            pretty_url = _url
-        else:
-            pretty_url = None
+            next_url = _url
 
         # some book-keeping
         curr_len = len(current)
