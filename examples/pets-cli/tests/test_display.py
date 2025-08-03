@@ -69,6 +69,12 @@ UNSAFE_DICT = {
     ],
 }
 
+SUMMARY_LIST = [
+    {"name": "sna", "data": 1},
+    {"name": "foo", "data": {"a": 1, "b": 2}},
+    {"name": "bar", "data": None},
+]
+
 
 def test_rich_table_defaults_outer():
     columns = ["col 1", "Column B", "III"]
@@ -432,14 +438,7 @@ def test_unsafe_table():
     ic1 = inner.columns[1]
 
     assert ic0._cells[0] == "foo"
-    deeper = ic1._cells[0]
-    assert deeper.row_count == 1
-    assert len(deeper.columns) == 2
-
-    dc0 = deeper.columns[0]
-    dc1 = deeper.columns[1]
-    assert dc0._cells[0] == "body"
-    assert dc1._cells[0] == "\\[//]contains escape"
+    assert ic1._cells[0] == "\\[//]contains escape"
 
 
 SIMPLE_TABLE = """\
@@ -478,6 +477,27 @@ def test_display(data, fmt, expected):
         display(data, fmt, OutputStyle.NONE)
         output = mock_stdout.getvalue()
         assert to_ascii(expected) == to_ascii(output)
+
+
+SUMMARY_TABLE = """\
+┏━━━━━━┳━━━━━━━━┓
+┃ Name ┃ Data   ┃
+┡━━━━━━╇━━━━━━━━┩
+│ sna  │ 1      │
+├──────┼────────┤
+│ foo  │  a  1  │
+│      │  b  2  │
+├──────┼────────┤
+│ bar  │ None   │
+└──────┴────────┘
+Found 3 items
+"""
+
+def test_summary_list():
+    with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+        display(SUMMARY_LIST, OutputFormat.TABLE, OutputStyle.NONE)
+        output = mock_stdout.getvalue()
+        assert to_ascii(SUMMARY_TABLE) == to_ascii(output)
 
 
 @pytest.mark.parametrize(
