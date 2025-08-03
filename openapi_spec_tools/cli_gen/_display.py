@@ -125,6 +125,16 @@ def _get_name_key(item: dict[Any, Any], key_fields: list[str]) -> Optional[str]:
     return None
 
 
+def _get_other_key(item: dict[Any, Any], name_key: str) -> Optional[str]:
+    """Find the "other" key (if there's just one value)."""
+    keys = set(item.keys())
+    keys.remove(name_key)
+    if len(keys) != 1:
+        return None
+
+    return keys.pop()
+
+
 def _is_url(s: str, url_prefixes: list[str]) -> bool:
     """Rudimentary check for somethingt starting with URL prefix."""
     return any(s.startswith(p) for p in url_prefixes)
@@ -160,8 +170,27 @@ def _create_list_table(
             table.add_row(_table_cell_value(item, config))
         return table
 
-    # create a table with identifier in left column, and rest of data in right column
+    # if there's just one property besides the key, use that as the label
     name_label = name_key[0].upper() + name_key[1:]
+    other_key = _get_other_key(items[0], name_key)
+    if other_key:
+        other_name = other_key[0].upper() + other_key[1:]
+        fields = [name_label, other_name]
+        table = RichTable(
+            *fields,
+            outer=outer,
+            show_lines=True,
+            caption=caption,
+            row_props=config.row_properties,
+        )
+        for item in items:
+            # id may be an int, so convert to string before truncating
+            name = _safe(item.pop(name_key, config.unknown_label))
+            body = _table_cell_value(item.get(other_key), config)
+            table.add_row(_truncate(name, config.key_max_len), body)
+        return table
+
+    # create a table with identifier in left column, and rest of data in right column
     fields = [name_label, config.properties_label]
     table = RichTable(
         *fields,
