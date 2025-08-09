@@ -525,6 +525,7 @@ def test_file_to_tree() -> None:
 @pytest.mark.parametrize(
     ["search_args", "expected"],
     [
+        pytest.param((), None, id="no-args"),
         pytest.param(("foo"), None, id="not-found"),
         pytest.param(("pet", "feed"), None, id="child-not-found"),
         pytest.param(

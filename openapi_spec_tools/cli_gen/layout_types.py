@@ -93,6 +93,9 @@ class LayoutNode:
 
     def find(self, *args) -> Optional["LayoutNode"]:
         """Search for the provided commands."""
+        if not args:
+            return None
+
         for child in self.children:
             if child.command == args[0]:
                 if len(args) == 1:
