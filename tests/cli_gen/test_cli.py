@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from tempfile import TemporaryDirectory
 from typing import Any
 from typing import Optional
@@ -15,6 +16,7 @@ from openapi_spec_tools.cli_gen.cli import generate_cli
 from openapi_spec_tools.cli_gen.cli import generate_unreferenced
 from openapi_spec_tools.cli_gen.cli import layout_check_format
 from openapi_spec_tools.cli_gen.cli import layout_operations
+from openapi_spec_tools.cli_gen.cli import layout_suggest
 from openapi_spec_tools.cli_gen.cli import layout_tree
 from openapi_spec_tools.cli_gen.cli import layout_tree_with_error_handling
 from openapi_spec_tools.cli_gen.cli import open_layout_with_error_handling
@@ -382,6 +384,27 @@ def test_layout_operations(filename, start, expected) -> None:
 
         output = mock_stdout.getvalue()
         assert to_ascii(output) == to_ascii(expected)
+
+
+def test_layout_suggest():
+    layout_file = NamedTemporaryFile()
+    layout_suggest(asset_filename("pet.yaml"), layout_file.name, prefix="/pets")
+
+    dest_file = Path(layout_file.name)
+    text = dest_file.read_text(encoding="utf-8", errors="ignore")
+    expected = """\
+main:
+    description: CLI to manage your application
+    operations:
+    - name: create
+      operationId: createPets
+    - name: list
+      operationId: listPets
+    - name: show
+      operationId: showPetById
+
+"""
+    assert expected == text
 
 
 @pytest.mark.parametrize(
