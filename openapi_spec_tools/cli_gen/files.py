@@ -4,13 +4,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen._tree import TreeNode
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
-from openapi_spec_tools.cli_gen.utils import to_snake_case
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 

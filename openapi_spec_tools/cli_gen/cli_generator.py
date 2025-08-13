@@ -6,20 +6,20 @@ from typing import Optional
 
 import yaml
 
+from openapi_spec_tools.base_gen.utils import is_case_sensitive
+from openapi_spec_tools.base_gen.utils import maybe_quoted
+from openapi_spec_tools.base_gen.utils import prepend
+from openapi_spec_tools.base_gen.utils import quoted
+from openapi_spec_tools.base_gen.utils import replace_special
+from openapi_spec_tools.base_gen.utils import set_missing
+from openapi_spec_tools.base_gen.utils import shallow
+from openapi_spec_tools.base_gen.utils import simple_escape
+from openapi_spec_tools.base_gen.utils import to_camel_case
+from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
-from openapi_spec_tools.cli_gen.utils import is_case_sensitive
-from openapi_spec_tools.cli_gen.utils import maybe_quoted
-from openapi_spec_tools.cli_gen.utils import prepend
-from openapi_spec_tools.cli_gen.utils import quoted
-from openapi_spec_tools.cli_gen.utils import replace_special
-from openapi_spec_tools.cli_gen.utils import set_missing
-from openapi_spec_tools.cli_gen.utils import shallow
-from openapi_spec_tools.cli_gen.utils import simple_escape
-from openapi_spec_tools.cli_gen.utils import to_camel_case
-from openapi_spec_tools.cli_gen.utils import to_snake_case
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import NULL_TYPES
