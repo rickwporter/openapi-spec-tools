@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -50,11 +51,12 @@ def _read_text(filename: str) -> str:
     ]
 )
 def test_open_oas(filename, message) -> None:
+    logger = logging.getLogger("")
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
         pytest.raises(typer.Exit) as err,
     ):
-        open_oas_with_error_handling(asset_filename(filename))
+        open_oas_with_error_handling(asset_filename(filename), logger)
 
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()

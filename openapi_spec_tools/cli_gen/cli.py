@@ -15,6 +15,8 @@ from rich import print_json
 from rich.console import Console
 from rich.table import Table
 
+from openapi_spec_tools.base_gen.files import open_oas_with_error_handling
+from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli_gen._arguments import LogLevelOption
 from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._logging import init_logging
@@ -29,7 +31,6 @@ from openapi_spec_tools.cli_gen.files import find_unreferenced
 from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_file
 from openapi_spec_tools.cli_gen.files import generate_tree_node
-from openapi_spec_tools.cli_gen.files import set_copyright
 from openapi_spec_tools.cli_gen.layout import DEFAULT_START
 from openapi_spec_tools.cli_gen.layout import check_pagination_definitions
 from openapi_spec_tools.cli_gen.layout import file_to_tree
@@ -43,7 +44,6 @@ from openapi_spec_tools.cli_gen.layout_generator import LayoutGenerator
 from openapi_spec_tools.cli_gen.layout_generator import write_layout
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import open_oas
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
@@ -58,26 +58,6 @@ StartPointOption = Annotated[str, typer.Option(help="Start point for CLI in layo
 
 #################################################
 # Utilities
-def open_oas_with_error_handling(filename: str) -> Any:
-    """Perform error handling around opening an OpenAPI spec.
-
-    Avoids the standard Typer error handling that is quite verbose.
-    """
-    try:
-        starttime = datetime.now()
-        data = open_oas(filename)
-        delta = datetime.now() - starttime
-        get_logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
-        return data
-    except FileNotFoundError:
-        message = f"failed to find {filename}"
-    except Exception as ex:
-        message = f"unable to parse {filename}: {ex}"
-
-    typer.echo(f"ERROR: {message}")
-    raise typer.Exit(1)
-
-
 def open_layout_with_error_handling(filename: str) -> Any:
     """Perform error handling around opening a layout file.
 
@@ -286,7 +266,7 @@ def layout_suggest(
     log_level: LogLevelOption = "info",
 ) -> None:
     init_logging(log_level, GENERATOR_LOG_CLASS)
-    oas = open_oas_with_error_handling(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
     generator = LayoutGenerator()
     node = generator.generate(oas, prefix)
 
@@ -359,7 +339,7 @@ def generate_cli(
             raise typer.Exit(1)
 
     commands = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
 
     if copyright_file:
         text = Path(copyright_file).read_text()
@@ -403,7 +383,7 @@ def generate_check_missing(
 ) -> None:
     init_logging(log_level, GENERATOR_LOG_CLASS)
     commands = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
 
     missing = check_for_missing(commands, oas)
     if missing:
@@ -423,7 +403,7 @@ def generate_unreferenced(
 ) -> None:
     init_logging(log_level, GENERATOR_LOG_CLASS)
     commands = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
 
     unreferenced = find_unreferenced(commands, oas)
     if not unreferenced:
@@ -466,7 +446,7 @@ def show_cli_tree(
 ) -> None:
     init_logging(log_level, GENERATOR_LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
     generator = CliGenerator("", oas)
 
     tree = generate_tree_node(generator, layout)
@@ -523,7 +503,7 @@ def trim_oas(
 
     init_logging(log_level, GENERATOR_LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file)
+    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
     updated = deepcopy(oas)
 
     operations = _operations(layout)
