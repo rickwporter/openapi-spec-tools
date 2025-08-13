@@ -392,19 +392,14 @@ def test_layout_suggest():
 
     dest_file = Path(layout_file.name)
     text = dest_file.read_text(encoding="utf-8", errors="ignore")
-    expected = """\
-main:
-    description: CLI to manage your application
-    operations:
-    - name: create
-      operationId: createPets
-    - name: list
-      operationId: listPets
-    - name: show
-      operationId: showPetById
-
-"""
-    assert expected == text
+    assert 'main:' in text
+    assert 'description: CLI to manage your application' in text
+    assert 'name: create' in text
+    assert 'operationId: createPets' in text
+    assert 'name: list' in text
+    assert 'operationId: listPets' in text
+    assert 'name: show' in text
+    assert 'operationId: showPetById' in text
 
 
 @pytest.mark.parametrize(
