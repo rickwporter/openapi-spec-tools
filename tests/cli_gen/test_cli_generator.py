@@ -149,10 +149,10 @@ def test_op_short_help(op, expected):
         ),
     ]
 )
-def test_op_long_help(op, expected):
+def test_op_doc_string(op, expected):
     uut = CliGenerator("foo", {})
     uut.max_help_length = 30
-    assert expected == uut.op_long_help(op)
+    assert expected == uut.op_doc_string(op)
 
 
 @pytest.mark.parametrize(
