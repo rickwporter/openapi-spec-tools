@@ -9,6 +9,11 @@ from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 
 
+def _read_text(filename: str) -> str:
+    with open(filename, "r", encoding="utf-8", newline="\n") as fp:
+        return fp.read().replace('\r\n', '\n')
+
+
 @pytest.mark.parametrize(
     ["path", "prefix", "expected"],
     [
@@ -132,8 +137,7 @@ def test_generate_node_file():
 
     write_layout(file.name, node)
 
-    dst_file = Path(file.name)
-    text = dst_file.read_text(encoding="utf-8", errors="ignore")
+    text = _read_text(file.name)
     expected = '''\
 main:
     description: CLI to manage your application
