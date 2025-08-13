@@ -39,6 +39,8 @@ from openapi_spec_tools.cli_gen.layout import operation_order
 from openapi_spec_tools.cli_gen.layout import subcommand_missing_properties
 from openapi_spec_tools.cli_gen.layout import subcommand_order
 from openapi_spec_tools.cli_gen.layout import subcommand_references
+from openapi_spec_tools.cli_gen.layout_generator import LayoutGenerator
+from openapi_spec_tools.cli_gen.layout_generator import write_layout
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import open_oas
@@ -270,6 +272,29 @@ def layout_operations(
     tree = layout_tree_with_error_handling(filename, start=start)
     operations = _operations(tree)
     print('\n'.join(sorted(operations)))
+    return
+
+
+@layout.command(
+    "suggest",
+    short_help="Suggest layout based on OpenAPI spec"
+)
+def layout_suggest(
+    openapi_file: OpenApiFilenameArgument,
+    output_file: Annotated[str, typer.Argument(show_default=False, help="File name for output")],
+    prefix: Annotated[str, typer.Option(show_default=False, help="Prefix common to all paths")] = "",
+    log_level: LogLevelOption = "info",
+) -> None:
+    init_logging(log_level, GENERATOR_LOG_CLASS)
+    oas = open_oas_with_error_handling(openapi_file)
+    generator = LayoutGenerator()
+    node = generator.generate(oas, prefix)
+
+    start = datetime.now()
+    write_layout(output_file, node)
+    delta = datetime.now() - start
+    get_logger(GENERATOR_LOG_CLASS).info(f"Writing {output_file} took {delta.total_seconds()} seconds")
+    print(f"Wrote {output_file}")
     return
 
 
