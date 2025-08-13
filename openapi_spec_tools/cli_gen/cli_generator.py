@@ -15,7 +15,7 @@ from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
-from openapi_spec_tools.cli_gen.layout_types import LayoutNode
+from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 
 

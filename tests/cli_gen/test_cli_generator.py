@@ -3,9 +3,9 @@ from pathlib import Path
 import pytest
 
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
-from openapi_spec_tools.cli_gen.layout import file_to_tree
-from openapi_spec_tools.cli_gen.layout_types import LayoutNode
-from openapi_spec_tools.cli_gen.layout_types import PaginationNames
+from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.types import PaginationNames
+from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
