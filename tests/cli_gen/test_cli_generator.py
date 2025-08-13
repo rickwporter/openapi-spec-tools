@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from openapi_spec_tools.cli_gen.generator import Generator
+from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.layout import file_to_tree
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.cli_gen.layout_types import PaginationNames
@@ -29,14 +29,14 @@ S1 = '\n    '
 S2 = f"{S1}    "
 
 def test_shebang():
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     text = uut.shebang()
     assert text.startswith("#!/")
     assert "python3" in text
 
 
 def test_standard_imports():
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     text = uut.standard_imports()
     assert "import typer" in text
     assert "from typing import Annotated" in text
@@ -45,7 +45,7 @@ def test_standard_imports():
 def test_subcommand_imports():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.subcommand_imports(tree.subcommands())
     for name in ["pets", "owners", "veterinarians"]:
         line = f"from cli_package.{name} import app as {name}"
@@ -55,7 +55,7 @@ def test_subcommand_imports():
 def test_app_definition():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.app_definition(tree)
     assert 'app = typer.Typer(no_args_is_help=True, help="Pet management application")' in text
     for name, command in {
@@ -85,7 +85,7 @@ def test_app_definition():
     ]
 )
 def test_op_short_help(op, expected):
-    uut = Generator("foo", {})
+    uut = CliGenerator("foo", {})
     assert expected == uut.op_short_help(op)
 
 
@@ -150,7 +150,7 @@ def test_op_short_help(op, expected):
     ]
 )
 def test_op_long_help(op, expected):
-    uut = Generator("foo", {})
+    uut = CliGenerator("foo", {})
     uut.max_help_length = 30
     assert expected == uut.op_long_help(op)
 
@@ -166,7 +166,7 @@ def test_op_long_help(op, expected):
     ]
 )
 def test_op_url_params(path, expected):
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     assert expected == uut.op_url_params(path)
 
 
@@ -174,7 +174,7 @@ def test_op_param_formation():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     query_params = uut.op_params(op, "query")
     properties = uut.params_to_settable_properties(query_params)
 
@@ -239,7 +239,7 @@ def test_op_param_formation():
 )
 def test_schema_to_type(schema, fmt, expected):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
 
     assert expected == uut.schema_to_type(schema, fmt)
 
@@ -268,7 +268,7 @@ def test_schema_to_type(schema, fmt, expected):
     ]
 )
 def test_class_name(proposed, expected):
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     assert expected == uut.class_name(proposed)
 
 
@@ -295,7 +295,7 @@ def test_class_name(proposed, expected):
     ],
 )
 def test_function_name(proposed, expected):
-    uut = Generator("", {})
+    uut = CliGenerator("", {})
     assert expected == uut.function_name(proposed)
 
 
@@ -322,7 +322,7 @@ def test_function_name(proposed, expected):
     ],
 )
 def test_variable_name(proposed, expected):
-    uut = Generator("", {})
+    uut = CliGenerator("", {})
     assert expected == uut.variable_name(proposed)
 
 
@@ -349,7 +349,7 @@ def test_variable_name(proposed, expected):
     ],
 )
 def test_option_name(proposed, expected):
-    uut = Generator("", {})
+    uut = CliGenerator("", {})
     assert expected == uut.option_name(proposed)
 
 
@@ -365,7 +365,7 @@ def test_option_name(proposed, expected):
     ]
 )
 def test_simplify_type(schema, expected):
-    uut = Generator("", {})
+    uut = CliGenerator("", {})
     assert expected == uut.simplify_type(schema)
 
 @pytest.mark.parametrize(
@@ -384,7 +384,7 @@ def test_simplify_type(schema, expected):
     ],
 )
 def test_get_parameter_pytype(param_data, expected):
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     assert expected == uut.get_parameter_pytype(param_data)
 
 
@@ -423,7 +423,7 @@ def test_get_parameter_pytype(param_data, expected):
     ],
 )
 def test_get_property_pytype(prop_name, prop_data, expected):
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     assert expected == uut.get_property_pytype(prop_name, prop_data)
 
 
@@ -438,7 +438,7 @@ def test_op_content_type(op_id, expected):
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get(op_id)
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
 
     assert expected == uut.op_content_header(op)
 
@@ -447,7 +447,7 @@ def test_op_body_formation():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     body_params = uut.op_body_settable_properties(op)
     text = uut.op_body_formation(body_params)
     assert "body = {}" in text
@@ -492,7 +492,7 @@ def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     path_params = uut.op_params(op, "path")
 
     lines = uut.op_path_arguments(path_params)
@@ -521,7 +521,7 @@ def test_op_query_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     query_params = uut.op_params(op, "query")
     properties = uut.params_to_settable_properties(query_params)
 
@@ -627,7 +627,7 @@ def test_op_query_arguments():
 )
 def test_model_is_complex(reference, expected):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     model = uut.get_model(f"#/components/schemas/{reference}")
     assert expected == uut.model_is_complex(model)
 
@@ -645,7 +645,7 @@ def test_model_is_complex(reference, expected):
     ]
 )
 def test_enum_values_match_type(enum_type, values, expected):
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     assert expected == uut.enum_values_match_type(enum_type, values)
 
 SIMPLE_ENUM = """\
@@ -718,7 +718,7 @@ SIMPLE_PROP[DEF] = None
     ]
 )
 def test_enum_declaration(name, enum_type, values, expected):
-    uut = Generator("", {})
+    uut = CliGenerator("", {})
     declaration = uut.enum_declaration(name, enum_type, values)
     assert expected == declaration
 
@@ -779,7 +779,7 @@ def test_enum_declaration(name, enum_type, values, expected):
     ],
 )
 def test_enum_definitions(path_params, query_params, body_params, expected):
-    uut = Generator("", {})
+    uut = CliGenerator("", {})
     definitions = uut.enum_definitions(path_params, query_params, body_params)
     assert expected == definitions
 
@@ -836,7 +836,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
     ],
 )
 def test_param_to_property(parameter, expected):
-    uut = Generator("", {})
+    uut = CliGenerator("", {})
     prop = uut.param_to_property(parameter)
     assert expected == prop
 
@@ -1165,7 +1165,7 @@ def test_param_to_property(parameter, expected):
 )
 def test_model_settable_properties(model_name, expected):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     model = uut.get_model(f"#/components/schemas/{model_name}")
     properties = uut.model_settable_properties(model_name, model)
     assert expected == properties
@@ -1175,7 +1175,7 @@ def test_op_body_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     body_params = uut.op_body_settable_properties(op)
 
     lines = uut.op_body_arguments(body_params)
@@ -1280,7 +1280,7 @@ def test_op_body_arguments():
 )
 def test_pagination_creation(names, expected) -> None:
     node = LayoutNode(command="foo", identifier="bar", pagination=names)
-    uut = Generator("foo", {})
+    uut = CliGenerator("foo", {})
     result = uut.pagination_creation(node)
     assert expected == result.strip()
 
@@ -1293,7 +1293,7 @@ def test_pagination_creation(names, expected) -> None:
 )
 def test_op_infra_arguments(command, has_details):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
 
     lines = uut.command_infra_arguments(command)
     text = "\n".join(lines)
@@ -1319,7 +1319,7 @@ def test_op_check_missing():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     query_params = uut.op_params(op, "query")
     body_params = uut.op_body_settable_properties(op)
 
@@ -1341,7 +1341,7 @@ def test_op_check_missing():
 
 
 def test_summary_display():
-    uut = Generator("foo", {})
+    uut = CliGenerator("foo", {})
 
     command = LayoutNode("foo", "foo", summary_fields=["abc", "defGhi"])
     text = uut.summary_display(command)
@@ -1357,7 +1357,7 @@ def test_function_definition_item():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     item = tree.find("pet", "create")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.function_definition(item)
     assert '@app.command("create", short_help="Create a pet")' in text
     assert 'def create_pets(' in text
@@ -1391,7 +1391,7 @@ def test_function_definition_item():
 def test_function_definition_bad_body():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command="create", identifier="snaFooCreate")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.function_definition(item)
     assert '@app.command("create", short_help="Create a normally messed up situation")' in text
     assert 'def sna_foo_create(' in text
@@ -1429,7 +1429,7 @@ def test_function_definition_paged():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets.yaml"))
     item = tree.find("list")
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.function_definition(item)
 
     assert '@app.command("list", short_help="List all pets")' in text
@@ -1456,7 +1456,7 @@ def test_function_definition_paged():
 def test_function_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooCheck')
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.function_definition(item)
 
     assert '@app.command("sna", hidden=True, short_help="Check on how messed up things are")' in text
@@ -1473,7 +1473,7 @@ def test_function_deprecated():
 def test_function_x_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooDelete')
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.function_definition(item)
 
     assert '@app.command("sna", hidden=True, short_help="Straighten things out")' in text
@@ -1490,7 +1490,7 @@ def test_function_x_deprecated():
 def test_function_header_params():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='testPathParams')
-    uut = Generator("cli_package", oas)
+    uut = CliGenerator("cli_package", oas)
     text = uut.function_definition(item)
 
     # check that the header enums are defined -- no need to check all the fields of each enum
@@ -1522,7 +1522,7 @@ def test_function_header_params():
 
 
 def test_main():
-    uut = Generator("cli_package", {})
+    uut = CliGenerator("cli_package", {})
     text = uut.main()
     assert 'if __name__ == "__main__":' in text
     assert "app()" in text
@@ -1592,7 +1592,7 @@ def test_main():
 )
 def test_tree_data(oas_filename, layout_filename, expected):
     oas = open_oas(asset_filename(oas_filename))
-    uut = Generator("cli", oas)
+    uut = CliGenerator("cli", oas)
     node = file_to_tree(asset_filename(layout_filename))
 
     result = uut.tree_data(node)
@@ -1608,7 +1608,7 @@ def test_tree_data(oas_filename, layout_filename, expected):
 )
 def test_tree_yaml(oas_filename, layout_filename, tree_filename):
     oas = open_oas(asset_filename(oas_filename))
-    uut = Generator("cli", oas)
+    uut = CliGenerator("cli", oas)
     node = file_to_tree(asset_filename(layout_filename))
     expected = Path(asset_filename(tree_filename)).read_text()
     assert expected == uut.get_tree_yaml(node)
@@ -1616,7 +1616,7 @@ def test_tree_yaml(oas_filename, layout_filename, tree_filename):
 
 def test_tree_function():
     node = LayoutNode("bar", "foo_bar")
-    uut = Generator("cli", {})
+    uut = CliGenerator("cli", {})
 
     text = uut.tree_function(node)
     assert '@app.command("commands", short_help="Display commands tree for bar sub-commands")' in text

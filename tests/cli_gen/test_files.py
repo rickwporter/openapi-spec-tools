@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
+from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.files import DEFAULT_COPYRIGHT
 from openapi_spec_tools.cli_gen.files import check_for_missing
 from openapi_spec_tools.cli_gen.files import copy_and_update
@@ -14,7 +15,6 @@ from openapi_spec_tools.cli_gen.files import find_unreferenced
 from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_node
 from openapi_spec_tools.cli_gen.files import set_copyright
-from openapi_spec_tools.cli_gen.generator import Generator
 from openapi_spec_tools.cli_gen.layout import file_to_tree
 from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
@@ -37,7 +37,7 @@ def test_generate_node_single():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets.yaml"))
     directory = TemporaryDirectory()
-    generator = Generator(pkg_name, oas)
+    generator = CliGenerator(pkg_name, oas)
     generate_node(generator, tree, directory.name)
 
     path = Path(directory.name)
@@ -79,7 +79,7 @@ def test_generate_node_multiple():
     oas = open_oas(asset_filename("pets_and_vets.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     directory = TemporaryDirectory()
-    generator = Generator(pkg_name, oas)
+    generator = CliGenerator(pkg_name, oas)
     generate_node(generator, tree, directory.name)
 
     path = Path(directory.name)
@@ -130,7 +130,7 @@ def test_generate_node_skip_bugged():
     oas = open_oas(asset_filename("pets_and_vets.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     directory = TemporaryDirectory()
-    generator = Generator(pkg_name, oas)
+    generator = CliGenerator(pkg_name, oas)
 
     # create a sub-command a bug
     node = tree.find("owners")
@@ -181,7 +181,7 @@ def test_generate_node_skip_bugged():
 def test_generate_tree_node(oas_filename, layout_filename, expected):
     oas = open_oas(asset_filename(oas_filename))
     layout = file_to_tree(asset_filename(layout_filename))
-    generator = Generator("cli", oas)
+    generator = CliGenerator("cli", oas)
     tree = generate_tree_node(generator, layout)
     names = {node.name for node in tree.children}
     assert expected == names
