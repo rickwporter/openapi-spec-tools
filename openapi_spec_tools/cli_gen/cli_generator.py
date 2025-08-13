@@ -64,7 +64,7 @@ RESERVED = {
 CONFLICT_SUFFIX = "_"
 
 
-class Generator:
+class CliGenerator:
     """Provides the majority of the CLI generation functions.
 
     Store a few key things to avoid the need for passing them all around, but most of the "action"

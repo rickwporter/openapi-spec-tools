@@ -7,8 +7,8 @@ from typing import Any
 from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen._tree import TreeNode
+from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
-from openapi_spec_tools.cli_gen.generator import Generator
 from openapi_spec_tools.cli_gen.layout_types import LayoutNode
 from openapi_spec_tools.cli_gen.utils import to_snake_case
 from openapi_spec_tools.types import OasField
@@ -58,7 +58,7 @@ def copyright() -> str:
     return _copyright
 
 
-def generate_node(generator: Generator, node: LayoutNode, directory: str) -> None:
+def generate_node(generator: CliGenerator, node: LayoutNode, directory: str) -> None:
     """Create a file/module for the current node, and recursively goes through sub-commands."""
     module_name = to_snake_case(node.identifier)
     logger.info(f"Generating {module_name} module")
@@ -82,7 +82,7 @@ def generate_node(generator: Generator, node: LayoutNode, directory: str) -> Non
         generate_node(generator, command, directory)
 
 
-def generate_tree_node(generator: Generator, node: LayoutNode) -> TreeNode:
+def generate_tree_node(generator: CliGenerator, node: LayoutNode) -> TreeNode:
     """Generate a TreeNode hierarchy for the specified node."""
     data = generator.tree_data(node)
     children = []
@@ -110,7 +110,7 @@ def generate_tree_node(generator: Generator, node: LayoutNode) -> TreeNode:
     )
 
 
-def generate_tree_file(generator: Generator, node: LayoutNode, directory: str) -> None:
+def generate_tree_file(generator: CliGenerator, node: LayoutNode, directory: str) -> None:
     """Create the YAML file."""
     filename = os.path.join(directory, "tree.yaml")
     with open(filename, "w", encoding="utf-8", newline="\n") as fp:

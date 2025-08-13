@@ -20,6 +20,7 @@ from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._logging import init_logging
 from openapi_spec_tools.cli_gen._tree import TreeDisplay
 from openapi_spec_tools.cli_gen._tree import create_tree_table
+from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.cli_gen.files import check_for_missing
 from openapi_spec_tools.cli_gen.files import copy_infrastructure
@@ -29,7 +30,6 @@ from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_file
 from openapi_spec_tools.cli_gen.files import generate_tree_node
 from openapi_spec_tools.cli_gen.files import set_copyright
-from openapi_spec_tools.cli_gen.generator import Generator
 from openapi_spec_tools.cli_gen.layout import DEFAULT_START
 from openapi_spec_tools.cli_gen.layout import check_pagination_definitions
 from openapi_spec_tools.cli_gen.layout import file_to_tree
@@ -381,7 +381,7 @@ def generate_cli(
     # copy over the basic infrastructure
     copy_infrastructure(code_dir, package_name)
 
-    generator = Generator(package_name, oas)
+    generator = CliGenerator(package_name, oas)
     generate_node(generator, commands, code_dir)
 
     # create the tree
@@ -467,7 +467,7 @@ def show_cli_tree(
     init_logging(log_level, GENERATOR_LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
-    generator = Generator("", oas)
+    generator = CliGenerator("", oas)
 
     tree = generate_tree_node(generator, layout)
     if not tree.children:
