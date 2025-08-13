@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from tempfile import NamedTemporaryFile
 from tempfile import TemporaryDirectory
 from typing import Any
 from typing import Optional
@@ -35,6 +34,11 @@ from tests.cli_gen.cli_output import PET_PATH
 from tests.cli_gen.helpers import to_ascii
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
+
+
+def _read_text(filename: str) -> str:
+    with open(filename, "r", encoding="utf-8", newline="\n") as fp:
+        return fp.read()
 
 
 @pytest.mark.parametrize(
@@ -387,11 +391,11 @@ def test_layout_operations(filename, start, expected) -> None:
 
 
 def test_layout_suggest():
-    layout_file = NamedTemporaryFile()
-    layout_suggest(asset_filename("pet.yaml"), layout_file.name, prefix="/pets")
+    directory = TemporaryDirectory()
+    layout_file = Path(directory.name) / "layout.yaml"
+    layout_suggest(asset_filename("pet.yaml"), layout_file.as_posix(), prefix="/pets")
 
-    dest_file = Path(layout_file.name)
-    text = dest_file.read_text(encoding="utf-8", errors="ignore")
+    text = layout_file.read_text(encoding="utf-8", errors="ignore")
     assert 'main:' in text
     assert 'description: CLI to manage your application' in text
     assert 'name: create' in text
@@ -491,10 +495,6 @@ def test_cli_generate_success_copyright(copyright_fixture):
     copyright_text = "# Simple copyright message"
     copyright_file = base_dir / "copyright.txt"
     copyright_file.write_bytes(copyright_text.encode(encoding="utf-8"))
-
-    def _read_text(filename: str) -> str:
-        with open(filename, "r", encoding="utf-8", newline="\n") as fp:
-            return fp.read()
 
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         generate_cli(

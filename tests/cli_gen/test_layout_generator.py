@@ -1,4 +1,5 @@
-from tempfile import NamedTemporaryFile
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -6,11 +7,6 @@ from openapi_spec_tools.cli_gen.layout_generator import LayoutGenerator
 from openapi_spec_tools.cli_gen.layout_generator import write_layout
 from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
-
-
-def _read_text(filename: str) -> str:
-    with open(filename, "r", encoding="utf-8", newline="\n") as fp:
-        return fp.read().replace('\r\n', '\n')
 
 
 @pytest.mark.parametrize(
@@ -130,13 +126,14 @@ def test_generate_misc():
 
 def test_generate_node_file():
     oas = open_oas(asset_filename("pet.yaml"))
-    file = NamedTemporaryFile()
+    tempdir = TemporaryDirectory()
+    file = Path(tempdir.name) / "layout.yaml"
     generator = LayoutGenerator()
     node = generator.generate(oas, "")
 
-    write_layout(file.name, node)
+    write_layout(file.as_posix(), node)
 
-    text = _read_text(file.name)
+    text = file.read_text(encoding="utf-8", errors="ignore")
     expected = '''\
 main:
     description: CLI to manage your application
