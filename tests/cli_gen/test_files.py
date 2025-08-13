@@ -5,31 +5,15 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
-from openapi_spec_tools.cli_gen.files import DEFAULT_COPYRIGHT
 from openapi_spec_tools.cli_gen.files import check_for_missing
-from openapi_spec_tools.cli_gen.files import copy_and_update
 from openapi_spec_tools.cli_gen.files import copy_infrastructure
 from openapi_spec_tools.cli_gen.files import copy_tests
-from openapi_spec_tools.cli_gen.files import copyright
 from openapi_spec_tools.cli_gen.files import find_unreferenced
 from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_node
-from openapi_spec_tools.cli_gen.files import set_copyright
 from openapi_spec_tools.cli_gen.layout import file_to_tree
 from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
-
-
-def test_copyright(copyright_fixture):
-    assert DEFAULT_COPYRIGHT == copyright()
-
-    text = "this is my copyright"
-    set_copyright(text)
-    assert text == copyright()
-
-    # reset to default
-    set_copyright()
-    assert DEFAULT_COPYRIGHT == copyright()
 
 
 def test_generate_node_single():
@@ -207,24 +191,6 @@ def test_generate_check_missing(layout_asset: str, oas_asset: str, expected: dic
     tree = file_to_tree(asset_filename(layout_asset))
     oas = open_oas(asset_filename(oas_asset))
     assert expected == check_for_missing(tree, oas)
-
-
-def test_copy_and_update():
-    source = asset_filename("arg_test.py")
-
-    tempdir = TemporaryDirectory()
-    dst_path = Path(tempdir.name) / "my_destination.py"
-    package = "this.is_a.different.package"
-    replacements = {
-        "openapi_spec_tools.cli_gen": package,
-    }
-
-    copy_and_update(source, dst_path.as_posix(), replacements)
-
-    text = dst_path.read_text()
-    assert DEFAULT_COPYRIGHT in text
-    assert package in text
-    assert "openapi_spec_tools.cli_gen" not in text
 
 
 @pytest.mark.parametrize(
