@@ -3,8 +3,8 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from openapi_spec_tools.cli_gen.layout_generator import LayoutGenerator
-from openapi_spec_tools.cli_gen.layout_generator import write_layout
+from openapi_spec_tools.layout.layout_generator import LayoutGenerator
+from openapi_spec_tools.layout.layout_generator import write_layout
 from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 

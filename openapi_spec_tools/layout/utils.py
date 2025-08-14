@@ -6,10 +6,10 @@ from typing import Optional
 
 import yaml
 
-from openapi_spec_tools.cli_gen.layout_types import LayoutField
-from openapi_spec_tools.cli_gen.layout_types import LayoutNode
-from openapi_spec_tools.cli_gen.layout_types import PaginationField
-from openapi_spec_tools.cli_gen.layout_types import PaginationNames
+from openapi_spec_tools.layout.types import LayoutField
+from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.types import PaginationField
+from openapi_spec_tools.layout.types import PaginationNames
 
 DEFAULT_START = "main"
 

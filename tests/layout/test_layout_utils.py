@@ -1,20 +1,20 @@
 import pytest
 
-from openapi_spec_tools.cli_gen.layout import check_pagination_definitions
-from openapi_spec_tools.cli_gen.layout import data_to_node
-from openapi_spec_tools.cli_gen.layout import field_to_list
-from openapi_spec_tools.cli_gen.layout import file_to_tree
-from openapi_spec_tools.cli_gen.layout import open_layout
-from openapi_spec_tools.cli_gen.layout import operation_duplicates
-from openapi_spec_tools.cli_gen.layout import operation_order
-from openapi_spec_tools.cli_gen.layout import parse_extras
-from openapi_spec_tools.cli_gen.layout import parse_pagination
-from openapi_spec_tools.cli_gen.layout import parse_to_tree
-from openapi_spec_tools.cli_gen.layout import subcommand_missing_properties
-from openapi_spec_tools.cli_gen.layout import subcommand_order
-from openapi_spec_tools.cli_gen.layout import subcommand_references
-from openapi_spec_tools.cli_gen.layout_types import LayoutNode
-from openapi_spec_tools.cli_gen.layout_types import PaginationNames
+from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.types import PaginationNames
+from openapi_spec_tools.layout.utils import check_pagination_definitions
+from openapi_spec_tools.layout.utils import data_to_node
+from openapi_spec_tools.layout.utils import field_to_list
+from openapi_spec_tools.layout.utils import file_to_tree
+from openapi_spec_tools.layout.utils import open_layout
+from openapi_spec_tools.layout.utils import operation_duplicates
+from openapi_spec_tools.layout.utils import operation_order
+from openapi_spec_tools.layout.utils import parse_extras
+from openapi_spec_tools.layout.utils import parse_pagination
+from openapi_spec_tools.layout.utils import parse_to_tree
+from openapi_spec_tools.layout.utils import subcommand_missing_properties
+from openapi_spec_tools.layout.utils import subcommand_order
+from openapi_spec_tools.layout.utils import subcommand_references
 from tests.helpers import asset_filename
 
 OPS = "operations"
@@ -425,6 +425,11 @@ def test_subcommand_order(data, start, expected) -> None:
     ["data", "expected"],
     [
         pytest.param(
+            {"a": {OPS: [{NAME: "foo"}]}},
+            {},
+            id="no-page",
+        ),
+        pytest.param(
             {"a": {OPS: [{NAME: "foo", PAGE: {"bar": 1}}]}},
             {"a.foo": "unsupported parameters: bar"},
             id="unsuppoted",
@@ -520,21 +525,3 @@ def test_file_to_tree() -> None:
     tree = file_to_tree(filename, "owners")
     assert "owners" == tree.command
     assert set() == {p.command for p in tree.subcommands()}
-
-
-@pytest.mark.parametrize(
-    ["search_args", "expected"],
-    [
-        pytest.param((), None, id="no-args"),
-        pytest.param(("foo"), None, id="not-found"),
-        pytest.param(("pet", "feed"), None, id="child-not-found"),
-        pytest.param(
-            ("pet", "create"),
-            LayoutNode(command="create", identifier="createPets", summary_fields=["name"]),
-            id="child",
-        ),
-    ]
-)
-def test_node_find(search_args, expected) -> None:
-    tree = file_to_tree(asset_filename("layout_pets2.yaml"))
-    assert expected == tree.find(*search_args)

@@ -11,7 +11,7 @@ from openapi_spec_tools.cli_gen.files import copy_tests
 from openapi_spec_tools.cli_gen.files import find_unreferenced
 from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_node
-from openapi_spec_tools.cli_gen.layout import file_to_tree
+from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 

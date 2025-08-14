@@ -2,9 +2,9 @@
 from typing import Any
 
 from openapi_spec_tools.base_gen.utils import to_snake_case
-from openapi_spec_tools.cli_gen.layout import DEFAULT_START
-from openapi_spec_tools.cli_gen.layout_types import LayoutField
-from openapi_spec_tools.cli_gen.layout_types import LayoutNode
+from openapi_spec_tools.layout.types import LayoutField
+from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.utils import DEFAULT_START
 from openapi_spec_tools.types import OasField
 
 CREATE = "create"
