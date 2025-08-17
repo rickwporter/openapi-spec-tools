@@ -1,0 +1,12 @@
+main:
+    description: CLI to manage your application
+    operations:
+    - name: create
+      operationId: createPets
+    - name: delete
+      operationId: deletePetById
+    - name: list
+      operationId: listPets
+    - name: show
+      operationId: showPetById
+
