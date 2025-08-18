@@ -15,11 +15,11 @@ from rich import print_json
 from rich.console import Console
 from rich.table import Table
 
+from openapi_spec_tools.base_gen._logging import get_logger
+from openapi_spec_tools.base_gen._logging import init_logging
 from openapi_spec_tools.base_gen.files import open_oas_with_error_handling
 from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli_gen._arguments import LogLevelOption
-from openapi_spec_tools.cli_gen._logging import get_logger
-from openapi_spec_tools.cli_gen._logging import init_logging
 from openapi_spec_tools.cli_gen._tree import TreeDisplay
 from openapi_spec_tools.cli_gen._tree import create_tree_table
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator

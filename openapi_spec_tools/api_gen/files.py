@@ -3,19 +3,19 @@ import os
 from pathlib import Path
 
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
+from openapi_spec_tools.base_gen._logging import get_logger
 from openapi_spec_tools.base_gen.files import copy_and_update
 from openapi_spec_tools.base_gen.files import copyright
 from openapi_spec_tools.base_gen.utils import to_snake_case
-from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.layout.types import LayoutNode
 
 # Maps the source to destination (currently all the same).
 API_GEN = Path(__file__).parent
-CLI_GEN = Path(__file__).parent.parent / "cli_gen"
+BASE_GEN = Path(__file__).parent.parent / "base_gen"
 INFRASTRUCTURE_FILES = {
-    CLI_GEN / "_logging.py": "_logging.py",
-    CLI_GEN / "_requests.py": "_requests.py",
+    BASE_GEN / "_logging.py": "_logging.py",
+    BASE_GEN / "_requests.py": "_requests.py",
     API_GEN / "_environment.py": "_environment.py",
 }
 

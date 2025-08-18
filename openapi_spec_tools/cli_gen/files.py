@@ -3,10 +3,10 @@ import os
 from pathlib import Path
 from typing import Any
 
+from openapi_spec_tools.base_gen._logging import get_logger
 from openapi_spec_tools.base_gen.files import copy_and_update
 from openapi_spec_tools.base_gen.files import copyright
 from openapi_spec_tools.base_gen.utils import to_snake_case
-from openapi_spec_tools.cli_gen._logging import get_logger
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen._tree import TreeNode
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
@@ -16,26 +16,31 @@ from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 
 # Maps the source to destination (currently all the same).
+BASE_GEN = Path(__file__).parent.parent / "base_gen"
+CLI_GEN = Path(__file__).parent
 INFRASTRUCTURE_FILES = {
-    "_arguments.py": "_arguments.py",
-    "_console.py": "_console.py",
-    "_display.py": "_display.py",
-    "_exceptions.py": "_exceptions.py",
-    "_logging.py": "_logging.py",
-    "_requests.py": "_requests.py",
-    "_tree.py": "_tree.py",
+    BASE_GEN / "_logging.py": "_logging.py",
+    BASE_GEN / "_requests.py": "_requests.py",
+    CLI_GEN / "_arguments.py": "_arguments.py",
+    CLI_GEN / "_console.py": "_console.py",
+    CLI_GEN / "_display.py": "_display.py",
+    CLI_GEN / "_exceptions.py": "_exceptions.py",
+    CLI_GEN / "_tree.py": "_tree.py",
 }
 
+TEST_DIR = Path(__file__).parent.parent.parent / "tests"
+BASE_TEST = TEST_DIR / "base_gen"
+CLI_TEST = TEST_DIR / "cli_gen"
 TEST_FILES = {
-    "__init__.py": "__init__.py",
-    "helpers.py": "helpers.py",
-    "test_console.py": "test_console.py",
-    "test_display.py": "test_display.py",
-    "test_exceptions.py": "test_exceptions.py",
-    "test_logging.py": "test_logging.py",
-    "test_main.py": "test_main.py",
-    "test_requests.py": "test_requests.py",
-    "test_tree.py": "test_tree.py",
+    BASE_TEST / "test_logging.py": "test_logging.py",
+    BASE_TEST / "test_requests.py": "test_requests.py",
+    CLI_TEST / "__init__.py": "__init__.py",
+    CLI_TEST / "helpers.py": "helpers.py",
+    CLI_TEST / "test_console.py": "test_console.py",
+    CLI_TEST / "test_display.py": "test_display.py",
+    CLI_TEST / "test_exceptions.py": "test_exceptions.py",
+    CLI_TEST / "test_main.py": "test_main.py",
+    CLI_TEST / "test_tree.py": "test_tree.py",
 }
 
 logger = get_logger(GENERATOR_LOG_CLASS)
@@ -148,20 +153,18 @@ def find_unreferenced(node: LayoutNode, oas: dict[str, Any]) -> dict[str, Any]:
 
 def copy_infrastructure(dst_dir: str, package_name: str):
     """Iterate over the INFRASTRUCTURE_FILES, and copies from local to dst."""
-    spath = Path(__file__).parent
     dpath = Path(dst_dir)
     replacements = {
         __package__: package_name,
+        "openapi_spec_tools.base_gen": package_name,
     }
     for src, dst in INFRASTRUCTURE_FILES.items():
-        sfile = spath / src
         dfile = dpath / dst
-        copy_and_update(sfile.as_posix(), dfile.as_posix(), replacements)
+        copy_and_update(src.as_posix(), dfile.as_posix(), replacements)
 
 
 def copy_tests(dst_dir: str, package_name: str, main_module: str):
     """Iterate over the TEST_FILES, and copies from local to dst."""
-    spath = Path(__file__).parent.parent.parent / "tests" / "cli_gen"
     dpath = Path(dst_dir)
     test_package = "tests"
     parts = dpath.as_posix().split("tests/", 1)
@@ -171,9 +174,10 @@ def copy_tests(dst_dir: str, package_name: str, main_module: str):
     replacements = {
         "from tests.assets.arg_test": f"from {package_name}.{main_module}",  # needed for test_main.py
         __package__: package_name,
+        "openapi_spec_tools.base_gen": package_name,
         "tests.cli_gen": test_package,
+        "tests.base_gen": test_package,
     }
     for src, dst in TEST_FILES.items():
-        sfile = spath / src
         dfile = dpath / dst
-        copy_and_update(sfile.as_posix(), dfile.as_posix(), replacements)
+        copy_and_update(src.as_posix(), dfile.as_posix(), replacements)

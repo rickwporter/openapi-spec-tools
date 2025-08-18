@@ -15,7 +15,7 @@ from typing import Optional
 import requests
 import yaml
 
-from openapi_spec_tools.cli_gen._logging import get_logger
+from openapi_spec_tools.base_gen._logging import get_logger
 
 GET = "GET"
 EXTENSION_MAP = {
