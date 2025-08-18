@@ -2,28 +2,26 @@
 """Implementation of the CLI generation CLI."""
 import os
 from copy import deepcopy
-from datetime import datetime
-from enum import Enum
 from pathlib import Path
 from typing import Annotated
-from typing import Any
 from typing import Optional
 
 import typer
 import yaml
-from rich import print_json
 from rich.console import Console
-from rich.table import Table
 
-from openapi_spec_tools.base_gen._logging import get_logger
-from openapi_spec_tools.base_gen._logging import init_logging
-from openapi_spec_tools.base_gen.files import open_oas_with_error_handling
 from openapi_spec_tools.base_gen.files import set_copyright
-from openapi_spec_tools.cli_gen._arguments import LogLevelOption
+from openapi_spec_tools.cli._arguments import CopyrightFileOption
+from openapi_spec_tools.cli._arguments import LayoutFilenameArgument
+from openapi_spec_tools.cli._arguments import LogLevelOption
+from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._arguments import StartPointOption
+from openapi_spec_tools.cli._utils import init_logging
+from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
+from openapi_spec_tools.cli._utils import open_oas_with_error_handling
 from openapi_spec_tools.cli_gen._tree import TreeDisplay
 from openapi_spec_tools.cli_gen._tree import create_tree_table
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
-from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.cli_gen.files import check_for_missing
 from openapi_spec_tools.cli_gen.files import copy_infrastructure
 from openapi_spec_tools.cli_gen.files import copy_tests
@@ -31,18 +29,8 @@ from openapi_spec_tools.cli_gen.files import find_unreferenced
 from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_file
 from openapi_spec_tools.cli_gen.files import generate_tree_node
-from openapi_spec_tools.layout.layout_generator import LayoutGenerator
-from openapi_spec_tools.layout.layout_generator import write_layout
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
-from openapi_spec_tools.layout.utils import check_pagination_definitions
-from openapi_spec_tools.layout.utils import file_to_tree
-from openapi_spec_tools.layout.utils import open_layout
-from openapi_spec_tools.layout.utils import operation_duplicates
-from openapi_spec_tools.layout.utils import operation_order
-from openapi_spec_tools.layout.utils import subcommand_missing_properties
-from openapi_spec_tools.layout.utils import subcommand_order
-from openapi_spec_tools.layout.utils import subcommand_references
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
@@ -50,232 +38,16 @@ from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
 
 SEP = "\n    "
-
-LayoutFilenameArgument = Annotated[str, typer.Argument(show_default=False , help="Layout file YAML definition")]
-OpenApiFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification filename")]
-StartPointOption = Annotated[str, typer.Option(help="Start point for CLI in layout file")]
-
+LOG_CLASS = "cli-gen"
 
 #################################################
 # Utilities
-def open_layout_with_error_handling(filename: str) -> Any:
-    """Perform error handling around opening a layout file.
-
-    Avoids the standard Typer error handling that is quite verbose.
-    """
-    try:
-        starttime = datetime.now()
-        data = open_layout(filename)
-        delta = datetime.now() - starttime
-        get_logger(GENERATOR_LOG_CLASS).info(f"Opening {filename} took {delta.total_seconds()} seconds")
-        return data
-    except FileNotFoundError:
-        message = f"failed to find {filename}"
-    except Exception as ex:
-        message = f"unable to parse {filename}: {ex}"
-
-    typer.echo(f"ERROR: {message}")
-    raise typer.Exit(1)
-
-
-def layout_tree_with_error_handling(filename: str, start: str) -> LayoutNode:
-    """Perform error handling around opening a layout file.
-
-    Avoids the standard Typer error handling that is quite verbose.
-    """
-    try:
-        starttime = datetime.now()
-        tree = file_to_tree(filename, start)
-        delta = datetime.now() - starttime
-        get_logger(GENERATOR_LOG_CLASS).info(f"Parsing {filename} into tree took {delta.total_seconds()} seconds")
-        return tree
-    except FileNotFoundError:
-        message = f"failed to find {filename}"
-    except ValueError as ex:
-        message = str(ex)
-    except Exception as ex:
-        message = f"unable to parse {filename}: {ex}"
-
-    typer.echo(f"ERROR: {message}")
-    raise typer.Exit(1)
-
-
 #################################################
 # Top-level stuff
-layout = typer.Typer(
-    name="layout",
-    no_args_is_help=True,
-    help="Various utilities for inspecting, analyzing and modifying CLI layout file.",
-)
 app = typer.Typer(
     no_args_is_help=True,
     help="Various operations for CLI generation."
 )
-app.add_typer(layout)
-
-
-
-#################################################
-# Layout stuff
-@layout.command(
-    "check",
-    short_help="Check formatting of layout file"
-)
-def layout_check_format(
-    filename: LayoutFilenameArgument,
-    start: StartPointOption = DEFAULT_START,
-    references: Annotated[bool, typer.Option(help="Check for missing and unused subcommands")] = True,
-    sub_order: Annotated[bool, typer.Option(help="Check the sub-command order")] = True,
-    missing_props: Annotated[bool, typer.Option(help="Check for missing properties")] = True,
-    op_dups: Annotated[bool, typer.Option(help="Check for duplicate names in sub-commands")] = True,
-    op_order: Annotated[bool, typer.Option(help="Check the operations order within each sub-command")] = True,
-    pagination: Annotated[bool, typer.Option(help="Check the pagination parameters for issues")] = True,
-) -> None:
-    data = open_layout_with_error_handling(filename)
-
-    def _dict_to_str(errors: dict[str, str], sep=SEP) -> str:
-        return f"{sep}{sep.join([f'{k}: {v}' for k, v in errors.items()])}"
-
-    result = 0
-    if references:
-        unused, missing = subcommand_references(data, start)
-        if missing:
-            typer.echo(f"Missing sub-commands for:{SEP}{SEP.join(missing)}")
-            result = 1
-
-        if unused:
-            typer.echo(f"Unused sub-commands for:{SEP}{SEP.join(unused)}")
-            result = 1
-
-    if sub_order:
-        errors = subcommand_order(data, start)
-        if errors:
-            typer.echo(f"Sub-commands are misordered:{SEP}{SEP.join(errors)}")
-            result = 1
-
-    if missing_props:
-        errors = subcommand_missing_properties(data)
-        if errors:
-            typer.echo(f"Sub-commands have missing properties:{_dict_to_str(errors)}")
-            result = 1
-
-    if op_dups:
-        errors = operation_duplicates(data)
-        if errors:
-            typer.echo(f"Duplicate operations in sub-commands:{_dict_to_str(errors)}")
-            result = 1
-
-    if op_order:
-        errors = operation_order(data)
-        if errors:
-            typer.echo(f"Sub-command operation orders should be:{_dict_to_str(errors)}")
-            result = 1
-
-    if pagination:
-        errors = check_pagination_definitions(data)
-        if errors:
-            typer.echo(f"Pagination parameter errors:{_dict_to_str(errors)}")
-            result = 1
-
-    if result:
-        raise typer.Exit(result)
-
-    typer.echo(f"No errors found in {filename}")
-    return
-
-
-class TreeFormat(str, Enum):
-    """Display options for show the tree output."""
-
-    TEXT = "text"
-    JSON = "json"
-    YAML = "yaml"
-
-
-@layout.command(
-    "tree",
-    short_help="Display the tree of commands"
-)
-def layout_tree(
-    filename: LayoutFilenameArgument,
-    start: StartPointOption = DEFAULT_START,
-    style: Annotated[TreeFormat, typer.Option(case_sensitive=False, help="Output style")] = TreeFormat.TEXT,
-    indent: Annotated[int, typer.Option(min=1, max=10, help="Number of characters of indent")] = 2,
-) -> None:
-    tree = layout_tree_with_error_handling(filename, start=start)
-    if style == TreeFormat.JSON:
-        print_json(data=tree.as_dict(), indent=indent, sort_keys=False)
-        return
-
-    if style == TreeFormat.YAML:
-        print(yaml.dump(tree.as_dict(), indent=indent, sort_keys=False))
-        return
-
-    def add_node(table: Table, node: LayoutNode, level: int) -> None:
-        name = f"{' ' * indent * level}{node.command}"
-        table.add_row(name, node.identifier, node.description)
-        for child in node.children:
-            add_node(table, child, level + 1)
-
-    table = Table(
-        highlight=True,
-        expand=False,
-        leading=0,
-        show_header=True,
-        show_edge=True,
-    )
-    headers = ["Command", "Identifier", "Help"]
-    for name in headers:
-        table.add_column(name, justify="left", no_wrap=True, overflow="ignore")
-
-    add_node(table, tree, 0)
-    console = Console()
-    console.print(table)
-    return
-
-
-@layout.command(
-    "operations",
-    short_help="List all operationIds referenced"
-)
-def layout_operations(
-    filename: LayoutFilenameArgument,
-    start: StartPointOption = DEFAULT_START,
-) -> None:
-    """Get a list of opertionId's used in the specified layout file."""
-    def _operations(_node: LayoutNode) -> set[str]:
-        ops = {op.identifier for op in _node.operations()}
-        for sub in _node.subcommands():
-            ops.update(_operations(sub))
-        return ops
-
-    tree = layout_tree_with_error_handling(filename, start=start)
-    operations = _operations(tree)
-    print('\n'.join(sorted(operations)))
-    return
-
-
-@layout.command(
-    "suggest",
-    short_help="Suggest layout based on OpenAPI spec"
-)
-def layout_suggest(
-    openapi_file: OpenApiFilenameArgument,
-    output_file: Annotated[str, typer.Argument(show_default=False, help="File name for output")],
-    prefix: Annotated[str, typer.Option(show_default=False, help="Prefix common to all paths")] = "",
-    log_level: LogLevelOption = "info",
-) -> None:
-    init_logging(log_level, GENERATOR_LOG_CLASS)
-    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
-    generator = LayoutGenerator()
-    node = generator.generate(oas, prefix)
-
-    start = datetime.now()
-    write_layout(output_file, node)
-    delta = datetime.now() - start
-    get_logger(GENERATOR_LOG_CLASS).info(f"Writing {output_file} took {delta.total_seconds()} seconds")
-    print(f"Wrote {output_file}")
-    return
 
 
 #################################################
@@ -306,10 +78,7 @@ def generate_cli(
         Optional[str],
         typer.Option(show_default=False, help="Directory for tests -- overrides default")
     ] = None,
-    copyright_file: Annotated[
-        Optional[str],
-        typer.Option(show_default=False, help="File name containing copyright message (for non-default)"),
-    ] = None,
+    copyright_file: CopyrightFileOption = None,
     include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "info",
@@ -319,7 +88,7 @@ def generate_cli(
     Use either `--project-dir` to set both relative code and test directories, or
     set the paths specifically using `--code-dir` and `--test-dir`.
     """
-    init_logging(log_level, GENERATOR_LOG_CLASS)
+    logger = init_logging(log_level, LOG_CLASS)
 
     if project_dir:
         code_dir = code_dir or os.path.join(project_dir, package_name)
@@ -338,8 +107,8 @@ def generate_cli(
             )
             raise typer.Exit(1)
 
-    commands = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
+    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
+    oas = open_oas_with_error_handling(openapi_file, logger)
 
     if copyright_file:
         text = Path(copyright_file).read_text()
@@ -381,9 +150,9 @@ def generate_check_missing(
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, GENERATOR_LOG_CLASS)
-    commands = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
+    logger = init_logging(log_level, LOG_CLASS)
+    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
+    oas = open_oas_with_error_handling(openapi_file, logger)
 
     missing = check_for_missing(commands, oas)
     if missing:
@@ -401,9 +170,9 @@ def generate_unreferenced(
     full_path: Annotated[bool, typer.Option(help="Use full URL path that included variables")] = False,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, GENERATOR_LOG_CLASS)
-    commands = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
+    logger = init_logging(log_level, LOG_CLASS)
+    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
+    oas = open_oas_with_error_handling(openapi_file, logger)
 
     unreferenced = find_unreferenced(commands, oas)
     if not unreferenced:
@@ -444,9 +213,9 @@ def show_cli_tree(
     max_depth: Annotated[int, typer.Option(help="Maximum tree depth to show")] = 10,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, GENERATOR_LOG_CLASS)
-    layout = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
+    logger = init_logging(log_level, LOG_CLASS)
+    layout = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
+    oas = open_oas_with_error_handling(openapi_file, logger)
     generator = CliGenerator("", oas)
 
     tree = generate_tree_node(generator, layout)
@@ -501,9 +270,9 @@ def trim_oas(
             ops.update(_operations(sub))
         return ops
 
-    init_logging(log_level, GENERATOR_LOG_CLASS)
-    layout = layout_tree_with_error_handling(layout_file, start=start)
-    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
+    logger = init_logging(log_level, LOG_CLASS)
+    layout = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
+    oas = open_oas_with_error_handling(openapi_file, logger)
     updated = deepcopy(oas)
 
     operations = _operations(layout)

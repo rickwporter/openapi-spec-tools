@@ -1,11 +1,5 @@
 """File utilities for use in CLI stuff."""
-import logging
 from datetime import datetime
-from typing import Any
-
-import typer
-
-from openapi_spec_tools.utils import open_oas
 
 DEFAULT_COPYRIGHT = f"""\
 # Copyright {datetime.now().year}
@@ -26,26 +20,6 @@ def set_copyright(copyright: str = DEFAULT_COPYRIGHT) -> None:
 def copyright() -> str:
     """Get the global copyright value."""
     return _copyright
-
-
-def open_oas_with_error_handling(filename: str, logger: logging.Logger) -> Any:
-    """Perform error handling around opening an OpenAPI spec.
-
-    Avoids the standard Typer error handling that is quite verbose.
-    """
-    try:
-        starttime = datetime.now()
-        data = open_oas(filename)
-        delta = datetime.now() - starttime
-        logger.info(f"Opening {filename} took {delta.total_seconds()} seconds")
-        return data
-    except FileNotFoundError:
-        message = f"failed to find {filename}"
-    except Exception as ex:
-        message = f"unable to parse {filename}: {ex}"
-
-    typer.echo(f"ERROR: {message}")
-    raise typer.Exit(1)
 
 
 def copy_and_update(src_filename: str, dst_filename: str, replacements: dict[str, str]):

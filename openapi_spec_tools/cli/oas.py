@@ -12,8 +12,8 @@ import typer
 import yaml
 from rich.console import Console
 
-from openapi_spec_tools.cli._typer import OasFilenameArgument
-from openapi_spec_tools.cli._typer import error_out
+from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._utils import error_out
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
@@ -108,7 +108,7 @@ app = typer.Typer(
 
 @app.command("info", short_help="Display the 'info' from the OpenAPI specification")
 def info(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
 ) -> None:
     spec = open_oas_with_error_handling(filename)
 
@@ -120,7 +120,7 @@ def info(
 
 @app.command("summary", short_help="Display summary of OAS data")
 def summary(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
 ) -> None:
     spec = open_oas_with_error_handling(filename)
     method_count = {
@@ -193,7 +193,7 @@ class DisplayOption(str, Enum):
 
 @app.command("update", short_help="Update the OpenAPI spec")
 def update(
-    original_filename: OasFilenameArgument,
+    original_filename: OpenApiFilenameArgument,
     updated_filename: Annotated[Optional[str], typer.Option(help="Filename for update OpenAPI spec")] = None,
     nullable_not_required: Annotated[
         bool,
@@ -278,7 +278,7 @@ analyze_typer.add_typer(op_typer, name="ops")
 
 @op_typer.command(name="list", short_help="List operations in OpenAPI spec")
 def operation_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: Annotated[
         Optional[str],
         typer.Option("--contains", help="Search for this value in the operation names"),
@@ -306,7 +306,7 @@ def operation_list(
 
 @op_typer.command(name="show", short_help="Show the opertions schema")
 def operation_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     operation_name: Annotated[str, typer.Argument(help="Name of the operation to show")],
 ) -> None:
     spec = open_oas_with_error_handling(filename)
@@ -331,7 +331,7 @@ def operation_show(
 
 @op_typer.command(name="models", short_help="List the models referenced by the specified operaton")
 def operation_models(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
 ) -> None:
     spec = open_oas_with_error_handling(filename)
@@ -371,7 +371,7 @@ PathModelsOption = Annotated[bool, typer.Option("--models", help="Include the re
 
 @path_typer.command(name="list", short_help="List paths in OpenAPI spec")
 def paths_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: PathSearchOption = None,
     include_subpaths: PathSubpathOption = False,
 ) -> None:
@@ -399,7 +399,7 @@ def paths_list(
 
 @path_typer.command(name="show", short_help="Show the path schema")
 def paths_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     path_name: Annotated[str, typer.Argument(help="Name of the path to show")],
     include_subpaths: PathSubpathOption = False,
     include_models: PathModelsOption = False,
@@ -428,7 +428,7 @@ def paths_show(
 
 @path_typer.command(name="ops", short_help="Show the operations in the specified path")
 def paths_operations(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     path_name: Annotated[str, typer.Option(help="Name of the path to show")],
     include_subpaths: PathSubpathOption = False,
 ) -> None:
@@ -459,7 +459,7 @@ analyze_typer.add_typer(models_typer, name="models")
 
 @models_typer.command(name="list", short_help="List models in OpenAPI spec")
 def models_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: Annotated[
         Optional[str],
         typer.Option("--contains", help="Search for this value in the model names"),
@@ -488,7 +488,7 @@ def models_list(
 
 @models_typer.command(name="show", short_help="Show the model schema")
 def models_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
     include_referenced: Annotated[bool, typer.Option("--references", help="Include referenced models")] = False,
 ) -> None:
@@ -513,7 +513,7 @@ def models_show(
 
 @models_typer.command(name="uses", short_help="List sub-models used by the specified model")
 def models_uses(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
     spec = open_oas_with_error_handling(filename)
@@ -540,7 +540,7 @@ def models_uses(
 
 @models_typer.command(name="used-by", short_help="List models which reference the specified model")
 def models_used_by(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
 ) -> None:
     spec = open_oas_with_error_handling(filename)
@@ -565,7 +565,7 @@ def models_used_by(
 
 @models_typer.command(name="ops", short_help="List operations which reference the specified model")
 def models_operations(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to search for")],
 ) -> None:
     spec = open_oas_with_error_handling(filename)
@@ -604,7 +604,7 @@ analyze_typer.add_typer(tag_typer, name="tags")
 
 @tag_typer.command(name="list", short_help="List tags in OpenAPI spec")
 def tags_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the tag names")] = None,
 ) -> None:
     spec = open_oas_with_error_handling(filename)
@@ -639,7 +639,7 @@ def tags_list(
 
 @tag_typer.command(name="show", short_help="Show the tag schema")
 def tags_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     tag_name: Annotated[str, typer.Argument(help="Name of the tag to show")],
 ) -> None:
     spec = open_oas_with_error_handling(filename)
@@ -676,7 +676,7 @@ analyze_typer.add_typer(content_typer, name="content")
 
 @content_typer.command("list", short_help="List operations by response content-type")
 def content_type_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     max_size: Annotated[int, typer.Option(help="Maximum number of operations to show")] = 10,
     content_type: Annotated[Optional[str], typer.Option(help="Only display for specified content type")] = None,
 ) -> None:

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Implementation of the CLI generation CLI."""
 import os
-from enum import Enum
 from pathlib import Path
 from typing import Annotated
 from typing import Optional
@@ -11,36 +10,18 @@ import typer
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.api_gen.files import copy_api_infrastructure
 from openapi_spec_tools.api_gen.files import generate_api_node
-from openapi_spec_tools.base_gen._logging import get_logger
-from openapi_spec_tools.base_gen._logging import init_logging
-from openapi_spec_tools.base_gen.files import open_oas_with_error_handling
 from openapi_spec_tools.base_gen.files import set_copyright
+from openapi_spec_tools.cli._arguments import CopyrightFileOption
+from openapi_spec_tools.cli._arguments import LogLevelOption
+from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._utils import get_logger
+from openapi_spec_tools.cli._utils import init_logging
+from openapi_spec_tools.cli._utils import open_oas_with_error_handling
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 
 SEP = "\n    "
 
-class LogLevel(str, Enum):
-    """Log levels."""
-
-    CRITICAL = "critical"
-    ERROR = "error"
-    WARN = "warn"
-    INFO = "info"
-    DEBUG = "debug"
-
-
-OpenApiFilenameArgument = Annotated[str, typer.Argument(show_default=False, help="OpenAPI specification filename")]
-LogLevelOption = Annotated[
-    LogLevel,
-    typer.Option(
-        "--log",
-        case_sensitive=False,
-        help="Log level",
-    ),
-]
-
-
-GENERATOR_LOG_CLASS = "api-gen"
+LOG_CLASS = "api-gen"
 
 #################################################
 # Top-level stuff
@@ -60,10 +41,7 @@ def generate_api(
         Optional[str],
         typer.Option(show_default=False, help="Directory for code -- overrides default")
     ] = None,
-    copyright_file: Annotated[
-        Optional[str],
-        typer.Option(show_default=False, help="File name containing copyright message (for non-default)"),
-    ] = None,
+    copyright_file: CopyrightFileOption = None,
     prefix: Annotated[
         str,
         typer.Option(show_default="", help="Prefix to ignore"),
@@ -71,10 +49,10 @@ def generate_api(
     log_level: LogLevelOption = "info",
 ) -> None:
     """Generate API code based on the provided parameters."""
-    init_logging(log_level, GENERATOR_LOG_CLASS)
+    init_logging(log_level, LOG_CLASS)
     code_dir = code_dir or package_name
 
-    oas = open_oas_with_error_handling(openapi_file, get_logger(GENERATOR_LOG_CLASS))
+    oas = open_oas_with_error_handling(openapi_file, get_logger(LOG_CLASS))
     layout_gen = LayoutGenerator()
     commands = layout_gen.generate(oas, prefix)
 
