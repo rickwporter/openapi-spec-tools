@@ -12,8 +12,8 @@ import typer
 import yaml
 from rich.console import Console
 
-from openapi_spec_tools._typer import OasFilenameArgument
-from openapi_spec_tools._typer import error_out
+from openapi_spec_tools.cli._typer import OasFilenameArgument
+from openapi_spec_tools.cli._typer import error_out
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs

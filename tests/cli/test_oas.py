@@ -8,29 +8,29 @@ from unittest import mock
 import pytest
 import typer
 
-from openapi_spec_tools.oas import DisplayOption
-from openapi_spec_tools.oas import console_factory
-from openapi_spec_tools.oas import content_type_list
-from openapi_spec_tools.oas import diff
-from openapi_spec_tools.oas import info
-from openapi_spec_tools.oas import models_list
-from openapi_spec_tools.oas import models_operations
-from openapi_spec_tools.oas import models_show
-from openapi_spec_tools.oas import models_used_by
-from openapi_spec_tools.oas import models_uses
-from openapi_spec_tools.oas import open_oas_with_error_handling
-from openapi_spec_tools.oas import operation_list
-from openapi_spec_tools.oas import operation_models
-from openapi_spec_tools.oas import operation_show
-from openapi_spec_tools.oas import paths_list
-from openapi_spec_tools.oas import paths_operations
-from openapi_spec_tools.oas import paths_show
-from openapi_spec_tools.oas import remove_dict_prefix
-from openapi_spec_tools.oas import remove_list_prefix
-from openapi_spec_tools.oas import summary
-from openapi_spec_tools.oas import tags_list
-from openapi_spec_tools.oas import tags_show
-from openapi_spec_tools.oas import update
+from openapi_spec_tools.cli.oas import DisplayOption
+from openapi_spec_tools.cli.oas import console_factory
+from openapi_spec_tools.cli.oas import content_type_list
+from openapi_spec_tools.cli.oas import diff
+from openapi_spec_tools.cli.oas import info
+from openapi_spec_tools.cli.oas import models_list
+from openapi_spec_tools.cli.oas import models_operations
+from openapi_spec_tools.cli.oas import models_show
+from openapi_spec_tools.cli.oas import models_used_by
+from openapi_spec_tools.cli.oas import models_uses
+from openapi_spec_tools.cli.oas import open_oas_with_error_handling
+from openapi_spec_tools.cli.oas import operation_list
+from openapi_spec_tools.cli.oas import operation_models
+from openapi_spec_tools.cli.oas import operation_show
+from openapi_spec_tools.cli.oas import paths_list
+from openapi_spec_tools.cli.oas import paths_operations
+from openapi_spec_tools.cli.oas import paths_show
+from openapi_spec_tools.cli.oas import remove_dict_prefix
+from openapi_spec_tools.cli.oas import remove_list_prefix
+from openapi_spec_tools.cli.oas import summary
+from openapi_spec_tools.cli.oas import tags_list
+from openapi_spec_tools.cli.oas import tags_show
+from openapi_spec_tools.cli.oas import update
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 

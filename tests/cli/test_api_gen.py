@@ -8,8 +8,8 @@ from unittest import mock
 import pytest
 import typer
 
-from openapi_spec_tools.api_gen.cli import generate_api
-from openapi_spec_tools.api_gen.cli import open_oas_with_error_handling
+from openapi_spec_tools.cli.api_gen import generate_api
+from openapi_spec_tools.cli.api_gen import open_oas_with_error_handling
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
