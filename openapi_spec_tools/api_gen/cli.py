@@ -11,10 +11,10 @@ import typer
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.api_gen.files import copy_api_infrastructure
 from openapi_spec_tools.api_gen.files import generate_api_node
+from openapi_spec_tools.base_gen._logging import get_logger
+from openapi_spec_tools.base_gen._logging import init_logging
 from openapi_spec_tools.base_gen.files import open_oas_with_error_handling
 from openapi_spec_tools.base_gen.files import set_copyright
-from openapi_spec_tools.cli_gen._logging import get_logger
-from openapi_spec_tools.cli_gen._logging import init_logging
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 
 SEP = "\n    "

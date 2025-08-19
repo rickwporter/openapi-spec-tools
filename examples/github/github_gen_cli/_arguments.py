@@ -7,9 +7,9 @@ from typing import Optional
 
 import typer
 
+from github_gen_cli._logging import LogLevel
 from github_gen_cli._display import OutputFormat
 from github_gen_cli._display import OutputStyle
-from github_gen_cli._logging import LogLevel
 from github_gen_cli._tree import TreeDisplay
 
 ENV_API_HOST = "API_HOST"

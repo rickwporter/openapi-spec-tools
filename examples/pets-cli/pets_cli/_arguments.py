@@ -7,9 +7,9 @@ from typing import Optional
 
 import typer
 
+from pets_cli._logging import LogLevel
 from pets_cli._display import OutputFormat
 from pets_cli._display import OutputStyle
-from pets_cli._logging import LogLevel
 from pets_cli._tree import TreeDisplay
 
 ENV_API_HOST = "API_HOST"

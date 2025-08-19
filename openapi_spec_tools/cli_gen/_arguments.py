@@ -3,9 +3,9 @@ from typing import Optional
 
 import typer
 
+from openapi_spec_tools.base_gen._logging import LogLevel
 from openapi_spec_tools.cli_gen._display import OutputFormat
 from openapi_spec_tools.cli_gen._display import OutputStyle
-from openapi_spec_tools.cli_gen._logging import LogLevel
 from openapi_spec_tools.cli_gen._tree import TreeDisplay
 
 ENV_API_HOST = "API_HOST"
