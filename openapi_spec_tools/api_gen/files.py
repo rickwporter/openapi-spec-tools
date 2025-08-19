@@ -46,6 +46,8 @@ def copy_api_infrastructure(dst_dir: str, package_name: str):
     dpath = Path(dst_dir)
     replacements = {
         __package__: package_name,
+        "openapi_spec_tools.api_gen": package_name,
+        "openapi_spec_tools.base_gen": package_name,
     }
     for src, dst in INFRASTRUCTURE_FILES.items():
         dfile = dpath / dst

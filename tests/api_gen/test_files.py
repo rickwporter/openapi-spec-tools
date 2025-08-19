@@ -96,3 +96,8 @@ def test_copy_api_infrastructure():
     }
     assert filenames == expected
 
+    # make sure all the imports have been updated
+    for fname in filenames:
+        file = dst_path / fname
+        text = file.read_text()
+        assert "from openapi_spec_tools" not in text
