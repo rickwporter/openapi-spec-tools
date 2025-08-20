@@ -32,10 +32,10 @@ all: install gen lint cov ## Perform a full cycle
 gen: layout-suggest cli-regen
 
 layout-lint:  ## Check the layout file format
-	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
+	$(poetry_run) layout check $(LAYOUT_FILE)
 
 layout-suggest: ## Create suggested layout file
-	$(poetry_run) cli-gen layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
+	$(poetry_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
 
 cli-gen: layout-lint ## Generate CLI code
 	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY)
