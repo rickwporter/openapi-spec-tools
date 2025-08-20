@@ -21,13 +21,9 @@ from tests.cli.cli_gen_output import PET_FUNC
 from tests.cli.cli_gen_output import PET_HELP
 from tests.cli.cli_gen_output import PET_OP
 from tests.cli.cli_gen_output import PET_PATH
+from tests.cli.helpers import read_text
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
-
-
-def _read_text(filename: str) -> str:
-    with open(filename, "r", encoding="utf-8", newline="\n") as fp:
-        return fp.read()
 
 
 @pytest.mark.parametrize(
@@ -145,7 +141,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
     path = base_dir / pkg_name
     for fname in filenames:
         file = path / fname
-        text = _read_text(file.as_posix())
+        text = read_text(file.as_posix())
         assert copyright_text in text
 
     filenames = {
@@ -161,7 +157,7 @@ def test_cli_generate_success_copyright(copyright_fixture):
     path = base_dir / "tests"
     for fname in filenames:
         file = path / fname
-        text = _read_text(file.as_posix())
+        text = read_text(file.as_posix())
         assert copyright_text in text
 
 
