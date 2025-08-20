@@ -1,9 +1,11 @@
 import logging
+import os
 from unittest import mock
 
 import pytest
 import typer
 
+from openapi_spec_tools.cli._utils import console_factory
 from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli._utils import open_layout_with_error_handling
 from openapi_spec_tools.cli._utils import open_oas_with_error_handling
@@ -73,3 +75,16 @@ def test_layout_tree_with_error(filename, message) -> None:
     assert output.startswith(message)
 
 
+def test_console_factory() -> None:
+    # when running the tests, the PYTEST_VERSION is defined by default
+    console = console_factory()
+    assert 3000 == console.width
+
+    with mock.patch.dict(os.environ, {"TERMINAL_WIDTH": "12"}):
+        console = console_factory()
+        assert 12 == console.width
+
+    # using default width for the platform, so it seems to vary
+    with mock.patch.dict(os.environ, {}, clear=True):
+        console = console_factory()
+        assert console.width != 3000

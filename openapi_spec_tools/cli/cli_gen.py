@@ -8,7 +8,6 @@ from typing import Optional
 
 import typer
 import yaml
-from rich.console import Console
 
 from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli._arguments import CopyrightFileOption
@@ -16,6 +15,7 @@ from openapi_spec_tools.cli._arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli._arguments import StartPointOption
+from openapi_spec_tools.cli._utils import console_factory
 from openapi_spec_tools.cli._utils import init_logging
 from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli._utils import open_oas_with_error_handling
@@ -226,7 +226,7 @@ def show_cli_tree(
     table = create_tree_table(tree, display, max_depth)
     table.show_header = True
     table.expand = False
-    console = Console()
+    console = console_factory()
     console.print(table)
 
 

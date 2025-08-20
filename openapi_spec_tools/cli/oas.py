@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Implement the 'oas' CLI with options for analyzing and modifying OpenAPI specs."""
-import os
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
@@ -10,10 +9,10 @@ from typing import Optional
 
 import typer
 import yaml
-from rich.console import Console
 
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._utils import console_factory
 from openapi_spec_tools.cli._utils import error_out
 from openapi_spec_tools.cli._utils import init_logging
 from openapi_spec_tools.cli._utils import open_oas_with_error_handling
@@ -43,21 +42,6 @@ LOG_CLASS = "oas"
 def short_filename(long: str) -> str:
     """Shorten the filename to just the name portion."""
     return Path(long).name
-
-
-def console_factory() -> Console:
-    """Consolidate creation/initialization of Console.
-
-    A little hacky here... Allow terminal width to be set directly by an environment variable, or
-    when detecting that we're testing use a wide terminal to avoid line wrap issues.
-    """
-    width = os.environ.get("TERMINAL_WIDTH")
-    pytest_version = os.environ.get("PYTEST_VERSION")
-    if width is not None:
-        width = int(width)
-    elif pytest_version is not None:
-        width = 3000
-    return Console(width=width)
 
 
 def remove_list_prefix(items: list[str]) -> list[str]:

@@ -8,13 +8,13 @@ import typer
 import yaml
 from rich import print
 from rich import print_json
-from rich.console import Console
 from rich.table import Table
 
 from openapi_spec_tools.cli._arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli._arguments import StartPointOption
+from openapi_spec_tools.cli._utils import console_factory
 from openapi_spec_tools.cli._utils import init_logging
 from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli._utils import open_layout_with_error_handling
@@ -157,7 +157,7 @@ def layout_tree(
         table.add_column(name, justify="left", no_wrap=True, overflow="ignore")
 
     add_node(table, tree, 0)
-    console = Console()
+    console = console_factory()
     console.print(table)
     return
 

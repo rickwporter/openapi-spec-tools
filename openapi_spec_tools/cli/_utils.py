@@ -1,11 +1,13 @@
 """Common extensions to Typer for local CLI use."""
 import logging
+import os
 from datetime import datetime
 from enum import Enum
 from typing import Any
 
 import typer
 from rich import print
+from rich.console import Console
 
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import file_to_tree
@@ -110,3 +112,16 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
     raise typer.Exit(1)
 
 
+def console_factory() -> Console:
+    """Consolidate creation/initialization of Console.
+
+    A little hacky here... Allow terminal width to be set directly by an environment variable, or
+    when detecting that we're testing use a wide terminal to avoid line wrap issues.
+    """
+    width = os.environ.get("TERMINAL_WIDTH")
+    pytest_version = os.environ.get("PYTEST_VERSION")
+    if width is not None:
+        width = int(width)
+    elif pytest_version is not None:
+        width = 3000
+    return Console(width=width)
