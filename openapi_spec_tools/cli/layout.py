@@ -195,6 +195,16 @@ def layout_suggest(
     prefix: Annotated[str, typer.Option(show_default=False, help="Prefix common to all paths")] = "",
     log_level: LogLevelOption = "info",
 ) -> None:
+    """Create a suggested layout based on the OpenAPI spec paths and operations.
+
+    This is a way to quick-start creating a layout file, but has a few issues:
+
+    * May have duplicate commands that may need to be fixed (detected with `layout check`)
+
+    * Does not consider pagaination
+
+    * May have some small modules (extra layers), such as `deploy list` instead of a desired `deploy`.
+    """
     logger = init_logging(log_level, LOG_CLASS)
     oas = open_oas_with_error_handling(openapi_file, logger)
     generator = LayoutGenerator()
