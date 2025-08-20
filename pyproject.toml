@@ -17,9 +17,10 @@ rich = "^14.0.0"
 requests = "2.32.4"
 
 [tool.poetry.scripts]
-oas = "openapi_spec_tools.oas:app"
-cli-gen = "openapi_spec_tools.cli_gen.cli:app"
-api-gen = "openapi_spec_tools.api_gen.cli:app"
+oas = "openapi_spec_tools.cli.oas:app"
+cli-gen = "openapi_spec_tools.cli.cli_gen:app"
+api-gen = "openapi_spec_tools.cli.api_gen:app"
+layout = "openapi_spec_tools.cli.layout:app"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
@@ -63,21 +64,17 @@ max-statements = 75
 [tool.ruff.lint.per-file-ignores]
 # ignore the unused imports in init
 "__init__.py" = ["F401"]
-"tests/cli_gen/cli_output.py" = ["W291"]
 "tests/*" = [
     "D",  # no need for docstrings on tests
     "PLR2004",  # magic numbers allowed in tests
 ]
-"openapi_spec_tools/oas.py" = [
+"openapi_spec_tools/cli/*" = [
     "D103", # CLI functions don't need docstrings
     "PLR0912",  # it is intentional to have CLI functions with lots of options
 ]
+"tests/cli/cli_gen_output.py" = ["W291"]
 "openapi_spec_tools/base_gen/base_generator.py" = [
     "PLR0912",  # should reduce the complexity, but it is difficult
-]
-"openapi_spec_tools/cli_gen/cli.py" = [
-    "D103", # CLI functions don't need docstrings
-    "PLR0912",  # it is intentional to have CLI functions with lots of options
 ]
 "openapi_spec_tools/cli_gen/cli_generator.py" = [
     "PLR0912",  # should reduce the complexity, but it is difficult

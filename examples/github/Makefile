@@ -31,7 +31,7 @@ all: install gen lint ## Perform a full cycle
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
-	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
+	$(poetry_run) layout check $(LAYOUT_FILE)
 
 trim: ## Creates the skinny OpenAPI spec
 	$(poetry_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC) --remove examples

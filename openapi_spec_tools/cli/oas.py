@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Implement the 'oas' CLI with options for analyzing and modifying OpenAPI specs."""
-import os
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
@@ -10,10 +9,13 @@ from typing import Optional
 
 import typer
 import yaml
-from rich.console import Console
 
-from openapi_spec_tools._typer import OasFilenameArgument
-from openapi_spec_tools._typer import error_out
+from openapi_spec_tools.cli._arguments import LogLevelOption
+from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._utils import console_factory
+from openapi_spec_tools.cli._utils import error_out
+from openapi_spec_tools.cli._utils import init_logging
+from openapi_spec_tools.cli._utils import open_oas_with_error_handling
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
@@ -26,7 +28,6 @@ from openapi_spec_tools.utils import model_filter
 from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
-from openapi_spec_tools.utils import open_oas
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
@@ -35,26 +36,12 @@ from openapi_spec_tools.utils import unmap_models
 from openapi_spec_tools.utils import unroll
 
 INDENT = "    "
+LOG_CLASS = "oas"
 
 
 def short_filename(long: str) -> str:
     """Shorten the filename to just the name portion."""
     return Path(long).name
-
-
-def console_factory() -> Console:
-    """Consolidate creation/initialization of Console.
-
-    A little hacky here... Allow terminal width to be set directly by an environment variable, or
-    when detecting that we're testing use a wide terminal to avoid line wrap issues.
-    """
-    width = os.environ.get("TERMINAL_WIDTH")
-    pytest_version = os.environ.get("PYTEST_VERSION")
-    if width is not None:
-        width = int(width)
-    elif pytest_version is not None:
-        width = 3000
-    return Console(width=width)
 
 
 def remove_list_prefix(items: list[str]) -> list[str]:
@@ -79,23 +66,6 @@ def remove_dict_prefix(map: dict[str, Any]) -> dict[str, Any]:
     return {k.replace(prefix, ""): v for k, v in map.items()}
 
 
-def open_oas_with_error_handling(filename: str) -> Any:
-    """Perform error handling around opening an OpenAPI spec.
-
-    Avoids the standard Typer error handling that is quite verbose.
-    """
-    try:
-        return open_oas(filename)
-    except FileNotFoundError:
-        message = f"failed to find {filename}"
-    except Exception as ex:
-        message = f"unable to parse {filename}: {ex}"
-
-    console = console_factory()
-    console.print(f"[red]ERROR:[/red] {message}")
-    raise typer.Exit(1)
-
-
 #################################################
 # Top-level stuff
 app = typer.Typer(
@@ -108,9 +78,11 @@ app = typer.Typer(
 
 @app.command("info", short_help="Display the 'info' from the OpenAPI specification")
 def info(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     info = spec.get("info", {})
     console = console_factory()
@@ -120,9 +92,11 @@ def info(
 
 @app.command("summary", short_help="Display summary of OAS data")
 def summary(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
     method_count = {
         'get': 0,
         'put': 0,
@@ -169,9 +143,11 @@ def diff(
         str,
         typer.Argument(metavar="FILENAME", show_default=False, help="Updated OpenAPI specification filename"),
     ],
+    log_level: LogLevelOption = "info",
 ) -> None:
-    old_spec = open_oas_with_error_handling(original)
-    new_spec = open_oas_with_error_handling(updated)
+    logger = init_logging(log_level, LOG_CLASS)
+    old_spec = open_oas_with_error_handling(original, logger)
+    new_spec = open_oas_with_error_handling(updated, logger)
 
     console = console_factory()
     diffs = find_diffs(old_spec, new_spec)
@@ -193,7 +169,7 @@ class DisplayOption(str, Enum):
 
 @app.command("update", short_help="Update the OpenAPI spec")
 def update(
-    original_filename: OasFilenameArgument,
+    original_filename: OpenApiFilenameArgument,
     updated_filename: Annotated[Optional[str], typer.Option(help="Filename for update OpenAPI spec")] = None,
     nullable_not_required: Annotated[
         bool,
@@ -220,8 +196,10 @@ def update(
         int,
         typer.Option(min=1, max=10, help="Number of characters to indent on YAML display"),
     ] = len(INDENT),
+    log_level: LogLevelOption = "info",
 ) -> None:
-    old_spec = open_oas_with_error_handling(original_filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    old_spec = open_oas_with_error_handling(original_filename, logger)
     updated = deepcopy(old_spec)
 
     if allowed_operations and remove_operations:
@@ -278,13 +256,15 @@ analyze_typer.add_typer(op_typer, name="ops")
 
 @op_typer.command(name="list", short_help="List operations in OpenAPI spec")
 def operation_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: Annotated[
         Optional[str],
         typer.Option("--contains", help="Search for this value in the operation names"),
     ] = None,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
     names = sorted(operations.keys())
@@ -306,10 +286,12 @@ def operation_list(
 
 @op_typer.command(name="show", short_help="Show the opertions schema")
 def operation_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     operation_name: Annotated[str, typer.Argument(help="Name of the operation to show")],
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
     operation = operations.get(operation_name)
@@ -331,10 +313,12 @@ def operation_show(
 
 @op_typer.command(name="models", short_help="List the models referenced by the specified operaton")
 def operation_models(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
     operation = operations.get(operation_name)
@@ -371,11 +355,13 @@ PathModelsOption = Annotated[bool, typer.Option("--models", help="Include the re
 
 @path_typer.command(name="list", short_help="List paths in OpenAPI spec")
 def paths_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: PathSearchOption = None,
     include_subpaths: PathSubpathOption = False,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     paths = find_paths(spec.get(OasField.PATHS, {}), search, include_subpaths)
     names = sorted(paths.keys())
@@ -399,12 +385,14 @@ def paths_list(
 
 @path_typer.command(name="show", short_help="Show the path schema")
 def paths_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     path_name: Annotated[str, typer.Argument(help="Name of the path to show")],
     include_subpaths: PathSubpathOption = False,
     include_models: PathModelsOption = False,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     paths = find_paths(spec.get(OasField.PATHS, {}), path_name, include_subpaths)
     if not paths:
@@ -428,11 +416,13 @@ def paths_show(
 
 @path_typer.command(name="ops", short_help="Show the operations in the specified path")
 def paths_operations(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     path_name: Annotated[str, typer.Option(help="Name of the path to show")],
     include_subpaths: PathSubpathOption = False,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     result = {}
     paths = find_paths(spec.get(OasField.PATHS, {}), path_name, include_subpaths)
@@ -459,13 +449,15 @@ analyze_typer.add_typer(models_typer, name="models")
 
 @models_typer.command(name="list", short_help="List models in OpenAPI spec")
 def models_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: Annotated[
         Optional[str],
         typer.Option("--contains", help="Search for this value in the model names"),
     ] = None,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     names = sorted(models.keys())
@@ -488,11 +480,13 @@ def models_list(
 
 @models_typer.command(name="show", short_help="Show the model schema")
 def models_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
     include_referenced: Annotated[bool, typer.Option("--references", help="Include referenced models")] = False,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -513,10 +507,12 @@ def models_show(
 
 @models_typer.command(name="uses", short_help="List sub-models used by the specified model")
 def models_uses(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -540,10 +536,12 @@ def models_uses(
 
 @models_typer.command(name="used-by", short_help="List models which reference the specified model")
 def models_used_by(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -565,10 +563,12 @@ def models_used_by(
 
 @models_typer.command(name="ops", short_help="List operations which reference the specified model")
 def models_operations(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to search for")],
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -604,10 +604,12 @@ analyze_typer.add_typer(tag_typer, name="tags")
 
 @tag_typer.command(name="list", short_help="List tags in OpenAPI spec")
 def tags_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the tag names")] = None,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     # NOTE: not all OAS's include a "tags" section, so walk the operations
 
@@ -639,10 +641,12 @@ def tags_list(
 
 @tag_typer.command(name="show", short_help="Show the tag schema")
 def tags_show(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     tag_name: Annotated[str, typer.Argument(help="Name of the tag to show")],
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
 
     operations = {}
     for path, path_data in spec.get(OasField.PATHS, {}).items():
@@ -676,11 +680,13 @@ analyze_typer.add_typer(content_typer, name="content")
 
 @content_typer.command("list", short_help="List operations by response content-type")
 def content_type_list(
-    filename: OasFilenameArgument,
+    filename: OpenApiFilenameArgument,
     max_size: Annotated[int, typer.Option(help="Maximum number of operations to show")] = 10,
     content_type: Annotated[Optional[str], typer.Option(help="Only display for specified content type")] = None,
+    log_level: LogLevelOption = "info",
 ) -> None:
-    spec = open_oas_with_error_handling(filename)
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
     content = map_content_types(spec)
 
     if content_type:

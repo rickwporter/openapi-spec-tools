@@ -29,7 +29,7 @@ all: install gen lint ## Perform a full cycle
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
-	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
+	$(poetry_run) layout check $(LAYOUT_FILE)
 
 gen: layout-lint ## Generate CLI code
 	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests

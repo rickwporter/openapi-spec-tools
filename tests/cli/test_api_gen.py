@@ -1,52 +1,14 @@
-import logging
-import os
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
 import pytest
-import typer
 
-from openapi_spec_tools.api_gen.cli import generate_api
-from openapi_spec_tools.api_gen.cli import open_oas_with_error_handling
+from openapi_spec_tools.cli.api_gen import generate_api
+from tests.cli.helpers import read_text
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
-
-
-@pytest.fixture
-def temp_working_dir():
-    orig_dir = os.getcwd()
-    with TemporaryDirectory() as temp_dir:
-        os.chdir(temp_dir)
-        yield temp_dir
-        os.chdir(orig_dir)
-
-
-def _read_text(filename: str) -> str:
-    with open(filename, "r", encoding="utf-8", newline="\n") as fp:
-        return fp.read()
-
-
-@pytest.mark.parametrize(
-    ["filename", "message"],
-    [
-        pytest.param("gone", "ERROR: failed to find", id="missing"),
-        pytest.param("bad.json", "ERROR: unable to parse", id="bad-json"),
-        pytest.param("bad.yaml", "ERROR: unable to parse", id="bad-yaml"),
-    ]
-)
-def test_open_oas(filename, message) -> None:
-    logger = logging.getLogger("")
-    with (
-        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
-        pytest.raises(typer.Exit) as err,
-    ):
-        open_oas_with_error_handling(asset_filename(filename), logger)
-
-    assert err.value.exit_code == 1
-    output = mock_stdout.getvalue()
-    assert output.startswith(message)
 
 
 @pytest.mark.parametrize(
@@ -120,5 +82,5 @@ def test_api_generate_success_copyright(copyright_fixture):
     }
     for fname in filenames:
         file = code_dir / fname
-        text = _read_text(file.as_posix())
+        text = read_text(file.as_posix())
         assert copyright_text in text

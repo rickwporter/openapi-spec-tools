@@ -1,4 +1,3 @@
-import os
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -8,73 +7,33 @@ from unittest import mock
 import pytest
 import typer
 
-from openapi_spec_tools.oas import DisplayOption
-from openapi_spec_tools.oas import console_factory
-from openapi_spec_tools.oas import content_type_list
-from openapi_spec_tools.oas import diff
-from openapi_spec_tools.oas import info
-from openapi_spec_tools.oas import models_list
-from openapi_spec_tools.oas import models_operations
-from openapi_spec_tools.oas import models_show
-from openapi_spec_tools.oas import models_used_by
-from openapi_spec_tools.oas import models_uses
-from openapi_spec_tools.oas import open_oas_with_error_handling
-from openapi_spec_tools.oas import operation_list
-from openapi_spec_tools.oas import operation_models
-from openapi_spec_tools.oas import operation_show
-from openapi_spec_tools.oas import paths_list
-from openapi_spec_tools.oas import paths_operations
-from openapi_spec_tools.oas import paths_show
-from openapi_spec_tools.oas import remove_dict_prefix
-from openapi_spec_tools.oas import remove_list_prefix
-from openapi_spec_tools.oas import summary
-from openapi_spec_tools.oas import tags_list
-from openapi_spec_tools.oas import tags_show
-from openapi_spec_tools.oas import update
+from openapi_spec_tools.cli.oas import DisplayOption
+from openapi_spec_tools.cli.oas import content_type_list
+from openapi_spec_tools.cli.oas import diff
+from openapi_spec_tools.cli.oas import info
+from openapi_spec_tools.cli.oas import models_list
+from openapi_spec_tools.cli.oas import models_operations
+from openapi_spec_tools.cli.oas import models_show
+from openapi_spec_tools.cli.oas import models_used_by
+from openapi_spec_tools.cli.oas import models_uses
+from openapi_spec_tools.cli.oas import operation_list
+from openapi_spec_tools.cli.oas import operation_models
+from openapi_spec_tools.cli.oas import operation_show
+from openapi_spec_tools.cli.oas import paths_list
+from openapi_spec_tools.cli.oas import paths_operations
+from openapi_spec_tools.cli.oas import paths_show
+from openapi_spec_tools.cli.oas import remove_dict_prefix
+from openapi_spec_tools.cli.oas import remove_list_prefix
+from openapi_spec_tools.cli.oas import summary
+from openapi_spec_tools.cli.oas import tags_list
+from openapi_spec_tools.cli.oas import tags_show
+from openapi_spec_tools.cli.oas import update
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
 PET3_YAML = asset_filename("pet3.yaml")
-
-
-#################################################
-# Utilities
-
-def test_console_factory() -> None:
-    # when running the tests, the PYTEST_VERSION is defined by default
-    console = console_factory()
-    assert 3000 == console.width
-
-    with mock.patch.dict(os.environ, {"TERMINAL_WIDTH": "12"}):
-        console = console_factory()
-        assert 12 == console.width
-
-    # using default width for the platform, so it seems to vary
-    with mock.patch.dict(os.environ, {}, clear=True):
-        console = console_factory()
-        assert console.width != 3000
-
-
-@pytest.mark.parametrize(
-    ["filename", "message"],
-    [
-        pytest.param("gone", "ERROR: failed to find", id="missing"),
-        pytest.param("bad.json", "ERROR: unable to parse", id="bad"),
-    ]
-)
-def test_open_oas(filename, message) -> None:
-    with (
-        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
-        pytest.raises(typer.Exit) as err,
-    ):
-        open_oas_with_error_handling(asset_filename(filename))
-
-    assert err.value.exit_code == 1
-    output = mock_stdout.getvalue()
-    assert output.startswith(message)
-
 
 
 #################################################
