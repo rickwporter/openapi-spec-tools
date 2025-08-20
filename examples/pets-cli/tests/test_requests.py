@@ -29,6 +29,15 @@ TEXT_PLAIN = "text/plain"
 IMAGE_PNG = "image/png"
 
 
+@pytest.fixture
+def working_dir():
+    orig = os.getcwd()
+    with TemporaryDirectory() as temp_dir:
+        os.chdir(temp_dir)
+        yield temp_dir
+        os.chdir(orig)
+
+
 @pytest.mark.parametrize(
     ["args", "expected"],
     [
@@ -193,12 +202,11 @@ def test_raise_for_error_success(status_code) -> None:
         pytest.param("GET", "application/unknown", "content include, not returned", {}, None, id="unhandled")
     ]
 )
+@pytest.mark.usefixtures("working_dir")
 def test_request(method, content_type, body, params, expected):
     url = "https://foo/path"
     headers = {"Content-type": content_type}
     response = success_response(url=url, body=body, headers=headers, content_type=content_type)
-    directory = TemporaryDirectory()
-    os.chdir(directory.name)
 
     prefix = "pets_cli"
     with (
