@@ -38,7 +38,11 @@ The OpenAPI specification (OAS) defines the interface for talking to your servic
 
 ### Create CLI layout file
 
-The CLI layout file provides the structure to the CLI, and refers to the OAS for the details. A short example of a `widget` sevice is provided below. The idea is that your OAS would define the operations referred to by `operationId`.
+The CLI layout file provides the structure to the CLI, and refers to the OAS operations for the details. 
+
+The easiest way to get started is to get a suggested layout file using `cli-gen layout suggest` for your OpenAPI specification. This creates a layout file that uses the path names to form the CLI structure, and uses all the OpenAPI spec operations. This process is imperfect, but provides a good starting point.
+
+A short example of a `widget` sevice is provided below. The idea is that your OAS would define the operations referred to by `operationId`.
 
 ```yaml
 main:
@@ -88,6 +92,8 @@ The [typer project](https://github.com/fastapi/typer) provides a user friendly p
 ### Layout File
 
 It is difficult to get a good CLI structure through inference from the OAS. Rather than get it wrong, let the user tell you what the CLI should look like. Hopefully, the layout structure is easy to extend over time. 
+
+The `cli-gen layout suggest` is a tool which attempts to infer a CLI structure from the OAS. It is most useful for generating an initial attempt an a layout file.
 
 ### No OpenAPI Models
 

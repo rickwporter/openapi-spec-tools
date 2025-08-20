@@ -74,6 +74,10 @@ Into code that produces a CLI that has commands like:
 
 See the examples in `examples/` for some more complete works.
 
+## API Generation
+
+The `api-gen` tool allows users to generate API code using the OpenAPI spec. The generated Python code provides type hints and helpful comments, but does no real checking of the arguments and/or return values. The return values are typically dictionaries instead of a data class, such as the models provided in the standard OpenAPI generator.
+
 ## Contributing
 
 The [DEVELOPMENT.md](DEVELOPMENT.md) has more information about getting setup as a developer.

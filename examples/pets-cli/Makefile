@@ -6,6 +6,7 @@ help: ## This message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 LAYOUT_FILE := layout.yaml
+SUGGESTED_FILE := suggested.yaml
 OPENAPI_SPEC := pet.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := pets_cli
@@ -27,15 +28,25 @@ all: install gen lint cov ## Perform a full cycle
 	$(poetry_run) pets
 
 ###########
-##@ Code generation
+##@ CLI generation
+gen: layout-suggest cli-regen
+
 layout-lint:  ## Check the layout file format
 	$(poetry_run) cli-gen layout check $(LAYOUT_FILE)
 
-gen: layout-lint ## Generate CLI code
+layout-suggest: ## Create suggested layout file
+	$(poetry_run) cli-gen layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
+
+cli-gen: layout-lint ## Generate CLI code
 	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY)
 
 missing: ## Print the OAS operations not in the layout
 	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
+
+cli-clean: ## Delete generated CLI code
+	rm -rf $(PACKAGE_NAME) tests/
+
+cli-regen: cli-clean cli-gen ## Regenerate CLI code
 
 ###########
 ##@ Linting

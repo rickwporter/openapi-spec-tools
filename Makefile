@@ -10,6 +10,7 @@ poetry_run ?= poetry run
 EXAMPLE_DIRS := examples/pets-cli
 EXAMPLE_DIRS += examples/cloudtruth-gen-cli
 EXAMPLE_DIRS += examples/github
+EXAMPLE_DIRS += examples/pets-api
 
 default: help
 
