@@ -51,6 +51,7 @@ def open_oas_with_error_handling(filename: str, logger: logging.Logger) -> Any:
     Avoids the standard Typer error handling that is quite verbose.
     """
     try:
+        logger.debug(f"Opening {filename}")
         starttime = datetime.now()
         data = open_oas(filename)
         delta = datetime.now() - starttime
@@ -71,6 +72,7 @@ def open_layout_with_error_handling(filename: str, logger: logging.Logger) -> An
     Avoids the standard Typer error handling that is quite verbose.
     """
     try:
+        logger.debug(f"Opening {filename}")
         starttime = datetime.now()
         data = open_layout(filename)
         delta = datetime.now() - starttime
@@ -91,6 +93,7 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
     Avoids the standard Typer error handling that is quite verbose.
     """
     try:
+        logger.debug(f"Opening {filename}")
         starttime = datetime.now()
         tree = file_to_tree(filename, start)
         delta = datetime.now() - starttime
