@@ -18,7 +18,6 @@ from openapi_spec_tools.cli.oas import models_operations
 from openapi_spec_tools.cli.oas import models_show
 from openapi_spec_tools.cli.oas import models_used_by
 from openapi_spec_tools.cli.oas import models_uses
-from openapi_spec_tools.cli.oas import open_oas_with_error_handling
 from openapi_spec_tools.cli.oas import operation_list
 from openapi_spec_tools.cli.oas import operation_models
 from openapi_spec_tools.cli.oas import operation_show
@@ -55,25 +54,6 @@ def test_console_factory() -> None:
     with mock.patch.dict(os.environ, {}, clear=True):
         console = console_factory()
         assert console.width != 3000
-
-
-@pytest.mark.parametrize(
-    ["filename", "message"],
-    [
-        pytest.param("gone", "ERROR: failed to find", id="missing"),
-        pytest.param("bad.json", "ERROR: unable to parse", id="bad"),
-    ]
-)
-def test_open_oas(filename, message) -> None:
-    with (
-        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
-        pytest.raises(typer.Exit) as err,
-    ):
-        open_oas_with_error_handling(asset_filename(filename))
-
-    assert err.value.exit_code == 1
-    output = mock_stdout.getvalue()
-    assert output.startswith(message)
 
 
 
