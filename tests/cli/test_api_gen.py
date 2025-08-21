@@ -18,7 +18,7 @@ from tests.helpers import asset_filename
         pytest.param("sna", "sna", id="overrides"),
     ],
 )
-def test_api_generate_success(code_dir, expected_dir, temp_working_dir):
+def test_api_generate_success_directory(code_dir, expected_dir, temp_working_dir):
     oas_file = asset_filename("pet2.yaml")
     pkg_name = "my_api_pkg"
     base_dir = Path(temp_working_dir)
@@ -53,7 +53,8 @@ def test_api_generate_success(code_dir, expected_dir, temp_working_dir):
     assert filenames == expected
 
 
-def test_api_generate_success_copyright(copyright_fixture):
+@pytest.mark.usefixtures("copyright_fixture")
+def test_api_generate_success_copyright():
     oas_file = asset_filename("pet2.yaml")
 
     pkg_name = "my_api_pkg"
@@ -84,3 +85,48 @@ def test_api_generate_success_copyright(copyright_fixture):
         file = code_dir / fname
         text = read_text(file.as_posix())
         assert copyright_text in text
+
+
+@pytest.mark.parametrize(
+    ["layout", "expected_files"],
+    [
+        pytest.param(
+            None,
+            {
+                'examine_blood_pressure.py',
+                'examine_heart_rate.py',
+                'owners.py',
+                'owners_pets.py',
+                'pets.py',
+                'version.py',
+                'vets.py',
+            },
+            id="all",
+        ),
+        pytest.param(asset_filename("layout_pets.yaml"), {"main.py"}, id="layout"),
+    ],
+)
+def test_api_generate_success_layout(layout, expected_files, temp_working_dir):
+    oas_file = asset_filename("pets_and_vets.yaml")
+    pkg_name = "my_api_pkg"
+
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+    ):
+        generate_api(
+            oas_file,
+            pkg_name,
+            layout_file=layout,
+        )
+        assert "Generated API files\n" == mock_stdout.getvalue()
+
+    path = Path(temp_working_dir) / pkg_name
+    filenames = {i.name for i in path.iterdir()}
+    expected = {
+        "__init__.py",
+        "_environment.py",
+        "_logging.py",
+        "_requests.py",
+    }
+    expected.update(expected_files)
+    assert filenames == expected

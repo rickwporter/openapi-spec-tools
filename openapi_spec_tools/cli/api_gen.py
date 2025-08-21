@@ -14,9 +14,11 @@ from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli._arguments import CopyrightFileOption
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
-from openapi_spec_tools.cli._utils import get_logger
+from openapi_spec_tools.cli._arguments import StartPointOption
 from openapi_spec_tools.cli._utils import init_logging
+from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli._utils import open_oas_with_error_handling
+from openapi_spec_tools.layout.layout_generator import DEFAULT_START
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 
 SEP = "\n    "
@@ -44,17 +46,25 @@ def generate_api(
     copyright_file: CopyrightFileOption = None,
     prefix: Annotated[
         str,
-        typer.Option(show_default="", help="Prefix to ignore"),
+        typer.Option(show_default="", help="Prefix to ignore when using path"),
     ] = "",
+    layout_file: Annotated[
+        Optional[str],
+        typer.Option(show_default=False, help="Layout file name to use (instead of generating layout)")
+    ] = None,
+    start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "info",
 ) -> None:
     """Generate API code based on the provided parameters."""
-    init_logging(log_level, LOG_CLASS)
+    logger = init_logging(log_level, LOG_CLASS)
     code_dir = code_dir or package_name
 
-    oas = open_oas_with_error_handling(openapi_file, get_logger(LOG_CLASS))
-    layout_gen = LayoutGenerator()
-    commands = layout_gen.generate(oas, prefix)
+    oas = open_oas_with_error_handling(openapi_file, logger)
+    if layout_file:
+        commands = layout_tree_with_error_handling(layout_file, start, logger)
+    else:
+        layout_gen = LayoutGenerator()
+        commands = layout_gen.generate(oas, prefix)
 
     if copyright_file:
         text = Path(copyright_file).read_text()
