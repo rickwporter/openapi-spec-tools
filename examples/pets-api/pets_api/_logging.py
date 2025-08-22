@@ -25,4 +25,6 @@ def get_logger(name: Optional[str] = LOG_CLASS) -> logging.Logger:
 
 def init_logging(level: LogLevel, name: Optional[str] = LOG_CLASS) -> logging.Logger:
     logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FMT)
-    return get_logger(name).setLevel(level.upper())
+    logger = get_logger(name)
+    logger.setLevel(level.upper())
+    return logger
