@@ -81,7 +81,7 @@ def generate_api(
     # copy over the basic infrastructure
     copy_api_infrastructure(code_dir, package_name)
 
-    generator = ApiGenerator(package_name, oas)
+    generator = ApiGenerator(package_name, oas, logger)
     generate_api_node(generator, commands, code_dir)
 
     typer.echo("Generated API files")
