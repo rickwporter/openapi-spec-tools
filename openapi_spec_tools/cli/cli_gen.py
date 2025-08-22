@@ -130,7 +130,7 @@ def generate_cli(
     # copy over the basic infrastructure
     copy_infrastructure(code_dir, package_name)
 
-    generator = CliGenerator(package_name, oas)
+    generator = CliGenerator(package_name, oas, logger)
     generate_node(generator, commands, code_dir)
 
     # create the tree
@@ -216,7 +216,7 @@ def show_cli_tree(
     logger = init_logging(log_level, LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
     oas = open_oas_with_error_handling(openapi_file, logger)
-    generator = CliGenerator("", oas)
+    generator = CliGenerator("", oas, logger)
 
     tree = generate_tree_node(generator, layout)
     if not tree.children:

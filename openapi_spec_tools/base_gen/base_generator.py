@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Any
 from typing import Optional
 
+from openapi_spec_tools.base_gen._logging import init_logging
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
 from openapi_spec_tools.base_gen.constants import NL
 from openapi_spec_tools.base_gen.constants import SEP1
@@ -24,8 +25,6 @@ from openapi_spec_tools.utils import NULL_TYPES
 from openapi_spec_tools.utils import map_operations
 
 LOG_CLASS = "base-gen"
-LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
-LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s %(message)s"
 
 class BaseGenerator:
     """Provides the majority of the CLI generation functions.
@@ -35,7 +34,7 @@ class BaseGenerator:
     overridden by consumers.
     """
 
-    def __init__(self, oas: dict[str, Any], log_class: str = LOG_CLASS, log_level: str = "INFO"):
+    def __init__(self, oas: dict[str, Any], logger: Optional[logging.Logger] = None):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
@@ -48,10 +47,7 @@ class BaseGenerator:
             ContentType.APP_JSON,
         ]
         self.max_help_length = 120
-
-        logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FMT)
-        self.logger = logging.getLogger(log_class)
-        self.logger.setLevel(log_level.upper())
+        self.logger = logger or init_logging("INFO", LOG_CLASS)
 
         # This is an incomplete list of Python builtins that should avoided in variable names
         self.reserved = {

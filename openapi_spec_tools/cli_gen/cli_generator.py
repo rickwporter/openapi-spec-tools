@@ -1,5 +1,7 @@
 """Declares the Generator class that is used for most of the CLi generation capability."""
+import logging
 from typing import Any
+from typing import Optional
 
 import yaml
 
@@ -14,7 +16,6 @@ from openapi_spec_tools.base_gen.utils import quoted
 from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen._tree import TreeField
-from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 
@@ -27,9 +28,9 @@ class CliGenerator(BaseGenerator):
     overridden by consumers.
     """
 
-    def __init__(self, package_name: str, oas: dict[str, Any]):
+    def __init__(self, package_name: str, oas: dict[str, Any], logger: Optional[logging.Logger] = None):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
-        super().__init__(oas=oas, log_class=GENERATOR_LOG_CLASS)
+        super().__init__(oas=oas, logger=logger)
         self.package_name = package_name
 
     def standard_imports(self) -> str:
