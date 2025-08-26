@@ -1,0 +1,15 @@
+SUM = "summary"
+DESC = "description"
+TYPE = "type"
+FORMAT = "format"
+REQUIRED = "required"
+COLLECT = "x-collection"
+ENUM = "enum"
+SCHEMA = "schema"
+ANY_OF = "anyOf"
+ONE_OF = "oneOf"
+ITEMS = "items"
+DEF = "default"
+
+S1 = '\n    '
+S2 = f"{S1}    "
