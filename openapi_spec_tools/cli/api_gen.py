@@ -7,9 +7,9 @@ from typing import Optional
 
 import typer
 
-from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.api_gen.files import copy_api_infrastructure
 from openapi_spec_tools.api_gen.files import generate_api_node
+from openapi_spec_tools.api_gen.flat_generator import FlatApiGenerator
 from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli._arguments import CopyrightFileOption
 from openapi_spec_tools.cli._arguments import LogLevelOption
@@ -81,7 +81,7 @@ def generate_api(
     # copy over the basic infrastructure
     copy_api_infrastructure(code_dir, package_name)
 
-    generator = ApiGenerator(package_name, oas, logger)
+    generator =FlatApiGenerator(package_name, oas, logger)
     generate_api_node(generator, commands, code_dir)
 
     typer.echo("Generated API files")

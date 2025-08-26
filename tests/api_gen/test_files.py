@@ -2,11 +2,11 @@ from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.api_gen.files import copy_api_infrastructure
 from openapi_spec_tools.api_gen.files import generate_api_node
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.utils import open_oas
+from tests.api_gen.helpers import TestApiGenerator
 from tests.helpers import asset_filename
 
 
@@ -16,7 +16,7 @@ def test_generate_api_node_single():
     layout_gen = LayoutGenerator()
     tree = layout_gen.generate(oas, "")
     directory = TemporaryDirectory()
-    generator = ApiGenerator(pkg_name, oas)
+    generator = TestApiGenerator(pkg_name, oas)
     generate_api_node(generator, tree, directory.name)
 
     path = Path(directory.name)
@@ -34,10 +34,10 @@ def test_generate_api_node_single():
         'def show_pet_by_id',
 
         # NOTE: function doc-strings are same as help strings
-        '# handler for createPets: POST /pets',
-        '# handler for deletePetById: DELETE /pets/{petId}',
-        '# handler for listPets: GET /pets',
-        '# handler for showPetById: GET /pets/{petId}',
+        '# handler for createPets',
+        '# handler for deletePetById',
+        '# handler for listPets',
+        '# handler for showPetById',
     ]
     for v in expected:
         assert v in text
@@ -49,7 +49,7 @@ def test_generate_api_node_multiple():
     layout_gen = LayoutGenerator()
     tree = layout_gen.generate(oas, "")
     directory = TemporaryDirectory()
-    generator = ApiGenerator(pkg_name, oas)
+    generator = TestApiGenerator(pkg_name, oas)
     generate_api_node(generator, tree, directory.name)
 
     path = Path(directory.name)
