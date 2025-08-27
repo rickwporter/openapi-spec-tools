@@ -402,11 +402,11 @@ class BaseGenerator:
 
         return self.expanded_settable_properties(name, expanded)
 
-    def op_body_settable_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
-        """Get a dictionary of settable body properties."""
+    def op_body_schema(self, operation: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+        """Get the name and schema dictionary."""
         body = self.op_get_body(operation)
         if not body:
-            return {}
+            return ("None", {})
 
         schema = body.get(OasField.SCHEMA, {})
         name = "body"
@@ -414,6 +414,14 @@ class BaseGenerator:
         if ref:
             name = self.short_reference_name(ref)
             schema = self.get_model(ref)
+
+        return (name, schema)
+
+    def op_body_settable_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
+        """Get a dictionary of settable body properties."""
+        name, schema = self.op_body_schema(operation)
+        if not schema:
+            return {}
 
         # attempt to simplify enum types to a single type to something that matches
         properties = self.model_settable_properties(name, schema)
