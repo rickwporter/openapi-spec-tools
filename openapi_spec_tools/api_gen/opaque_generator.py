@@ -1,4 +1,4 @@
-"""Declares the Generator class that is used for most of the CLi generation capability."""
+"""Declares the OpaqueApiGenerator class."""
 from typing import Any
 
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
@@ -10,15 +10,14 @@ from openapi_spec_tools.types import OasField
 
 
 class OpaqueApiGenerator(ApiGenerator):
-    """Provides the majority of the CLI generation functions.
+    """Generates an API with opaque bodies.
 
-    Store a few key things to avoid the need for passing them all around, but most of the "action"
-    is driven by an outside actor. This was done in an object-oriented fashion so pieces can be
-    overridden by consumers.
+    The body (when present) is handled as a blob, so there are not manipulations to create the
+    body -- it is just passed through to the request function (typically a POST).
     """
 
     def op_body_arguments(self, body_params: dict[str, Any]) -> list[str]:
-        """Convert the body parameters dictionary into a list of API function arguments/help."""
+        """Convert the body parameter dictionary into a list of API function arguments/help."""
         args = []
         if body_params:
             help = body_params.get(OasField.DESCRIPTION)

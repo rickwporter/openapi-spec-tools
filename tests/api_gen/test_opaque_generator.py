@@ -1,6 +1,6 @@
 import pytest
 
-from openapi_spec_tools.api_gen.opaque_gen import OpaqueApiGenerator
+from openapi_spec_tools.api_gen.opaque_generator import OpaqueApiGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.utils import open_oas
