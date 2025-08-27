@@ -122,4 +122,4 @@ from {self.package_name} import _requests as _r  # noqa: F401
     @abstractmethod
     def function_definition(self, command: LayoutNode) -> str:
         """Provide function definition for specified command."""
-        pass
+        pass  # pragma: no cover
