@@ -16,10 +16,10 @@ from pets_api import _requests as _r  # noqa: F401
 
 def list_pets(
     limit: Optional[int] = None,  # How many items to return at one time (max 100)
-    _api_host: str = _e.env_str("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
-    _api_key: str = _e.env_str("API_KEY"),  # API key for bearer authentication
-    _api_timeout: int = _e.env("API_TIMEOUT", 5),  # timeout for operation
-    _log_level: str = _e.env("API_LOG_LEVEL", "info"),  # log level
+    _api_host: str = _e.env_string("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
+    _api_key: str = _e.env_string("API_KEY"),  # API key for bearer authentication
+    _api_timeout: int = _e.env_int("API_TIMEOUT", 5),  # timeout for operation
+    _log_level: str = _e.env_string("API_LOG_LEVEL", "info"),  # log level
 ) -> Any:
     '''
     List all pets
@@ -42,10 +42,10 @@ def create_pets(
     name: str = None,
     tag: Optional[str] = None,
     owner: str = None,
-    _api_host: str = _e.env_str("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
-    _api_key: str = _e.env_str("API_KEY"),  # API key for bearer authentication
-    _api_timeout: int = _e.env("API_TIMEOUT", 5),  # timeout for operation
-    _log_level: str = _e.env("API_LOG_LEVEL", "info"),  # log level
+    _api_host: str = _e.env_string("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
+    _api_key: str = _e.env_string("API_KEY"),  # API key for bearer authentication
+    _api_timeout: int = _e.env_int("API_TIMEOUT", 5),  # timeout for operation
+    _log_level: str = _e.env_string("API_LOG_LEVEL", "info"),  # log level
 ) -> Any:
     '''
     Create a pet
@@ -69,10 +69,10 @@ def create_pets(
 
 def show_pet_by_id(
     pet_id: str,  # The id of the pet to retrieve
-    _api_host: str = _e.env_str("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
-    _api_key: str = _e.env_str("API_KEY"),  # API key for bearer authentication
-    _api_timeout: int = _e.env("API_TIMEOUT", 5),  # timeout for operation
-    _log_level: str = _e.env("API_LOG_LEVEL", "info"),  # log level
+    _api_host: str = _e.env_string("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
+    _api_key: str = _e.env_string("API_KEY"),  # API key for bearer authentication
+    _api_timeout: int = _e.env_int("API_TIMEOUT", 5),  # timeout for operation
+    _log_level: str = _e.env_string("API_LOG_LEVEL", "info"),  # log level
 ) -> Any:
     '''
     Info for a specific pet
@@ -90,10 +90,10 @@ def show_pet_by_id(
 
 def delete_pet_by_id(
     pet_id: str,  # The id of the pet to retrieve
-    _api_host: str = _e.env_str("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
-    _api_key: str = _e.env_str("API_KEY"),  # API key for bearer authentication
-    _api_timeout: int = _e.env("API_TIMEOUT", 5),  # timeout for operation
-    _log_level: str = _e.env("API_LOG_LEVEL", "info"),  # log level
+    _api_host: str = _e.env_string("API_HOST", "http://petstore.swagger.io/v1"),  # host URL
+    _api_key: str = _e.env_string("API_KEY"),  # API key for bearer authentication
+    _api_timeout: int = _e.env_int("API_TIMEOUT", 5),  # timeout for operation
+    _log_level: str = _e.env_string("API_LOG_LEVEL", "info"),  # log level
 ) -> Any:
     '''
     Delete a pet
