@@ -130,3 +130,36 @@ def test_api_generate_success_layout(layout, expected_files, temp_working_dir):
     }
     expected.update(expected_files)
     assert filenames == expected
+
+@pytest.mark.parametrize(
+    ["body_type", "expected"],
+    [
+        pytest.param(
+            "flat", [
+                'def create_pets(\n    id: int = None,',
+                'body["id"] = id',
+            ],
+            id="flat",
+        ),
+        pytest.param(
+            "opaque", [
+                'def create_pets(\n    body: Any = None,',
+            ],
+            id="opaque",
+        ),
+    ],
+)
+def test_api_generate_success_body_type(body_type, expected, temp_working_dir):
+    oas_file = asset_filename("pet.yaml")
+    pkg_name = "my_api_pkg"
+
+    generate_api(
+        oas_file,
+        pkg_name,
+        body_type=body_type,
+    )
+
+    file = Path(temp_working_dir) / pkg_name / "pets.py"
+    text = read_text(file.as_posix())
+    for item in expected:
+        assert item in text
