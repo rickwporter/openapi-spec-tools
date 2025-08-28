@@ -63,10 +63,10 @@ from {self.package_name} import _requests as _r  # noqa: F401
     def command_infra_arguments(self, command: LayoutNode) -> list[str]:
         """Get the standard CLI function arguments to the command."""
         args = [
-            f'_api_host: str = _e.env_str({quoted(self.env_host)}, {quoted(self.default_host)}),  # host URL',
-            f'_api_key: str = _e.env_str({quoted(self.env_key)}),  # API key for bearer authentication',
-            f'_api_timeout: int = _e.env({quoted(self.env_timeout)}, 5),  # timeout for operation',
-            f'_log_level: str = _e.env({quoted(self.env_log_level)}, "info"),  # log level',
+            f'_api_host: str = _e.env_string({quoted(self.env_host)}, {quoted(self.default_host)}),  # host URL',
+            f'_api_key: str = _e.env_string({quoted(self.env_key)}),  # API key for bearer authentication',
+            f'_api_timeout: int = _e.env_int({quoted(self.env_timeout)}, 5),  # timeout for operation',
+            f'_log_level: str = _e.env_string({quoted(self.env_log_level)}, "info"),  # log level',
         ]
         return args
 
