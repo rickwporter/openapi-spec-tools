@@ -48,11 +48,17 @@ def test_function_definition():
     assert 'def create_pets(' in text
     assert '# handler for createPets: POST /pets' in text
 
-    # check standard arguments
-    assert '_api_host: str = _e.env_string("API_HOST", "http://petstore.swagger.io/v1"),  # host URL' in text
-    assert '_api_key: str = _e.env_string("API_KEY"),  # API key for bearer authentication' in text
-    assert '_api_timeout: int = _e.env_int("API_TIMEOUT", 5),  # timeout for operation' in text
-    assert '_log_level: str = _e.env_string("API_LOG_LEVEL", "info"),  # log level' in text
+    # check infra arguments
+    assert '_api_host: Optional[str] = None,' in text
+    assert '_api_key: Optional[str] = None,' in text
+    assert '_api_timeout: Optional[int] = None,' in text
+    assert '_log_level: Optional[str] = None,' in text
+
+    # check infra initialization/defaults
+    assert '_api_host = _api_host or _e.env_string("API_HOST"' in text
+    assert '_api_key = _api_key or _e.env_string("API_KEY"' in text
+    assert '_api_timeout = _api_timeout or _e.env_int("API_TIMEOUT"' in text
+    assert '_log_level = _log_level or _e.env_string("API_LOG_LEVEL"' in text
 
     # check the body of the function
     assert "_l.init_logging(_log_level)" in text
@@ -69,11 +75,11 @@ def test_function_deprecated():
 
     assert 'def snafoo_check(' in text
 
-    # check a couple arguments
-    assert '_api_host: str = _e.env_string("API_HOST", "http://petstore.swagger.io/v1"),  # host URL' in text
-    assert '_api_key: str = _e.env_string("API_KEY"),  # API key for bearer authentication' in text
-    assert '_api_timeout: int = _e.env_int("API_TIMEOUT", 5),  # timeout for operation' in text
-    assert '_log_level: str = _e.env_string("API_LOG_LEVEL", "info"),  # log level' in text
+    # check infra arguments
+    assert '_api_host: Optional[str] = None,' in text
+    assert '_api_key: Optional[str] = None,' in text
+    assert '_api_timeout: Optional[int] = None,' in text
+    assert '_log_level: Optional[str] = None,' in text
 
     # check the warning log
     assert '_l.logger().warning("snafooCheck is deprecated and should not be used.")' in text
@@ -87,11 +93,11 @@ def test_function_x_deprecated():
 
     assert 'def snafoo_delete(' in text
 
-    # check a couple arguments
-    assert '_api_host: str = _e.env_string("API_HOST", "http://petstore.swagger.io/v1"),  # host URL' in text
-    assert '_api_key: str = _e.env_string("API_KEY"),  # API key for bearer authentication' in text
-    assert '_api_timeout: int = _e.env_int("API_TIMEOUT", 5),  # timeout for operation' in text
-    assert '_log_level: str = _e.env_string("API_LOG_LEVEL", "info"),  # log level' in text
+    # check infra arguments
+    assert '_api_host: Optional[str] = None,' in text
+    assert '_api_key: Optional[str] = None,' in text
+    assert '_api_timeout: Optional[int] = None,' in text
+    assert '_log_level: Optional[str] = None,' in text
 
     # check the warning log
     assert '_l.logger().warning("snafooDelete was deprecated in 3.2.1, and should not be used.")' in text
