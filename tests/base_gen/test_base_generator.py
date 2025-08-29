@@ -255,6 +255,7 @@ def test_model_is_complex(reference, expected):
         pytest.param('foo/{bar}', '_api_host, "foo", bar', id="foo/{bar}"),
         pytest.param('sna/foo/bar', '_api_host, "sna/foo/bar"', id="sna/foo/bar"),
         pytest.param('sna/{foo}/bar', '_api_host, "sna", foo, "bar"', id="sna/{foo}/bar"),
+        pytest.param('sna/{foo}/{bar}', '_api_host, "sna", foo, bar', id="sna/{foo}/{bar}"),
     ]
 )
 def test_op_url_params(path, expected):
