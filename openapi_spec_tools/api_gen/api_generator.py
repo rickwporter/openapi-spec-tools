@@ -11,6 +11,7 @@ from typing import Optional
 
 from openapi_spec_tools.base_gen.base_generator import BaseGenerator
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
+from openapi_spec_tools.base_gen.constants import SEP1
 from openapi_spec_tools.base_gen.utils import maybe_quoted
 from openapi_spec_tools.base_gen.utils import quoted
 from openapi_spec_tools.base_gen.utils import simple_escape
@@ -34,6 +35,8 @@ class ApiGenerator(BaseGenerator, ABC):
         self.env_key = "API_KEY"
         self.env_timeout = "API_TIMEOUT"
         self.env_log_level = "API_LOG_LEVEL"
+        self.default_log = "info"
+        self.default_timeout = 5
 
     def property_help(self, prop: dict[str, Any]) -> str:
         """Get the short help string for the specified property."""
@@ -60,13 +63,38 @@ from {self.package_name} import _logging as _l  # noqa: F401
 from {self.package_name} import _requests as _r  # noqa: F401
 """
 
+    def init_infra_args(self, operation: dict[str, Any]) -> str:
+        """Provide initialization of standard arguments inside body."""
+        host_default = (
+            f'_e.env_string({quoted(self.env_host)}, '
+            f'default={quoted(self.default_host)}, except_missing=True)'
+        )
+        key_default = f'_e.env_string({quoted(self.env_key)}, except_missing=True)'
+        timeout_default = f'_e.env_int({quoted(self.env_timeout)}, default={self.default_timeout})'
+        log_default = f'_e.env_string({quoted(self.env_log_level)}, default={quoted(self.default_log)})'
+        lines = [
+            f'_api_host = _api_host or {host_default}',
+            f'_api_key = _api_key or {key_default}',
+            f'_api_timeout = _api_timeout or {timeout_default}',
+            f'_log_level = _log_level or {log_default}',
+        ]
+        return SEP1.join(lines)
+
+
     def command_infra_arguments(self, command: LayoutNode) -> list[str]:
         """Get the standard CLI function arguments to the command."""
+        host_help = f'API host, read from {self.env_host} if not provided, defaults to {self.default_host}'
+        key_help = f'API key for bearer auth, read from {self.env_key} if not provided'
+        timeout_help = (
+            f'timeout for operation, read from {self.env_timeout} if not provided, '
+            f'defaults to {self.default_timeout}'
+        )
+        log_help = f'log level, read from {self.env_log_level} if not provided, defaults to {self.default_log}'
         args = [
-            f'_api_host: str = _e.env_string({quoted(self.env_host)}, {quoted(self.default_host)}),  # host URL',
-            f'_api_key: str = _e.env_string({quoted(self.env_key)}),  # API key for bearer authentication',
-            f'_api_timeout: int = _e.env_int({quoted(self.env_timeout)}, 5),  # timeout for operation',
-            f'_log_level: str = _e.env_string({quoted(self.env_log_level)}, "info"),  # log level',
+            f'_api_host: Optional[str] = None,  # {host_help}',
+            f'_api_key: Optional[str] = None,  # {key_help}',
+            f'_api_timeout: Optional[int] = None,  # {timeout_help}',
+            f'_log_level: Optional[str] = None,  # {log_help}',
         ]
         return args
 

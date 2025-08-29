@@ -90,6 +90,8 @@ class FlatApiGenerator(ApiGenerator):
 {self.enum_definitions(path_params, query_params + header_params, body_params)}
 def {func_name}({args_str}) -> Any:
     {self.op_doc_string(op)}# handler for {node.identifier}: {method} {path}
+    {self.init_infra_args(op)}
+
     _l.init_logging(_log_level){deprecation_warning}{user_header_init}
     headers = _r.request_headers(_api_key{self.op_content_header(op)}{user_header_arg})
     url = _r.create_url({self.op_url_params(path)})
