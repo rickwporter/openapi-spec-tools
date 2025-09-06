@@ -13,9 +13,11 @@ from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli._arguments import CodeDirectoryOption
 from openapi_spec_tools.cli._arguments import CopyrightFileOption
 from openapi_spec_tools.cli._arguments import LayoutFilenameArgument
+from openapi_spec_tools.cli._arguments import LayoutFilenameOption
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli._arguments import PackageNameArgument
+from openapi_spec_tools.cli._arguments import PathPrefixOption
 from openapi_spec_tools.cli._arguments import StartPointOption
 from openapi_spec_tools.cli._arguments import UpdatedOpenApiFilenameOption
 from openapi_spec_tools.cli._utils import console_factory
@@ -32,6 +34,7 @@ from openapi_spec_tools.cli_gen.files import find_unreferenced
 from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_file
 from openapi_spec_tools.cli_gen.files import generate_tree_node
+from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
 from openapi_spec_tools.types import OasField
@@ -68,9 +71,9 @@ def render_missing(missing: dict[str, list[str]]) -> str:
 
 @app.command("generate", short_help="Generate CLI code")
 def generate_cli(
-    layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
     package_name: PackageNameArgument,
+    layout_file: LayoutFilenameOption = None,
     project_dir: Annotated[
         Optional[str],
         typer.Option(metavar=DIRECTORY, show_default=False, help="Project directory name")
@@ -82,6 +85,7 @@ def generate_cli(
     ] = None,
     copyright_file: CopyrightFileOption = None,
     include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
+    prefix: PathPrefixOption = "",
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "info",
 ) -> None:
@@ -109,17 +113,22 @@ def generate_cli(
             )
             raise typer.Exit(1)
 
-    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
-    oas = open_oas_with_error_handling(openapi_file, logger)
-
     if copyright_file:
         text = Path(copyright_file).read_text()
         set_copyright(text)
 
-    missing = check_for_missing(commands, oas)
-    if missing:
-        typer.echo(render_missing(missing))
-        raise typer.Exit(1)
+    oas = open_oas_with_error_handling(openapi_file, logger)
+    if layout_file:
+        commands = layout_tree_with_error_handling(layout_file, start, logger)
+
+        missing = check_for_missing(commands, oas)
+        if missing:
+            typer.echo(render_missing(missing))
+            raise typer.Exit(1)
+    else:
+        layout_gen = LayoutGenerator()
+        commands = layout_gen.generate(oas, prefix)
+        typer.echo("Generated layout -- equivalent can be saved using 'layout suggest'.")
 
     os.makedirs(code_dir, exist_ok=True)
 

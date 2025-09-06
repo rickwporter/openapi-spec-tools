@@ -13,6 +13,7 @@ from rich.table import Table
 from openapi_spec_tools.cli._arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._arguments import PathPrefixOption
 from openapi_spec_tools.cli._arguments import StartPointOption
 from openapi_spec_tools.cli._utils import console_factory
 from openapi_spec_tools.cli._utils import init_logging
@@ -191,8 +192,8 @@ def layout_operations(
 )
 def layout_suggest(
     openapi_file: OpenApiFilenameArgument,
-    output_file: Annotated[str, typer.Argument(show_default=False, help="File name for output")],
-    prefix: Annotated[str, typer.Option(show_default=False, help="Prefix common to all paths")] = "",
+    output_file: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="File name for output")],
+    prefix: PathPrefixOption = "",
     log_level: LogLevelOption = "info",
 ) -> None:
     """Create a suggested layout based on the OpenAPI spec paths and operations.

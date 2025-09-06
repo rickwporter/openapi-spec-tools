@@ -32,7 +32,7 @@ CopyrightFileOption = Annotated[
 ]
 LayoutFilenameArgument = Annotated[
     str,
-    typer.Argument(metavar=FILENAME, show_default=False , help="Layout file YAML definition"),
+    typer.Argument(metavar=FILENAME, show_default=False, help="Layout file YAML definition"),
 ]
 LayoutFilenameOption = Annotated[
     Optional[str],
@@ -56,6 +56,10 @@ OpenApiFilenameArgument = Annotated[
     typer.Argument(metavar=FILENAME, show_default=False, help="OpenAPI specification filename"),
 ]
 PackageNameArgument = Annotated[str, typer.Argument(metavar="PACKAGE", show_default=False, help="Base package name")]
+PathPrefixOption = Annotated[
+    str,
+    typer.Option(metavar="PREFIX", show_default=False, help="Prefix to ignore when using path"),
+]
 StartPointOption = Annotated[str, typer.Option("--start", metavar="START", help="Start point for CLI in layout file")]
 UpdatedOpenApiFilenameOption = Annotated[
     Optional[str],
