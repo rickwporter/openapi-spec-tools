@@ -37,7 +37,7 @@ trim: ## Creates the skinny OpenAPI spec
 	$(poetry_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC) --remove examples
 
 gen: layout-lint trim ## Generate CLI code
-	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(TRIMMED_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	$(poetry_run) cli-gen generate $(TRIMMED_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)

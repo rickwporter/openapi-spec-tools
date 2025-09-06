@@ -38,7 +38,7 @@ layout-suggest: ## Create suggested layout file
 	$(poetry_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
 
 cli-gen: layout-lint ## Generate CLI code
-	$(poetry_run) cli-gen generate $(LAYOUT_FILE) $(OPENAPI_SPEC) $(PACKAGE_NAME) --project-dir $(PROJECT_DIRECTORY)
+	$(poetry_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY)
 
 missing: ## Print the OAS operations not in the layout
 	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
