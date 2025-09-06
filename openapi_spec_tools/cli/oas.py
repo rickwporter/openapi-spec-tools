@@ -12,6 +12,7 @@ import yaml
 
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._arguments import UpdatedOpenApiFilenameOption
 from openapi_spec_tools.cli._utils import console_factory
 from openapi_spec_tools.cli._utils import error_out
 from openapi_spec_tools.cli._utils import init_logging
@@ -170,7 +171,7 @@ class DisplayOption(str, Enum):
 @app.command("update", short_help="Update the OpenAPI spec")
 def update(
     original_filename: OpenApiFilenameArgument,
-    updated_filename: Annotated[Optional[str], typer.Option(help="Filename for update OpenAPI spec")] = None,
+    updated_filename: UpdatedOpenApiFilenameOption = None,
     nullable_not_required: Annotated[
         bool,
         typer.Option(help="Remove 'nullable' properties from required list"),

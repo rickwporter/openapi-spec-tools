@@ -4,7 +4,6 @@ import os
 from enum import Enum
 from pathlib import Path
 from typing import Annotated
-from typing import Optional
 
 import typer
 
@@ -13,9 +12,12 @@ from openapi_spec_tools.api_gen.files import generate_api_node
 from openapi_spec_tools.api_gen.flat_generator import FlatApiGenerator
 from openapi_spec_tools.api_gen.opaque_generator import OpaqueApiGenerator
 from openapi_spec_tools.base_gen.files import set_copyright
+from openapi_spec_tools.cli._arguments import CodeDirectoryOption
 from openapi_spec_tools.cli._arguments import CopyrightFileOption
+from openapi_spec_tools.cli._arguments import LayoutFilenameOption
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._arguments import PackageNameArgument
 from openapi_spec_tools.cli._arguments import StartPointOption
 from openapi_spec_tools.cli._utils import init_logging
 from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
@@ -47,20 +49,14 @@ app = typer.Typer(
 @app.command("generate", short_help="Generate API code")
 def generate_api(
     openapi_file: OpenApiFilenameArgument,
-    package_name: Annotated[str, typer.Argument(show_default=False, help="Base package name")],
-    code_dir: Annotated[
-        Optional[str],
-        typer.Option(show_default=False, help="Directory for code -- overrides default")
-    ] = None,
+    package_name: PackageNameArgument,
+    code_dir: CodeDirectoryOption = None,
     copyright_file: CopyrightFileOption = None,
     prefix: Annotated[
         str,
         typer.Option(show_default="", help="Prefix to ignore when using path"),
     ] = "",
-    layout_file: Annotated[
-        Optional[str],
-        typer.Option(show_default=False, help="Layout file name to use (instead of generating layout)")
-    ] = None,
+    layout_file: LayoutFilenameOption = None,
     start: StartPointOption = DEFAULT_START,
     body_type: Annotated[BodyType, typer.Option(help="Request body handling for API functions")] = BodyType.FLAT,
     log_level: LogLevelOption = "info",
