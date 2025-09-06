@@ -120,6 +120,8 @@ class LayoutGenerator:
                 path_node.children.append(
                     LayoutNode(command=command, identifier=op_id)
                 )
+                # sort the children to match layout linting
+                path_node.children = sorted(path_node.children, key=lambda x: x.command)
 
         return main
 
@@ -131,8 +133,7 @@ def layout_node_text(node: LayoutNode) -> str:
     text += f"{indent}{LayoutField.DESCRIPTION.value}: {node.description}\n"
     text += f"{indent}{LayoutField.OPERATIONS.value}:\n"
 
-    sorted_children = sorted(node.children, key=lambda x: x.command)
-    for child in sorted_children:
+    for child in node.children:
         text += f"{indent}- {LayoutField.NAME.value}: {child.command}\n"
         flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
         text += f"{indent}  {flavor}: {child.identifier}\n"
