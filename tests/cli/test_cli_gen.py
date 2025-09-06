@@ -48,9 +48,9 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         generate_cli(
-            layout_file,
             oas_file,
             pkg_name,
+            layout_file=layout_file,
             project_dir=directory.name,
             code_dir=code_path,
             test_dir=test_path,
@@ -118,9 +118,9 @@ def test_cli_generate_success_copyright(copyright_fixture):
 
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         generate_cli(
-            layout_file,
             oas_file,
             pkg_name,
+            layout_file=layout_file,
             project_dir=directory.name,
             include_tests=True,
             copyright_file=copyright_file.as_posix()
@@ -161,6 +161,41 @@ def test_cli_generate_success_copyright(copyright_fixture):
         assert copyright_text in text
 
 
+def test_cli_generate_success_no_layout():
+    oas_file = asset_filename("pet2.yaml")
+
+    pkg_name = "my_cli_pkg"
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        generate_cli(
+            oas_file,
+            pkg_name,
+            project_dir=directory.name,
+            prefix="/pets"
+        )
+        text = mock_stdout.getvalue()
+        assert "Generated layout -- equivalent can be saved using 'layout suggest'" in text
+        assert "Generated files" in text
+
+    filenames = {
+        "__init__.py",
+        "_arguments.py",
+        "_console.py",
+        "_display.py",
+        "_exceptions.py",
+        "_logging.py",
+        "_requests.py",
+        "_tree.py",
+        "main.py",
+        "tree.yaml",
+    }
+    path = base_dir / pkg_name
+    found = {item.name for item in path.iterdir()}
+    assert filenames == found
+
+
 @pytest.mark.parametrize(
     ["code_dir", "test_dir", "include_tests", "error"],
     [
@@ -196,7 +231,12 @@ def test_cli_generate_location_errors(code_dir, test_dir, include_tests, error):
     ):
         with pytest.raises(typer.Exit) as context:
             generate_cli(
-                layout_file, oas_file, pkg_name, code_dir=code_dir, test_dir=test_dir, include_tests=include_tests
+                oas_file,
+                pkg_name,
+                layout_file=layout_file,
+                code_dir=code_dir,
+                test_dir=test_dir,
+                include_tests=include_tests,
             )
         ex = context.value
         assert ex.exit_code == 1
@@ -219,7 +259,7 @@ Commands with missing operations:
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         with pytest.raises(typer.Exit) as context:
-            generate_cli(layout_file, oas_file, pkg_name, directory.name)
+            generate_cli(oas_file, pkg_name, layout_file, directory.name)
         ex = context.value
         assert ex.exit_code == 1
         assert message == mock_stdout.getvalue()
