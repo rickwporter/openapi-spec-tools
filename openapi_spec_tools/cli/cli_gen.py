@@ -10,11 +10,14 @@ import typer
 import yaml
 
 from openapi_spec_tools.base_gen.files import set_copyright
+from openapi_spec_tools.cli._arguments import CodeDirectoryOption
 from openapi_spec_tools.cli._arguments import CopyrightFileOption
 from openapi_spec_tools.cli._arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli._arguments import PackageNameArgument
 from openapi_spec_tools.cli._arguments import StartPointOption
+from openapi_spec_tools.cli._arguments import UpdatedOpenApiFilenameOption
 from openapi_spec_tools.cli._utils import console_factory
 from openapi_spec_tools.cli._utils import init_logging
 from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
@@ -39,6 +42,8 @@ from openapi_spec_tools.utils import set_nullable_not_required
 
 SEP = "\n    "
 LOG_CLASS = "cli-gen"
+FILENAME = "FILENAME"
+DIRECTORY = "DIRECTORY"
 
 #################################################
 # Utilities
@@ -65,18 +70,15 @@ def render_missing(missing: dict[str, list[str]]) -> str:
 def generate_cli(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
-    package_name: Annotated[str, typer.Argument(show_default=False, help="Base package name")],
+    package_name: PackageNameArgument,
     project_dir: Annotated[
         Optional[str],
-        typer.Option(show_default=False, help="Project directory name")
+        typer.Option(metavar=DIRECTORY, show_default=False, help="Project directory name")
     ] = None,
-    code_dir: Annotated[
-        Optional[str],
-        typer.Option(show_default=False, help="Directory for code -- overrides default")
-    ] = None,
+    code_dir: CodeDirectoryOption = None,
     test_dir: Annotated[
         Optional[str],
-        typer.Option(show_default=False, help="Directory for tests -- overrides default")
+        typer.Option(metavar=DIRECTORY, show_default=False, help="Directory for tests -- overrides default")
     ] = None,
     copyright_file: CopyrightFileOption = None,
     include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
@@ -210,7 +212,7 @@ def show_cli_tree(
         TreeDisplay,
         typer.Option(case_sensitive=False, help="Details to show about tree")
     ] = TreeDisplay.ALL,
-    max_depth: Annotated[int, typer.Option(help="Maximum tree depth to show")] = 10,
+    max_depth: Annotated[int, typer.Option(metavar="DEPTH", help="Maximum tree depth to show")] = 10,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -237,16 +239,10 @@ def show_cli_tree(
 def trim_oas(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
-    updated_file: Annotated[
-        Optional[str],
-        typer.Option(
-            show_default=False,
-            help="Filename for updated OpenAPI spec, overwrites original of not specified.",
-        ),
-    ] = None,
+    updated_file: UpdatedOpenApiFilenameOption = None,
     remove_properties: Annotated[
         Optional[list[str]],
-        typer.Option("--remove", show_default=False, help="List of properties to remove."),
+        typer.Option("--remove", metavar="PROPERTIES", show_default=False, help="List of properties to remove."),
     ] = None,
     start: StartPointOption = DEFAULT_START,
     nullable_not_required: Annotated[
