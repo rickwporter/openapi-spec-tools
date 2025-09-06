@@ -18,6 +18,7 @@ from openapi_spec_tools.cli._arguments import LayoutFilenameOption
 from openapi_spec_tools.cli._arguments import LogLevelOption
 from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli._arguments import PackageNameArgument
+from openapi_spec_tools.cli._arguments import PathPrefixOption
 from openapi_spec_tools.cli._arguments import StartPointOption
 from openapi_spec_tools.cli._utils import init_logging
 from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
@@ -52,10 +53,7 @@ def generate_api(
     package_name: PackageNameArgument,
     code_dir: CodeDirectoryOption = None,
     copyright_file: CopyrightFileOption = None,
-    prefix: Annotated[
-        str,
-        typer.Option(show_default="", help="Prefix to ignore when using path"),
-    ] = "",
+    prefix: PathPrefixOption = "",
     layout_file: LayoutFilenameOption = None,
     start: StartPointOption = DEFAULT_START,
     body_type: Annotated[BodyType, typer.Option(help="Request body handling for API functions")] = BodyType.FLAT,
