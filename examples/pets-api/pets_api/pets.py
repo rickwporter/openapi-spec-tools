@@ -14,34 +14,6 @@ from pets_api import _logging as _l  # noqa: F401
 from pets_api import _requests as _r  # noqa: F401
 
 
-def list_pets(
-    limit: Optional[int] = None,  # How many items to return at one time (max 100)
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
-) -> Any:
-    '''
-    List all pets
-    '''
-    # handler for listPets: GET /pets
-    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
-    _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
-    _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
-    _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
-
-    _l.init_logging(_log_level)
-    headers = _r.request_headers(_api_key)
-    url = _r.create_url(_api_host, "pets")
-
-    params = {}
-    if limit is not None:
-        params["limit"] = limit
-
-    data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
-    return data
-
-
 def create_pets(
     id: int = None,
     name: str = None,
@@ -77,32 +49,6 @@ def create_pets(
     return data
 
 
-def show_pet_by_id(
-    pet_id: str,  # The id of the pet to retrieve
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
-) -> Any:
-    '''
-    Info for a specific pet
-    '''
-    # handler for showPetById: GET /pets/{petId}
-    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
-    _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
-    _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
-    _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
-
-    _l.init_logging(_log_level)
-    headers = _r.request_headers(_api_key)
-    url = _r.create_url(_api_host, "pets", pet_id)
-
-    params = {}
-
-    data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
-    return data
-
-
 def delete_pet_by_id(
     pet_id: str,  # The id of the pet to retrieve
     _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
@@ -126,4 +72,58 @@ def delete_pet_by_id(
     params = {}
 
     data = _r.request("DELETE", url, headers=headers, params=params, timeout=_api_timeout)
+    return data
+
+
+def list_pets(
+    limit: Optional[int] = None,  # How many items to return at one time (max 100)
+    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
+    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+) -> Any:
+    '''
+    List all pets
+    '''
+    # handler for listPets: GET /pets
+    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
+    _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
+    _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
+    _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
+
+    _l.init_logging(_log_level)
+    headers = _r.request_headers(_api_key)
+    url = _r.create_url(_api_host, "pets")
+
+    params = {}
+    if limit is not None:
+        params["limit"] = limit
+
+    data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
+    return data
+
+
+def show_pet_by_id(
+    pet_id: str,  # The id of the pet to retrieve
+    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
+    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+) -> Any:
+    '''
+    Info for a specific pet
+    '''
+    # handler for showPetById: GET /pets/{petId}
+    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
+    _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
+    _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
+    _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
+
+    _l.init_logging(_log_level)
+    headers = _r.request_headers(_api_key)
+    url = _r.create_url(_api_host, "pets", pet_id)
+
+    params = {}
+
+    data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
     return data
