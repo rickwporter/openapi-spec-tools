@@ -45,7 +45,7 @@ select = [
     "N",  # PEP8 naming conventions
 ]
 fixable = [
-    "D", "E", "I",
+    "D", "E", "I", "W",
 ]
 ignore = [
     "PLR1711",  # "useless" returns make the code more readable
