@@ -1,3 +1,4 @@
+"""typer argument definitions to improve consistency amongst CLI commands."""
 from enum import Enum
 from typing import Annotated
 from typing import Optional

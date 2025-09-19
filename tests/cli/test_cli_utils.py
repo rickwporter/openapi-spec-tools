@@ -5,10 +5,10 @@ from unittest import mock
 import pytest
 import typer
 
-from openapi_spec_tools.cli._utils import console_factory
-from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
-from openapi_spec_tools.cli._utils import open_layout_with_error_handling
-from openapi_spec_tools.cli._utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.utils import console_factory
+from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
+from openapi_spec_tools.cli.utils import open_layout_with_error_handling
+from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
