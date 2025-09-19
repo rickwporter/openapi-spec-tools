@@ -12,6 +12,7 @@ from rich.console import Console
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.layout.utils import open_layout
+from openapi_spec_tools.layout.utils import write_layout
 from openapi_spec_tools.utils import open_oas
 
 # Common argument definition
@@ -112,6 +113,14 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
 
     typer.echo(f"ERROR: {message}")
     raise typer.Exit(1)
+
+
+def write_layout_tree(filename: str, node: LayoutNode, logger: logging.Logger) -> None:
+    """Write the layout node tree to the specified file."""
+    start = datetime.now()
+    write_layout(filename, node)
+    delta = datetime.now() - start
+    logger.info(f"Writing {filename} took {delta.total_seconds()} seconds")
 
 
 def console_factory() -> Console:

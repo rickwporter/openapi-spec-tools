@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Implement the 'layout' CLI."""
-from datetime import datetime
 from enum import Enum
 from typing import Annotated
 
@@ -20,6 +19,7 @@ from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.utils import write_layout_tree
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
@@ -29,7 +29,6 @@ from openapi_spec_tools.layout.utils import operation_order
 from openapi_spec_tools.layout.utils import subcommand_missing_properties
 from openapi_spec_tools.layout.utils import subcommand_order
 from openapi_spec_tools.layout.utils import subcommand_references
-from openapi_spec_tools.layout.utils import write_layout
 
 SEP = "\n    "
 LOG_CLASS = "layout"
@@ -211,10 +210,7 @@ def layout_suggest(
     generator = LayoutGenerator()
     node = generator.generate(oas, prefix)
 
-    start = datetime.now()
-    write_layout(output_file, node)
-    delta = datetime.now() - start
-    logger.info(f"Writing {output_file} took {delta.total_seconds()} seconds")
+    write_layout_tree(output_file, node, logger)
     print(f"Wrote {output_file}")
     return
 
