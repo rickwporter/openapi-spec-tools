@@ -21,7 +21,6 @@ from openapi_spec_tools.cli._utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli._utils import open_layout_with_error_handling
 from openapi_spec_tools.cli._utils import open_oas_with_error_handling
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
-from openapi_spec_tools.layout.layout_generator import write_layout
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
 from openapi_spec_tools.layout.utils import check_pagination_definitions
@@ -30,6 +29,7 @@ from openapi_spec_tools.layout.utils import operation_order
 from openapi_spec_tools.layout.utils import subcommand_missing_properties
 from openapi_spec_tools.layout.utils import subcommand_order
 from openapi_spec_tools.layout.utils import subcommand_references
+from openapi_spec_tools.layout.utils import write_layout
 
 SEP = "\n    "
 LOG_CLASS = "layout"

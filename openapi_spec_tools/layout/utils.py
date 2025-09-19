@@ -254,3 +254,52 @@ def file_to_tree(filename: str, start: str = DEFAULT_START) -> LayoutNode:
     """Open filename and parse to a LayoutNode tree."""
     data = open_layout(filename)
     return parse_to_tree(data, start)
+
+
+def pagination_text(pagination: PaginationNames, indent: str) -> str:
+    """Create text for the provided pagination parameters and indent."""
+    text = ""
+    if pagination.items_property:
+        text += f"{indent}{PaginationField.ITEM_PROP.value}: {pagination.items_property}\n"
+    if pagination.item_start:
+        text += f"{indent}{PaginationField.ITEM_START.value}: {pagination.item_start}\n"
+    if pagination.page_start:
+        text += f"{indent}{PaginationField.PAGE_START.value}: {pagination.page_start}\n"
+    if pagination.page_size:
+        text += f"{indent}{PaginationField.PAGE_SIZE.value}: {pagination.page_size}\n"
+    if pagination.next_header:
+        text += f"{indent}{PaginationField.NEXT_HEADER.value}: {pagination.next_header}\n"
+    if pagination.next_property:
+        text += f"{indent}{PaginationField.NEXT_PROP.value}: {pagination.next_property}\n"
+    return text
+
+
+def layout_node_text(node: LayoutNode) -> str:
+    """Create text for node, and all children."""
+    indent = "    "
+    text = f"{node.identifier}:\n"
+    text += f"{indent}{LayoutField.DESCRIPTION.value}: {node.description}\n"
+    text += f"{indent}{LayoutField.OPERATIONS.value}:\n"
+
+    for child in node.children:
+        text += f"{indent}- {LayoutField.NAME.value}: {child.command}\n"
+        flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
+        text += f"{indent}  {flavor}: {child.identifier}\n"
+        if child.pagination:
+            text += f"{indent}  pagination:\n"
+            text += pagination_text(child.pagination, indent * 2)
+    text += "\n"
+
+    # recursively generate sections for sub-commands
+    sorted_subcommands = sorted(node.subcommands(), key=lambda x: x.identifier)
+    for child in sorted_subcommands:
+        text += layout_node_text(child)
+
+    return text
+
+
+def write_layout(filename: str, node: LayoutNode):
+    """Write the text from the node to the specified file."""
+    with open(filename, "w", encoding="utf-8", newline="\n") as fp:
+        fp.write(layout_node_text(node))
+
