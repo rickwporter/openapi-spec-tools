@@ -149,7 +149,7 @@ this_is_it:
       operationId: another_op
 
 """
-    
+
 
 def test_generate_pets():
     oas = open_oas(asset_filename("pet.yaml"))
