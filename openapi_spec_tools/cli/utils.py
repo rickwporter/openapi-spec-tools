@@ -21,6 +21,8 @@ LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 
 
 class LogLevel(str, Enum):
+    """Enumeration for use by CLI to set log level."""
+
     CRITICAL = "critical"
     ERROR = "error"
     WARN = "warn"

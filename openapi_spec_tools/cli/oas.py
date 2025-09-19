@@ -10,13 +10,13 @@ from typing import Optional
 import typer
 import yaml
 
-from openapi_spec_tools.cli._arguments import LogLevelOption
-from openapi_spec_tools.cli._arguments import OpenApiFilenameArgument
-from openapi_spec_tools.cli._arguments import UpdatedOpenApiFilenameOption
-from openapi_spec_tools.cli._utils import console_factory
-from openapi_spec_tools.cli._utils import error_out
-from openapi_spec_tools.cli._utils import init_logging
-from openapi_spec_tools.cli._utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.arguments import LogLevelOption
+from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
+from openapi_spec_tools.cli.utils import console_factory
+from openapi_spec_tools.cli.utils import error_out
+from openapi_spec_tools.cli.utils import init_logging
+from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
