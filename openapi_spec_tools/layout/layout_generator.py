@@ -1,9 +1,12 @@
 """Declares the LayoutGenerator for inferring a layout from an OpenAPI specification."""
 from typing import Any
+from typing import Optional
 
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.layout.types import LayoutField
 from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.types import PaginationField
+from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import DEFAULT_START
 from openapi_spec_tools.types import OasField
 
@@ -101,6 +104,13 @@ class LayoutGenerator:
         current.children.append(path_node)
         return path_node
 
+    def get_pagination(self, op_data: dict[str, Any]) -> Optional[PaginationNames]:
+        """Determine pagination parameters from the operation data.
+
+        Intended to be overridden if you want your suggested layout to contain pagination parameters.
+        """
+        return None
+
     def generate(self, oas: dict[str, Any], prefix: str) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
         main = LayoutNode(DEFAULT_START, DEFAULT_START, description="CLI to manage your application")
@@ -117,13 +127,32 @@ class LayoutGenerator:
                 path_node = self.get_or_create_node_with_parents(main, commands)
                 op_id = op_data.get(OasField.OP_ID)
                 command = self.suggest_command(method, op_id)
+                pagination = self.get_pagination(op_data)
                 path_node.children.append(
-                    LayoutNode(command=command, identifier=op_id)
+                    LayoutNode(command=command, identifier=op_id, pagination=pagination)
                 )
                 # sort the children to match layout linting
                 path_node.children = sorted(path_node.children, key=lambda x: x.command)
 
         return main
+
+
+def pagination_text(pagination: PaginationNames, indent: str) -> str:
+    """Create text for the provided pagination parameters and indent."""
+    text = ""
+    if pagination.items_property:
+        text += f"{indent}{PaginationField.ITEM_PROP.value}: {pagination.items_property}\n"
+    if pagination.item_start:
+        text += f"{indent}{PaginationField.ITEM_START.value}: {pagination.item_start}\n"
+    if pagination.page_start:
+        text += f"{indent}{PaginationField.PAGE_START.value}: {pagination.page_start}\n"
+    if pagination.page_size:
+        text += f"{indent}{PaginationField.PAGE_SIZE.value}: {pagination.page_size}\n"
+    if pagination.next_header:
+        text += f"{indent}{PaginationField.NEXT_HEADER.value}: {pagination.next_header}\n"
+    if pagination.next_property:
+        text += f"{indent}{PaginationField.NEXT_PROP.value}: {pagination.next_property}\n"
+    return text
 
 
 def layout_node_text(node: LayoutNode) -> str:
@@ -137,6 +166,9 @@ def layout_node_text(node: LayoutNode) -> str:
         text += f"{indent}- {LayoutField.NAME.value}: {child.command}\n"
         flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
         text += f"{indent}  {flavor}: {child.identifier}\n"
+        if child.pagination:
+            text += f"{indent}  pagination:\n"
+            text += pagination_text(child.pagination, indent * 2)
     text += "\n"
 
     # recursively generate sections for sub-commands
