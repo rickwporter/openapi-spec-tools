@@ -4,7 +4,11 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
+from openapi_spec_tools.layout.layout_generator import layout_node_text
+from openapi_spec_tools.layout.layout_generator import pagination_text
 from openapi_spec_tools.layout.layout_generator import write_layout
+from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 
@@ -68,6 +72,83 @@ def test_commands_to_identifier(commands, expected):
 def test_suggest_command(method, op_id, expected):
     uut = LayoutGenerator()
     assert expected == uut.suggest_command(method, op_id)
+
+
+ALL_PAGE_TEXT = """\
+itemProperty: itemProp
+itemStart: item
+pageStart: page
+pageSize: size
+nextHeader: My-header
+nextProperty: nextProp
+"""
+ITEMS_PAGE_TEXT = """\
+  itemProperty: itemProp
+  itemStart: item
+"""
+PAGE_PAGE_TEXT = """\
+****pageStart: page
+****pageSize: size
+"""
+
+@pytest.mark.parametrize(
+    ["pagination", "indent", "expected"],
+    [
+        pytest.param(
+            PaginationNames(
+                page_size="size",
+                page_start="page",
+                item_start="item",
+                items_property="itemProp",
+                next_property="nextProp",
+                next_header="My-header",
+            ),
+            "",
+            ALL_PAGE_TEXT,
+            id="all",
+        ),
+        pytest.param(
+            PaginationNames(item_start="item", items_property="itemProp"),
+            "  ",
+            ITEMS_PAGE_TEXT,
+            id="items",
+        ),
+        pytest.param(
+            PaginationNames(page_size="size", page_start="page"),
+            "****",
+            PAGE_PAGE_TEXT,
+            id="page",
+        ),
+    ]
+)
+def test_pagination_text(pagination, indent, expected):
+    actual = pagination_text(pagination, indent)
+    assert expected == actual
+
+
+def test_layout_node_text():
+    node = LayoutNode(
+        command="parent",
+        identifier="this_is_it",
+        description="summary",
+        children=[
+            LayoutNode(command="child1", identifier="my_child", pagination=PaginationNames(page_size="page")),
+            LayoutNode(command="child2", identifier="another_op")
+        ]
+    )
+    text = layout_node_text(node)
+    assert text == """\
+this_is_it:
+    description: summary
+    operations:
+    - name: child1
+      operationId: my_child
+      pagination:
+        pageSize: page
+    - name: child2
+      operationId: another_op
+
+"""
 
 
 def test_generate_pets():
