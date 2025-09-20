@@ -55,4 +55,5 @@ class ContentType(str, Enum):
     APP_OCTETS = "application/octet-stream"
     APP_PDF = "application/pdf"
     APP_XML = "application/xml"
+    APP_YAML = "application/yaml"
     APP_ZIP = "application/zip"
