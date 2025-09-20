@@ -6,6 +6,7 @@ help: ## This message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 LAYOUT_FILE := layout.yaml
+SUGGESTED_FILE := suggested.yaml
 OPENAPI_SPEC := ct.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := cloudtruth_gen_cli
@@ -31,12 +32,14 @@ all: install gen lint ## Perform a full cycle
 layout-lint:  ## Check the layout file format
 	$(poetry_run) layout check $(LAYOUT_FILE)
 
-gen: layout-lint ## Generate CLI code
+gen: layout-lint suggest ## Generate CLI code
 	$(poetry_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
+suggest: ## Use the local code to suggest a layout
+	$(poetry_run) ./layout.py $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /api/v1
 
 ###########
 ##@ Linting
