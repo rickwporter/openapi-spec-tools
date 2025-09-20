@@ -13,8 +13,8 @@ from tests.helpers import asset_filename
 def test_generate_api_node_single():
     pkg_name = "api_pkg"
     oas = open_oas(asset_filename("pet2.yaml"))
-    layout_gen = LayoutGenerator()
-    tree = layout_gen.generate(oas, "")
+    layout_gen = LayoutGenerator(oas)
+    tree = layout_gen.generate("")
     directory = TemporaryDirectory()
     generator = TestApiGenerator(pkg_name, oas)
     generate_api_node(generator, tree, directory.name)
@@ -46,8 +46,8 @@ def test_generate_api_node_single():
 def test_generate_api_node_multiple():
     pkg_name = "api_pkg"
     oas = open_oas(asset_filename("pets_and_vets.yaml"))
-    layout_gen = LayoutGenerator()
-    tree = layout_gen.generate(oas, "")
+    layout_gen = LayoutGenerator(oas)
+    tree = layout_gen.generate("")
     directory = TemporaryDirectory()
     generator = TestApiGenerator(pkg_name, oas)
     generate_api_node(generator, tree, directory.name)

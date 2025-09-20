@@ -19,8 +19,9 @@ UPDATE = "update"
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
 
-    def __init__(self):
+    def __init__(self, oas: dict[str, Any]):
         """Initialize the generator with internal values."""
+        self.paths = oas.get(OasField.PATHS, {})
         self.common_ops = {
             "add": CREATE,
             "create": CREATE,
@@ -109,12 +110,11 @@ class LayoutGenerator:
         """
         return None
 
-    def generate(self, oas: dict[str, Any], prefix: str) -> LayoutNode:
+    def generate(self, prefix: str) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
         main = LayoutNode(DEFAULT_START, DEFAULT_START, description="CLI to manage your application")
 
-        paths = oas.get(OasField.PATHS, {})
-        for path_name, path_data in paths.items():
+        for path_name, path_data in self.paths.items():
             path_parts = self.path_to_parts(path_name, prefix)
             commands = self.parts_to_commands(path_parts)
 

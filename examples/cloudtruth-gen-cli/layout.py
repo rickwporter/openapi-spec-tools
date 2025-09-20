@@ -73,8 +73,8 @@ def layout_suggest(
     """
     logger = init_logging(log_level, LOG_CLASS)
     oas = open_oas_with_error_handling(openapi_file, logger)
-    generator = CloudTruthLayoutGenerator()
-    node = generator.generate(oas, prefix)
+    generator = CloudTruthLayoutGenerator(oas)
+    node = generator.generate(prefix)
 
     write_layout_tree(output_file, node, logger)
     print(f"Wrote {output_file}")

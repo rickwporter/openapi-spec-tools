@@ -21,7 +21,7 @@ from tests.helpers import asset_filename
     ],
 )
 def test_path_to_parts(path, prefix, expected):
-    uut = LayoutGenerator()
+    uut = LayoutGenerator({})
     assert expected == uut.path_to_parts(path, prefix)
 
 
@@ -36,7 +36,7 @@ def test_path_to_parts(path, prefix, expected):
     ]
 )
 def test_parts_to_commands(parts, expected):
-    uut = LayoutGenerator()
+    uut = LayoutGenerator({})
     assert expected == uut.parts_to_commands(parts)
 
 
@@ -51,7 +51,7 @@ def test_parts_to_commands(parts, expected):
     ]
 )
 def test_commands_to_identifier(commands, expected):
-    uut = LayoutGenerator()
+    uut = LayoutGenerator({})
     assert expected == uut.commands_to_identifier(commands)
 
 
@@ -66,15 +66,15 @@ def test_commands_to_identifier(commands, expected):
     ]
 )
 def test_suggest_command(method, op_id, expected):
-    uut = LayoutGenerator()
+    uut = LayoutGenerator({})
     assert expected == uut.suggest_command(method, op_id)
 
 
 def test_generate_pets():
     oas = open_oas(asset_filename("pet.yaml"))
 
-    uut = LayoutGenerator()
-    node = uut.generate(oas, "/pets")
+    uut = LayoutGenerator(oas)
+    node = uut.generate("/pets")
     assert [] == node.subcommands()
     ops = node.operations()
     assert 3 == len(ops)
@@ -85,8 +85,8 @@ def test_generate_pets():
 def test_generate_cloudtruth():
     oas = open_oas(asset_filename("ct.yaml"))
 
-    uut = LayoutGenerator()
-    node = uut.generate(oas, "/api/v1")
+    uut = LayoutGenerator(oas)
+    node = uut.generate("/api/v1")
 
     # no direct operations -- all in sub-commands
     assert [] == node.operations()
@@ -111,8 +111,8 @@ def test_generate_cloudtruth():
 def test_generate_misc():
     oas = open_oas(asset_filename("misc.yaml"))
 
-    uut = LayoutGenerator()
-    node = uut.generate(oas, "")
+    uut = LayoutGenerator(oas)
+    node = uut.generate("")
     assert [] == node.operations()
 
     sub_cmds = node.subcommands()
@@ -128,8 +128,8 @@ def test_generate_node_file():
     oas = open_oas(asset_filename("pet.yaml"))
     tempdir = TemporaryDirectory()
     file = Path(tempdir.name) / "layout.yaml"
-    generator = LayoutGenerator()
-    node = generator.generate(oas, "")
+    generator = LayoutGenerator(oas)
+    node = generator.generate("")
 
     write_layout(file.as_posix(), node)
 
@@ -152,4 +152,3 @@ pets:
       operationId: showPetById
 '''
     assert expected in text
-
