@@ -54,8 +54,10 @@ audit:
     - name: list
       operationId: audit_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: audit_retrieve
     - name: summary
@@ -89,8 +91,10 @@ environments:
     - name: list
       operationId: environments_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: pushes
       subcommandId: environments_pushes
     - name: set
@@ -116,8 +120,10 @@ environments_pushes:
     - name: list
       operationId: environments_pushes_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
 
 environments_tags:
     description: Manage environments tags
@@ -129,8 +135,10 @@ environments_tags:
     - name: list
       operationId: environments_tags_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: environments_tags_update
     - name: show
@@ -154,8 +162,10 @@ grants:
     - name: list
       operationId: grants_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: grants_update
     - name: show
@@ -181,8 +191,10 @@ groups:
     - name: list
       operationId: groups_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: groups_update
     - name: show
@@ -234,8 +246,10 @@ integrations_aws:
     - name: list
       operationId: integrations_aws_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: pulls
       subcommandId: integrations_aws_pulls
     - name: pushes
@@ -259,8 +273,10 @@ integrations_aws_pulls:
     - name: list
       operationId: integrations_aws_pulls_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: integrations_aws_pulls_update
     - name: show
@@ -284,8 +300,10 @@ integrations_aws_pulls_tasks:
     - name: list
       operationId: integrations_aws_pulls_tasks_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_aws_pulls_tasks_retrieve
     - name: steps
@@ -297,8 +315,10 @@ integrations_aws_pulls_tasks_steps:
     - name: list
       operationId: integrations_aws_pulls_tasks_steps_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_aws_pulls_tasks_steps_retrieve
 
@@ -312,8 +332,10 @@ integrations_aws_pushes:
     - name: list
       operationId: integrations_aws_pushes_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: integrations_aws_pushes_update
     - name: show
@@ -337,8 +359,10 @@ integrations_aws_pushes_tasks:
     - name: list
       operationId: integrations_aws_pushes_tasks_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_aws_pushes_tasks_retrieve
     - name: steps
@@ -350,8 +374,10 @@ integrations_aws_pushes_tasks_steps:
     - name: list
       operationId: integrations_aws_pushes_tasks_steps_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_aws_pushes_tasks_steps_retrieve
 
@@ -377,8 +403,10 @@ integrations_azure_key_vault:
     - name: list
       operationId: integrations_azure_key_vault_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: pulls
       subcommandId: integrations_azure_key_vault_pulls
     - name: pushes
@@ -402,8 +430,10 @@ integrations_azure_key_vault_pulls:
     - name: list
       operationId: integrations_azure_key_vault_pulls_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: integrations_azure_key_vault_pulls_update
     - name: show
@@ -427,8 +457,10 @@ integrations_azure_key_vault_pulls_tasks:
     - name: list
       operationId: integrations_azure_key_vault_pulls_tasks_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_azure_key_vault_pulls_tasks_retrieve
     - name: steps
@@ -440,8 +472,10 @@ integrations_azure_key_vault_pulls_tasks_steps:
     - name: list
       operationId: integrations_azure_key_vault_pulls_tasks_steps_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_azure_key_vault_pulls_tasks_steps_retrieve
 
@@ -455,8 +489,10 @@ integrations_azure_key_vault_pushes:
     - name: list
       operationId: integrations_azure_key_vault_pushes_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: integrations_azure_key_vault_pushes_update
     - name: show
@@ -480,8 +516,10 @@ integrations_azure_key_vault_pushes_tasks:
     - name: list
       operationId: integrations_azure_key_vault_pushes_tasks_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_azure_key_vault_pushes_tasks_retrieve
     - name: steps
@@ -493,8 +531,10 @@ integrations_azure_key_vault_pushes_tasks_steps:
     - name: list
       operationId: integrations_azure_key_vault_pushes_tasks_steps_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_azure_key_vault_pushes_tasks_steps_retrieve
 
@@ -510,8 +550,10 @@ integrations_explore:
     - name: list
       operationId: integrations_explore_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
 
 integrations_github:
     description: Manage integrations github
@@ -523,8 +565,10 @@ integrations_github:
     - name: list
       operationId: integrations_github_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: pulls
       subcommandId: integrations_github_pulls
     - name: show
@@ -536,8 +580,10 @@ integrations_github_pulls:
     - name: list
       operationId: integrations_github_pulls_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: integrations_github_pulls_update
     - name: show
@@ -561,8 +607,10 @@ integrations_github_pulls_tasks:
     - name: list
       operationId: integrations_github_pulls_tasks_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_github_pulls_tasks_retrieve
     - name: steps
@@ -574,8 +622,10 @@ integrations_github_pulls_tasks_steps:
     - name: list
       operationId: integrations_github_pulls_tasks_steps_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: integrations_github_pulls_tasks_steps_retrieve
 
@@ -589,8 +639,10 @@ invitations:
     - name: list
       operationId: invitations_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: invitations_update
     - name: show
@@ -624,8 +676,10 @@ memberships:
     - name: list
       operationId: memberships_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: memberships_update
     - name: show
@@ -643,8 +697,10 @@ organizations:
     - name: list
       operationId: organizations_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: organizations_update
     - name: show
@@ -662,8 +718,10 @@ projects:
     - name: list
       operationId: projects_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: projects_update
     - name: show
@@ -703,8 +761,10 @@ projects_parameters:
     - name: list
       operationId: projects_parameters_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: pushes
       subcommandId: projects_parameters_pushes
     - name: rules
@@ -738,8 +798,10 @@ projects_parameters_duality:
     - name: list
       operationId: projects_parameters_duality_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
 
 projects_parameters_pushes:
     description: Manage projects parameters pushes
@@ -747,8 +809,10 @@ projects_parameters_pushes:
     - name: list
       operationId: projects_parameters_pushes_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
 
 projects_parameters_rules:
     description: Manage projects parameters rules
@@ -760,8 +824,10 @@ projects_parameters_rules:
     - name: list
       operationId: projects_parameters_rules_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: projects_parameters_rules_update
     - name: show
@@ -791,8 +857,10 @@ projects_parameters_values:
     - name: list
       operationId: projects_parameters_values_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: projects_parameters_values_update
     - name: show
@@ -816,8 +884,10 @@ projects_templates:
     - name: list
       operationId: projects_templates_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: projects_templates_update
     - name: show
@@ -851,8 +921,10 @@ serviceaccounts:
     - name: list
       operationId: serviceaccounts_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: serviceaccounts_update
     - name: show
@@ -870,8 +942,10 @@ types:
     - name: list
       operationId: types_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: rules
       subcommandId: types_rules
     - name: set
@@ -891,8 +965,10 @@ types_rules:
     - name: list
       operationId: types_rules_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: set
       operationId: types_rules_update
     - name: show
@@ -908,8 +984,10 @@ users:
     - name: list
       operationId: users_list
       pagination:
+        itemProperty: results
         pageStart: page
         pageSize: page_size
+        nextProperty: next
     - name: show
       operationId: users_retrieve
     - name: current
