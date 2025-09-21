@@ -71,8 +71,8 @@ def generate_api(
     if layout_file:
         commands = layout_tree_with_error_handling(layout_file, start, logger)
     else:
-        layout_gen = LayoutGenerator()
-        commands = layout_gen.generate(oas, prefix)
+        layout_gen = LayoutGenerator(oas)
+        commands = layout_gen.generate(prefix)
 
     if copyright_file:
         text = Path(copyright_file).read_text()

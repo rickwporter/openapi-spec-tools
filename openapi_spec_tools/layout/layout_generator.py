@@ -6,6 +6,7 @@ from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import DEFAULT_START
+from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 
 CREATE = "create"
@@ -19,8 +20,14 @@ UPDATE = "update"
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
 
-    def __init__(self):
+    def __init__(self, oas: dict[str, Any]):
         """Initialize the generator with internal values."""
+        self.paths = oas.get(OasField.PATHS, {})
+        self.components = oas.get(OasField.COMPONENTS, {})
+        self.supported_response_content = [
+            ContentType.APP_JSON,
+            ContentType.APP_YAML,
+        ]
         self.common_ops = {
             "add": CREATE,
             "create": CREATE,
@@ -55,6 +62,55 @@ class LayoutGenerator:
     def commands_to_identifier(commands: list[str]) -> str:
         """Convert the list of commands into an identifier."""
         return "_".join([to_snake_case(x).replace("-", "_") for x in commands])
+
+    @staticmethod
+    def find_parameter(params: list[dict[str, Any]], name: str) -> Optional[dict[str, Any]]:
+        """Find the parameter matching the provided name (if possible)."""
+        for p in params:
+            if p.get(OasField.NAME) == name:
+                return p
+        return None
+
+    def get_model(self, full_name: str) -> dict[str, Any]:
+        """Get the model from reference name."""
+        keys = [
+            item for item in full_name.split('/')
+            if item and item not in ['#', OasField.COMPONENTS.value]
+        ]
+        if not keys:
+            return None
+
+        value = self.components
+        for k in keys:
+            value = value.get(k)
+            if not value:
+                return None
+
+        return value
+
+    def get_response_body(self, op_data: dict[str, Any]) -> Optional[dict[str, Any]]:
+        """Get the response body data (if any)."""
+        responses = op_data.get(OasField.RESPONSES, {})
+        for code, data in responses.items():
+            # only look at successful responses
+            if not code.startswith("2"):
+                continue
+
+            content_data = data.get(OasField.CONTENT, {})
+            for content_type, content_details in content_data.items():
+                if content_type not in self.supported_response_content:
+                    continue
+
+                schema = content_details.get(OasField.SCHEMA)
+
+                # the info is directly in the schema
+                if set(schema.keys()) != {OasField.REFS.value}:
+                    return schema
+
+                model = self.get_model(schema.get(OasField.REFS))
+                return model
+
+        return None
 
     def suggest_command(self, method: str, op_id: str) -> str:
         """Suggest a command based on the method and operationId."""
@@ -109,12 +165,11 @@ class LayoutGenerator:
         """
         return None
 
-    def generate(self, oas: dict[str, Any], prefix: str) -> LayoutNode:
+    def generate(self, prefix: str) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
         main = LayoutNode(DEFAULT_START, DEFAULT_START, description="CLI to manage your application")
 
-        paths = oas.get(OasField.PATHS, {})
-        for path_name, path_data in paths.items():
+        for path_name, path_data in self.paths.items():
             path_parts = self.path_to_parts(path_name, prefix)
             commands = self.parts_to_commands(path_parts)
 
