@@ -1,0 +1,62 @@
+paths:
+  /something:
+    delete:
+      operationId: deleteSomething
+      responses:
+        '204':
+          description: No body in this delete response.
+    get:
+      operationId: getSomething
+      responses:
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+    put:
+      operationId: putSomething
+      responses:
+        '204':
+          content:
+            application/html:
+              schema:
+                $ref: '#/components/schemas/Pet'
+    post:
+      operationId: postSomething
+      responses:
+        '204':
+          content:
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/Pet'
+  /something/else:
+    delete:
+      operationId: deleteSomethingElse
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+    get:
+      operationId: getSomethingElse
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  species:
+                    type: string
+
+
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

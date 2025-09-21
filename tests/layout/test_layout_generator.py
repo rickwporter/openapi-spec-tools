@@ -5,8 +5,12 @@ import pytest
 
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.utils import write_layout
+from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
+
+NAME = "name"
 
 
 @pytest.mark.parametrize(
@@ -53,6 +57,62 @@ def test_parts_to_commands(parts, expected):
 def test_commands_to_identifier(commands, expected):
     uut = LayoutGenerator({})
     assert expected == uut.commands_to_identifier(commands)
+
+
+@pytest.mark.parametrize(
+    ["name", "expected"],
+    [
+        pytest.param("my-name", {NAME: "my-name", "something": "else"}, id="found"),
+        pytest.param("your-name", None, id="not-found")
+    ],
+)
+def test_find_parameter(name, expected):
+    parameters = [
+        {NAME: "other", "value": None},
+        {NAME: "my-name", "something": "else"},
+    ]
+    uut = LayoutGenerator({})
+    assert expected == uut.find_parameter(parameters, name)
+
+
+@pytest.mark.parametrize(
+    ["reference", "found"],
+    [
+        pytest.param("#/components/schemas/Pet", True, id="found"),
+        pytest.param("#/components/", False, id="no-keys"),
+        pytest.param("#/components/schemas/Animal", False, id="not-found"),
+    ]
+)
+def test_get_model(reference, found):
+    oas = open_oas(asset_filename("pet.yaml"))
+    uut = LayoutGenerator(oas)
+
+    item = uut.get_model(reference)
+    assert found == (item is not None)
+
+
+ANIMAL = {'type': 'object', 'properties': {'species': {'type': 'string'}}}
+PET = {'type': 'object', 'properties': {'id': {'type': 'integer'}, 'name': {'type': 'string'}}}
+
+@pytest.mark.parametrize(
+    ["op_id", "expected"],
+    [
+        pytest.param("getSomething", None, id="no-success"),
+        pytest.param("deleteSomething", None, id="no-content"),
+        pytest.param("putSomething", None, id="unsupported"),
+        pytest.param("postSomething", PET, id="yaml"),
+        pytest.param("deleteSomethingElse", PET, id="json"),
+        pytest.param("getSomethingElse", ANIMAL, id="no-ref"),
+    ]
+)
+def test_get_response_body(op_id, expected):
+    oas = open_oas(asset_filename("misc2.yaml"))
+    uut = LayoutGenerator(oas)
+
+    operations = map_operations(oas.get(OasField.PATHS, {}))
+    op = operations.get(op_id)
+    actual = uut.get_response_body(op)
+    assert expected == actual
 
 
 @pytest.mark.parametrize(
