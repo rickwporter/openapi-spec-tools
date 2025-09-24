@@ -11,6 +11,7 @@ from openapi_spec_tools.api_gen.files import copy_api_infrastructure
 from openapi_spec_tools.api_gen.files import generate_api_node
 from openapi_spec_tools.api_gen.flat_generator import FlatApiGenerator
 from openapi_spec_tools.api_gen.opaque_generator import OpaqueApiGenerator
+from openapi_spec_tools.api_gen.property_generator import PropertyApiGenerator
 from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
 from openapi_spec_tools.cli.arguments import CopyrightFileOption
@@ -34,6 +35,7 @@ class BodyType(str, Enum):
     """Different body types for API generated code."""
 
     FLAT = "flat"
+    PROPERTY = "property"
     OPAQUE = "opaque"
 
 
@@ -91,6 +93,8 @@ def generate_api(
 
     if body_type == BodyType.FLAT:
         generator = FlatApiGenerator(package_name, oas, logger)
+    elif body_type == BodyType.PROPERTY:
+        generator = PropertyApiGenerator(package_name, oas, logger)
     else:
         generator = OpaqueApiGenerator(package_name, oas, logger)
     generate_api_node(generator, commands, code_dir)

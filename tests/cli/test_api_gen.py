@@ -147,6 +147,12 @@ def test_api_generate_success_layout(layout, expected_files, temp_working_dir):
             ],
             id="opaque",
         ),
+        pytest.param(
+            "property", [
+                'def create_pets(\n    id: int = None,',
+            ],
+            id="property",
+        ),
     ],
 )
 def test_api_generate_success_body_type(body_type, expected, temp_working_dir):
