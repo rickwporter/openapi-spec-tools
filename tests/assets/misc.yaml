@@ -710,3 +710,7 @@ components:
         - saturday
         - SUNDAY
         - sunday
+    ShapeShifter:
+      oneOf:
+      - $ref: "#/components/schemas/SpeciesProp"
+      - $ref: "#/components/schemas/Attachment"
