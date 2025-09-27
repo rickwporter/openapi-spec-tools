@@ -4,7 +4,10 @@ from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
 from tests.api_gen.constants import DESC
+from tests.api_gen.constants import ENUM
+from tests.api_gen.constants import REQUIRED
 from tests.api_gen.constants import SUM
+from tests.api_gen.constants import X_REF
 from tests.api_gen.helpers import TestApiGenerator
 from tests.helpers import asset_filename
 
@@ -16,8 +19,14 @@ from tests.helpers import asset_filename
         pytest.param({SUM: "Short summary. With sentence."}, 50, "  # Short summary. With sentence.", id="sum-sent"),
         pytest.param({DESC: "Short desc. With sentence."}, 50, "  # Short desc. With sentence.", id="desc-sent"),
         pytest.param({DESC: "Description", SUM: "Summary"}, 50, "  # Summary", id="both"),
-        pytest.param({SUM: "Short summary. With sentence."}, 25, "  # Short summary", id="sentence"),
-        pytest.param({SUM: "Short summary. With sentence."}, 10, "  # Short summ", id="truncated"),
+        pytest.param({SUM: "Short summary. With sentence."}, 25, "  # Short summary...", id="sentence"),
+        pytest.param({SUM: "Short summary. With sentence."}, 10, "  # Short summ...", id="truncated"),
+        pytest.param({REQUIRED: True, SUM: "some help"}, 100, "  # some help [required]", id="required"),
+        pytest.param({REQUIRED: True, SUM: "Requires some help"}, 100, "  # Requires some help", id="req-desc"),
+        pytest.param({REQUIRED: True}, 100, "  # [required]", id="req-only"),
+        pytest.param({REQUIRED: True, X_REF: "RefName"}, 100, "  # see RefName for info [required]", id="req-ref"),
+        pytest.param({ENUM: ["a", "t", 0]}, 100, "  # choices: a, t, 0", id="enum"),
+        pytest.param({X_REF: "ShortReferenceName"}, 100, "  # see ShortReferenceName for info", id="ref")
     ]
 )
 def test_property_help(prop, max_len, expected):

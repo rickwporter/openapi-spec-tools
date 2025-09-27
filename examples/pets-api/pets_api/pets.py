@@ -15,10 +15,10 @@ from pets_api import _requests as _r  # noqa: F401
 
 
 def create_pets(
-    id: int = None,
-    name: str = None,
+    id: int = None,  # [required]
+    name: str = None,  # [required]
     tag: Optional[str] = None,
-    owner: str = None,
+    owner: str = None,  # [required]
     _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
     _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
     _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
@@ -50,7 +50,7 @@ def create_pets(
 
 
 def delete_pet_by_id(
-    pet_id: str,  # The id of the pet to retrieve
+    pet_id: str,  # The id of the pet to retrieve [required]
     _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
     _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
     _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
@@ -104,7 +104,7 @@ def list_pets(
 
 
 def show_pet_by_id(
-    pet_id: str,  # The id of the pet to retrieve
+    pet_id: str,  # The id of the pet to retrieve [required]
     _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
     _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
     _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
