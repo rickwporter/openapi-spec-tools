@@ -101,13 +101,10 @@ class PropertyApiGenerator(ApiGenerator):
         """Convert the body parameter dictionary into a list of API function arguments/help."""
         args = []
         for prop_name, prop_data in properties.items():
-            help = self.op_short_help(prop_data)
-            short_ref = prop_data.get(OasField.X_REF)
             required = prop_data.get(OasField.REQUIRED)
             default = prop_data.get(OasField.DEFAULT)
             collection = prop_data.get(OasField.X_COLLECT)
             py_type = self.schema_to_pytype(prop_data)
-            choices = prop_data.get(OasField.ENUM)
             if prop_data.get(OasField.PROPS):
                 py_type = "dict[str, Any]"
             if not py_type:
@@ -119,15 +116,8 @@ class PropertyApiGenerator(ApiGenerator):
                     py_type = f"{collection}[{py_type}]"
                 if not required:
                     py_type = f"Optional[{py_type}]"
-            if help:
-                pass
-            elif short_ref:
-                help = f"see {short_ref} for info"
-            elif choices:
-                help = f"choices: {', '.join([str(_) for _ in choices])}"
-            if required and "required" not in help.lower():
-                help += " [required]"
-            full_help = "" if not help else f"  # {help}"
+
+            full_help = self.property_help(prop_data)
 
             # need to provide a default, since it may come AFTER option parameters with defaults
             args.append(f"{self.variable_name(prop_name)}: {py_type} = {maybe_quoted(default)},{full_help}")

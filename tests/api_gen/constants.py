@@ -10,6 +10,7 @@ ANY_OF = "anyOf"
 ONE_OF = "oneOf"
 ITEMS = "items"
 DEF = "default"
+X_REF = "x-reference"
 
 S1 = '\n    '
 S2 = f"{S1}    "
