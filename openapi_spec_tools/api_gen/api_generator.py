@@ -62,6 +62,16 @@ class ApiGenerator(BaseGenerator, ABC):
             return ""
         return f"  # {simple_escape(help)}"
 
+    def op_body_arguments(self, body_params: list[dict[str, Any]]) -> list[str]:
+        """Convert the body parameters dictionary into a list of API function arguments/help."""
+        args = []
+        for prop_name, prop_data in body_params.items():
+            prop_data[OasField.NAME.value] = prop_name
+            arg = self.property_to_argument(prop_data, allow_required=False)
+            args.append(arg)
+
+        return args
+
     def standard_imports(self) -> str:
         """Get the standard imports for all CLI modules."""
         return f"""

@@ -3,8 +3,6 @@
 The bodies are "unrolled" to individual parameters (as best as possible), and passed as
 parameters into the functions.
 """
-from typing import Any
-
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.base_gen.constants import NL
 from openapi_spec_tools.base_gen.constants import SEP1
@@ -20,17 +18,6 @@ class FlatApiGenerator(ApiGenerator):
     is driven by an outside actor. This was done in an object-oriented fashion so pieces can be
     overridden by consumers.
     """
-
-    def op_body_arguments(self, body_params: list[dict[str, Any]]) -> list[str]:
-        """Convert the body parameters dictionary into a list of API function arguments/help."""
-        args = []
-        for prop_name, prop_data in body_params.items():
-            prop_data[OasField.NAME.value] = prop_name
-            arg = self.property_to_argument(prop_data, allow_required=False)
-            args.append(arg)
-
-        return args
-
 
     def function_definition(self, node: LayoutNode) -> str:
         """Generate the function text for the provided LayoutNode."""

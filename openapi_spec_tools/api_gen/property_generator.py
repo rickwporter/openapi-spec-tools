@@ -6,7 +6,6 @@ from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
 from openapi_spec_tools.base_gen.constants import NL
 from openapi_spec_tools.base_gen.constants import SEP1
-from openapi_spec_tools.base_gen.utils import maybe_quoted
 from openapi_spec_tools.base_gen.utils import quoted
 from openapi_spec_tools.base_gen.utils import shallow
 from openapi_spec_tools.layout.types import LayoutNode
@@ -96,35 +95,6 @@ class PropertyApiGenerator(ApiGenerator):
 
         return body_props
 
-
-    def op_body_arguments(self, properties: dict[str, Any]) -> list[str]:
-        """Convert the body parameter dictionary into a list of API function arguments/help."""
-        args = []
-        for prop_name, prop_data in properties.items():
-            required = prop_data.get(OasField.REQUIRED)
-            default = prop_data.get(OasField.DEFAULT)
-            collection = prop_data.get(OasField.X_COLLECT)
-            py_type = self.schema_to_pytype(prop_data)
-            if prop_data.get(OasField.PROPS):
-                py_type = "dict[str, Any]"
-            if not py_type:
-                py_type = "Any"
-            else:
-                if py_type == "str" and default is not None:
-                    default = str(default)
-                if collection:
-                    py_type = f"{collection}[{py_type}]"
-                if not required:
-                    py_type = f"Optional[{py_type}]"
-
-            full_help = self.property_help(prop_data)
-
-            # need to provide a default, since it may come AFTER option parameters with defaults
-            args.append(f"{self.variable_name(prop_name)}: {py_type} = {maybe_quoted(default)},{full_help}")
-
-        return args
-
-
     def op_body_formation(self, properties: dict[str, Any]) -> str:
         """Create body parameter and poulates it when there are body paramters."""
         if not properties:
@@ -206,7 +176,7 @@ class PropertyApiGenerator(ApiGenerator):
             user_header_init = NL + SEP1 + SEP1.join(lines) + NL
 
         return f"""
-{self.enum_definitions(path_params, query_params + header_params, {})}
+{self.enum_definitions(path_params, query_params + header_params, body_params)}
 def {func_name}({args_str}) -> Any:
     {self.op_doc_string(op)}# handler for {node.identifier}: {method} {path}
     {self.init_infra_args(op)}
