@@ -238,8 +238,8 @@ class BaseGenerator:
                 return ct.value
         return None
 
-    def op_get_body(self, operation: dict[str, Any]) -> Optional[dict[str, Any]]:
-        """Get the first body matching a supported type."""
+    def op_request_body(self, operation: dict[str, Any]) -> Optional[dict[str, Any]]:
+        """Get the first request body matching a supported type."""
         content = self.op_request_content(operation)
         for ct in self.supported:
             body = content.get(ct.value)
@@ -404,7 +404,7 @@ class BaseGenerator:
 
     def op_body_schema(self, operation: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Get the name and schema dictionary."""
-        body = self.op_get_body(operation)
+        body = self.op_request_body(operation)
         if not body:
             return ("None", {})
 
