@@ -21,14 +21,14 @@ def test_op_body_arguments():
     assert 'name: str = None,  # Pet name' in text
     assert 'tag: Optional[str] = None,  # Pet classification' in text
     assert 'another_value: Optional[str] = "Anything goes",  # A string with a default' in text
-    assert 'flavor: Optional[Flavor] = None,  # Species type' in text
+    assert 'flavor: Optional[Species] = None,  # Species type' in text
     assert 'bin_string: Optional[BinString] = "4",' in text
     assert 'optional_list: Optional[list[str]] = None,' in text
     assert 'first_choice: Optional[int] = None,' in text
     assert 'list_various: Optional[list[bool]] = None,' in text
     assert 'format_: Optional[str] = "text",' in text
     assert 'gone: Optional[str] = None,  # To be removed' in text
-    assert 'best_day: Optional[BestDay] = None,  # enum buried in all-of' in text
+    assert 'best_day: Optional[DayOfWeek] = None,  # enum buried in all-of' in text
     assert 'inconsistent: Optional[Inconsistent] = "2",' in text
     assert 'non_list_def: Optional[list[NonListDef]] = ["1.1"],' in text
 

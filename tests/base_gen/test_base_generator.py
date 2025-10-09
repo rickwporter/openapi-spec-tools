@@ -395,7 +395,7 @@ def test_get_parameter_pytype(param_data, expected):
         pytest.param(
             "foo",
             {TYPE: "string", REQUIRED: True, ENUM: ["a", "b"], "x-reference": "east_west"},
-            "Foo",
+            "EastWest",
             id="named-enum",
         ),
         pytest.param(
