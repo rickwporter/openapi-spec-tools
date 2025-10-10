@@ -1,5 +1,6 @@
 import pytest
 
+from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
@@ -41,6 +42,83 @@ def test_standard_imports():
     assert 'from typing import Any' in text
     assert 'from datetime import datetime' in text
     assert 'from api_package import _environment as _e' in text
+
+@pytest.mark.parametrize(
+    [
+        "env_host",
+        "default_host",
+        "env_key",
+        "env_timeout",
+        "default_timeout",
+        "env_log",
+        "default_log",
+        "expected",
+    ],
+    [
+        pytest.param(
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            """\
+_api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
+_api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
+_api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+_log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info\
+""",
+            id="defaults",
+        ),
+        pytest.param(
+            "MY_HOST",
+            "localhost",
+            "YOUR_KEY",
+            "THEIR_TIME",
+            30,
+            "SOME_LOG_LEVEL",
+            "blah",
+            """\
+_api_host: Optional[str] = None,  # API host, read from MY_HOST if not provided, defaults to localhost
+_api_key: Optional[str] = None,  # API key for bearer auth, read from YOUR_KEY if not provided
+_api_timeout: Optional[int] = None,  # timeout for operation, read from THEIR_TIME if not provided, defaults to 30
+_log_level: Optional[str] = None,  # log level, read from SOME_LOG_LEVEL if not provided, defaults to blah\
+""",
+            id="updates",
+        )
+    ]
+)
+def test_command_infra_arguments(
+    env_host,
+    default_host,
+    env_key,
+    env_timeout,
+    default_timeout,
+    env_log,
+    default_log,
+    expected,
+):
+    uut = TestApiGenerator("api_package", {})
+    if env_host:
+        uut.env_host = env_host
+    if default_host:
+        uut.default_host = default_host
+    if env_key:
+        uut.env_key = env_key
+    if env_timeout:
+        uut.env_timeout = env_timeout
+    if default_timeout:
+        uut.default_timeout = default_timeout
+    if env_log:
+        uut.env_log_level = env_log
+    if default_log:
+        uut.default_log = default_log
+    node = LayoutNode("foo", "bar")
+    args = uut.command_infra_arguments(node)
+    text = "\n".join(args)
+    assert expected == text
+
 
 def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
