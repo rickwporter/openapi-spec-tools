@@ -365,6 +365,7 @@ def test_simplify_type(schema, expected):
             "SnaFoo",
             id="ref-enum",
         ),
+        pytest.param({TYPE: "object", "properties": {TYPE: "string"}}, "dict[str, Any]", id="object"),
     ],
 )
 def test_get_parameter_pytype(param_data, expected):
