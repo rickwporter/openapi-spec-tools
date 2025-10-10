@@ -96,7 +96,9 @@ from {self.package_name} import _requests as _r  # noqa: F401
 
     def command_infra_arguments(self, command: LayoutNode) -> list[str]:
         """Get the standard CLI function arguments to the command."""
-        host_help = f'API host, read from {self.env_host} if not provided, defaults to {self.default_host}'
+        host_help = f'API host, read from {self.env_host} if not provided'
+        if self.default_host:
+            host_help += f', defaults to {self.default_host}'
         key_help = f'API key for bearer auth, read from {self.env_key} if not provided'
         timeout_help = (
             f'timeout for operation, read from {self.env_timeout} if not provided, '
