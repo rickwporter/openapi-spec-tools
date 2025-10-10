@@ -499,7 +499,15 @@ class BaseGenerator:
             name = param_data.get(OasField.X_REF) or param_data.get(OasField.NAME)
             return self.class_name(name)
 
-        return self.schema_to_pytype(param_data)
+        py_type = self.schema_to_pytype(param_data)
+        if py_type:
+            return py_type
+
+        oas_type = self.simplify_type(param_data.get(OasField.TYPE))
+        if oas_type == "object":
+            return "dict[str, Any]"
+
+        return None
 
     def get_property_pytype(self, prop_name: str, prop_data: dict[str, Any]) -> Optional[str]:
         """Get the "basic" Python type from a property object.
