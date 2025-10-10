@@ -202,7 +202,7 @@ def test_op_body_arguments():
         in text
     )
     assert (
-        'flavor: Annotated[Optional[Flavor], '
+        'flavor: Annotated[Optional[Species], '
         'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'
         in text
     )
@@ -232,7 +232,7 @@ def test_op_body_arguments():
         in text
     )
     assert (
-        'best_day: Annotated[Optional[BestDay], typer.Option(show_default=False, '
+        'best_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
         'case_sensitive=True, help="enum buried in all-of")] = None'
         in text
     )

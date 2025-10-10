@@ -38,7 +38,7 @@ def show_commands(
     return
 
 
-class Role(str, Enum):  # noqa: F811
+class RoleEnum(str, Enum):  # noqa: F811
     OWNER = "OWNER"
     ADMIN = "ADMIN"
     CONTRIB = "CONTRIB"
@@ -49,7 +49,7 @@ class Role(str, Enum):  # noqa: F811
 def grants_create(
     principal: Annotated[str, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
     scope: Annotated[str, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
-    role: Annotated[Role, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
+    role: Annotated[RoleEnum, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -241,7 +241,7 @@ def grants_list(
     return
 
 
-class Role(str, Enum):  # noqa: F811
+class RoleEnum(str, Enum):  # noqa: F811
     OWNER = "OWNER"
     ADMIN = "ADMIN"
     CONTRIB = "CONTRIB"
@@ -253,7 +253,7 @@ def grants_update(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the grant.")],
     principal: Annotated[str, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
     scope: Annotated[str, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
-    role: Annotated[Role, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
+    role: Annotated[RoleEnum, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -337,7 +337,7 @@ def grants_retrieve(
     return
 
 
-class Role(str, Enum):  # noqa: F811
+class RoleEnum(str, Enum):  # noqa: F811
     OWNER = "OWNER"
     ADMIN = "ADMIN"
     CONTRIB = "CONTRIB"
@@ -349,7 +349,7 @@ def grants_partial_update(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the grant.")],
     principal: Annotated[Optional[str], typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
     scope: Annotated[Optional[str], typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
-    role: Annotated[Optional[Role], typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
+    role: Annotated[Optional[RoleEnum], typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

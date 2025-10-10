@@ -496,7 +496,7 @@ class BaseGenerator:
         """
         values = param_data.get(OasField.ENUM)
         if values:
-            name = param_data.get(OasField.NAME)
+            name = param_data.get(OasField.X_REF) or param_data.get(OasField.NAME)
             return self.class_name(name)
 
         return self.schema_to_pytype(param_data)
@@ -507,7 +507,8 @@ class BaseGenerator:
         Each property potentially has 'type' and 'format' fields.
         """
         if prop_data.get(OasField.ENUM):
-            pytype = self.class_name(prop_name)
+            base_name = prop_data.get(OasField.X_REF) or prop_name
+            pytype = self.class_name(base_name)
         else:
             pytype = self.schema_to_pytype(prop_data)
             if not pytype:
@@ -839,7 +840,7 @@ class BaseGenerator:
             if not values:
                 continue
 
-            e_name = param_data.get(OasField.NAME)
+            e_name = param_data.get(OasField.X_REF) or param_data.get(OasField.NAME)
             e_type = self.schema_to_pytype(param_data) or 'str'
             enums[self.class_name(e_name)] = (e_type, values)
 
@@ -847,8 +848,9 @@ class BaseGenerator:
             values = prop.get(OasField.ENUM)
             if not values:
                 continue
+            e_name = prop.get(OasField.X_REF) or name
             e_type = self.schema_to_pytype(prop) or 'str'
-            enums[self.class_name(name)] = (e_type, values)
+            enums[self.class_name(e_name)] = (e_type, values)
 
         if not enums:
             return ""
