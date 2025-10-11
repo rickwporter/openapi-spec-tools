@@ -426,15 +426,7 @@ class BaseGenerator:
         # attempt to simplify enum types to a single type to something that matches
         properties = self.model_settable_properties(name, schema)
         for prop_data in properties.values():
-            enum_values = prop_data.get(OasField.ENUM)
-            schema_type = prop_data.get(OasField.TYPE)
-            if enum_values and isinstance(schema_type, list):
-                schema_list = self.enum_find_schema(schema_type, enum_values)
-                schema_type = schema_list[0]
-                prop_data[OasField.TYPE.value] = schema_type
-            # make sure the enumeration and default values align with the type
-            if enum_values and schema_type == "string":
-                self.enum_stringify(prop_data)
+            self.update_enum(prop_data)
 
         return properties
 
@@ -610,15 +602,7 @@ class BaseGenerator:
             prop[OasField.X_COLLECT.value] = schema_type
             schema_type = items.get(OasField.TYPE)
 
-        enum_values = prop.get(OasField.ENUM)
-        if enum_values and isinstance(schema_type, list):
-            schema_list = self.enum_find_schema(schema_type, enum_values)
-            schema_type = schema_list[0]
-            prop[OasField.TYPE.value] = schema_type
-
-        # make sure the enumeration and default values align with the type
-        if enum_values and schema_type == "string":
-            self.enum_stringify(prop)
+        self.update_enum(prop)
 
         schema = self.simplify_type(prop)
         if schema:
@@ -810,6 +794,25 @@ class BaseGenerator:
         schema[OasField.DEFAULT.value] = def_val
 
         return
+
+    def update_enum(self, prop: dict[str, Any]) -> dict[str, Any]:
+        """Update the property when it is an enum.
+
+        In some cases, the type needs updating. And, when the enum type is string, it makes
+        sure the possible values and default are strings.
+        """
+        enum_values = prop.get(OasField.ENUM)
+        schema_type = prop.get(OasField.TYPE)
+        if enum_values and isinstance(schema_type, list):
+            schema_list = self.enum_find_schema(schema_type, enum_values)
+            schema_type = schema_list[0]
+            prop[OasField.TYPE.value] = schema_type
+
+        # make sure the enumeration and default values align with the type
+        if enum_values and schema_type == "string":
+            self.enum_stringify(prop)
+
+        return prop
 
     def enum_declaration(self, name: str, enum_type: str, values: list[Any]) -> str:
         """Turn data into an enum declation."""

@@ -3,10 +3,8 @@ from copy import deepcopy
 from typing import Any
 
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
-from openapi_spec_tools.base_gen.constants import COLLECTIONS
 from openapi_spec_tools.base_gen.constants import NL
 from openapi_spec_tools.base_gen.constants import SEP1
-from openapi_spec_tools.base_gen.utils import maybe_quoted
 from openapi_spec_tools.base_gen.utils import quoted
 from openapi_spec_tools.base_gen.utils import shallow
 from openapi_spec_tools.layout.types import LayoutNode
@@ -15,6 +13,36 @@ from openapi_spec_tools.types import OasField
 
 class PropertyApiGenerator(ApiGenerator):
     """Generates an API with body expanded to the first level of properties."""
+
+    def update_reference(self, prop: dict[str, Any]) -> dict[str, Any]:
+        """Update a property's reference."""
+        reference = prop.get(OasField.REFS, "")
+
+        # this helps with CloudTruth where the role's are based on an enum reference inside an 'allOf'
+        all_of = prop.get(OasField.ALL_OF, [])
+        if not reference and len(all_of) == 1:
+            item = all_of[0]
+            reference = item.get(OasField.REFS)
+
+        if reference:
+            prop[OasField.X_REF.value] = self.short_reference_name(reference)
+
+            # resolve references, if they're enums
+            sub_model = self.get_model(reference)
+            if sub_model:
+                prop.update(sub_model)
+
+        return prop
+
+    def update_collection(self, prop: dict[str, Any]) -> dict[str, Any]:
+        """Update the collection information."""
+        collection_type = self.model_collection_type(prop)
+        if collection_type:
+            item_model = prop.pop(OasField.ITEMS, {})
+            prop[OasField.X_COLLECT.value] = collection_type
+            prop.update(item_model)
+
+        return prop
 
     def op_body_top_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
         """Get a list of top-level properties for the operation."""
@@ -37,15 +65,14 @@ class PropertyApiGenerator(ApiGenerator):
             else:
                 sub_model = deepcopy(parent)
             required_sub = sub_model.get(OasField.REQUIRED, [])
-            for sub_name, sub_data in sub_model.get(OasField.PROPS, {}).items():
-                if sub_data.get(OasField.READ_ONLY):
+            for sub_name, _sub_data in sub_model.get(OasField.PROPS, {}).items():
+                if _sub_data.get(OasField.READ_ONLY):
                     continue
 
+                sub_data = self.update_collection(_sub_data)
+                sub_data = self.update_reference(sub_data)
                 sub_data[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED) or sub_name in required_sub
-                ref = sub_data.get(OasField.REFS)
-                if ref:
-                    sub_data[OasField.X_REF.value] = self.short_reference_name(ref)
-                body_props[sub_name] = sub_data
+                body_props[sub_name] = self.update_enum(sub_data)
 
         any_of = model.pop(OasField.ANY_OF, None)
         if any_of:
@@ -53,7 +80,9 @@ class PropertyApiGenerator(ApiGenerator):
                 self.logger.info(f"Grabbing anyOf[0] item from {name}")
                 self.logger.debug(f"{name} anyOf selected: {shallow(any_of[0])}")
             # just grab the first one... not sure this is the best choice, but need to do something
-            model.update(any_of[0])
+            updated = self.update_collection(any_of[0])
+            updated = self.update_reference(updated)
+            model.update(self.update_enum(updated))
 
         one_of = model.pop(OasField.ONE_OF, None)
         if one_of:
@@ -62,7 +91,9 @@ class PropertyApiGenerator(ApiGenerator):
                 self.logger.info(f"Grabbing oneOf[0] item from {name}")
                 self.logger.debug(f"{name} oneOf selected: {shallow(updated[0])}")
             # just grab the first one... not sure this is the best choice, but need to do something
-            model.update(updated[0])
+            updated = self.update_collection(updated[0])
+            updated = self.update_reference(updated)
+            model.update(self.update_enum(updated))
 
         reference = model.get(OasField.REFS, "")
         short_refname = self.short_reference_name(reference)
@@ -72,58 +103,18 @@ class PropertyApiGenerator(ApiGenerator):
         required_props = model.get(OasField.REQUIRED, [])
 
         # copy the individual properties
-        for prop_name, prop_data in model.get(OasField.PROPS, {}).items():
-            if prop_data.get(OasField.READ_ONLY, False):
+        for prop_name, _prop_data in model.get(OasField.PROPS, {}).items():
+            if _prop_data.get(OasField.READ_ONLY, False):
                 continue
 
+            prop_data = deepcopy(_prop_data)
             prop_data[OasField.REQUIRED.value] = prop_name in required_props
+            prop_data = self.update_collection(prop_data)
+            prop_data = self.update_reference(prop_data)
 
-            collection_type = self.model_collection_type(prop_data)
-            if collection_type:
-                item_model = prop_data.pop(OasField.ITEMS, {})
-                prop_data[OasField.X_COLLECT.value] = COLLECTIONS.get(collection_type)
-                prop_data.update(item_model)
-
-            prop_ref = prop_data.get(OasField.REFS, "")
-            sub_model = self.get_model(prop_ref)
-            if sub_model:
-                prop_data.update(sub_model)
-            prop_short_ref = self.short_reference_name(prop_ref)
-            if prop_short_ref:
-                prop_data[OasField.X_REF.value] = prop_short_ref
-
-            body_props[prop_name] = prop_data
+            body_props[prop_name] = self.update_enum(prop_data)
 
         return body_props
-
-
-    def op_body_arguments(self, properties: dict[str, Any]) -> list[str]:
-        """Convert the body parameter dictionary into a list of API function arguments/help."""
-        args = []
-        for prop_name, prop_data in properties.items():
-            required = prop_data.get(OasField.REQUIRED)
-            default = prop_data.get(OasField.DEFAULT)
-            collection = prop_data.get(OasField.X_COLLECT)
-            py_type = self.schema_to_pytype(prop_data)
-            if prop_data.get(OasField.PROPS):
-                py_type = "dict[str, Any]"
-            if not py_type:
-                py_type = "Any"
-            else:
-                if py_type == "str" and default is not None:
-                    default = str(default)
-                if collection:
-                    py_type = f"{collection}[{py_type}]"
-                if not required:
-                    py_type = f"Optional[{py_type}]"
-
-            full_help = self.property_help(prop_data)
-
-            # need to provide a default, since it may come AFTER option parameters with defaults
-            args.append(f"{self.variable_name(prop_name)}: {py_type} = {maybe_quoted(default)},{full_help}")
-
-        return args
-
 
     def op_body_formation(self, properties: dict[str, Any]) -> str:
         """Create body parameter and poulates it when there are body paramters."""
@@ -206,7 +197,7 @@ class PropertyApiGenerator(ApiGenerator):
             user_header_init = NL + SEP1 + SEP1.join(lines) + NL
 
         return f"""
-{self.enum_definitions(path_params, query_params + header_params, {})}
+{self.enum_definitions(path_params, query_params + header_params, body_params)}
 def {func_name}({args_str}) -> Any:
     {self.op_doc_string(op)}# handler for {node.identifier}: {method} {path}
     {self.init_infra_args(op)}
