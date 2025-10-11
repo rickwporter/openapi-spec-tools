@@ -1015,6 +1015,7 @@ def test_param_to_property(parameter, expected):
                     'x-reference': 'RoleEnum',
                     '$ref': '#/components/schemas/RoleEnum',
                     'description': 'The role that the user has in the organization.',
+                    'default': None,
                 },
             },
             id="enum-one-of"

@@ -79,8 +79,8 @@ def test_op_body_arguments():
     assert 'another_value: Optional[str] = "Anything goes",  # A string with a default' in text
     assert 'flavor: Optional[Species] = None,  # Species type' in text
     assert 'bin_string: Optional[BinString] = "4",  # choices: 1, 2, 4, 8' in text
-    assert 'optional_list: Optional[Any] = None,' in text
-    assert 'first_choice: Optional[Any] = None,' in text
+    assert 'optional_list: Optional[list[str]] = None,' in text
+    assert 'first_choice: Optional[int] = None,' in text
     assert 'list_various: Optional[list[Any]] = None,' in text
     assert 'format_: Optional[str] = "text",' in text
     assert 'gone: Optional[str] = None,  # To be removed' in text
