@@ -166,6 +166,36 @@ class BaseGenerator:
 
         return value
 
+    def update_reference(self, prop: dict[str, Any]) -> dict[str, Any]:
+        """Update a property's reference."""
+        reference = prop.get(OasField.REFS, "")
+
+        # this helps with CloudTruth where the role's are based on an enum reference inside an 'allOf'
+        all_of = prop.get(OasField.ALL_OF, [])
+        if not reference and len(all_of) == 1:
+            item = all_of[0]
+            reference = item.get(OasField.REFS)
+
+        if reference:
+            prop[OasField.X_REF.value] = self.short_reference_name(reference)
+
+            # resolve references, if they're enums
+            sub_model = self.get_model(reference)
+            if sub_model:
+                prop.update(sub_model)
+
+        return prop
+
+    def update_collection(self, prop: dict[str, Any]) -> dict[str, Any]:
+        """Update the collection information."""
+        collection_type = self.model_collection_type(prop)
+        if collection_type:
+            item_model = prop.pop(OasField.ITEMS, {})
+            prop[OasField.X_COLLECT.value] = collection_type
+            prop.update(item_model)
+
+        return prop
+
     def model_is_complex(self, model: dict[str, Any]) -> bool:
         """Determine if the model is complex, such that it would not work well with a list.
 
@@ -331,14 +361,7 @@ class BaseGenerator:
             # just grab the first one... not sure this is the best choice, but need to do something
             model.update(any_of[0])
 
-        one_of = model.get(OasField.ONE_OF)
-        if one_of:
-            updated = self.condense_one_of(one_of)
-            if len(updated) != 1:
-                self.logger.info(f"Grabbing oneOf[0] item from {name}")
-                self.logger.debug(f"{name} oneOf selected: {shallow(updated[0])}")
-            # just grab the first one... not sure this is the best choice, but need to do something
-            model.update(updated[0])
+        self.update_one_of(name, model)
 
         reference = model.get(OasField.REFS, "")
         short_refname = self.short_reference_name(reference)
@@ -560,6 +583,22 @@ class BaseGenerator:
 
         return condensed
 
+    def update_one_of(self, name: str, prop: dict[str, Any]) -> dict[str, Any]:
+        """Update the property when oneOf is present."""
+        one_of = prop.pop(OasField.ONE_OF, None)
+        if one_of:
+            updated = self.condense_one_of(one_of)
+            if len(updated) != 1:
+                self.logger.info(f"Grabbing oneOf[0] item from {name}")
+                self.logger.debug(f"{name} oneOf selected: {shallow(updated[0])}")
+
+            # just grab the first one... not sure this is the best choice, but need to do something
+            updated = self.update_collection(deepcopy(updated[0]))
+            updated = self.update_reference(updated)
+            prop.update(self.update_enum(updated))
+
+        return prop
+
     def param_to_property(self, param: dict[str, Any]) -> dict[str, Any]:
         """Convert parameter data to property data.
 
@@ -567,16 +606,8 @@ class BaseGenerator:
         collection information, required).
         """
         prop = deepcopy(param)
-
-        one_of = prop.pop(OasField.ONE_OF, [])
-        if one_of:
-            updated = self.condense_one_of(one_of)
-            if len(updated) == 1:
-                prop.update(updated[0])
-            else:
-                # just grab the first one... not sure this is the best choice, but need to do something
-                self.logger.warning(f"Grabbing oneOf[0] item from {shallow(updated[0])}")
-                prop.update(updated[0])
+        name = prop.get(OasField.NAME)
+        prop = self.update_one_of(name, prop)
 
         any_of = prop.pop(OasField.ANY_OF, [])
         if any_of:

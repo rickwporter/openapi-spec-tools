@@ -14,36 +14,6 @@ from openapi_spec_tools.types import OasField
 class PropertyApiGenerator(ApiGenerator):
     """Generates an API with body expanded to the first level of properties."""
 
-    def update_reference(self, prop: dict[str, Any]) -> dict[str, Any]:
-        """Update a property's reference."""
-        reference = prop.get(OasField.REFS, "")
-
-        # this helps with CloudTruth where the role's are based on an enum reference inside an 'allOf'
-        all_of = prop.get(OasField.ALL_OF, [])
-        if not reference and len(all_of) == 1:
-            item = all_of[0]
-            reference = item.get(OasField.REFS)
-
-        if reference:
-            prop[OasField.X_REF.value] = self.short_reference_name(reference)
-
-            # resolve references, if they're enums
-            sub_model = self.get_model(reference)
-            if sub_model:
-                prop.update(sub_model)
-
-        return prop
-
-    def update_collection(self, prop: dict[str, Any]) -> dict[str, Any]:
-        """Update the collection information."""
-        collection_type = self.model_collection_type(prop)
-        if collection_type:
-            item_model = prop.pop(OasField.ITEMS, {})
-            prop[OasField.X_COLLECT.value] = collection_type
-            prop.update(item_model)
-
-        return prop
-
     def op_body_top_properties(self, operation: dict[str, Any]) -> dict[str, Any]:
         """Get a list of top-level properties for the operation."""
         name, schema = self.op_body_schema(operation)
@@ -69,7 +39,8 @@ class PropertyApiGenerator(ApiGenerator):
                 if _sub_data.get(OasField.READ_ONLY):
                     continue
 
-                sub_data = self.update_collection(_sub_data)
+                sub_data = self.update_one_of(sub_name, deepcopy(_sub_data))
+                sub_data = self.update_collection(sub_data)
                 sub_data = self.update_reference(sub_data)
                 sub_data[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED) or sub_name in required_sub
                 body_props[sub_name] = self.update_enum(sub_data)
@@ -80,26 +51,14 @@ class PropertyApiGenerator(ApiGenerator):
                 self.logger.info(f"Grabbing anyOf[0] item from {name}")
                 self.logger.debug(f"{name} anyOf selected: {shallow(any_of[0])}")
             # just grab the first one... not sure this is the best choice, but need to do something
-            updated = self.update_collection(any_of[0])
+            updated = self.update_one_of(name, deepcopy(any_of[0]))
+            updated = self.update_collection(updated)
             updated = self.update_reference(updated)
             model.update(self.update_enum(updated))
 
-        one_of = model.pop(OasField.ONE_OF, None)
-        if one_of:
-            updated = self.condense_one_of(one_of)
-            if len(updated) != 1:
-                self.logger.info(f"Grabbing oneOf[0] item from {name}")
-                self.logger.debug(f"{name} oneOf selected: {shallow(updated[0])}")
-            # just grab the first one... not sure this is the best choice, but need to do something
-            updated = self.update_collection(updated[0])
-            updated = self.update_reference(updated)
-            model.update(self.update_enum(updated))
-
-        reference = model.get(OasField.REFS, "")
-        short_refname = self.short_reference_name(reference)
-        if reference:
-            model.update(self.get_model(reference))
-            model[OasField.X_REF.value] = short_refname
+        model = self.update_one_of(name, model)
+        model = self.update_collection(model)
+        model = self.update_reference(model)
         required_props = model.get(OasField.REQUIRED, [])
 
         # copy the individual properties
@@ -109,6 +68,7 @@ class PropertyApiGenerator(ApiGenerator):
 
             prop_data = deepcopy(_prop_data)
             prop_data[OasField.REQUIRED.value] = prop_name in required_props
+            prop_data = self.update_one_of(prop_name, prop_data)
             prop_data = self.update_collection(prop_data)
             prop_data = self.update_reference(prop_data)
 
