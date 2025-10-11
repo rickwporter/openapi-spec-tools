@@ -74,19 +74,19 @@ def test_op_body_arguments():
     args = uut.op_body_arguments(body_params)
     text = "\n".join(args)
 
-    assert 'name: str = None,  # Pet name' in text
+    assert 'name: str = None,  # Pet name [required]' in text
     assert 'tag: Optional[str] = None,  # Pet classification' in text
     assert 'another_value: Optional[str] = "Anything goes",  # A string with a default' in text
-    assert 'flavor: Any = None,  # see Species for info' in text
-    assert 'bin_string: Optional[str] = "4",  # choices: 1, 2, 4, 8' in text
-    assert 'optional_list: Any = None,' in text
-    assert 'first_choice: Any = None,' in text
-    assert 'list_various: Any = None,' in text
+    assert 'flavor: Optional[Species] = None,  # Species type' in text
+    assert 'bin_string: Optional[BinString] = "4",  # choices: 1, 2, 4, 8' in text
+    assert 'optional_list: Optional[Any] = None,' in text
+    assert 'first_choice: Optional[Any] = None,' in text
+    assert 'list_various: Optional[list[Any]] = None,' in text
     assert 'format_: Optional[str] = "text",' in text
     assert 'gone: Optional[str] = None,  # To be removed' in text
-    assert 'best_day: Any = None,  # enum buried in all-of' in text
-    assert 'inconsistent: Optional[int] = 2,  # choices: 1, 2, infinity-and-beyond' in text
-    assert 'non_list_def: Any = 1.1,' in text
+    assert 'best_day: Optional[DayOfWeek] = None,  # enum buried in all-of' in text
+    assert 'inconsistent: Optional[Inconsistent] = "2",  # choices: 1, 2, infinity-and-beyond' in text
+    assert 'non_list_def: Optional[list[NonListDef]] = ["1.1"],' in text
 
     # this is filtered out bu the op_body_settable_properties
     assert 'bogus: Annotated' not in text
