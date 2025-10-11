@@ -11,7 +11,11 @@ The project has been published to PyPi, so you should be able to install it with
 ```
 
 Generally, there are two intended ways to utilize this package:
-* Use `oas` and `cli-gen` as CLI tools to perform actions
+* Use the CLI tools to perform actions
+    * `oas` - analyzing and modifying an OpenAPI spec
+    * `layout` - generating and analyzing a YAML file that provides structure to the CLI/API generator
+    * `cli-gen` - generates a CLI from an OpenAPI spec (and optionally a layout file)
+    * `api-gen` - generates API code from an OpenAPI spec (and optionally a layout file)
 * Use the code in the Python modules for your own purpose
 
 The sections below provide a brief description with links to more examples and details.
