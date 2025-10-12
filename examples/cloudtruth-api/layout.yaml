@@ -1,0 +1,818 @@
+main:
+    description: CLI to manage your application
+    operations:
+    - name: api
+      subcommandId: api
+    - name: audit
+      subcommandId: audit
+    - name: backup
+      subcommandId: backup
+    - name: environments
+      subcommandId: environments
+    - name: features
+      subcommandId: features
+    - name: grants
+      subcommandId: grants
+    - name: groups
+      subcommandId: groups
+    - name: import
+      subcommandId: import
+    - name: integrations
+      subcommandId: integrations
+    - name: invitations
+      subcommandId: invitations
+    - name: memberships
+      subcommandId: memberships
+    - name: organizations
+      subcommandId: organizations
+    - name: projects
+      subcommandId: projects
+    - name: serviceaccounts
+      subcommandId: serviceaccounts
+    - name: types
+      subcommandId: types
+    - name: users
+      subcommandId: users
+    - name: utils
+      subcommandId: utils
+
+api:
+    description: Manage api
+    operations:
+    - name: schema
+      subcommandId: api_schema
+
+api_schema:
+    description: Manage api schema
+    operations:
+    - name: show
+      operationId: api_schema_retrieve
+
+audit:
+    description: Manage audit
+    operations:
+    - name: list
+      operationId: audit_list
+    - name: show
+      operationId: audit_retrieve
+    - name: summary
+      subcommandId: audit_summary
+
+audit_summary:
+    description: Manage audit summary
+    operations:
+    - name: show
+      operationId: audit_summary_retrieve
+
+backup:
+    description: Manage backup
+    operations:
+    - name: snapshot
+      subcommandId: backup_snapshot
+
+backup_snapshot:
+    description: Manage backup snapshot
+    operations:
+    - name: create
+      operationId: backup_snapshot_create
+
+environments:
+    description: Manage environments
+    operations:
+    - name: create
+      operationId: environments_create
+    - name: delete
+      operationId: environments_destroy
+    - name: list
+      operationId: environments_list
+    - name: pushes
+      subcommandId: environments_pushes
+    - name: set
+      operationId: environments_update
+    - name: show
+      operationId: environments_retrieve
+    - name: tags
+      subcommandId: environments_tags
+    - name: update
+      operationId: environments_partial_update
+    - name: copy
+      subcommandId: environments_copy
+
+environments_copy:
+    description: Manage environments copy
+    operations:
+    - name: create
+      operationId: environments_copy_create
+
+environments_pushes:
+    description: Manage environments pushes
+    operations:
+    - name: list
+      operationId: environments_pushes_list
+
+environments_tags:
+    description: Manage environments tags
+    operations:
+    - name: create
+      operationId: environments_tags_create
+    - name: delete
+      operationId: environments_tags_destroy
+    - name: list
+      operationId: environments_tags_list
+    - name: set
+      operationId: environments_tags_update
+    - name: show
+      operationId: environments_tags_retrieve
+    - name: update
+      operationId: environments_tags_partial_update
+
+features:
+    description: Manage features
+    operations:
+    - name: show
+      operationId: features_retrieve
+
+grants:
+    description: Manage grants
+    operations:
+    - name: create
+      operationId: grants_create
+    - name: delete
+      operationId: grants_destroy
+    - name: list
+      operationId: grants_list
+    - name: set
+      operationId: grants_update
+    - name: show
+      operationId: grants_retrieve
+    - name: update
+      operationId: grants_partial_update
+    - name: multi
+      subcommandId: grants_multi
+
+grants_multi:
+    description: Manage grants multi
+    operations:
+    - name: delete
+      operationId: grants_multi_destroy
+
+groups:
+    description: Manage groups
+    operations:
+    - name: create
+      operationId: groups_create
+    - name: delete
+      operationId: groups_destroy
+    - name: list
+      operationId: groups_list
+    - name: set
+      operationId: groups_update
+    - name: show
+      operationId: groups_retrieve
+    - name: update
+      operationId: groups_partial_update
+    - name: add
+      subcommandId: groups_add
+    - name: remove
+      subcommandId: groups_remove
+
+groups_add:
+    description: Manage groups add
+    operations:
+    - name: create
+      operationId: groups_add_create
+
+groups_remove:
+    description: Manage groups remove
+    operations:
+    - name: create
+      operationId: groups_remove_create
+
+import:
+    description: Manage import
+    operations:
+    - name: create
+      operationId: import_create
+
+integrations:
+    description: Manage integrations
+    operations:
+    - name: aws
+      subcommandId: integrations_aws
+    - name: azure
+      subcommandId: integrations_azure
+    - name: explore
+      subcommandId: integrations_explore
+    - name: github
+      subcommandId: integrations_github
+
+integrations_aws:
+    description: Manage integrations aws
+    operations:
+    - name: create
+      operationId: integrations_aws_create
+    - name: delete
+      operationId: integrations_aws_destroy
+    - name: list
+      operationId: integrations_aws_list
+    - name: pulls
+      subcommandId: integrations_aws_pulls
+    - name: pushes
+      subcommandId: integrations_aws_pushes
+    - name: set
+      operationId: integrations_aws_update
+    - name: show
+      operationId: integrations_aws_retrieve
+    - name: update
+      operationId: integrations_aws_partial_update
+    - name: scan
+      subcommandId: integrations_aws_scan
+
+integrations_aws_pulls:
+    description: Manage integrations aws pulls
+    operations:
+    - name: create
+      operationId: integrations_aws_pulls_create
+    - name: delete
+      operationId: integrations_aws_pulls_destroy
+    - name: list
+      operationId: integrations_aws_pulls_list
+    - name: set
+      operationId: integrations_aws_pulls_update
+    - name: show
+      operationId: integrations_aws_pulls_retrieve
+    - name: tasks
+      subcommandId: integrations_aws_pulls_tasks
+    - name: update
+      operationId: integrations_aws_pulls_partial_update
+    - name: sync
+      subcommandId: integrations_aws_pulls_sync
+
+integrations_aws_pulls_sync:
+    description: Manage integrations aws pulls sync
+    operations:
+    - name: create
+      operationId: integrations_aws_pulls_sync_create
+
+integrations_aws_pulls_tasks:
+    description: Manage integrations aws pulls tasks
+    operations:
+    - name: list
+      operationId: integrations_aws_pulls_tasks_list
+    - name: show
+      operationId: integrations_aws_pulls_tasks_retrieve
+    - name: steps
+      subcommandId: integrations_aws_pulls_tasks_steps
+
+integrations_aws_pulls_tasks_steps:
+    description: Manage integrations aws pulls tasks steps
+    operations:
+    - name: list
+      operationId: integrations_aws_pulls_tasks_steps_list
+    - name: show
+      operationId: integrations_aws_pulls_tasks_steps_retrieve
+
+integrations_aws_pushes:
+    description: Manage integrations aws pushes
+    operations:
+    - name: create
+      operationId: integrations_aws_pushes_create
+    - name: delete
+      operationId: integrations_aws_pushes_destroy
+    - name: list
+      operationId: integrations_aws_pushes_list
+    - name: set
+      operationId: integrations_aws_pushes_update
+    - name: show
+      operationId: integrations_aws_pushes_retrieve
+    - name: tasks
+      subcommandId: integrations_aws_pushes_tasks
+    - name: update
+      operationId: integrations_aws_pushes_partial_update
+    - name: sync
+      subcommandId: integrations_aws_pushes_sync
+
+integrations_aws_pushes_sync:
+    description: Manage integrations aws pushes sync
+    operations:
+    - name: create
+      operationId: integrations_aws_pushes_sync_create
+
+integrations_aws_pushes_tasks:
+    description: Manage integrations aws pushes tasks
+    operations:
+    - name: list
+      operationId: integrations_aws_pushes_tasks_list
+    - name: show
+      operationId: integrations_aws_pushes_tasks_retrieve
+    - name: steps
+      subcommandId: integrations_aws_pushes_tasks_steps
+
+integrations_aws_pushes_tasks_steps:
+    description: Manage integrations aws pushes tasks steps
+    operations:
+    - name: list
+      operationId: integrations_aws_pushes_tasks_steps_list
+    - name: show
+      operationId: integrations_aws_pushes_tasks_steps_retrieve
+
+integrations_aws_scan:
+    description: Manage integrations aws scan
+    operations:
+    - name: create
+      operationId: integrations_aws_scan_create
+
+integrations_azure:
+    description: Manage integrations azure
+    operations:
+    - name: key-vault
+      subcommandId: integrations_azure_key_vault
+
+integrations_azure_key_vault:
+    description: Manage integrations azure key-vault
+    operations:
+    - name: create
+      operationId: integrations_azure_key_vault_create
+    - name: delete
+      operationId: integrations_azure_key_vault_destroy
+    - name: list
+      operationId: integrations_azure_key_vault_list
+    - name: pulls
+      subcommandId: integrations_azure_key_vault_pulls
+    - name: pushes
+      subcommandId: integrations_azure_key_vault_pushes
+    - name: set
+      operationId: integrations_azure_key_vault_update
+    - name: show
+      operationId: integrations_azure_key_vault_retrieve
+    - name: update
+      operationId: integrations_azure_key_vault_partial_update
+    - name: scan
+      subcommandId: integrations_azure_key_vault_scan
+
+integrations_azure_key_vault_pulls:
+    description: Manage integrations azure key-vault pulls
+    operations:
+    - name: create
+      operationId: integrations_azure_key_vault_pulls_create
+    - name: delete
+      operationId: integrations_azure_key_vault_pulls_destroy
+    - name: list
+      operationId: integrations_azure_key_vault_pulls_list
+    - name: set
+      operationId: integrations_azure_key_vault_pulls_update
+    - name: show
+      operationId: integrations_azure_key_vault_pulls_retrieve
+    - name: tasks
+      subcommandId: integrations_azure_key_vault_pulls_tasks
+    - name: update
+      operationId: integrations_azure_key_vault_pulls_partial_update
+    - name: sync
+      subcommandId: integrations_azure_key_vault_pulls_sync
+
+integrations_azure_key_vault_pulls_sync:
+    description: Manage integrations azure key-vault pulls sync
+    operations:
+    - name: create
+      operationId: integrations_azure_key_vault_pulls_sync_create
+
+integrations_azure_key_vault_pulls_tasks:
+    description: Manage integrations azure key-vault pulls tasks
+    operations:
+    - name: list
+      operationId: integrations_azure_key_vault_pulls_tasks_list
+    - name: show
+      operationId: integrations_azure_key_vault_pulls_tasks_retrieve
+    - name: steps
+      subcommandId: integrations_azure_key_vault_pulls_tasks_steps
+
+integrations_azure_key_vault_pulls_tasks_steps:
+    description: Manage integrations azure key-vault pulls tasks steps
+    operations:
+    - name: list
+      operationId: integrations_azure_key_vault_pulls_tasks_steps_list
+    - name: show
+      operationId: integrations_azure_key_vault_pulls_tasks_steps_retrieve
+
+integrations_azure_key_vault_pushes:
+    description: Manage integrations azure key-vault pushes
+    operations:
+    - name: create
+      operationId: integrations_azure_key_vault_pushes_create
+    - name: delete
+      operationId: integrations_azure_key_vault_pushes_destroy
+    - name: list
+      operationId: integrations_azure_key_vault_pushes_list
+    - name: set
+      operationId: integrations_azure_key_vault_pushes_update
+    - name: show
+      operationId: integrations_azure_key_vault_pushes_retrieve
+    - name: tasks
+      subcommandId: integrations_azure_key_vault_pushes_tasks
+    - name: update
+      operationId: integrations_azure_key_vault_pushes_partial_update
+    - name: sync
+      subcommandId: integrations_azure_key_vault_pushes_sync
+
+integrations_azure_key_vault_pushes_sync:
+    description: Manage integrations azure key-vault pushes sync
+    operations:
+    - name: create
+      operationId: integrations_azure_key_vault_pushes_sync_create
+
+integrations_azure_key_vault_pushes_tasks:
+    description: Manage integrations azure key-vault pushes tasks
+    operations:
+    - name: list
+      operationId: integrations_azure_key_vault_pushes_tasks_list
+    - name: show
+      operationId: integrations_azure_key_vault_pushes_tasks_retrieve
+    - name: steps
+      subcommandId: integrations_azure_key_vault_pushes_tasks_steps
+
+integrations_azure_key_vault_pushes_tasks_steps:
+    description: Manage integrations azure key-vault pushes tasks steps
+    operations:
+    - name: list
+      operationId: integrations_azure_key_vault_pushes_tasks_steps_list
+    - name: show
+      operationId: integrations_azure_key_vault_pushes_tasks_steps_retrieve
+
+integrations_azure_key_vault_scan:
+    description: Manage integrations azure key-vault scan
+    operations:
+    - name: create
+      operationId: integrations_azure_key_vault_scan_create
+
+integrations_explore:
+    description: Manage integrations explore
+    operations:
+    - name: list
+      operationId: integrations_explore_list
+
+integrations_github:
+    description: Manage integrations github
+    operations:
+    - name: create
+      operationId: integrations_github_create
+    - name: delete
+      operationId: integrations_github_destroy
+    - name: list
+      operationId: integrations_github_list
+    - name: pulls
+      subcommandId: integrations_github_pulls
+    - name: show
+      operationId: integrations_github_retrieve
+
+integrations_github_pulls:
+    description: Manage integrations github pulls
+    operations:
+    - name: list
+      operationId: integrations_github_pulls_list
+    - name: set
+      operationId: integrations_github_pulls_update
+    - name: show
+      operationId: integrations_github_pulls_retrieve
+    - name: tasks
+      subcommandId: integrations_github_pulls_tasks
+    - name: update
+      operationId: integrations_github_pulls_partial_update
+    - name: sync
+      subcommandId: integrations_github_pulls_sync
+
+integrations_github_pulls_sync:
+    description: Manage integrations github pulls sync
+    operations:
+    - name: create
+      operationId: integrations_github_pulls_sync_create
+
+integrations_github_pulls_tasks:
+    description: Manage integrations github pulls tasks
+    operations:
+    - name: list
+      operationId: integrations_github_pulls_tasks_list
+    - name: show
+      operationId: integrations_github_pulls_tasks_retrieve
+    - name: steps
+      subcommandId: integrations_github_pulls_tasks_steps
+
+integrations_github_pulls_tasks_steps:
+    description: Manage integrations github pulls tasks steps
+    operations:
+    - name: list
+      operationId: integrations_github_pulls_tasks_steps_list
+    - name: show
+      operationId: integrations_github_pulls_tasks_steps_retrieve
+
+invitations:
+    description: Manage invitations
+    operations:
+    - name: create
+      operationId: invitations_create
+    - name: delete
+      operationId: invitations_destroy
+    - name: list
+      operationId: invitations_list
+    - name: set
+      operationId: invitations_update
+    - name: show
+      operationId: invitations_retrieve
+    - name: update
+      operationId: invitations_partial_update
+    - name: accept
+      subcommandId: invitations_accept
+    - name: resend
+      subcommandId: invitations_resend
+
+invitations_accept:
+    description: Manage invitations accept
+    operations:
+    - name: create
+      operationId: invitations_accept_create
+
+invitations_resend:
+    description: Manage invitations resend
+    operations:
+    - name: create
+      operationId: invitations_resend_create
+
+memberships:
+    description: Manage memberships
+    operations:
+    - name: create
+      operationId: memberships_create
+    - name: delete
+      operationId: memberships_destroy
+    - name: list
+      operationId: memberships_list
+    - name: set
+      operationId: memberships_update
+    - name: show
+      operationId: memberships_retrieve
+    - name: update
+      operationId: memberships_partial_update
+
+organizations:
+    description: Manage organizations
+    operations:
+    - name: create
+      operationId: organizations_create
+    - name: delete
+      operationId: organizations_destroy
+    - name: list
+      operationId: organizations_list
+    - name: set
+      operationId: organizations_update
+    - name: show
+      operationId: organizations_retrieve
+    - name: update
+      operationId: organizations_partial_update
+
+projects:
+    description: Manage projects
+    operations:
+    - name: create
+      operationId: projects_create
+    - name: delete
+      operationId: projects_destroy
+    - name: list
+      operationId: projects_list
+    - name: set
+      operationId: projects_update
+    - name: show
+      operationId: projects_retrieve
+    - name: update
+      operationId: projects_partial_update
+    - name: copy
+      subcommandId: projects_copy
+    - name: parameter-export
+      subcommandId: projects_parameter_export
+    - name: parameters
+      subcommandId: projects_parameters
+    - name: template-preview
+      subcommandId: projects_template_preview
+    - name: templates
+      subcommandId: projects_templates
+
+projects_copy:
+    description: Manage projects copy
+    operations:
+    - name: create
+      operationId: projects_copy_create
+
+projects_parameter_export:
+    description: Manage projects parameter-export
+    operations:
+    - name: list
+      operationId: projects_parameter_export_list
+
+projects_parameters:
+    description: Manage projects parameters
+    operations:
+    - name: create
+      operationId: projects_parameters_create
+    - name: delete
+      operationId: projects_parameters_destroy
+    - name: list
+      operationId: projects_parameters_list
+    - name: pushes
+      subcommandId: projects_parameters_pushes
+    - name: rules
+      subcommandId: projects_parameters_rules
+    - name: set
+      operationId: projects_parameters_update
+    - name: show
+      operationId: projects_parameters_retrieve
+    - name: update
+      operationId: projects_parameters_partial_update
+    - name: values
+      subcommandId: projects_parameters_values
+    - name: copy
+      subcommandId: projects_parameters_copy
+    - name: timeline
+      subcommandId: projects_parameters_timeline
+    - name: duality
+      subcommandId: projects_parameters_duality
+    - name: timelines
+      subcommandId: projects_parameters_timelines
+
+projects_parameters_copy:
+    description: Manage projects parameters copy
+    operations:
+    - name: create
+      operationId: projects_parameters_copy_create
+
+projects_parameters_duality:
+    description: Manage projects parameters duality
+    operations:
+    - name: list
+      operationId: projects_parameters_duality_list
+
+projects_parameters_pushes:
+    description: Manage projects parameters pushes
+    operations:
+    - name: list
+      operationId: projects_parameters_pushes_list
+
+projects_parameters_rules:
+    description: Manage projects parameters rules
+    operations:
+    - name: create
+      operationId: projects_parameters_rules_create
+    - name: delete
+      operationId: projects_parameters_rules_destroy
+    - name: list
+      operationId: projects_parameters_rules_list
+    - name: set
+      operationId: projects_parameters_rules_update
+    - name: show
+      operationId: projects_parameters_rules_retrieve
+    - name: update
+      operationId: projects_parameters_rules_partial_update
+
+projects_parameters_timeline:
+    description: Manage projects parameters timeline
+    operations:
+    - name: show
+      operationId: projects_parameters_timeline_retrieve
+
+projects_parameters_timelines:
+    description: Manage projects parameters timelines
+    operations:
+    - name: show
+      operationId: projects_parameters_timelines_retrieve
+
+projects_parameters_values:
+    description: Manage projects parameters values
+    operations:
+    - name: create
+      operationId: projects_parameters_values_create
+    - name: delete
+      operationId: projects_parameters_values_destroy
+    - name: list
+      operationId: projects_parameters_values_list
+    - name: set
+      operationId: projects_parameters_values_update
+    - name: show
+      operationId: projects_parameters_values_retrieve
+    - name: update
+      operationId: projects_parameters_values_partial_update
+
+projects_template_preview:
+    description: Manage projects template-preview
+    operations:
+    - name: create
+      operationId: projects_template_preview_create
+
+projects_templates:
+    description: Manage projects templates
+    operations:
+    - name: create
+      operationId: projects_templates_create
+    - name: delete
+      operationId: projects_templates_destroy
+    - name: list
+      operationId: projects_templates_list
+    - name: set
+      operationId: projects_templates_update
+    - name: show
+      operationId: projects_templates_retrieve
+    - name: update
+      operationId: projects_templates_partial_update
+    - name: timeline
+      subcommandId: projects_templates_timeline
+    - name: timelines
+      subcommandId: projects_templates_timelines
+
+projects_templates_timeline:
+    description: Manage projects templates timeline
+    operations:
+    - name: show
+      operationId: projects_templates_timeline_retrieve
+
+projects_templates_timelines:
+    description: Manage projects templates timelines
+    operations:
+    - name: show
+      operationId: projects_templates_timelines_retrieve
+
+serviceaccounts:
+    description: Manage serviceaccounts
+    operations:
+    - name: create
+      operationId: serviceaccounts_create
+    - name: delete
+      operationId: serviceaccounts_destroy
+    - name: list
+      operationId: serviceaccounts_list
+    - name: set
+      operationId: serviceaccounts_update
+    - name: show
+      operationId: serviceaccounts_retrieve
+    - name: update
+      operationId: serviceaccounts_partial_update
+
+types:
+    description: Manage types
+    operations:
+    - name: create
+      operationId: types_create
+    - name: delete
+      operationId: types_destroy
+    - name: list
+      operationId: types_list
+    - name: rules
+      subcommandId: types_rules
+    - name: set
+      operationId: types_update
+    - name: show
+      operationId: types_retrieve
+    - name: update
+      operationId: types_partial_update
+
+types_rules:
+    description: Manage types rules
+    operations:
+    - name: create
+      operationId: types_rules_create
+    - name: delete
+      operationId: types_rules_destroy
+    - name: list
+      operationId: types_rules_list
+    - name: set
+      operationId: types_rules_update
+    - name: show
+      operationId: types_rules_retrieve
+    - name: update
+      operationId: types_rules_partial_update
+
+users:
+    description: Manage users
+    operations:
+    - name: delete
+      operationId: users_destroy
+    - name: list
+      operationId: users_list
+    - name: show
+      operationId: users_retrieve
+    - name: current
+      subcommandId: users_current
+
+users_current:
+    description: Manage users current
+    operations:
+    - name: show
+      operationId: users_current_retrieve
+
+utils:
+    description: Manage utils
+    operations:
+    - name: generate-password
+      subcommandId: utils_generate_password
+
+utils_generate_password:
+    description: Manage utils generate-password
+    operations:
+    - name: create
+      operationId: utils_generate_password_create
+
