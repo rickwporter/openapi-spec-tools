@@ -24,8 +24,8 @@ layout = "openapi_spec_tools.cli.layout:app"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
-ruff = "^0.7.2"
-black = "^24.10.0"
+ruff = "^0.11.13"
+black = "^25.1.0"
 coverage = "^7.6.10"
 
 [tool.ruff]
