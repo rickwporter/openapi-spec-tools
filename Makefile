@@ -11,6 +11,7 @@ EXAMPLE_DIRS := examples/pets-cli
 EXAMPLE_DIRS += examples/cloudtruth-gen-cli
 EXAMPLE_DIRS += examples/github
 EXAMPLE_DIRS += examples/pets-api
+EXAMPLE_DIRS += examples/cloudtruth-api
 
 default: help
 
