@@ -15,6 +15,7 @@ class OasField(str, Enum):
     ENUM = "enum"
     FORMAT = "format"
     IN = "in"
+    INFO = "info"
     ITEMS = "items"
     MAX = "maximum"
     MIN = "minimum"

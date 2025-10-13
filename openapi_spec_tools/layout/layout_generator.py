@@ -16,6 +16,7 @@ SET = "set"
 SHOW = "show"
 UPDATE = "update"
 
+DEFAULT_HELP = "CLI to manage your application"
 
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
@@ -24,6 +25,7 @@ class LayoutGenerator:
         """Initialize the generator with internal values."""
         self.paths = oas.get(OasField.PATHS, {})
         self.components = oas.get(OasField.COMPONENTS, {})
+        self.description = oas.get(OasField.INFO, {}).get(OasField.DESCRIPTION)
         self.supported_response_content = [
             ContentType.APP_JSON,
             ContentType.APP_YAML,
@@ -165,9 +167,10 @@ class LayoutGenerator:
         """
         return None
 
-    def generate(self, prefix: str) -> LayoutNode:
+    def generate(self, prefix: str, description: Optional[str] = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
-        main = LayoutNode(DEFAULT_START, DEFAULT_START, description="CLI to manage your application")
+        help = description or self.description or DEFAULT_HELP
+        main = LayoutNode(DEFAULT_START, DEFAULT_START, help)
 
         for path_name, path_data in self.paths.items():
             path_parts = self.path_to_parts(path_name, prefix)
@@ -178,6 +181,8 @@ class LayoutGenerator:
                     continue
 
                 path_node = self.get_or_create_node_with_parents(main, commands)
+                if path_node == main:
+                    breakpoint()
                 op_id = op_data.get(OasField.OP_ID)
                 command = self.suggest_command(method, op_id)
                 pagination = self.get_pagination(op_data)
