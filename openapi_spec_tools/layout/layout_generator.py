@@ -181,8 +181,6 @@ class LayoutGenerator:
                     continue
 
                 path_node = self.get_or_create_node_with_parents(main, commands)
-                if path_node == main:
-                    breakpoint()
                 op_id = op_data.get(OasField.OP_ID)
                 command = self.suggest_command(method, op_id)
                 pagination = self.get_pagination(op_data)
@@ -191,5 +189,8 @@ class LayoutGenerator:
                 )
                 # sort the children to match layout linting
                 path_node.children = sorted(path_node.children, key=lambda x: x.command)
+
+        # finally, sort the main children
+        main.children = sorted(main.children, key=lambda x: x.command)
 
         return main
