@@ -1,5 +1,5 @@
 main:
-    description: CLI to manage your application
+    description: CloudTruth centralizes your configuration parameters and secrets making them eas...
     operations:
     - name: api
       subcommandId: api

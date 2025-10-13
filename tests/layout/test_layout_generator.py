@@ -148,6 +148,8 @@ def test_generate_cloudtruth():
     uut = LayoutGenerator(oas)
     node = uut.generate("/api/v1")
 
+    assert 'CloudTruth centralizes your configuration parameters' in node.description
+
     # no direct operations -- all in sub-commands
     assert [] == node.operations()
 
@@ -172,7 +174,9 @@ def test_generate_misc():
     oas = open_oas(asset_filename("misc.yaml"))
 
     uut = LayoutGenerator(oas)
-    node = uut.generate("")
+    node = uut.generate("", description="this is it")
+
+    assert node.description == "this is it"
     assert [] == node.operations()
 
     sub_cmds = node.subcommands()
@@ -190,6 +194,8 @@ def test_generate_node_file():
     file = Path(tempdir.name) / "layout.yaml"
     generator = LayoutGenerator(oas)
     node = generator.generate("")
+
+    assert "CLI to manage your application" == node.description
 
     write_layout(file.as_posix(), node)
 

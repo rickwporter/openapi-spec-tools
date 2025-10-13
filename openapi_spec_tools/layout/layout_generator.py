@@ -2,6 +2,7 @@
 from typing import Any
 from typing import Optional
 
+from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
@@ -16,6 +17,7 @@ SET = "set"
 SHOW = "show"
 UPDATE = "update"
 
+DEFAULT_HELP = "CLI to manage your application"
 
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
@@ -24,6 +26,8 @@ class LayoutGenerator:
         """Initialize the generator with internal values."""
         self.paths = oas.get(OasField.PATHS, {})
         self.components = oas.get(OasField.COMPONENTS, {})
+        self.description = oas.get(OasField.INFO, {}).get(OasField.DESCRIPTION)
+        self.max_help_length = 80
         self.supported_response_content = [
             ContentType.APP_JSON,
             ContentType.APP_YAML,
@@ -70,6 +74,12 @@ class LayoutGenerator:
             if p.get(OasField.NAME) == name:
                 return p
         return None
+
+    def short_help(self, help: str) -> str:
+        """Shortens a long help string into something more managable."""
+        if len(help) > self.max_help_length:
+            help = help.split(". ")[0].strip()[:self.max_help_length] + '...'
+        return simple_escape(help)
 
     def get_model(self, full_name: str) -> dict[str, Any]:
         """Get the model from reference name."""
@@ -165,9 +175,10 @@ class LayoutGenerator:
         """
         return None
 
-    def generate(self, prefix: str) -> LayoutNode:
+    def generate(self, prefix: str, description: Optional[str] = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
-        main = LayoutNode(DEFAULT_START, DEFAULT_START, description="CLI to manage your application")
+        help = self.short_help(description or self.description or DEFAULT_HELP)
+        main = LayoutNode(DEFAULT_START, DEFAULT_START, help)
 
         for path_name, path_data in self.paths.items():
             path_parts = self.path_to_parts(path_name, prefix)
@@ -186,5 +197,8 @@ class LayoutGenerator:
                 )
                 # sort the children to match layout linting
                 path_node.children = sorted(path_node.children, key=lambda x: x.command)
+
+        # finally, sort the main children
+        main.children = sorted(main.children, key=lambda x: x.command)
 
         return main
