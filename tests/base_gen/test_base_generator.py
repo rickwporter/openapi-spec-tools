@@ -127,6 +127,7 @@ def test_variable_name(proposed, expected):
         pytest.param("any", "--any", id="any"),
         pytest.param("input", "--input", id="input"),
         pytest.param("list", "--list", id="list"),
+        pytest.param("date", "--date", id="date"),
     ],
 )
 def test_option_name(proposed, expected):

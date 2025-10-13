@@ -57,6 +57,8 @@ class BaseGenerator:
             "breakpoint",
             "class",
             "continue",
+            "date",
+            "datetime",
             "dict",
             "except",
             "float",
@@ -70,8 +72,9 @@ class BaseGenerator:
             "min",
             "print",
             "set",
-            "type",
             "try",
+            "type",
+            "typer",
             "while",
         }
         self.conflict_suffix = "_"
@@ -100,7 +103,7 @@ class BaseGenerator:
     def option_name(self, s: str) -> str:
         """Get the typer option name for the provided string."""
         value = to_snake_case(replace_special(s))
-        return "--" + value.replace("_", "-")
+        return "--" + value.rstrip("_").replace("_", "-")
 
     def short_reference_name(self, full_name: str) -> str:
         """Transform the '#/components/schemas/Xxx' to 'Xxx'."""
