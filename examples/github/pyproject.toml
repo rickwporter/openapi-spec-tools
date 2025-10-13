@@ -23,7 +23,7 @@ gh-cli = "github_gen_cli.main:app"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.11.13"
 black = "^25.1.0"
-pytest = "^8.3.5"
+pytest = "^8.4.0"
 coverage = "^7.8.0"
 openapi-spec-tools = {path = "../..", develop = true}
 

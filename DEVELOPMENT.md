@@ -47,7 +47,7 @@ Package operations: 15 installs, 0 updates, 0 removals
   - Installing rich (13.9.4)
   - Installing black (24.10.0)
   - Installing coverage (7.8.0)
-  - Installing pytest (8.3.5)
+  - Installing pytest (8.4.0)
   - Installing pyyaml (6.0.2)
   - Installing ruff (0.9.10)
   - Installing typer (0.15.3)
@@ -104,7 +104,7 @@ The `make` command allows users to see the command that is run by design. This a
 (.env) % TEST_TARGET=tests/cli_gen/test_console.py make cov
 poetry run coverage run -m pytest -v tests/cli_gen/test_console.py
 =============== test session starts ===============
-platform darwin -- Python 3.9.21, pytest-8.3.5, pluggy-1.5.0 -- /Users/rick/temp/openapi-spec-tools/.env/bin/python
+platform darwin -- Python 3.9.21, pytest-8.4.0, pluggy-1.5.0 -- /Users/rick/temp/openapi-spec-tools/.env/bin/python
 cachedir: .pytest_cache
 rootdir: /Users/rick/temp/openapi-spec-tools
 configfile: pyproject.toml
