@@ -2,6 +2,7 @@
 from typing import Any
 from typing import Optional
 
+from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
@@ -26,6 +27,7 @@ class LayoutGenerator:
         self.paths = oas.get(OasField.PATHS, {})
         self.components = oas.get(OasField.COMPONENTS, {})
         self.description = oas.get(OasField.INFO, {}).get(OasField.DESCRIPTION)
+        self.max_help_length = 80
         self.supported_response_content = [
             ContentType.APP_JSON,
             ContentType.APP_YAML,
@@ -72,6 +74,12 @@ class LayoutGenerator:
             if p.get(OasField.NAME) == name:
                 return p
         return None
+
+    def short_help(self, help: str) -> str:
+        """Shortens a long help string into something more managable."""
+        if len(help) > self.max_help_length:
+            help = help.split(". ")[0].strip()[:self.max_help_length] + '...'
+        return simple_escape(help)
 
     def get_model(self, full_name: str) -> dict[str, Any]:
         """Get the model from reference name."""
@@ -169,7 +177,7 @@ class LayoutGenerator:
 
     def generate(self, prefix: str, description: Optional[str] = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
-        help = description or self.description or DEFAULT_HELP
+        help = self.short_help(description or self.description or DEFAULT_HELP)
         main = LayoutNode(DEFAULT_START, DEFAULT_START, help)
 
         for path_name, path_data in self.paths.items():

@@ -1,5 +1,5 @@
 main:
-    description: CloudTruth centralizes your configuration parameters and secrets making them easier to manage and use as a team.
+    description: CloudTruth centralizes your configuration parameters and secrets making them eas...
     operations:
     - name: api
       subcommandId: api
