@@ -17,7 +17,7 @@ default: help
 
 ###########
 ##@ General
-all: lint example-gen lint cov wheel ## Complete cycle: generate/lint/test everything
+all: lint toml-check example-gen lint cov wheel ## Complete cycle: generate/lint/test everything
 
 # NOTE: due to example sub-projects, clean up all occurrances of these files/directories
 clean: ## Remove build/test artifacts
@@ -54,6 +54,9 @@ lint: ## Check code formatting
 
 delint: ## Fix formatting issues
 	$(poetry_run) ruff check --fix
+
+toml-check: ## Check the project/sub-projects are using the same Python package versions
+	$(poetry_run) tools/toml.py check .
 
 ###########
 ##@ Test
