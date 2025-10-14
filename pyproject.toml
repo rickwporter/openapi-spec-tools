@@ -14,7 +14,7 @@ python = "^3.9"
 pyyaml = "^6.0.2"
 typer = "^0.16.0"
 rich = "^14.0.0"
-requests = "2.32.4"
+requests = "^2.32.4"
 
 [tool.poetry.scripts]
 oas = "openapi_spec_tools.cli.oas:app"
@@ -26,7 +26,7 @@ layout = "openapi_spec_tools.cli.layout:app"
 pytest = "^8.4.0"
 ruff = "^0.11.13"
 black = "^25.1.0"
-coverage = "^7.6.10"
+coverage = "^7.9.1"
 
 [tool.ruff]
 line-length = 120
