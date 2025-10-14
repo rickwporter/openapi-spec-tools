@@ -1,0 +1,42 @@
+main:
+    description: API for finding and booking train trips across Europe.
+    operations:
+    - name: bookings
+      subcommandId: bookings
+    - name: stations
+      subcommandId: stations
+    - name: trips
+      subcommandId: trips
+
+bookings:
+    description: Manage bookings
+    operations:
+    - name: create
+      operationId: create-booking
+    - name: delete
+      operationId: delete-booking
+    - name: show
+      operationId: get-bookings
+    - name: show
+      operationId: get-booking
+    - name: payment
+      subcommandId: bookings_payment
+
+bookings_payment:
+    description: Manage bookings payment
+    operations:
+    - name: create
+      operationId: create-booking-payment
+
+stations:
+    description: Manage stations
+    operations:
+    - name: show
+      operationId: get-stations
+
+trips:
+    description: Manage trips
+    operations:
+    - name: show
+      operationId: get-trips
+
