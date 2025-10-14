@@ -11,6 +11,8 @@ from openapi_spec_tools.utils import open_oas
 from tests.helpers import asset_filename
 
 NAME = "name"
+OP_ID = "operationId"
+X_METH = "x-method"
 
 
 @pytest.mark.parametrize(
@@ -116,18 +118,18 @@ def test_get_response_body(op_id, expected):
 
 
 @pytest.mark.parametrize(
-    ["method", "op_id", "expected"],
+    ["op_data", "expected"],
     [
-        pytest.param("PUT", "foo_list", "set", id="put"),
-        pytest.param("PaTCh", "foo_list", "update", id="update"),
-        pytest.param("delete", "add_item", "create", id="begin"),
-        pytest.param("delete", "itemRetrieve", "show", id="end"),
-        pytest.param("delete", "item", "delete", id="method"),
+        pytest.param({X_METH: "PUT", OP_ID: "foo_list"}, "set", id="put"),
+        pytest.param({X_METH: "PaTCh", OP_ID: "foo_list"}, "update", id="update"),
+        pytest.param({X_METH: "delete", OP_ID: "add_item"}, "create", id="begin"),
+        pytest.param({X_METH: "delete", OP_ID: "itemRetrieve"}, "show", id="end"),
+        pytest.param({X_METH: "delete", OP_ID: "item"}, "delete", id="method"),
     ]
 )
-def test_suggest_command(method, op_id, expected):
+def test_suggest_command(op_data, expected):
     uut = LayoutGenerator({})
-    assert expected == uut.suggest_command(method, op_id)
+    assert expected == uut.suggest_command(op_data)
 
 
 def test_generate_pets():
