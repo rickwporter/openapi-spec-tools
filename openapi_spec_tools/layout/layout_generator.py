@@ -18,33 +18,43 @@ SHOW = "show"
 UPDATE = "update"
 
 DEFAULT_HELP = "CLI to manage your application"
+DEFAULT_MAX_HELP_LENGTH = 80
+DEFAULT_SUPPORTED_CONTENT = [
+    ContentType.APP_JSON,
+    ContentType.APP_YAML,
+]
+DEFAULT_OPERATION_MAP = {
+    "add": CREATE,
+    "create": CREATE,
+    "post": CREATE,
+    "delete": DELETE,
+    "remove": DELETE,
+    "list": LIST,
+    "retrieve": SHOW,
+    "get": SHOW,
+    "update": UPDATE,
+    "patch": UPDATE,
+    "put": SET,
+}
+
 
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
 
-    def __init__(self, oas: dict[str, Any]):
+    def __init__(
+        self,
+        oas: dict[str, Any],
+        max_help_length: int = DEFAULT_MAX_HELP_LENGTH,
+        supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
+        common_operations: dict[str, str] = DEFAULT_OPERATION_MAP,
+    ):
         """Initialize the generator with internal values."""
         self.paths = oas.get(OasField.PATHS, {})
         self.components = oas.get(OasField.COMPONENTS, {})
         self.description = oas.get(OasField.INFO, {}).get(OasField.DESCRIPTION)
-        self.max_help_length = 80
-        self.supported_response_content = [
-            ContentType.APP_JSON,
-            ContentType.APP_YAML,
-        ]
-        self.common_ops = {
-            "add": CREATE,
-            "create": CREATE,
-            "post": CREATE,
-            "delete": DELETE,
-            "remove": DELETE,
-            "list": LIST,
-            "retrieve": SHOW,
-            "get": SHOW,
-            "update": UPDATE,
-            "patch": UPDATE,
-            "put": SET,
-        }
+        self.max_help_length = max_help_length
+        self.supported_response_content = supported_content
+        self.common_ops = common_operations
 
     @staticmethod
     def path_to_parts(path_name: str, prefix: str) -> list[str]:

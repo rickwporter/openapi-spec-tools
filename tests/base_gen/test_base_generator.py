@@ -224,8 +224,7 @@ def test_op_short_help(op, expected):
     ]
 )
 def test_op_doc_string(op, expected):
-    uut = BaseGenerator({})
-    uut.max_help_length = 30
+    uut = BaseGenerator({}, max_help_length=30)
     assert expected == uut.op_doc_string(op)
 
 

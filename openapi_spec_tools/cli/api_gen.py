@@ -92,11 +92,11 @@ def generate_api(
     copy_api_infrastructure(code_dir, package_name)
 
     if body_type == BodyType.FLAT:
-        generator = FlatApiGenerator(package_name, oas, logger)
+        generator = FlatApiGenerator(package_name, oas, logger=logger)
     elif body_type == BodyType.PROPERTY:
-        generator = PropertyApiGenerator(package_name, oas, logger)
+        generator = PropertyApiGenerator(package_name, oas, logger=logger)
     else:
-        generator = OpaqueApiGenerator(package_name, oas, logger)
+        generator = OpaqueApiGenerator(package_name, oas, logger=logger)
     generate_api_node(generator, commands, code_dir)
 
     typer.echo("Generated API files")
