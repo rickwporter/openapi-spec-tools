@@ -3,11 +3,9 @@
 This functionality that is useful for all API generators, and forces addition of function_definition()
 for various. The abstract function allows the files.py to maintain the same interface.
 """
-import logging
 from abc import ABC
 from abc import abstractmethod
 from typing import Any
-from typing import Optional
 
 from openapi_spec_tools.base_gen.base_generator import BaseGenerator
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
@@ -18,6 +16,13 @@ from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 
+DEFAULT_VAR_HOST = "API_HOST"
+DEFAULT_VAR_KEY = "API_KEY"
+DEFAULT_VAR_TIMEOUT = "API_TIMEOUT"
+DEFAULT_VAR_LOG_LEVEL = "API_LOG_LEVEL"
+DEFAULT_VALUE_LOG_LEVEL = "info"
+DEFAULT_VALUE_TIMEOUT = 5
+
 
 class ApiGenerator(BaseGenerator, ABC):
     """Provides the majority of the CLI generation functions.
@@ -27,16 +32,27 @@ class ApiGenerator(BaseGenerator, ABC):
     overridden by consumers.
     """
 
-    def __init__(self, package_name: str, oas: dict[str, Any], logger: Optional[logging.Logger] = None):
+    def __init__(
+        self,
+        package_name: str,
+        oas: dict[str, Any],
+        env_host: str = DEFAULT_VAR_HOST,
+        env_key: str = DEFAULT_VAR_KEY,
+        env_timeout: str = DEFAULT_VAR_TIMEOUT,
+        env_log_level: str = DEFAULT_VAR_LOG_LEVEL,
+        default_log_level: str = DEFAULT_VALUE_LOG_LEVEL,
+        default_timeout: int = DEFAULT_VALUE_TIMEOUT,
+        **kwargs,
+    ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
-        super().__init__(oas, logger=logger)
+        super().__init__(oas, **kwargs)
         self.package_name = package_name
-        self.env_host = "API_HOST"
-        self.env_key = "API_KEY"
-        self.env_timeout = "API_TIMEOUT"
-        self.env_log_level = "API_LOG_LEVEL"
-        self.default_log = "info"
-        self.default_timeout = 5
+        self.env_host = env_host
+        self.env_key = env_key
+        self.env_timeout = env_timeout
+        self.env_log_level = env_log_level
+        self.default_log = default_log_level
+        self.default_timeout = default_timeout
 
     def property_help(self, prop: dict[str, Any]) -> str:
         """Get the short help string for the specified property."""

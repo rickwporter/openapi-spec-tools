@@ -25,6 +25,41 @@ from openapi_spec_tools.utils import NULL_TYPES
 from openapi_spec_tools.utils import map_operations
 
 LOG_CLASS = "base-gen"
+DEFAULT_SUPPORTED_CONTENT = [
+    ContentType.APP_JSON,
+]
+DEFAULT_MAX_HELP_LENGTH = 120
+DEFAULT_CONFLICT_SUFFIX = "_"
+
+# This is an incomplete list of Python builtins and imports that should avoided in variable names
+DEFAULT_RESERVED = {
+    "all",
+    "any",
+    "bool",
+    "breakpoint",
+    "class",
+    "continue",
+    "date",
+    "datetime",
+    "dict",
+    "except",
+    "float",
+    "for",
+    "format",
+    "in",
+    "input",
+    "int",
+    "list",
+    "max",
+    "min",
+    "print",
+    "set",
+    "try",
+    "type",
+    "typer",
+    "while",
+}
+
 
 class BaseGenerator:
     """Provides the majority of the CLI generation functions.
@@ -34,7 +69,15 @@ class BaseGenerator:
     overridden by consumers.
     """
 
-    def __init__(self, oas: dict[str, Any], logger: Optional[logging.Logger] = None):
+    def __init__(
+        self,
+        oas: dict[str, Any],
+        logger: Optional[logging.Logger] = None,
+        supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
+        max_help_length: int = DEFAULT_MAX_HELP_LENGTH,
+        reserved: set[str] = DEFAULT_RESERVED,
+        conflict_suffix: str = DEFAULT_CONFLICT_SUFFIX,
+    ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
@@ -43,41 +86,12 @@ class BaseGenerator:
         if servers:
             self.default_host = servers[0].get(OasField.URL, "")
         # ordered list of supported types
-        self.supported = [
-            ContentType.APP_JSON,
-        ]
-        self.max_help_length = 120
+        self.supported = supported_content
+        self.max_help_length = max_help_length
         self.logger = logger or init_logging("INFO", LOG_CLASS)
 
-        # This is an incomplete list of Python builtins that should avoided in variable names
-        self.reserved = {
-            "all",
-            "any",
-            "bool",
-            "breakpoint",
-            "class",
-            "continue",
-            "date",
-            "datetime",
-            "dict",
-            "except",
-            "float",
-            "for",
-            "format",
-            "in",
-            "input",
-            "int",
-            "list",
-            "max",
-            "min",
-            "print",
-            "set",
-            "try",
-            "type",
-            "typer",
-            "while",
-        }
-        self.conflict_suffix = "_"
+        self.reserved = reserved
+        self.conflict_suffix = conflict_suffix
 
     def class_name(self, s: str) -> str:
         """Get the class name for provided string."""

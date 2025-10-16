@@ -31,8 +31,7 @@ from tests.helpers import asset_filename
     ]
 )
 def test_property_help(prop, max_len, expected):
-    uut = TestApiGenerator("", {})
-    uut.max_help_length = max_len
+    uut = TestApiGenerator("", {}, max_help_length=max_len)
     assert expected == uut.property_help(prop)
 
 
@@ -44,24 +43,10 @@ def test_standard_imports():
     assert 'from api_package import _environment as _e' in text
 
 @pytest.mark.parametrize(
-    [
-        "env_host",
-        "default_host",
-        "env_key",
-        "env_timeout",
-        "default_timeout",
-        "env_log",
-        "default_log",
-        "expected",
-    ],
+    ["args", "default_host", "expected"],
     [
         pytest.param(
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
+            {},
             None,
             """\
 _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
@@ -72,13 +57,15 @@ _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not p
             id="defaults",
         ),
         pytest.param(
-            "MY_HOST",
+            {
+                "env_host": "MY_HOST",
+                "env_key": "YOUR_KEY",
+                "env_timeout": "THEIR_TIME",
+                "default_timeout": 30,
+                "env_log_level": "SOME_LOG_LEVEL",
+                "default_log_level": "blah",
+            },
             "localhost",
-            "YOUR_KEY",
-            "THEIR_TIME",
-            30,
-            "SOME_LOG_LEVEL",
-            "blah",
             """\
 _api_host: Optional[str] = None,  # API host, read from MY_HOST if not provided, defaults to localhost
 _api_key: Optional[str] = None,  # API key for bearer auth, read from YOUR_KEY if not provided
@@ -90,30 +77,11 @@ _log_level: Optional[str] = None,  # log level, read from SOME_LOG_LEVEL if not 
     ]
 )
 def test_command_infra_arguments(
-    env_host,
-    default_host,
-    env_key,
-    env_timeout,
-    default_timeout,
-    env_log,
-    default_log,
+    args, default_host,
     expected,
 ):
-    uut = TestApiGenerator("api_package", {})
-    if env_host:
-        uut.env_host = env_host
-    if default_host:
-        uut.default_host = default_host
-    if env_key:
-        uut.env_key = env_key
-    if env_timeout:
-        uut.env_timeout = env_timeout
-    if default_timeout:
-        uut.default_timeout = default_timeout
-    if env_log:
-        uut.env_log_level = env_log
-    if default_log:
-        uut.default_log = default_log
+    uut = TestApiGenerator("api_package", {}, **args)
+    uut.default_host = default_host
     node = LayoutNode("foo", "bar")
     args = uut.command_infra_arguments(node)
     text = "\n".join(args)
