@@ -283,7 +283,7 @@ ITEMS = [
             PageParams(max_count=10, items_property_name="foo"),
             {"foo": ITEMS},
             ITEMS,
-            id="no-start",
+            id="just-once",
         ),
     ]
 )
