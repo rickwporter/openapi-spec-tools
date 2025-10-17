@@ -282,7 +282,13 @@ ITEMS = [
             ITEMS,
             ITEMS,
             id="page-start",
-            ),
+        ),
+        pytest.param(
+            PageParams(max_count=10, items_property_name="foo"),
+            {"foo": ITEMS},
+            ITEMS,
+            id="just-once",
+        ),
     ]
 )
 def test_depaginate_single_success(page_params, resp_body, expected):

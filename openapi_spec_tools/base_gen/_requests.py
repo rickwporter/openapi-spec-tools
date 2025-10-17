@@ -239,6 +239,13 @@ def depaginate(
     if page_params.page_size_name and page_params.page_size_value is not None:
         _params[page_params.page_size_name] = page_size
 
+    just_once = not any([
+        page_params.page_start_name,
+        page_params.item_start_name,
+        page_params.next_header_name,
+        page_params.next_property_name,
+    ])
+
     while _url:
         if next_url:
             pretty_url = next_url
@@ -282,6 +289,7 @@ def depaginate(
             curr_len == 0  # no items provided (even when no page size or max count)
             or (page_size and curr_len < page_size)  # did not get a full page
             or (max_count and item_count >= max_count)  # reached max items
+            or just_once
         ):
             break
 
