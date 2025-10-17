@@ -1,6 +1,7 @@
 import pytest
 
 from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import file_to_tree
 from tests.helpers import asset_filename
 
@@ -37,3 +38,30 @@ def test_node_dict(node, sparse, expected):
 def test_node_find(search_args, expected) -> None:
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     assert expected == tree.find(*search_args)
+
+
+@pytest.mark.parametrize(
+    ["page_names", "expected"],
+    [
+        pytest.param(PaginationNames(), False, id="empty"),
+        pytest.param(PaginationNames(page_size="per-page"), True, id="page-size"),
+        pytest.param(PaginationNames(page_start="start"), True, id="page-start"),
+        pytest.param(PaginationNames(item_start="offset"), True, id="item-start"),
+        pytest.param(PaginationNames(next_header="next"), True, id="next-header"),
+        pytest.param(PaginationNames(next_property="next"), True, id="next-prop"),
+        pytest.param(PaginationNames(items_property="data"), False, id="items-prop"),
+        pytest.param(
+            PaginationNames(
+                page_size="page",
+                page_start="start",
+                item_start="offset",
+                items_property="data",
+                next_header="next",
+                next_property="next"),
+            True,
+            id="all",
+        ),
+    ]
+)
+def test_page_parameters_sizeable(page_names, expected):
+    assert page_names.sizeable() == expected
