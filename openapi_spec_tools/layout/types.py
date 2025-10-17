@@ -61,6 +61,10 @@ class PaginationNames:
     next_header: Optional[str] = None
     next_property: Optional[str] = None
 
+    def sizeable(self) -> bool:
+        """Check if any variables are defined that should lead to allow specifying a size."""
+        return any([self.page_size, self.page_start, self.item_start, self.next_header, self.next_property])
+
 
 @dataclasses.dataclass
 class LayoutNode:

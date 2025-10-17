@@ -96,7 +96,7 @@ if __name__ == "__main__":
         ]
         if command.summary_fields:
             args.append('_details: _a.DetailsOption = False')
-        if command.pagination:
+        if command.pagination and command.pagination.sizeable():
             args.append('_max_count: _a.MaxCountOption = None')
         return args
 
@@ -221,8 +221,10 @@ if __name__ == "__main__":
         """Create the 'page_info' variable."""
         if not command.pagination:
             return ''
-        args = {"max_count": "_max_count"}
+        args = {}
         names = command.pagination
+        if names.sizeable():
+            args["max_count"] = "_max_count"
         if names.page_size:
             args["page_size_name"] = quoted(names.page_size)
             args["page_size_value"] = self.variable_name(names.page_size)
@@ -238,6 +240,9 @@ if __name__ == "__main__":
             args["next_header_name"] = quoted(names.next_header)
         if names.next_property:
             args["next_property_name"] = quoted(names.next_property)
+
+        if not args:
+            return ''
 
         arg_text = ','.join([f"{SEP2}{k}={v}" for k, v in args.items()])
         return f"{SEP1}page_info = _r.PageParams({arg_text},{SEP1})"
