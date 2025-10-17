@@ -240,7 +240,7 @@ def depaginate(
         _params[page_params.page_size_name] = page_size
 
     just_once = not any([
-        page_params.page_size_name,
+        page_params.page_start_name,
         page_params.item_start_name,
         page_params.next_header_name,
         page_params.next_property_name,
