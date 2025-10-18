@@ -75,7 +75,10 @@ def test_op_path_arguments():
         'species: Annotated[Optional[str], typer.Option(help="Species name in Latin without spaces")] = "monkey"'
         in text
     )
-    assert 'neutered: Annotated[Optional[bool], typer.Option(hidden=True, help="Ouch")] = True' in text
+    assert (
+        'neutered: Annotated[Optional[bool], typer.Option("--neutered/--no-neutered", hidden=True, help="Ouch")] = True'
+        in text
+    )
     assert (
         'birthday: Annotated[Optional[datetime], typer.Option(show_default=False, help="When is the party?")] = None'
         in text
@@ -113,7 +116,7 @@ def test_op_query_arguments():
         'another_qparam: Annotated[str, typer.Option(show_default=False, help="Query parameter")] = None'
         in text
     )
-    assert 'more: Annotated[Optional[bool], typer.Option(hidden=True)] = False' in text
+    assert 'more: Annotated[Optional[bool], typer.Option("--more/--no-more", hidden=True)] = False' in text
     assert (
         'day_value: Annotated[Optional[DayValue], '
         'typer.Option(show_default=False, case_sensitive=False, hidden=True)] = None'
