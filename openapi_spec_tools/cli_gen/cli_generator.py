@@ -133,7 +133,11 @@ if __name__ == "__main__":
             arg_default = ""
         else:
             typer_type = 'typer.Option'
-            if prop_name.lower() in self.reserved:
+            if py_type == "bool":
+                option = self.option_name(prop_name)
+                no_option = option.replace("--", "--no-", 1)
+                typer_args.insert(0, quoted(f"{option}/{no_option}"))
+            elif prop_name.lower() in self.reserved:
                 # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
                 typer_args.insert(0, quoted(self.option_name(prop_name)))
             if not required:
