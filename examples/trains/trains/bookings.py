@@ -42,8 +42,8 @@ def show_commands(
 def create_booking(
     trip_id: Annotated[Optional[str], typer.Option(show_default=False, help="Identifier of the booked trip")] = None,
     passenger_name: Annotated[Optional[str], typer.Option(show_default=False, help="Name of the passenger")] = None,
-    has_bicycle: Annotated[Optional[bool], typer.Option(show_default=False, help="Indicates whether the passenger has a bicycle.")] = None,
-    has_dog: Annotated[Optional[bool], typer.Option(show_default=False, help="Indicates whether the passenger has a dog.")] = None,
+    has_bicycle: Annotated[Optional[bool], typer.Option("--has-bicycle/--no-has-bicycle", show_default=False, help="Indicates whether the passenger has a bicycle.")] = None,
+    has_dog: Annotated[Optional[bool], typer.Option("--has-dog/--no-has-dog", show_default=False, help="Indicates whether the passenger has a dog.")] = None,
     _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
