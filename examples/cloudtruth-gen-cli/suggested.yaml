@@ -840,12 +840,16 @@ projects_parameters_timeline:
     operations:
     - name: show
       operationId: projects_parameters_timeline_retrieve
+      pagination:
+        itemProperty: results
 
 projects_parameters_timelines:
     description: Manage projects parameters timelines
     operations:
     - name: show
       operationId: projects_parameters_timelines_retrieve
+      pagination:
+        itemProperty: results
 
 projects_parameters_values:
     description: Manage projects parameters values
@@ -904,12 +908,16 @@ projects_templates_timeline:
     operations:
     - name: show
       operationId: projects_templates_timeline_retrieve
+      pagination:
+        itemProperty: results
 
 projects_templates_timelines:
     description: Manage projects templates timelines
     operations:
     - name: show
       operationId: projects_templates_timelines_retrieve
+      pagination:
+        itemProperty: results
 
 serviceaccounts:
     description: Manage serviceaccounts

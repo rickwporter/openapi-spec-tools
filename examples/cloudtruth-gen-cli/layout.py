@@ -26,33 +26,6 @@ app = typer.Typer(
 )
 
 #################################################
-# Generator class
-class CloudTruthLayoutGenerator(LayoutGenerator):
-    def get_pagination(self, op_data: dict[str, Any]) -> Optional[PaginationNames]:
-        params = op_data.get(OasField.PARAMS, [])
-        
-        args = {}
-        if self.find_parameter(params, "page_size"):
-            args['page_size'] = "page_size"
-        if self.find_parameter(params, "page"):
-            args['page_start'] = "page"
-
-        # if no query parameters, do not check the response
-        if not args:
-            return None
-
-        response = self.get_response_body(op_data)
-        if response:
-            properties = response.get(OasField.PROPS, {})
-            if properties.get("next"):
-                args['next_property'] = 'next'
-            if properties.get("results"):
-                args['items_property'] = 'results'
-
-        return PaginationNames(**args)
-
-
-#################################################
 # CLI function
 @app.command(
     "suggest",
@@ -74,7 +47,13 @@ def layout_suggest(
     """
     logger = init_logging(log_level, LOG_CLASS)
     oas = open_oas_with_error_handling(openapi_file, logger)
-    generator = CloudTruthLayoutGenerator(oas)
+    generator = LayoutGenerator(
+        oas,
+        page_size_params="page_size",
+        page_start_params=["page"],
+        items_properties="results",
+        next_properties="next",
+    )
     node = generator.generate(prefix)
 
     write_layout_tree(output_file, node, logger)
