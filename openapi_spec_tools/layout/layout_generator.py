@@ -1,6 +1,7 @@
 """Declares the LayoutGenerator for inferring a layout from an OpenAPI specification."""
 from typing import Any
 from typing import Optional
+from typing import Union
 
 from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_snake_case
@@ -38,6 +39,13 @@ DEFAULT_OPERATION_MAP = {
 }
 
 
+def _to_list(data: Union[None, str, list[str]]) -> list[str]:
+    """Convert the data (either a str or list[str]) to a list[str]."""
+    if not data:
+        return []
+    return [data] if isinstance(data, str) else data
+
+
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
 
@@ -47,6 +55,12 @@ class LayoutGenerator:
         max_help_length: int = DEFAULT_MAX_HELP_LENGTH,
         supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
         common_operations: dict[str, str] = DEFAULT_OPERATION_MAP,
+        page_size_params: Union[None, str, list[str]] = None,
+        page_start_params: Union[None, str, list[str]] = None,
+        item_start_params: Union[None, str, list[str]] = None,
+        items_properties: Union[None, str, list[str]] = None,
+        next_properties: Union[None, str, list[str]] = None,
+        next_headers: Union[None, str, list[str]] = None,
     ):
         """Initialize the generator with internal values."""
         self.paths = oas.get(OasField.PATHS, {})
@@ -55,6 +69,13 @@ class LayoutGenerator:
         self.max_help_length = max_help_length
         self.supported_response_content = supported_content
         self.common_ops = common_operations
+
+        self.page_size_params = _to_list(page_size_params)
+        self.page_start_params = _to_list(page_start_params)
+        self.item_start_params = _to_list(item_start_params)
+        self.items_properties = _to_list(items_properties)
+        self.next_properties = _to_list(next_properties)
+        self.next_headers = _to_list(next_headers)
 
     @staticmethod
     def path_to_parts(path_name: str, prefix: str) -> list[str]:
@@ -107,6 +128,20 @@ class LayoutGenerator:
                 return None
 
         return value
+
+    def get_response_headers(self, op_data: dict[str, Any]) -> Optional[dict[str, Any]]:
+        """Get the response headers (if any)."""
+        responses = op_data.get(OasField.RESPONSES, {})
+        for code, data in responses.items():
+            # only look at successful responses
+            if not code.startswith("2"):
+                continue
+
+            headers = data.get(OasField.HEADERS)
+            if headers:
+                return headers
+
+        return None
 
     def get_response_body(self, op_data: dict[str, Any]) -> Optional[dict[str, Any]]:
         """Get the response body data (if any)."""
@@ -180,11 +215,44 @@ class LayoutGenerator:
         return path_node
 
     def get_pagination(self, op_data: dict[str, Any]) -> Optional[PaginationNames]:
-        """Determine pagination parameters from the operation data.
+        """Determine pagination parameters from the operation data."""
+        args = {}
+        params = op_data.get(OasField.PARAMS, [])
 
-        Intended to be overridden if you want your suggested layout to contain pagination parameters.
-        """
-        return None
+        def _param_args(arg_name: str, param_names: list[str]) -> None:
+            for name in param_names:
+                if self.find_parameter(params, name):
+                    args[arg_name] = name
+                    return
+            return
+
+        _param_args('page_size', self.page_size_params)
+        _param_args('page_start', self.page_start_params)
+        _param_args('item_start', self.item_start_params)
+
+        body = self.get_response_body(op_data) or {}
+        properties = body.get(OasField.PROPS, {})
+
+        def _prop_args(arg_name: str, prop_names: list[str]) -> None:
+            for name in prop_names:
+                if name in properties:
+                    args[arg_name] = name
+                    return
+            return
+
+        _prop_args('items_property', self.items_properties)
+        _prop_args('next_property', self.next_properties)
+
+        headers = self.get_response_headers(op_data) or {}
+        for name in self.next_headers:
+            if name in headers:
+                args['next_header'] = name
+                break
+
+        if not args:
+            return None
+
+        return PaginationNames(**args)
 
     def generate(self, prefix: str, description: Optional[str] = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""

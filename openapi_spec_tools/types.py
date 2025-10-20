@@ -14,6 +14,7 @@ class OasField(str, Enum):
     DESCRIPTION = "description"
     ENUM = "enum"
     FORMAT = "format"
+    HEADERS = "headers"
     IN = "in"
     INFO = "info"
     ITEMS = "items"

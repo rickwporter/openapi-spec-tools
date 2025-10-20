@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
+from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import write_layout
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
@@ -13,6 +14,12 @@ from tests.helpers import asset_filename
 NAME = "name"
 OP_ID = "operationId"
 X_METH = "x-method"
+PAGE_SIZE = "page_size_params"
+PAGE_START = "page_start_params"
+ITEM_START = "item_start_params"
+ITEM_PROP = "items_properties"
+NEXT_PROP = "next_properties"
+NEXT_HEAD = "next_headers"
 
 
 @pytest.mark.parametrize(
@@ -220,3 +227,40 @@ pets:
       operationId: showPetById
 '''
     assert expected in text
+
+
+@pytest.mark.parametrize(
+    ["gen_args", "expected"],
+    [
+        pytest.param({}, None, id="none"),
+        pytest.param({PAGE_SIZE: "limit"}, PaginationNames(page_size="limit"), id="simple"),
+        pytest.param({ITEM_START: ["limit"]}, PaginationNames(item_start="limit"), id="single-list"),
+        pytest.param(
+            {PAGE_START: ["start", "foobar", "another"]},
+            PaginationNames(page_start="foobar"),
+            id="multi-list",
+        ),
+        pytest.param(
+            {PAGE_START: "more", PAGE_SIZE: "limit"},
+            PaginationNames(page_size="limit", page_start="more"),
+            id="multi-params",
+        ),
+        pytest.param(
+            {ITEM_PROP: "items", NEXT_PROP: ["ahead", "next-url"]},
+            PaginationNames(items_property="items", next_property="next-url"),
+            id="props",
+        ),
+        pytest.param(
+            {NEXT_HEAD: ["next", "X-next", "x-next"]},
+            PaginationNames(next_header="x-next"),
+            id="next-head",
+        ),
+    ]
+)
+def test_get_pagination(gen_args, expected):
+    oas = open_oas(asset_filename("misc.yaml"))
+    path = "/pets/{numFeet}/{species}/{neutered}/{birthday}"
+    op_data = oas.get(OasField.PATHS).get(path).get("get")
+
+    uut = LayoutGenerator(oas, **gen_args)
+    assert expected == uut.get_pagination(op_data)
