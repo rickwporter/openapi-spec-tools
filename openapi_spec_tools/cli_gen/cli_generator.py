@@ -221,6 +221,14 @@ if __name__ == "__main__":
         lines.append(f"    data = _d.summary(data, [{', '.join(args)}])")
         return SEP2 + SEP2.join(lines)
 
+    def hidden(self, node: LayoutNode) -> str:
+        """Add the call to remove the hidden fields."""
+        if not node.hidden_fields:
+            return ""
+
+        args = [quoted(v) for v in node.hidden_fields]
+        return f"{SEP2}data = _d.remove(data, [{', '.join(args)}])"
+
     def pagination_creation(self, command: LayoutNode) -> str:
         """Create the 'page_info' variable."""
         if not command.pagination:
@@ -329,7 +337,7 @@ def {func_name}({args_str}) -> None:
     params = {self.op_param_formation(query_params)}{self.op_body_formation(body_params)}
 
     try:
-        data = _r.{req_func}({', '.join(req_args)}){self.summary_display(node)}
+        data = _r.{req_func}({', '.join(req_args)}){self.hidden(node)}{self.summary_display(node)}
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)

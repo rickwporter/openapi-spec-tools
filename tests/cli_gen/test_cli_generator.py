@@ -369,6 +369,16 @@ def test_summary_display():
     text = uut.summary_display(command)
     assert '' == text
 
+def test_hidden():
+    uut = CliGenerator("foo", {})
+
+    command = LayoutNode("foo", "foo", hidden_fields=["xYz", "@bc"])
+    text = uut.hidden(command)
+    assert 'data = _d.remove(data, ["xYz", "@bc"])' in text
+
+    command = LayoutNode("foo", "foo")
+    text = uut.hidden(command)
+    assert '' == text
 
 def test_function_definition_item():
     oas = open_oas(asset_filename("pet2.yaml"))
@@ -395,6 +405,7 @@ def test_function_definition_item():
     assert 'url = _r.create_url(_api_host, "pets")' in text
     assert 'params = {}' in text
     assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)' in text
+    assert 'data = _d.remove(data, ["sna", "foo", "bar"])' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
     assert 'data = _d.summary(data, ["name"])' in text
