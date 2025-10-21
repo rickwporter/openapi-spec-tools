@@ -234,6 +234,7 @@ def grants_list(
 
     try:
         data = _r.depaginate(page_info, url, headers=headers, params=params, timeout=_api_timeout)
+        data = _d.remove(data, ["something-not-found"])
         _d.display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
