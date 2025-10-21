@@ -11,6 +11,7 @@ class LayoutField(str, Enum):
     NAME = "name"
     BUG_IDS = "bugIds"
     DESCRIPTION = "description"
+    HIDDEN_FIELDS = "hiddenFields"
     OP_ID = "operationId"
     OPERATIONS = "operations"
     SUB_ID = "subcommandId"
@@ -78,6 +79,7 @@ class LayoutNode:
     extra: dict[str, Any] = dataclasses.field(default_factory=dict)
     children: list["LayoutNode"] = dataclasses.field(default_factory=list)
     pagination: Optional[PaginationNames] = None
+    hidden_fields: list[str] = dataclasses.field(default_factory=list)
 
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
         """Convert object to dictionary."""

@@ -66,6 +66,7 @@ Optional:
 * `bugIds` - means no code is generated for this operation
 * `pagination` - properties used to define strategy for retrieving lists of items (see below)
 * `summaryFields` - used to display just the listed fields with a `--details` (or `-v`) flag to display all the fields
+* `hiddenFields` - used to always remove the listed fields
 
 #### Pagination Schema
 
