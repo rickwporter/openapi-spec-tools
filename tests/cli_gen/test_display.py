@@ -13,6 +13,7 @@ from openapi_spec_tools.cli_gen._display import OutputStyle
 from openapi_spec_tools.cli_gen._display import RichTable
 from openapi_spec_tools.cli_gen._display import TableConfig
 from openapi_spec_tools.cli_gen._display import display
+from openapi_spec_tools.cli_gen._display import remove
 from openapi_spec_tools.cli_gen._display import rich_table_factory
 from openapi_spec_tools.cli_gen._display import summary
 from tests.cli_gen.helpers import to_ascii
@@ -514,3 +515,22 @@ def test_summary_list():
 )
 def test_summary(data, properties, expected):
     assert expected == summary(data, properties)
+
+
+@pytest.mark.parametrize(
+    ["data", "properties", "expected"],
+    [
+        pytest.param(None, ["foo"], None, id="None"),
+        pytest.param({"foo": "bar"}, ["foo"], {}, id="simple"),
+        pytest.param({"foo": "bar"}, ["bar"], {"foo": "bar"}, id="missing"),
+        pytest.param({"sna": "foo", "foo": "bar", "bar": "sna"}, ["bar", "sna"], {"foo": "bar"}, id="multiple"),
+        pytest.param(
+            [{"north": 1, "south": 2}, {"west": 1, "north": 3}, {"east": 1}],
+            ["north"],
+            [{"south": 2}, {"west": 1}, {"east": 1}],
+            id="list",
+        ),
+    ]
+)
+def test_remove(data, properties, expected):
+    assert expected == remove(data, properties)

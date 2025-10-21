@@ -30,7 +30,12 @@ def test_node_dict(node, sparse, expected):
         pytest.param(("pet", "feed"), None, id="child-not-found"),
         pytest.param(
             ("pet", "create"),
-            LayoutNode(command="create", identifier="createPets", summary_fields=["name"]),
+            LayoutNode(
+                command="create",
+                identifier="createPets",
+                summary_fields=["name"],
+                hidden_fields=["sna", "foo", "bar"],
+            ),
             id="child",
         ),
     ]

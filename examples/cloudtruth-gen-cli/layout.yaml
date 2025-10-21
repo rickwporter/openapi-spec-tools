@@ -101,6 +101,7 @@ grants:
       pageSize: page_size
       nextProperty: next
       itemProperty: result
+    hiddenFields: something-not-found
   - name: set
     operationId: grants_update
   - name: show

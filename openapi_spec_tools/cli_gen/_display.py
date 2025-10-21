@@ -317,6 +317,22 @@ def summary(obj: Any, properties: list[str]) -> Any:
     return {prop: obj.get(prop) for prop in properties}
 
 
+def remove(obj: Any, properties: list[str]) -> Any:
+    """Remove the specified properties from the specified object."""
+    if obj is None:
+        return None
+
+    if isinstance(obj, list):
+        # recursively call for each item in the list
+        return [remove(item, properties) for item in obj]
+
+    for pname in properties:
+        # remove all the properties
+        obj.pop(pname, None)
+
+    return obj
+
+
 def display(obj: Any, fmt: OutputFormat, style: OutputStyle, indent: int = 2) -> None:
     """Display the data provided in obj, according to the formating arguments."""
     no_color = style != OutputStyle.ALL
