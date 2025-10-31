@@ -30,6 +30,49 @@ def test_tree_node_get():
     assert node.get(TreeDisplay.ALL) is None
 
 
+def test_tree_node_contains():
+    uut = TreeNode(
+        name="myName",
+        help="not helpful",
+        operation="pysops",
+        function="disfunction",
+        method="madness",
+        path="narrow",
+        children=[
+            TreeNode(
+                name="services",
+                children=[
+                    TreeNode(name="army", help="None required"),
+                    TreeNode(name="navy", help="Every day"),
+                ]
+            ),
+            TreeNode(
+                name="sna",
+                operation="foo",
+                method="bar",
+            ),
+        ],
+    )
+
+    # properties
+    assert uut.contains("myName")
+    assert uut.contains("not help")
+    assert uut.contains("pys")
+    assert uut.contains("madness")
+    assert uut.contains("disfunc")
+    assert uut.contains("narrow")
+
+    # children
+    assert uut.contains("services")
+    assert uut.contains("army")
+    assert uut.contains("bar")
+
+    # not found
+    assert not uut.contains("name")
+    assert not uut.contains("none")
+    assert not uut.contains("gold")
+
+
 SAMPLE_TREE = """
 audit:
   description: View CloudTruth audit data
@@ -164,18 +207,32 @@ SUB_DISPLAY = """\
 │ create  Tags allow you to name stable points for your configuration.                             │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
-
+CREATED_DISPLAY = """\
+╭─ Command Tree ───────────────────────────────────────────────────────────────────────────────────╮
+│ backup             backup_snapshot_create                                                        │
+│ generate-password  utils_generate_password_create                                                │
+│ environment*                                                                                     │
+│   create           environments_create                                                           │
+│   tags*                                                                                          │
+│     create         environments_tags_create                                                      │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+"""
+MISSING_DISPLAY = """\
+No 'backup' matches found.
+"""
 
 @pytest.mark.parametrize(
-    ["start", "display", "depth", "expected"],
+    ["start", "display", "depth", "search", "expected"],
     [
-        pytest.param("main", TreeDisplay.ALL, 10, FULL_DISPLAY, id="full"),
-        pytest.param("main", TreeDisplay.OPERATION, 10, OP_DISPLAY, id="operation"),
-        pytest.param("main", TreeDisplay.OPERATION, 1, DEPTH_DISPLAY, id="depth"),
-        pytest.param("environments_tags", TreeDisplay.HELP, 10, SUB_DISPLAY, id="sub"),
+        pytest.param("main", TreeDisplay.ALL, 10, None, FULL_DISPLAY, id="full"),
+        pytest.param("main", TreeDisplay.OPERATION, 10, "", OP_DISPLAY, id="operation"),
+        pytest.param("main", TreeDisplay.OPERATION, 1, None, DEPTH_DISPLAY, id="depth"),
+        pytest.param("environments_tags", TreeDisplay.HELP, 10, None, SUB_DISPLAY, id="sub"),
+        pytest.param("main", TreeDisplay.FUNCTION, 10, "create", CREATED_DISPLAY, id="search"),
+        pytest.param("environments", TreeDisplay.ALL, 10, "backup", MISSING_DISPLAY, id="missing"),
     ]
 )
-def test_show_tree(start, display, depth, expected):
+def test_show_tree(start, display, depth, search, expected):
     directory = TemporaryDirectory()
     file = Path(directory.name, "sample.yaml")
     data = SAMPLE_TREE.encode(encoding="utf-8")
@@ -184,7 +241,7 @@ def test_show_tree(start, display, depth, expected):
     with (
         mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout,
     ):
-        tree(file.as_posix(), identifier=start, display=display, max_depth=depth)
+        tree(file.as_posix(), identifier=start, display=display, max_depth=depth, needle=search)
 
         result = mock_stdout.getvalue().replace("\r", "")
         assert to_ascii(expected) == to_ascii(result)

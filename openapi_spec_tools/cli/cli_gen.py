@@ -222,6 +222,10 @@ def show_cli_tree(
         typer.Option(case_sensitive=False, help="Details to show about tree")
     ] = TreeDisplay.ALL,
     max_depth: Annotated[int, typer.Option(metavar="DEPTH", help="Maximum tree depth to show")] = 10,
+    search: Annotated[
+        Optional[str],
+        typer.Option(metavar="NEEDLE", help="Only show the tree for items with this needle.")
+    ] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -234,7 +238,7 @@ def show_cli_tree(
         typer.echo("No operations or sub-commands found")
         return
 
-    table = create_tree_table(tree, display, max_depth)
+    table = create_tree_table(tree, display, max_depth, search)
     table.show_header = True
     table.expand = False
     console = console_factory()
