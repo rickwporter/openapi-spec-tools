@@ -60,6 +60,19 @@ class TreeNode:
             return f"{self.method.upper():6} {self.path}" if self.path else ''
         return None
 
+    def contains(self, needle: str) -> bool:
+        """Check if the needle is found in this node, or any children."""
+        def _has_needle(value: Optional[str]) -> bool:
+            return value and needle in value
+
+        if any(_has_needle(p) for p in [self.name, self.help, self.function, self.operation, self.path, self.method]):
+            return True
+
+        if any(c.contains(needle) for c in self.children):
+            return True
+
+        return False
+
 
 def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> Optional[TreeNode]:
     """Parse the specified file into a tree."""

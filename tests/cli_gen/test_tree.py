@@ -30,6 +30,49 @@ def test_tree_node_get():
     assert node.get(TreeDisplay.ALL) is None
 
 
+def test_tree_node_contains():
+    uut = TreeNode(
+        name="myName",
+        help="not helpful",
+        operation="pysops",
+        function="disfunction",
+        method="madness",
+        path="narrow",
+        children=[
+            TreeNode(
+                name="services",
+                children=[
+                    TreeNode(name="army", help="None required"),
+                    TreeNode(name="navy", help="Every day"),
+                ]
+            ),
+            TreeNode(
+                name="sna",
+                operation="foo",
+                method="bar",
+            ),
+        ],
+    )
+
+    # properties
+    assert uut.contains("myName")
+    assert uut.contains("not help")
+    assert uut.contains("pys")
+    assert uut.contains("madness")
+    assert uut.contains("disfunc")
+    assert uut.contains("narrow")
+
+    # children
+    assert uut.contains("services")
+    assert uut.contains("army")
+    assert uut.contains("bar")
+
+    # not found
+    assert not uut.contains("name")
+    assert not uut.contains("none")
+    assert not uut.contains("gold")
+
+
 SAMPLE_TREE = """
 audit:
   description: View CloudTruth audit data
