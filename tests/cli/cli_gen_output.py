@@ -45,6 +45,10 @@ delete   DELETE /pets/{petId}
 list     GET    /pets        
 show     GET    /pets/{petId}
 """
+PET_ADD = """\
+Command  Function   
+add      create_pets
+"""
 P_V_ALL = """\
 Command             All                                       
 owners              help  Keepers of the pets                 

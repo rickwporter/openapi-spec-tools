@@ -16,6 +16,7 @@ from tests.cli.cli_gen_output import P_V_ALL
 from tests.cli.cli_gen_output import P_V_MID
 from tests.cli.cli_gen_output import P_V_PETS
 from tests.cli.cli_gen_output import P_V_SHALLOW
+from tests.cli.cli_gen_output import PET_ADD
 from tests.cli.cli_gen_output import PET_ALL
 from tests.cli.cli_gen_output import PET_FUNC
 from tests.cli.cli_gen_output import PET_HELP
@@ -358,7 +359,7 @@ def test_unreferenced(layout_file, oas_file, full, expected):
 
 
 @pytest.mark.parametrize(
-    ["layout_file", "oas_file", "start", "display", "depth", "expected"],
+    ["layout_file", "oas_file", "start", "display", "depth", "search", "expected"],
     [
         pytest.param(
             "layout_operationless.yaml",
@@ -366,45 +367,49 @@ def test_unreferenced(layout_file, oas_file, full, expected):
             "hospital",
             TreeDisplay.ALL,
             10,
+            None,
             "No operations or sub-commands found\n",
             id="empty",
         ),
         pytest.param(
-            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.ALL, 10, PET_ALL, id="all",
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.ALL, 10, None, PET_ALL, id="all",
         ),
         pytest.param(
-            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.HELP, 10, PET_HELP, id="help",
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.HELP, 10, None, PET_HELP, id="help",
         ),
         pytest.param(
-            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.FUNCTION, 10, PET_FUNC, id="func",
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.FUNCTION, 10, None, PET_FUNC, id="func",
         ),
         pytest.param(
-            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.OPERATION, 10, PET_OP, id="operation",
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.OPERATION, 10, None, PET_OP, id="operation",
         ),
         pytest.param(
-            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.PATH, 10, PET_PATH, id="path",
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.PATH, 10, None, PET_PATH, id="path",
         ),
         pytest.param(
-            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.ALL, 10, P_V_ALL, id="complete",
+            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.ALL, 10, None, P_V_ALL, id="complete",
         ),
         pytest.param(
-            "layout_pets2.yaml", "pets_and_vets.yaml", "pets", TreeDisplay.OPERATION, 10, P_V_PETS, id="alt-start",
+            "layout_pets2.yaml", "pets_and_vets.yaml", "pets", TreeDisplay.OPERATION, 10, "", P_V_PETS, id="alt-start",
         ),
         pytest.param(
-            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.OPERATION, 0, P_V_SHALLOW, id="depth=0",
+            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.OPERATION, 0, "", P_V_SHALLOW, id="depth=0",
         ),
         pytest.param(
-            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.OPERATION, 1, P_V_MID, id="depth=1",
+            "layout_pets2.yaml", "pets_and_vets.yaml", "main", TreeDisplay.OPERATION, 1, None, P_V_MID, id="depth=1",
         ),
+        pytest.param(
+            "layout_pets.yaml", "pet2.yaml", "main", TreeDisplay.FUNCTION, 10, "add", PET_ADD, id="search",
+        )
     ]
 )
-def test_show_cli_tree(layout_file, oas_file, start, display, depth, expected):
+def test_show_cli_tree(layout_file, oas_file, start, display, depth, search, expected):
     lname = asset_filename(layout_file)
     oname = asset_filename(oas_file)
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
-        show_cli_tree(lname, oname, start=start, display=display, max_depth=depth)
+        show_cli_tree(lname, oname, start=start, display=display, max_depth=depth, search=search)
 
         result = mock_stdout.getvalue()
         assert expected == result
