@@ -64,6 +64,19 @@ class TreeNode:
             return f"{self.method.upper():6} {self.path}" if self.path else ''
         return None
 
+    def contains(self, needle: str) -> bool:
+        """Check if the needle is found in this node, or any children."""
+        def _has_needle(value: Optional[str]) -> bool:
+            return value and needle in value
+
+        if any(_has_needle(p) for p in [self.name, self.help, self.function, self.operation, self.path, self.method]):
+            return True
+
+        if any(c.contains(needle) for c in self.children):
+            return True
+
+        return False
+
 
 def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> Optional[TreeNode]:
     """Parse the specified file into a tree."""
@@ -120,7 +133,14 @@ def create_node_table(node: TreeNode) -> Table:
     return table
 
 
-def add_node_to_table(table: Table, node: TreeNode, display: TreeDisplay, depth: int, max_depth: int) -> None:
+def add_node_to_table(
+    table: Table,
+    node: TreeNode,
+    display: TreeDisplay,
+    depth: int,
+    max_depth: int,
+    needle: Optional[str],
+) -> None:
     """Add a node (with children) to the table."""
     indent = INDENT * depth
     if display != TreeDisplay.ALL:
@@ -131,10 +151,20 @@ def add_node_to_table(table: Table, node: TreeNode, display: TreeDisplay, depth:
     table.add_row(indent + node.name, content)
     if max_depth > depth:
         for child in node.children:
-            add_node_to_table(table, child, display, depth + 1, max_depth)
+            if needle and not child.contains(needle):
+                continue
+
+            add_node_to_table(table, child, display, depth + 1, max_depth, needle)
+
+    return
 
 
-def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> Table:
+def create_tree_table(
+    node: TreeNode,
+    display: TreeDisplay,
+    max_depth: int,
+    needle: Optional[str] = None,
+) -> Table:
     """Create the tree table.
 
     It is a "flat" table where the left column is the commands with each child being
@@ -156,20 +186,27 @@ def create_tree_table(node: TreeNode, display: TreeDisplay, max_depth: int) -> T
     table.add_column("Command", style="bold cyan", no_wrap=True)
     table.add_column(display.value.title())
     for child in node.children:
-        add_node_to_table(table, child, display, 0, max_depth)
+        if needle and not child.contains(needle):
+            continue
+
+        add_node_to_table(table, child, display, 0, max_depth, needle)
 
     return table
 
 
-def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int) -> None:
+def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int, needle: Optional[str] = None) -> None:
     """Print the tree table for the specified command."""
     with open(filename, "r", encoding="utf-8", newline="\n") as fp:
         data = yaml.safe_load(fp)
 
+    console = console_factory()
+
     # parse into the tree format
     node = parse_tree(identifier, identifier, data)
-    table = create_tree_table(node, display, max_depth)
+    if needle and not node.contains(needle):
+        console.print(f"No '{needle}' matches found.")
+        return
 
+    table = create_tree_table(node, display, max_depth, needle)
     panel = Panel(table, border_style="dim", title="Command Tree", title_align="left")
-    console = console_factory()
     console.print(panel)

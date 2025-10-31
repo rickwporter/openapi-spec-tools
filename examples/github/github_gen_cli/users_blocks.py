@@ -28,13 +28,14 @@ app = typer.Typer(no_args_is_help=True, help="Managed blocked users")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
     depth: _a.MaxDepthOption = 5,
+    search: _a.TreeSearchOption = None,
 ) -> None:
     """Show blocks sub-commands.
 
     The '*' denotes a sub-command with other sub-commands, but no direct actions.
     """
     path = Path(__file__).parent / "tree.yaml"
-    _t.tree(path.as_posix(), "users_blocks", display, depth)
+    _t.tree(path.as_posix(), "users_blocks", display, depth, search)
     return
 
 

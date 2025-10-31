@@ -103,3 +103,10 @@ TreeDisplayOption = Annotated[
         help="Details of the CLI command tree to show."
     ),
 ]
+TreeSearchOption = Annotated[
+    Optional[str],
+    typer.Option(
+        "--search",
+        help="Value to look for in command info."
+    )
+]

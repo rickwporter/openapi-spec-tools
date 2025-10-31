@@ -28,13 +28,14 @@ app = typer.Typer(no_args_is_help=True, help="Manage environment tags")
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
     depth: _a.MaxDepthOption = 5,
+    search: _a.TreeSearchOption = None,
 ) -> None:
     """Show tags sub-commands.
 
     The '*' denotes a sub-command with other sub-commands, but no direct actions.
     """
     path = Path(__file__).parent / "tree.yaml"
-    _t.tree(path.as_posix(), "environments_tags", display, depth)
+    _t.tree(path.as_posix(), "environments_tags", display, depth, search)
     return
 
 
