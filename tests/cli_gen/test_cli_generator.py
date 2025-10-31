@@ -652,4 +652,5 @@ def test_tree_function():
     assert '"""Show bar sub-commands.' in text
     assert 'display: _a.TreeDisplayOption = _a.TreeDisplay.HELP' in text
     assert 'depth: _a.MaxDepthOption = 5' in text
-    assert '_t.tree(path.as_posix(), "foo_bar", display, depth)' in text
+    assert 'search: _a.TreeSearchOption = None' in text
+    assert '_t.tree(path.as_posix(), "foo_bar", display, depth, search)' in text

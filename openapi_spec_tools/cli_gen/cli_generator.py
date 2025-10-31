@@ -391,12 +391,13 @@ def {func_name}({args_str}) -> None:
 def show_commands(
     display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
     depth: _a.MaxDepthOption = 5,
+    search: _a.TreeSearchOption = None,
 ) -> None:
     """Show {node.command} sub-commands.
 
     The '*' denotes a sub-command with other sub-commands, but no direct actions.
     """
     path = Path(__file__).parent / "tree.yaml"
-    _t.tree(path.as_posix(), "{node.identifier}", display, depth)
+    _t.tree(path.as_posix(), "{node.identifier}", display, depth, search)
     return
 '''
