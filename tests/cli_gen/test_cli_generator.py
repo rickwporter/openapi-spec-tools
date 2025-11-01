@@ -380,6 +380,17 @@ def test_hidden():
     text = uut.hidden(command)
     assert '' == text
 
+def test_allowed():
+    uut = CliGenerator("foo", {})
+
+    command = LayoutNode("foo", "foo", allowed_fields=["sN@", "bAr"])
+    text = uut.allowed(command)
+    assert 'data = _d.allowed(data, ["sN@", "bAr"])' in text
+
+    command = LayoutNode("foo", "foo")
+    text = uut.allowed(command)
+    assert '' == text
+
 def test_function_definition_item():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
@@ -406,6 +417,7 @@ def test_function_definition_item():
     assert 'params = {}' in text
     assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)' in text
     assert 'data = _d.remove(data, ["sna", "foo", "bar"])' in text
+    assert 'data = _d.allowed(data, ["red-sox", "bruins"])' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
     assert 'data = _d.allowed(data, ["name"])' in text
