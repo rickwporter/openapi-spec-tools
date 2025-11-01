@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
         lines = ["if not _details:"]
         args = [quoted(v) for v in node.summary_fields]
-        lines.append(f"    data = _d.summary(data, [{', '.join(args)}])")
+        lines.append(f"    data = _d.allowed(data, [{', '.join(args)}])")
         return SEP2 + SEP2.join(lines)
 
     def hidden(self, node: LayoutNode) -> str:
