@@ -72,6 +72,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     bugs = field_to_list(item, LayoutField.BUG_IDS)
     summary_fields = field_to_list(item, LayoutField.SUMMARY_FIELDS)
     hidden_fields = field_to_list(item, LayoutField.HIDDEN_FIELDS)
+    allowed_fields = field_to_list(item, LayoutField.ALLOWED_FIELDS)
     extra = parse_extras(item)
     pagination = parse_pagination(item.get(LayoutField.PAGINATION))
 
@@ -97,6 +98,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         bugs=bugs,
         summary_fields=summary_fields,
         hidden_fields=hidden_fields,
+        allowed_fields=allowed_fields,
         extra=extra,
         children=children,
         pagination=pagination,
