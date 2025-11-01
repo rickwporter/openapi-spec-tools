@@ -12,10 +12,10 @@ from openapi_spec_tools.cli_gen._display import OutputFormat
 from openapi_spec_tools.cli_gen._display import OutputStyle
 from openapi_spec_tools.cli_gen._display import RichTable
 from openapi_spec_tools.cli_gen._display import TableConfig
+from openapi_spec_tools.cli_gen._display import allowed
 from openapi_spec_tools.cli_gen._display import display
 from openapi_spec_tools.cli_gen._display import remove
 from openapi_spec_tools.cli_gen._display import rich_table_factory
-from openapi_spec_tools.cli_gen._display import summary
 from tests.cli_gen.helpers import to_ascii
 
 SIMPLE_DICT = {
@@ -513,8 +513,8 @@ def test_summary_list():
         ),
     ]
 )
-def test_summary(data, properties, expected):
-    assert expected == summary(data, properties)
+def test_allowed(data, properties, expected):
+    assert expected == allowed(data, properties)
 
 
 @pytest.mark.parametrize(

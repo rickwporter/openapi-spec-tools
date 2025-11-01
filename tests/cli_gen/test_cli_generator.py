@@ -363,7 +363,7 @@ def test_summary_display():
     command = LayoutNode("foo", "foo", summary_fields=["abc", "defGhi"])
     text = uut.summary_display(command)
     assert 'if not _details:' in text
-    assert 'data = _d.summary(data, ["abc", "defGhi"])' in text
+    assert 'data = _d.allowed(data, ["abc", "defGhi"])' in text
 
     command = LayoutNode("foo", "foo")
     text = uut.summary_display(command)
@@ -408,7 +408,7 @@ def test_function_definition_item():
     assert 'data = _d.remove(data, ["sna", "foo", "bar"])' in text
     assert '_d.display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
-    assert 'data = _d.summary(data, ["name"])' in text
+    assert 'data = _d.allowed(data, ["name"])' in text
 
     # make sure the missing parameter checks are present
     assert 'missing.append("--api-key")' in text

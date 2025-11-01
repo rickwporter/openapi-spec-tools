@@ -16,10 +16,10 @@ from pets_cli._display import OutputFormat
 from pets_cli._display import OutputStyle
 from pets_cli._display import RichTable
 from pets_cli._display import TableConfig
+from pets_cli._display import allowed
 from pets_cli._display import display
 from pets_cli._display import remove
 from pets_cli._display import rich_table_factory
-from pets_cli._display import summary
 from tests.helpers import to_ascii
 
 SIMPLE_DICT = {
@@ -517,8 +517,8 @@ def test_summary_list():
         ),
     ]
 )
-def test_summary(data, properties, expected):
-    assert expected == summary(data, properties)
+def test_allowed(data, properties, expected):
+    assert expected == allowed(data, properties)
 
 
 @pytest.mark.parametrize(
