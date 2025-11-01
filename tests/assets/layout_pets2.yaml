@@ -30,6 +30,9 @@ pets:
       - sna
       - foo
       - bar
+      allowedFields:
+      - red-sox
+      - bruins
     - name: delete
       operationId: deletePetById
     - name: examine

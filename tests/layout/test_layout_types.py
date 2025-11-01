@@ -35,6 +35,7 @@ def test_node_dict(node, sparse, expected):
                 identifier="createPets",
                 summary_fields=["name"],
                 hidden_fields=["sna", "foo", "bar"],
+                allowed_fields=["red-sox", "bruins"],
             ),
             id="child",
         ),
