@@ -176,6 +176,12 @@ main:
     name: generate-password
     operationId: utils_generate_password_create
     path: /api/v1/utils/generate_password/
+  - function: api_schema_retrieve
+    help: OpenApi3 schema for this API
+    method: GET
+    name: schema
+    operationId: api_schema_retrieve
+    path: /api/schema/
   - name: audit
     subcommandId: audit
   - name: environment

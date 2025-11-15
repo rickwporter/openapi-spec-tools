@@ -13,6 +13,8 @@ main:
     subcommandId: grants
   - name: membership
     subcommandId: memberships
+  - name: schema
+    operationId: api_schema_retrieve
   - name: user
     subcommandId: users
 
