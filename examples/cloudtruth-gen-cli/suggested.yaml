@@ -84,6 +84,8 @@ backup_snapshot:
 environments:
     description: Manage environments
     operations:
+    - name: copy
+      subcommandId: environments_copy
     - name: create
       operationId: environments_create
     - name: delete
@@ -105,8 +107,6 @@ environments:
       subcommandId: environments_tags
     - name: update
       operationId: environments_partial_update
-    - name: copy
-      subcommandId: environments_copy
 
 environments_copy:
     description: Manage environments copy
@@ -166,14 +166,14 @@ grants:
         pageStart: page
         pageSize: page_size
         nextProperty: next
+    - name: multi
+      subcommandId: grants_multi
     - name: set
       operationId: grants_update
     - name: show
       operationId: grants_retrieve
     - name: update
       operationId: grants_partial_update
-    - name: multi
-      subcommandId: grants_multi
 
 grants_multi:
     description: Manage grants multi
@@ -184,6 +184,8 @@ grants_multi:
 groups:
     description: Manage groups
     operations:
+    - name: add
+      subcommandId: groups_add
     - name: create
       operationId: groups_create
     - name: delete
@@ -195,16 +197,14 @@ groups:
         pageStart: page
         pageSize: page_size
         nextProperty: next
+    - name: remove
+      subcommandId: groups_remove
     - name: set
       operationId: groups_update
     - name: show
       operationId: groups_retrieve
     - name: update
       operationId: groups_partial_update
-    - name: add
-      subcommandId: groups_add
-    - name: remove
-      subcommandId: groups_remove
 
 groups_add:
     description: Manage groups add
@@ -254,14 +254,14 @@ integrations_aws:
       subcommandId: integrations_aws_pulls
     - name: pushes
       subcommandId: integrations_aws_pushes
+    - name: scan
+      subcommandId: integrations_aws_scan
     - name: set
       operationId: integrations_aws_update
     - name: show
       operationId: integrations_aws_retrieve
     - name: update
       operationId: integrations_aws_partial_update
-    - name: scan
-      subcommandId: integrations_aws_scan
 
 integrations_aws_pulls:
     description: Manage integrations aws pulls
@@ -281,12 +281,12 @@ integrations_aws_pulls:
       operationId: integrations_aws_pulls_update
     - name: show
       operationId: integrations_aws_pulls_retrieve
+    - name: sync
+      subcommandId: integrations_aws_pulls_sync
     - name: tasks
       subcommandId: integrations_aws_pulls_tasks
     - name: update
       operationId: integrations_aws_pulls_partial_update
-    - name: sync
-      subcommandId: integrations_aws_pulls_sync
 
 integrations_aws_pulls_sync:
     description: Manage integrations aws pulls sync
@@ -340,12 +340,12 @@ integrations_aws_pushes:
       operationId: integrations_aws_pushes_update
     - name: show
       operationId: integrations_aws_pushes_retrieve
+    - name: sync
+      subcommandId: integrations_aws_pushes_sync
     - name: tasks
       subcommandId: integrations_aws_pushes_tasks
     - name: update
       operationId: integrations_aws_pushes_partial_update
-    - name: sync
-      subcommandId: integrations_aws_pushes_sync
 
 integrations_aws_pushes_sync:
     description: Manage integrations aws pushes sync
@@ -411,14 +411,14 @@ integrations_azure_key_vault:
       subcommandId: integrations_azure_key_vault_pulls
     - name: pushes
       subcommandId: integrations_azure_key_vault_pushes
+    - name: scan
+      subcommandId: integrations_azure_key_vault_scan
     - name: set
       operationId: integrations_azure_key_vault_update
     - name: show
       operationId: integrations_azure_key_vault_retrieve
     - name: update
       operationId: integrations_azure_key_vault_partial_update
-    - name: scan
-      subcommandId: integrations_azure_key_vault_scan
 
 integrations_azure_key_vault_pulls:
     description: Manage integrations azure key-vault pulls
@@ -438,12 +438,12 @@ integrations_azure_key_vault_pulls:
       operationId: integrations_azure_key_vault_pulls_update
     - name: show
       operationId: integrations_azure_key_vault_pulls_retrieve
+    - name: sync
+      subcommandId: integrations_azure_key_vault_pulls_sync
     - name: tasks
       subcommandId: integrations_azure_key_vault_pulls_tasks
     - name: update
       operationId: integrations_azure_key_vault_pulls_partial_update
-    - name: sync
-      subcommandId: integrations_azure_key_vault_pulls_sync
 
 integrations_azure_key_vault_pulls_sync:
     description: Manage integrations azure key-vault pulls sync
@@ -497,12 +497,12 @@ integrations_azure_key_vault_pushes:
       operationId: integrations_azure_key_vault_pushes_update
     - name: show
       operationId: integrations_azure_key_vault_pushes_retrieve
+    - name: sync
+      subcommandId: integrations_azure_key_vault_pushes_sync
     - name: tasks
       subcommandId: integrations_azure_key_vault_pushes_tasks
     - name: update
       operationId: integrations_azure_key_vault_pushes_partial_update
-    - name: sync
-      subcommandId: integrations_azure_key_vault_pushes_sync
 
 integrations_azure_key_vault_pushes_sync:
     description: Manage integrations azure key-vault pushes sync
@@ -588,12 +588,12 @@ integrations_github_pulls:
       operationId: integrations_github_pulls_update
     - name: show
       operationId: integrations_github_pulls_retrieve
+    - name: sync
+      subcommandId: integrations_github_pulls_sync
     - name: tasks
       subcommandId: integrations_github_pulls_tasks
     - name: update
       operationId: integrations_github_pulls_partial_update
-    - name: sync
-      subcommandId: integrations_github_pulls_sync
 
 integrations_github_pulls_sync:
     description: Manage integrations github pulls sync
@@ -632,6 +632,8 @@ integrations_github_pulls_tasks_steps:
 invitations:
     description: Manage invitations
     operations:
+    - name: accept
+      subcommandId: invitations_accept
     - name: create
       operationId: invitations_create
     - name: delete
@@ -643,16 +645,14 @@ invitations:
         pageStart: page
         pageSize: page_size
         nextProperty: next
+    - name: resend
+      subcommandId: invitations_resend
     - name: set
       operationId: invitations_update
     - name: show
       operationId: invitations_retrieve
     - name: update
       operationId: invitations_partial_update
-    - name: accept
-      subcommandId: invitations_accept
-    - name: resend
-      subcommandId: invitations_resend
 
 invitations_accept:
     description: Manage invitations accept
@@ -711,6 +711,8 @@ organizations:
 projects:
     description: Manage projects
     operations:
+    - name: copy
+      subcommandId: projects_copy
     - name: create
       operationId: projects_create
     - name: delete
@@ -722,22 +724,20 @@ projects:
         pageStart: page
         pageSize: page_size
         nextProperty: next
-    - name: set
-      operationId: projects_update
-    - name: show
-      operationId: projects_retrieve
-    - name: update
-      operationId: projects_partial_update
-    - name: copy
-      subcommandId: projects_copy
     - name: parameter-export
       subcommandId: projects_parameter_export
     - name: parameters
       subcommandId: projects_parameters
+    - name: set
+      operationId: projects_update
+    - name: show
+      operationId: projects_retrieve
     - name: template-preview
       subcommandId: projects_template_preview
     - name: templates
       subcommandId: projects_templates
+    - name: update
+      operationId: projects_partial_update
 
 projects_copy:
     description: Manage projects copy
@@ -754,10 +754,14 @@ projects_parameter_export:
 projects_parameters:
     description: Manage projects parameters
     operations:
+    - name: copy
+      subcommandId: projects_parameters_copy
     - name: create
       operationId: projects_parameters_create
     - name: delete
       operationId: projects_parameters_destroy
+    - name: duality
+      subcommandId: projects_parameters_duality
     - name: list
       operationId: projects_parameters_list
       pagination:
@@ -773,18 +777,14 @@ projects_parameters:
       operationId: projects_parameters_update
     - name: show
       operationId: projects_parameters_retrieve
+    - name: timeline
+      subcommandId: projects_parameters_timeline
+    - name: timelines
+      subcommandId: projects_parameters_timelines
     - name: update
       operationId: projects_parameters_partial_update
     - name: values
       subcommandId: projects_parameters_values
-    - name: copy
-      subcommandId: projects_parameters_copy
-    - name: timeline
-      subcommandId: projects_parameters_timeline
-    - name: duality
-      subcommandId: projects_parameters_duality
-    - name: timelines
-      subcommandId: projects_parameters_timelines
 
 projects_parameters_copy:
     description: Manage projects parameters copy
@@ -896,12 +896,12 @@ projects_templates:
       operationId: projects_templates_update
     - name: show
       operationId: projects_templates_retrieve
-    - name: update
-      operationId: projects_templates_partial_update
     - name: timeline
       subcommandId: projects_templates_timeline
     - name: timelines
       subcommandId: projects_templates_timelines
+    - name: update
+      operationId: projects_templates_partial_update
 
 projects_templates_timeline:
     description: Manage projects templates timeline
@@ -987,6 +987,8 @@ types_rules:
 users:
     description: Manage users
     operations:
+    - name: current
+      subcommandId: users_current
     - name: delete
       operationId: users_destroy
     - name: list
@@ -998,8 +1000,6 @@ users:
         nextProperty: next
     - name: show
       operationId: users_retrieve
-    - name: current
-      subcommandId: users_current
 
 users_current:
     description: Manage users current
