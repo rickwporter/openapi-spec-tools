@@ -285,10 +285,19 @@ def layout_node_text(node: LayoutNode) -> str:
     text += f"{indent}{LayoutField.DESCRIPTION.value}: {node.description}\n"
     text += f"{indent}{LayoutField.OPERATIONS.value}:\n"
 
-    for child in node.children:
+    for child in sorted(node.children, key=lambda x: x.command):
         text += f"{indent}- {LayoutField.NAME.value}: {child.command}\n"
         flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
-        text += f"{indent}  {flavor}: {child.identifier}\n"
+        data_map = {
+            flavor: child.identifier,
+            LayoutField.BUG_IDS.value: ", ".join(child.bugs),
+            LayoutField.ALLOWED_FIELDS.value: ", ".join(child.allowed_fields),
+            LayoutField.HIDDEN_FIELDS.value: ", ".join(child.hidden_fields),
+            LayoutField.SUMMARY_FIELDS.value: ", ".join(child.summary_fields),
+        }
+        for k, v in data_map.items():
+            if v:
+                text += f"{indent}  {k}: {v}\n"
         if child.pagination:
             text += f"{indent}  pagination:\n"
             text += pagination_text(child.pagination, indent * 2)

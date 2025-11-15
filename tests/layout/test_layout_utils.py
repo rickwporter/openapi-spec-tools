@@ -591,6 +591,14 @@ def test_layout_node_text():
         identifier="this_is_it",
         description="summary",
         children=[
+            LayoutNode(
+                command="child3",
+                identifier="more_ops",
+                bugs=["mosquito", "spider"],
+                hidden_fields=["peekaboo"],
+                summary_fields=["brief", "short"],
+                allowed_fields=["a", "b", "c"],
+            ),
             LayoutNode(command="child1", identifier="my_child", pagination=PaginationNames(page_size="page")),
             LayoutNode(command="child2", identifier="another_op")
         ]
@@ -606,6 +614,12 @@ this_is_it:
         pageSize: page
     - name: child2
       operationId: another_op
+    - name: child3
+      operationId: more_ops
+      bugIds: mosquito, spider
+      allowedFields: a, b, c
+      hiddenFields: peekaboo
+      summaryFields: brief, short
 
 """
 

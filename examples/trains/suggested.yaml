@@ -15,12 +15,12 @@ bookings:
       operationId: create-booking
     - name: delete
       operationId: delete-booking
+    - name: payment
+      subcommandId: bookings_payment
     - name: show
       operationId: get-bookings
     - name: show
       operationId: get-booking
-    - name: payment
-      subcommandId: bookings_payment
 
 bookings_payment:
     description: Manage bookings payment
