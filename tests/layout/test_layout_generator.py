@@ -23,22 +23,6 @@ NEXT_HEAD = "next_headers"
 
 
 @pytest.mark.parametrize(
-    ["path", "prefix", "expected"],
-    [
-        pytest.param("", "", [], id="empty"),
-        pytest.param("/foo", "/foo", [], id="only-prefix"),
-        pytest.param("/foo", "/foo/foo", ["foo"], id="single-prefix"),
-        pytest.param("/foo/{bar}", "/foo", [], id="prefix-id"),
-        pytest.param("/sna/foo/{bar}", "/foo", ["sna", "foo"], id="late-prefix"),
-        pytest.param("/sna/foo/{bar}/all", "/sna", ["foo", "all"], id="all"),
-    ],
-)
-def test_path_to_parts(path, prefix, expected):
-    uut = LayoutGenerator({})
-    assert expected == uut.path_to_parts(path, prefix)
-
-
-@pytest.mark.parametrize(
     ["parts", "expected"],
     [
         pytest.param([], [], id="empty"),

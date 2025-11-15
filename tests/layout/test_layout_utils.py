@@ -14,6 +14,7 @@ from openapi_spec_tools.layout.utils import pagination_text
 from openapi_spec_tools.layout.utils import parse_extras
 from openapi_spec_tools.layout.utils import parse_pagination
 from openapi_spec_tools.layout.utils import parse_to_tree
+from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.layout.utils import subcommand_missing_properties
 from openapi_spec_tools.layout.utils import subcommand_order
 from openapi_spec_tools.layout.utils import subcommand_references
@@ -185,6 +186,21 @@ def test_field_list(data, field, expected) -> None:
 )
 def test_parse_extras(data, expected) -> None:
     assert expected == parse_extras(data)
+
+
+@pytest.mark.parametrize(
+    ["path", "prefix", "expected"],
+    [
+        pytest.param("", "", [], id="empty"),
+        pytest.param("/foo", "/foo", [], id="only-prefix"),
+        pytest.param("/foo", "/foo/foo", ["foo"], id="single-prefix"),
+        pytest.param("/foo/{bar}", "/foo", [], id="prefix-id"),
+        pytest.param("/sna/foo/{bar}", "/foo", ["sna", "foo"], id="late-prefix"),
+        pytest.param("/sna/foo/{bar}/all", "/sna", ["foo", "all"], id="all"),
+    ],
+)
+def test_path_to_parts(path, prefix, expected):
+    assert expected == path_to_parts(path, prefix)
 
 
 @pytest.mark.parametrize(

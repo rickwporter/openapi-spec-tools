@@ -50,6 +50,17 @@ def parse_extras(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def path_to_parts(path_name: str, prefix: str) -> list[str]:
+    """Break the path string into parts, and removes the parameterized values."""
+    shortened = path_name if not path_name.startswith(prefix) else path_name.replace(prefix, "", 1)
+    parts = [
+        item.strip()
+        for item in shortened.split('/')
+        if item.strip() and '{' not in item  # ignore parameters
+    ]
+    return parts
+
+
 def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames]:
     """Parse the data into pagination parameters."""
     if not data:
