@@ -3,6 +3,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 from typing import Optional
+from typing import Union
 
 import yaml
 
@@ -278,15 +279,15 @@ def pagination_text(pagination: PaginationNames, indent: str) -> str:
     return text
 
 
-def layout_node_text(node: LayoutNode) -> str:
+def layout_node_text(node: LayoutNode, indent: Union[int, str] = 4) -> str:
     """Create text for node, and all children."""
-    indent = "    "
+    _indent = " " * indent if isinstance(indent, int) else indent
     text = f"{node.identifier}:\n"
-    text += f"{indent}{LayoutField.DESCRIPTION.value}: {node.description}\n"
-    text += f"{indent}{LayoutField.OPERATIONS.value}:\n"
+    text += f"{_indent}{LayoutField.DESCRIPTION.value}: {node.description}\n"
+    text += f"{_indent}{LayoutField.OPERATIONS.value}:\n"
 
     for child in sorted(node.children, key=lambda x: x.command):
-        text += f"{indent}- {LayoutField.NAME.value}: {child.command}\n"
+        text += f"{_indent}- {LayoutField.NAME.value}: {child.command}\n"
         flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
         data_map = {
             flavor: child.identifier,
@@ -297,22 +298,22 @@ def layout_node_text(node: LayoutNode) -> str:
         }
         for k, v in data_map.items():
             if v:
-                text += f"{indent}  {k}: {v}\n"
+                text += f"{_indent}  {k}: {v}\n"
         if child.pagination:
-            text += f"{indent}  pagination:\n"
-            text += pagination_text(child.pagination, indent * 2)
+            text += f"{_indent}  pagination:\n"
+            text += pagination_text(child.pagination, _indent * 2)
     text += "\n"
 
     # recursively generate sections for sub-commands
     sorted_subcommands = sorted(node.subcommands(), key=lambda x: x.identifier)
     for child in sorted_subcommands:
-        text += layout_node_text(child)
+        text += layout_node_text(child, indent)
 
     return text
 
 
-def write_layout(filename: str, node: LayoutNode):
+def write_layout(filename: str, node: LayoutNode, indent: int = 4):
     """Write the text from the node to the specified file."""
     with open(filename, "w", encoding="utf-8", newline="\n") as fp:
-        fp.write(layout_node_text(node))
+        fp.write(layout_node_text(node, indent))
 

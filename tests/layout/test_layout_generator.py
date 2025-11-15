@@ -228,6 +228,28 @@ pets:
 '''
     assert expected in text
 
+    write_layout(file.as_posix(), node, 2)
+
+    text = file.read_text(encoding="utf-8", errors="ignore")
+    expected = '''\
+main:
+  description: CLI to manage your application
+  operations:
+  - name: pets
+    subcommandId: pets
+
+pets:
+  description: Manage pets
+  operations:
+  - name: create
+    operationId: createPets
+  - name: list
+    operationId: listPets
+  - name: show
+    operationId: showPetById
+'''
+    assert expected in text
+
 
 @pytest.mark.parametrize(
     ["gen_args", "expected"],

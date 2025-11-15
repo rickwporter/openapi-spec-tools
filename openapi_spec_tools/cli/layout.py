@@ -9,6 +9,7 @@ from rich import print
 from rich import print_json
 from rich.table import Table
 
+from openapi_spec_tools.cli.arguments import IndentOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
@@ -193,6 +194,7 @@ def layout_suggest(
     openapi_file: OpenApiFilenameArgument,
     output_file: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="File name for output")],
     prefix: PathPrefixOption = "",
+    indent: IndentOption = 4,
     log_level: LogLevelOption = "info",
 ) -> None:
     """Create a suggested layout based on the OpenAPI spec paths and operations.
@@ -210,7 +212,7 @@ def layout_suggest(
     generator = LayoutGenerator(oas)
     node = generator.generate(prefix)
 
-    write_layout_tree(output_file, node, logger)
+    write_layout_tree(output_file, node, logger, indent)
     print(f"Wrote {output_file}")
     return
 

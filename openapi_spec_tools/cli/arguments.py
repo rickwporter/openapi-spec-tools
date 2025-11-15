@@ -31,6 +31,15 @@ CopyrightFileOption = Annotated[
         help="File name containing copyright message (for non-default)",
     ),
 ]
+IndentOption = Annotated[
+    int,
+    typer.Option(
+        "--indent",
+        min=1,
+        max=8,
+        help="Number of spaces to indent YAML levels",
+    )
+]
 LayoutFilenameArgument = Annotated[
     str,
     typer.Argument(metavar=FILENAME, show_default=False, help="Layout file YAML definition"),
