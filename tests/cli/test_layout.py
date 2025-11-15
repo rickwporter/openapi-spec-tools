@@ -309,11 +309,11 @@ def test_layout_operations(filename, start, expected) -> None:
 def test_layout_suggest():
     directory = TemporaryDirectory()
     layout_file = Path(directory.name) / "layout.yaml"
-    layout_suggest(asset_filename("pet.yaml"), layout_file.as_posix(), prefix="/pets")
+    layout_suggest(asset_filename("pet.yaml"), layout_file.as_posix(), prefix="/pets", indent=1)
 
     text = layout_file.read_text(encoding="utf-8", errors="ignore")
     assert 'main:' in text
-    assert 'description: CLI to manage your application' in text
+    assert '\n description: CLI to manage your application' in text
     assert 'name: create' in text
     assert 'operationId: createPets' in text
     assert 'name: list' in text

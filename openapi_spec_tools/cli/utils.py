@@ -115,10 +115,10 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
     raise typer.Exit(1)
 
 
-def write_layout_tree(filename: str, node: LayoutNode, logger: logging.Logger) -> None:
+def write_layout_tree(filename: str, node: LayoutNode, logger: logging.Logger, indent: int = 4) -> None:
     """Write the layout node tree to the specified file."""
     start = datetime.now()
-    write_layout(filename, node)
+    write_layout(filename, node, indent)
     delta = datetime.now() - start
     logger.info(f"Writing {filename} took {delta.total_seconds()} seconds")
 
