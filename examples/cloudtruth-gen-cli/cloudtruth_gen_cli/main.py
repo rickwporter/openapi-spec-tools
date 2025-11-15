@@ -136,5 +136,152 @@ def utils_generate_password_create(
     return
 
 
+class Format(str, Enum):  # noqa: F811
+    JSON = "json"
+    YAML = "yaml"
+
+
+class Lang(str, Enum):  # noqa: F811
+    AF = "af"
+    AR = "ar"
+    AR_DZ = "ar-dz"
+    AST = "ast"
+    AZ = "az"
+    BE = "be"
+    BG = "bg"
+    BN = "bn"
+    BR = "br"
+    BS = "bs"
+    CA = "ca"
+    CS = "cs"
+    CY = "cy"
+    DA = "da"
+    DE = "de"
+    DSB = "dsb"
+    EL = "el"
+    EN = "en"
+    EN_AU = "en-au"
+    EN_GB = "en-gb"
+    EO = "eo"
+    ES = "es"
+    ES_AR = "es-ar"
+    ES_CO = "es-co"
+    ES_MX = "es-mx"
+    ES_NI = "es-ni"
+    ES_VE = "es-ve"
+    ET = "et"
+    EU = "eu"
+    FA = "fa"
+    FI = "fi"
+    FR = "fr"
+    FY = "fy"
+    GA = "ga"
+    GD = "gd"
+    GL = "gl"
+    HE = "he"
+    HI = "hi"
+    HR = "hr"
+    HSB = "hsb"
+    HU = "hu"
+    HY = "hy"
+    IA = "ia"
+    ID = "id"
+    IG = "ig"
+    IO = "io"
+    IS = "is"
+    IT = "it"
+    JA = "ja"
+    KA = "ka"
+    KAB = "kab"
+    KK = "kk"
+    KM = "km"
+    KN = "kn"
+    KO = "ko"
+    KY = "ky"
+    LB = "lb"
+    LT = "lt"
+    LV = "lv"
+    MK = "mk"
+    ML = "ml"
+    MN = "mn"
+    MR = "mr"
+    MS = "ms"
+    MY = "my"
+    NB = "nb"
+    NE = "ne"
+    NL = "nl"
+    NN = "nn"
+    OS = "os"
+    PA = "pa"
+    PL = "pl"
+    PT = "pt"
+    PT_BR = "pt-br"
+    RO = "ro"
+    RU = "ru"
+    SK = "sk"
+    SL = "sl"
+    SQ = "sq"
+    SR = "sr"
+    SR_LATN = "sr-latn"
+    SV = "sv"
+    SW = "sw"
+    TA = "ta"
+    TE = "te"
+    TG = "tg"
+    TH = "th"
+    TK = "tk"
+    TR = "tr"
+    TT = "tt"
+    UDM = "udm"
+    UK = "uk"
+    UR = "ur"
+    UZ = "uz"
+    VI = "vi"
+    ZH_HANS = "zh-hans"
+    ZH_HANT = "zh-hant"
+
+
+@app.command("schema", short_help="OpenApi3 schema for this API")
+def api_schema_retrieve(
+    format_: Annotated[Optional[Format], typer.Option("--format", show_default=False, case_sensitive=False)] = None,
+    lang: Annotated[Optional[Lang], typer.Option(show_default=False, case_sensitive=False)] = None,
+    _api_host: _a.ApiHostOption = "",
+    _api_key: _a.ApiKeyOption = None,
+    _api_timeout: _a.ApiTimeoutOption = 5,
+    _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
+    _out_fmt: _a.OutputFormatOption = _a.OutputFormat.TABLE,
+    _out_style: _a.OutputStyleOption = _a.OutputStyle.ALL,
+) -> None:
+    '''
+    OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+    - YAML: application/vnd.oai.openapi
+    - JSON: application/vnd.oai.openapi+json
+    '''
+    # handler for api_schema_retrieve: GET /api/schema/
+    _l.init_logging(_log_level)
+    headers = _r.request_headers(_api_key)
+    url = _r.create_url(_api_host, "api/schema/")
+    missing = []
+    if _api_key is None:
+        missing.append("--api-key")
+    if missing:
+        _e.handle_exceptions(_e.MissingRequiredError(missing))
+
+    params = {}
+    if format_ is not None:
+        params["format"] = format_
+    if lang is not None:
+        params["lang"] = lang
+
+    try:
+        data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
+        _d.display(data, _out_fmt, _out_style)
+    except Exception as ex:
+        _e.handle_exceptions(ex)
+
+    return
+
+
 if __name__ == "__main__":
     app()
