@@ -7,6 +7,16 @@ info:
 servers:
   - url: http://petstore.swagger.io/v1
 paths:
+  /schema:
+    get:
+      summary: Get the pets schema
+      operationId: getSchema
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
   /pets:
     get:
       summary: List all pets
