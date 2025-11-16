@@ -8,6 +8,7 @@ from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import DEFAULT_START
+from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 
@@ -76,17 +77,6 @@ class LayoutGenerator:
         self.items_properties = _to_list(items_properties)
         self.next_properties = _to_list(next_properties)
         self.next_headers = _to_list(next_headers)
-
-    @staticmethod
-    def path_to_parts(path_name: str, prefix: str) -> list[str]:
-        """Break the path string into parts, and removes the parameterized values."""
-        shortened = path_name if not path_name.startswith(prefix) else path_name.replace(prefix, "", 1)
-        parts = [
-            item.strip()
-            for item in shortened.split('/')
-            if item.strip() and '{' not in item  # ignore parameters
-        ]
-        return parts
 
     @staticmethod
     def parts_to_commands(path_parts: list[str]) -> list[str]:
@@ -260,7 +250,7 @@ class LayoutGenerator:
         main = LayoutNode(DEFAULT_START, DEFAULT_START, help)
 
         for path_name, path_data in self.paths.items():
-            path_parts = self.path_to_parts(path_name, prefix)
+            path_parts = path_to_parts(path_name, prefix)
             commands = self.parts_to_commands(path_parts)
 
             for method, op_data in path_data.items():
