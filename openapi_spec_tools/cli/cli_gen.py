@@ -4,6 +4,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from typing import Annotated
+from typing import Any
 from typing import Optional
 
 import typer
@@ -12,6 +13,7 @@ import yaml
 from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
 from openapi_spec_tools.cli.arguments import CopyrightFileOption
+from openapi_spec_tools.cli.arguments import IndentOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli.arguments import LayoutFilenameOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
@@ -24,6 +26,7 @@ from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.utils import write_layout_tree
 from openapi_spec_tools.cli_gen._tree import TreeDisplay
 from openapi_spec_tools.cli_gen._tree import create_tree_table
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
@@ -37,7 +40,9 @@ from openapi_spec_tools.cli_gen.files import generate_tree_node
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
+from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
@@ -210,6 +215,77 @@ def generate_unreferenced(
             typer.echo(f"  - {op.get(OasField.OP_ID)}")
 
     typer.echo(f"\nFound {len(unreferenced)} operations in {len(paths)} paths")
+
+
+def find_parent(
+    node: LayoutNode,
+    operations: dict[str, Any],
+    path_parts: list[str],
+    prefix: str,
+) -> Optional[LayoutNode]:
+    """Find the parent node (if any) where an operation matches the path parts.
+
+    The LayoutNode's only know the operationId (not the path), so the operations are needed to
+    retrieve the path parts.
+    """
+    for node_op in node.operations():
+        operation = operations.get(node_op.identifier) or {}
+        node_parts = path_to_parts(operation.get(OasField.X_PATH, ""), prefix)
+        if path_parts == node_parts:
+            return node
+
+    for child in node.subcommands():
+        node_op = find_parent(child, operations, path_parts, prefix)
+        if node_op:
+            return node_op
+
+    return None
+
+
+@app.command("update", help="Updates the layout file with the missing operations.")
+def update_layout(
+    layout_file: LayoutFilenameArgument,
+    openapi_file: OpenApiFilenameArgument,
+    new_file: Annotated[
+        Optional[str],
+        typer.Option(metavar="FILENAME", help="New filename (if different than original)")
+    ] = None,
+    start: StartPointOption = DEFAULT_START,
+    prefix: PathPrefixOption = "",
+    indent: IndentOption = 4,
+    log_level: LogLevelOption = "info",
+) -> None:
+    logger = init_logging(log_level, LOG_CLASS)
+    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
+    oas = open_oas_with_error_handling(openapi_file, logger)
+
+    unreferenced = find_unreferenced(commands, oas)
+    if not unreferenced:
+        typer.echo("No unreferenced operations found")
+        return
+
+    generator = LayoutGenerator(oas)
+    operations = map_operations(oas.get(OasField.PATHS))
+
+    # walk the list of unreference operations, and try to fit them in
+    for op_id, unref in unreferenced.items():
+        parts = path_to_parts(unref.get(OasField.X_PATH), prefix)
+        command = generator.suggest_command(unref)
+        pagination = generator.get_pagination(unref)
+        op_node = LayoutNode(command=command, identifier=op_id, pagination=pagination)
+
+        # attempt to find parent based on path
+        parent = find_parent(commands, operations, parts, prefix)
+        if parent:
+            logger.debug(f"Found parent for {op_id}")
+        else:
+            logger.debug(f"Created node path for {op_id}")
+            parent = generator.get_or_create_node_with_parents(commands, parts)
+
+        parent.children.append(op_node)
+
+    write_layout_tree(new_file or layout_file, commands, logger, indent)
+    typer.echo(f"\nAdded {len(unreferenced)} operations")
 
 
 @app.command("tree", help="Displays the CLI tree")

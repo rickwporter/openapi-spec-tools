@@ -12,6 +12,7 @@ from openapi_spec_tools.cli.cli_gen import generate_cli
 from openapi_spec_tools.cli.cli_gen import generate_unreferenced
 from openapi_spec_tools.cli.cli_gen import show_cli_tree
 from openapi_spec_tools.cli.cli_gen import trim_oas
+from openapi_spec_tools.cli.cli_gen import update_layout
 from tests.cli.cli_gen_output import P_V_ALL
 from tests.cli.cli_gen_output import P_V_MID
 from tests.cli.cli_gen_output import P_V_PETS
@@ -427,3 +428,49 @@ def test_trim_oas():
     expected = Path(asset_filename("ct_trimmed.yaml")).read_text()
     actual = updated.read_text()
     assert expected == actual
+
+
+def test_update_layout_none():
+    directory = TemporaryDirectory()
+    updated_file = Path(directory.name) / "layout.yaml"
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+    ):
+        update_layout(
+            asset_filename("layout_pets.yaml"),
+            asset_filename("pet.yaml"),
+            updated_file.as_posix(),
+            prefix="/pets",
+            indent=1,
+        )
+        assert "No unreferenced operations found" in mock_stdout.getvalue()
+        assert not updated_file.exists()
+
+
+def test_update_layout_updates():
+    directory = TemporaryDirectory()
+    updated_file = Path(directory.name) / "layout.yaml"
+    orig_filename = asset_filename("layout_pets3.yaml")
+    original_text = read_text(orig_filename)
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+    ):
+        update_layout(
+            orig_filename,
+            asset_filename("pet3.yaml"),
+            updated_file.as_posix(),
+            prefix="/pets",
+            indent=1,
+        )
+
+    assert "Added 3 operations" in mock_stdout.getvalue()
+    assert updated_file.exists()
+    updated_text = updated_file.read_text()
+
+    # check that the getSchema operation was added
+    assert "operationId: getSchema" not in original_text
+    assert "operationId: getSchema" in updated_text
+
+    # check that another already exists
+    assert "operationId: showPetById" in original_text
+    assert "operationId: showPetById" in updated_text
