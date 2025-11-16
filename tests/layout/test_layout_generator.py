@@ -197,18 +197,17 @@ def test_generate_node_file():
 main:
     description: CLI to manage your application
     operations:
-    - name: pets
-      subcommandId: pets
-
+    -   name: pets
+        subcommandId: pets
 pets:
     description: Manage pets
     operations:
-    - name: create
-      operationId: createPets
-    - name: list
-      operationId: listPets
-    - name: show
-      operationId: showPetById
+    -   name: create
+        operationId: createPets
+    -   name: list
+        operationId: listPets
+    -   name: show
+        operationId: showPetById
 '''
     assert expected in text
 
@@ -221,7 +220,6 @@ main:
   operations:
   - name: pets
     subcommandId: pets
-
 pets:
   description: Manage pets
   operations:

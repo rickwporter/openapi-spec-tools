@@ -35,7 +35,7 @@ IndentOption = Annotated[
     int,
     typer.Option(
         "--indent",
-        min=1,
+        min=2,
         max=8,
         help="Number of spaces to indent YAML levels",
     )

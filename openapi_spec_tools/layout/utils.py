@@ -3,7 +3,6 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 from typing import Optional
-from typing import Union
 
 import yaml
 
@@ -272,59 +271,64 @@ def file_to_tree(filename: str, start: str = DEFAULT_START) -> LayoutNode:
     return parse_to_tree(data, start)
 
 
-def pagination_text(pagination: PaginationNames, indent: str) -> str:
-    """Create text for the provided pagination parameters and indent."""
-    text = ""
+def pagination_to_dict(pagination: PaginationNames) -> dict[str, Any]:
+    """Convert the PaginationNames to a dictionary for output."""
+    result = {}
     if pagination.items_property:
-        text += f"{indent}{PaginationField.ITEM_PROP.value}: {pagination.items_property}\n"
+        result[PaginationField.ITEM_PROP.value] = pagination.items_property
     if pagination.item_start:
-        text += f"{indent}{PaginationField.ITEM_START.value}: {pagination.item_start}\n"
+        result[PaginationField.ITEM_START.value] = pagination.item_start
     if pagination.page_start:
-        text += f"{indent}{PaginationField.PAGE_START.value}: {pagination.page_start}\n"
+        result[PaginationField.PAGE_START.value] = pagination.page_start
     if pagination.page_size:
-        text += f"{indent}{PaginationField.PAGE_SIZE.value}: {pagination.page_size}\n"
+        result[PaginationField.PAGE_SIZE.value] = pagination.page_size
     if pagination.next_header:
-        text += f"{indent}{PaginationField.NEXT_HEADER.value}: {pagination.next_header}\n"
+        result[PaginationField.NEXT_HEADER.value] = pagination.next_header
     if pagination.next_property:
-        text += f"{indent}{PaginationField.NEXT_PROP.value}: {pagination.next_property}\n"
-    return text
+        result[PaginationField.NEXT_PROP.value] = pagination.next_property
+
+    return result
 
 
-def layout_node_text(node: LayoutNode, indent: Union[int, str] = 4) -> str:
-    """Create text for node, and all children."""
-    _indent = " " * indent if isinstance(indent, int) else indent
-    text = f"{node.identifier}:\n"
-    text += f"{_indent}{LayoutField.DESCRIPTION.value}: {node.description}\n"
-    text += f"{_indent}{LayoutField.OPERATIONS.value}:\n"
-
+def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
+    """Convert LayoutNode to a dictionary for output."""
+    operations = []
     for child in sorted(node.children, key=lambda x: x.command):
-        text += f"{_indent}- {LayoutField.NAME.value}: {child.command}\n"
         flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
-        data_map = {
+        op_data = {
+            LayoutField.NAME.value: child.command,
             flavor: child.identifier,
-            LayoutField.BUG_IDS.value: ", ".join(child.bugs),
-            LayoutField.ALLOWED_FIELDS.value: ", ".join(child.allowed_fields),
-            LayoutField.HIDDEN_FIELDS.value: ", ".join(child.hidden_fields),
-            LayoutField.SUMMARY_FIELDS.value: ", ".join(child.summary_fields),
         }
-        for k, v in data_map.items():
-            if v:
-                text += f"{_indent}  {k}: {v}\n"
+        if child.bugs:
+            op_data[LayoutField.BUG_IDS.value] = child.bugs
+        if child.allowed_fields:
+            op_data[LayoutField.ALLOWED_FIELDS.value] = child.allowed_fields
+        if child.hidden_fields:
+            op_data[LayoutField.HIDDEN_FIELDS.value] = child.hidden_fields
+        if child.summary_fields:
+            op_data[LayoutField.SUMMARY_FIELDS.value] = child.summary_fields
         if child.pagination:
-            text += f"{_indent}  pagination:\n"
-            text += pagination_text(child.pagination, _indent * 2)
-    text += "\n"
+            op_data[LayoutField.PAGINATION.value] = pagination_to_dict(child.pagination)
+        operations.append(op_data)
+
+    result = {
+        node.identifier: {
+            LayoutField.DESCRIPTION.value: node.description,
+            LayoutField.OPERATIONS.value: operations,
+        },
+    }
 
     # recursively generate sections for sub-commands
     sorted_subcommands = sorted(node.subcommands(), key=lambda x: x.identifier)
     for child in sorted_subcommands:
-        text += layout_node_text(child, indent)
+        result.update(layout_node_to_dict(child))
 
-    return text
+    return result
 
 
 def write_layout(filename: str, node: LayoutNode, indent: int = 4):
     """Write the text from the node to the specified file."""
     with open(filename, "w", encoding="utf-8", newline="\n") as fp:
-        fp.write(layout_node_text(node, indent))
+        node_dict = layout_node_to_dict(node)
+        yaml.dump(node_dict, fp, line_break="\n", indent=indent, sort_keys=False)
 
