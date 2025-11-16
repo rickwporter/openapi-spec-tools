@@ -35,28 +35,27 @@ main:
     subcommandId: types
   - name: user
     subcommandId: users
-
 audit:
   description: View CloudTruth audit data
   operations:
   - name: list
     operationId: audit_list
     pagination:
-    itemProperty: result
-    pageStart: page
-    pageSize: page_size
-    nextProperty: next
+      itemProperty: result
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
   - name: show
     operationId: audit_retrieve
   - name: summary
     operationId: audit_summary_retrieve
-
 environments:
   description: Manage CloudTruth environments
   operations:
   - name: copy
     operationId: environments_copy_create
-    bugIds: complex-value
+    bugIds:
+    - complex-value
   - name: create
     operationId: environments_create
   - name: delete
@@ -64,17 +63,17 @@ environments:
   - name: list
     operationId: environments_list
     pagination:
-    itemProperty: result
-    pageStart: page
-    pageSize: page_size
-    nextProperty: next
+      itemProperty: result
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
   - name: pushes
     operationId: environments_pushes_list
     pagination:
-    itemProperty: result
-    pageStart: page
-    pageSize: page_size
-    nextProperty: next
+      itemProperty: result
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
   - name: set
     operationId: environments_update
   - name: show
@@ -83,7 +82,6 @@ environments:
     subcommandId: environments_tags
   - name: update
     operationId: environments_partial_update
-
 environments_tags:
   description: Manage environment tags
   operations:
@@ -94,23 +92,21 @@ environments_tags:
   - name: list
     operationId: environments_tags_list
     pagination:
-    itemProperty: result
-    pageStart: page
-    pageSize: page_size
-    nextProperty: next
+      itemProperty: result
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
   - name: set
     operationId: environments_tags_update
   - name: show
     operationId: environments_tags_retrieve
   - name: update
     operationId: environments_tags_partial_update
-
 features:
   description: Manage features
   operations:
   - name: show
     operationId: features_retrieve
-
 grants:
   description: Manage CloudTruth grants
   operations:
@@ -122,19 +118,19 @@ grants:
     operationId: grants_multi_destroy
   - name: list
     operationId: grants_list
-    hiddenFields: something-not-found
+    hiddenFields:
+    - something-not-found
     pagination:
-    itemProperty: result
-    pageStart: page
-    pageSize: page_size
-    nextProperty: next
+      itemProperty: result
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
   - name: set
     operationId: grants_update
   - name: show
     operationId: grants_retrieve
   - name: update
     operationId: grants_partial_update
-
 groups:
   description: Manage groups
   operations:
@@ -154,25 +150,21 @@ groups:
     operationId: groups_retrieve
   - name: update
     operationId: groups_partial_update
-
 groups_add:
   description: Manage groups add
   operations:
   - name: create
     operationId: groups_add_create
-
 groups_remove:
   description: Manage groups remove
   operations:
   - name: create
     operationId: groups_remove_create
-
 import:
   description: Manage import
   operations:
   - name: create
     operationId: import_create
-
 integrations:
   description: Manage integrations
   operations:
@@ -184,7 +176,6 @@ integrations:
     subcommandId: integrations_explore
   - name: github
     subcommandId: integrations_github
-
 integrations_aws:
   description: Manage integrations aws
   operations:
@@ -206,7 +197,6 @@ integrations_aws:
     operationId: integrations_aws_retrieve
   - name: update
     operationId: integrations_aws_partial_update
-
 integrations_aws_pulls:
   description: Manage integrations aws pulls
   operations:
@@ -226,13 +216,11 @@ integrations_aws_pulls:
     subcommandId: integrations_aws_pulls_tasks
   - name: update
     operationId: integrations_aws_pulls_partial_update
-
 integrations_aws_pulls_sync:
   description: Manage integrations aws pulls sync
   operations:
   - name: create
     operationId: integrations_aws_pulls_sync_create
-
 integrations_aws_pulls_tasks:
   description: Manage integrations aws pulls tasks
   operations:
@@ -242,7 +230,6 @@ integrations_aws_pulls_tasks:
     operationId: integrations_aws_pulls_tasks_retrieve
   - name: steps
     subcommandId: integrations_aws_pulls_tasks_steps
-
 integrations_aws_pulls_tasks_steps:
   description: Manage integrations aws pulls tasks steps
   operations:
@@ -250,7 +237,6 @@ integrations_aws_pulls_tasks_steps:
     operationId: integrations_aws_pulls_tasks_steps_list
   - name: show
     operationId: integrations_aws_pulls_tasks_steps_retrieve
-
 integrations_aws_pushes:
   description: Manage integrations aws pushes
   operations:
@@ -270,13 +256,11 @@ integrations_aws_pushes:
     subcommandId: integrations_aws_pushes_tasks
   - name: update
     operationId: integrations_aws_pushes_partial_update
-
 integrations_aws_pushes_sync:
   description: Manage integrations aws pushes sync
   operations:
   - name: create
     operationId: integrations_aws_pushes_sync_create
-
 integrations_aws_pushes_tasks:
   description: Manage integrations aws pushes tasks
   operations:
@@ -286,7 +270,6 @@ integrations_aws_pushes_tasks:
     operationId: integrations_aws_pushes_tasks_retrieve
   - name: steps
     subcommandId: integrations_aws_pushes_tasks_steps
-
 integrations_aws_pushes_tasks_steps:
   description: Manage integrations aws pushes tasks steps
   operations:
@@ -294,19 +277,16 @@ integrations_aws_pushes_tasks_steps:
     operationId: integrations_aws_pushes_tasks_steps_list
   - name: show
     operationId: integrations_aws_pushes_tasks_steps_retrieve
-
 integrations_aws_scan:
   description: Manage integrations aws scan
   operations:
   - name: create
     operationId: integrations_aws_scan_create
-
 integrations_azure:
   description: Manage integrations azure
   operations:
   - name: key_vault
     subcommandId: integrations_azure_key_vault
-
 integrations_azure_key_vault:
   description: Manage integrations azure key_vault
   operations:
@@ -328,7 +308,6 @@ integrations_azure_key_vault:
     operationId: integrations_azure_key_vault_retrieve
   - name: update
     operationId: integrations_azure_key_vault_partial_update
-
 integrations_azure_key_vault_pulls:
   description: Manage integrations azure key_vault pulls
   operations:
@@ -348,13 +327,11 @@ integrations_azure_key_vault_pulls:
     subcommandId: integrations_azure_key_vault_pulls_tasks
   - name: update
     operationId: integrations_azure_key_vault_pulls_partial_update
-
 integrations_azure_key_vault_pulls_sync:
   description: Manage integrations azure key_vault pulls sync
   operations:
   - name: create
     operationId: integrations_azure_key_vault_pulls_sync_create
-
 integrations_azure_key_vault_pulls_tasks:
   description: Manage integrations azure key_vault pulls tasks
   operations:
@@ -364,7 +341,6 @@ integrations_azure_key_vault_pulls_tasks:
     operationId: integrations_azure_key_vault_pulls_tasks_retrieve
   - name: steps
     subcommandId: integrations_azure_key_vault_pulls_tasks_steps
-
 integrations_azure_key_vault_pulls_tasks_steps:
   description: Manage integrations azure key_vault pulls tasks steps
   operations:
@@ -372,7 +348,6 @@ integrations_azure_key_vault_pulls_tasks_steps:
     operationId: integrations_azure_key_vault_pulls_tasks_steps_list
   - name: show
     operationId: integrations_azure_key_vault_pulls_tasks_steps_retrieve
-
 integrations_azure_key_vault_pushes:
   description: Manage integrations azure key_vault pushes
   operations:
@@ -392,13 +367,11 @@ integrations_azure_key_vault_pushes:
     subcommandId: integrations_azure_key_vault_pushes_tasks
   - name: update
     operationId: integrations_azure_key_vault_pushes_partial_update
-
 integrations_azure_key_vault_pushes_sync:
   description: Manage integrations azure key_vault pushes sync
   operations:
   - name: create
     operationId: integrations_azure_key_vault_pushes_sync_create
-
 integrations_azure_key_vault_pushes_tasks:
   description: Manage integrations azure key_vault pushes tasks
   operations:
@@ -408,7 +381,6 @@ integrations_azure_key_vault_pushes_tasks:
     operationId: integrations_azure_key_vault_pushes_tasks_retrieve
   - name: steps
     subcommandId: integrations_azure_key_vault_pushes_tasks_steps
-
 integrations_azure_key_vault_pushes_tasks_steps:
   description: Manage integrations azure key_vault pushes tasks steps
   operations:
@@ -416,19 +388,16 @@ integrations_azure_key_vault_pushes_tasks_steps:
     operationId: integrations_azure_key_vault_pushes_tasks_steps_list
   - name: show
     operationId: integrations_azure_key_vault_pushes_tasks_steps_retrieve
-
 integrations_azure_key_vault_scan:
   description: Manage integrations azure key_vault scan
   operations:
   - name: create
     operationId: integrations_azure_key_vault_scan_create
-
 integrations_explore:
   description: Manage integrations explore
   operations:
   - name: list
     operationId: integrations_explore_list
-
 integrations_github:
   description: Manage integrations github
   operations:
@@ -442,7 +411,6 @@ integrations_github:
     subcommandId: integrations_github_pulls
   - name: show
     operationId: integrations_github_retrieve
-
 integrations_github_pulls:
   description: Manage integrations github pulls
   operations:
@@ -458,13 +426,11 @@ integrations_github_pulls:
     subcommandId: integrations_github_pulls_tasks
   - name: update
     operationId: integrations_github_pulls_partial_update
-
 integrations_github_pulls_sync:
   description: Manage integrations github pulls sync
   operations:
   - name: create
     operationId: integrations_github_pulls_sync_create
-
 integrations_github_pulls_tasks:
   description: Manage integrations github pulls tasks
   operations:
@@ -474,7 +440,6 @@ integrations_github_pulls_tasks:
     operationId: integrations_github_pulls_tasks_retrieve
   - name: steps
     subcommandId: integrations_github_pulls_tasks_steps
-
 integrations_github_pulls_tasks_steps:
   description: Manage integrations github pulls tasks steps
   operations:
@@ -482,7 +447,6 @@ integrations_github_pulls_tasks_steps:
     operationId: integrations_github_pulls_tasks_steps_list
   - name: show
     operationId: integrations_github_pulls_tasks_steps_retrieve
-
 invitations:
   description: Manage invitations
   operations:
@@ -502,19 +466,16 @@ invitations:
     operationId: invitations_retrieve
   - name: update
     operationId: invitations_partial_update
-
 invitations_accept:
   description: Manage invitations accept
   operations:
   - name: create
     operationId: invitations_accept_create
-
 invitations_resend:
   description: Manage invitations resend
   operations:
   - name: create
     operationId: invitations_resend_create
-
 memberships:
   description: Manage CloudTruth memberships
   operations:
@@ -525,17 +486,16 @@ memberships:
   - name: list
     operationId: memberships_list
     pagination:
-    itemProperty: result
-    pageStart: page
-    pageSize: page_size
-    nextProperty: next
+      itemProperty: result
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
   - name: set
     operationId: memberships_update
   - name: show
     operationId: memberships_retrieve
   - name: update
     operationId: memberships_partial_update
-
 organizations:
   description: Manage organizations
   operations:
@@ -551,7 +511,6 @@ organizations:
     operationId: organizations_retrieve
   - name: update
     operationId: organizations_partial_update
-
 projects:
   description: Manage projects
   operations:
@@ -577,19 +536,16 @@ projects:
     subcommandId: projects_templates
   - name: update
     operationId: projects_partial_update
-
 projects_copy:
   description: Manage projects copy
   operations:
   - name: create
     operationId: projects_copy_create
-
 projects_parameter_export:
   description: Manage projects parameter-export
   operations:
   - name: list
     operationId: projects_parameter_export_list
-
 projects_parameters:
   description: Manage projects parameters
   operations:
@@ -619,25 +575,21 @@ projects_parameters:
     operationId: projects_parameters_partial_update
   - name: values
     subcommandId: projects_parameters_values
-
 projects_parameters_copy:
   description: Manage projects parameters copy
   operations:
   - name: create
     operationId: projects_parameters_copy_create
-
 projects_parameters_duality:
   description: Manage projects parameters duality
   operations:
   - name: list
     operationId: projects_parameters_duality_list
-
 projects_parameters_pushes:
   description: Manage projects parameters pushes
   operations:
   - name: list
     operationId: projects_parameters_pushes_list
-
 projects_parameters_rules:
   description: Manage projects parameters rules
   operations:
@@ -653,19 +605,16 @@ projects_parameters_rules:
     operationId: projects_parameters_rules_retrieve
   - name: update
     operationId: projects_parameters_rules_partial_update
-
 projects_parameters_timeline:
   description: Manage projects parameters timeline
   operations:
   - name: show
     operationId: projects_parameters_timeline_retrieve
-
 projects_parameters_timelines:
   description: Manage projects parameters timelines
   operations:
   - name: show
     operationId: projects_parameters_timelines_retrieve
-
 projects_parameters_values:
   description: Manage projects parameters values
   operations:
@@ -681,13 +630,11 @@ projects_parameters_values:
     operationId: projects_parameters_values_retrieve
   - name: update
     operationId: projects_parameters_values_partial_update
-
 projects_template_preview:
   description: Manage projects template-preview
   operations:
   - name: create
     operationId: projects_template_preview_create
-
 projects_templates:
   description: Manage projects templates
   operations:
@@ -707,19 +654,16 @@ projects_templates:
     subcommandId: projects_templates_timelines
   - name: update
     operationId: projects_templates_partial_update
-
 projects_templates_timeline:
   description: Manage projects templates timeline
   operations:
   - name: show
     operationId: projects_templates_timeline_retrieve
-
 projects_templates_timelines:
   description: Manage projects templates timelines
   operations:
   - name: show
     operationId: projects_templates_timelines_retrieve
-
 serviceaccounts:
   description: Manage serviceaccounts
   operations:
@@ -735,7 +679,6 @@ serviceaccounts:
     operationId: serviceaccounts_retrieve
   - name: update
     operationId: serviceaccounts_partial_update
-
 types:
   description: Manage types
   operations:
@@ -753,7 +696,6 @@ types:
     operationId: types_retrieve
   - name: update
     operationId: types_partial_update
-
 types_rules:
   description: Manage types rules
   operations:
@@ -769,7 +711,6 @@ types_rules:
     operationId: types_rules_retrieve
   - name: update
     operationId: types_rules_partial_update
-
 users:
   description: Manage CloudTruth users
   operations:
@@ -780,10 +721,9 @@ users:
   - name: list
     operationId: users_list
     pagination:
-    itemProperty: result
-    pageStart: page
-    pageSize: page_size
-    nextProperty: next
+      itemProperty: result
+      pageStart: page
+      pageSize: page_size
+      nextProperty: next
   - name: show
     operationId: users_retrieve
-
