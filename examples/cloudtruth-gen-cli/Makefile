@@ -7,9 +7,11 @@ help: ## This message
 
 LAYOUT_FILE := layout.yaml
 SUGGESTED_FILE := suggested.yaml
+UPDATED_FILE := updated.yaml
 OPENAPI_SPEC := ct.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := cloudtruth_gen_cli
+PATH_PREFIX := /api/v1
 
 TEST_TARGET ?= tests
 poetry_run ?= poetry run
@@ -32,14 +34,17 @@ all: install gen lint ## Perform a full cycle
 layout-lint:  ## Check the layout file format
 	$(poetry_run) layout check $(LAYOUT_FILE)
 
-gen: layout-lint suggest ## Generate CLI code
+gen: layout-lint suggest update ## Generate CLI code
 	$(poetry_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 suggest: ## Use the local code to suggest a layout
-	$(poetry_run) ./layout.py $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /api/v1
+	$(poetry_run) ./layout.py $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix $(PATH_PREFIX)
+
+update: ## Generates a new layout using the old as a guide
+	$(poetry_run) cli-gen update $(LAYOUT_FILE) $(OPENAPI_SPEC) --new-file $(UPDATED_FILE) --prefix $(PATH_PREFIX) --indent 2
 
 ###########
 ##@ Linting
