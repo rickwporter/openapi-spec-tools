@@ -6,11 +6,11 @@ from openapi_spec_tools.layout.utils import check_pagination_definitions
 from openapi_spec_tools.layout.utils import data_to_node
 from openapi_spec_tools.layout.utils import field_to_list
 from openapi_spec_tools.layout.utils import file_to_tree
-from openapi_spec_tools.layout.utils import layout_node_text
+from openapi_spec_tools.layout.utils import layout_node_to_dict
 from openapi_spec_tools.layout.utils import open_layout
 from openapi_spec_tools.layout.utils import operation_duplicates
 from openapi_spec_tools.layout.utils import operation_order
-from openapi_spec_tools.layout.utils import pagination_text
+from openapi_spec_tools.layout.utils import pagination_to_dict
 from openapi_spec_tools.layout.utils import parse_extras
 from openapi_spec_tools.layout.utils import parse_pagination
 from openapi_spec_tools.layout.utils import parse_to_tree
@@ -549,25 +549,21 @@ def test_file_to_tree() -> None:
     assert set() == {p.command for p in tree.subcommands()}
 
 
-ALL_PAGE_TEXT = """\
-itemProperty: itemProp
-itemStart: item
-pageStart: page
-pageSize: size
-nextHeader: My-header
-nextProperty: nextProp
-"""
-ITEMS_PAGE_TEXT = """\
-  itemProperty: itemProp
-  itemStart: item
-"""
-PAGE_PAGE_TEXT = """\
-****pageStart: page
-****pageSize: size
-"""
+ALL_PAGE_DICT = {
+    "itemProperty": "itemProp",
+    "itemStart": "item",
+    "pageStart": "page",
+    "pageSize": "size",
+    "nextHeader": "My-header",
+    "nextProperty": "nextProp",
+}
+ITEMS_PAGE_DICT = {
+    "itemProperty": "itemProp",
+    "itemStart": "item",
+}
 
 @pytest.mark.parametrize(
-    ["pagination", "indent", "expected"],
+    ["pagination", "expected"],
     [
         pytest.param(
             PaginationNames(
@@ -578,30 +574,22 @@ PAGE_PAGE_TEXT = """\
                 next_property="nextProp",
                 next_header="My-header",
             ),
-            "",
-            ALL_PAGE_TEXT,
+            ALL_PAGE_DICT,
             id="all",
         ),
         pytest.param(
             PaginationNames(item_start="item", items_property="itemProp"),
-            "  ",
-            ITEMS_PAGE_TEXT,
+            ITEMS_PAGE_DICT,
             id="items",
-        ),
-        pytest.param(
-            PaginationNames(page_size="size", page_start="page"),
-            "****",
-            PAGE_PAGE_TEXT,
-            id="page",
         ),
     ]
 )
-def test_pagination_text(pagination, indent, expected):
-    actual = pagination_text(pagination, indent)
+def test_pagination_to_dict(pagination, expected):
+    actual = pagination_to_dict(pagination)
     assert expected == actual
 
 
-def test_layout_node_text():
+def test_layout_node_to_dict():
     node = LayoutNode(
         command="parent",
         identifier="this_is_it",
@@ -619,24 +607,28 @@ def test_layout_node_text():
             LayoutNode(command="child2", identifier="another_op")
         ]
     )
-    text = layout_node_text(node)
-    assert text == """\
-this_is_it:
-    description: summary
-    operations:
-    - name: child1
-      operationId: my_child
-      pagination:
-        pageSize: page
-    - name: child2
-      operationId: another_op
-    - name: child3
-      operationId: more_ops
-      bugIds: mosquito, spider
-      allowedFields: a, b, c
-      hiddenFields: peekaboo
-      summaryFields: brief, short
-
-"""
-
-
+    actual = layout_node_to_dict(node)
+    assert actual == {
+        "this_is_it": {
+            "description": "summary",
+            "operations": [
+                {
+                    "name": "child1",
+                    "operationId": "my_child",
+                    "pagination": {"pageSize": "page"},
+                },
+                {
+                    "name": "child2",
+                    "operationId": "another_op",
+                },
+                {
+                    "name": "child3",
+                    "operationId": "more_ops",
+                    "bugIds": ["mosquito", "spider"],
+                    "allowedFields": ["a", "b", "c"],
+                    "hiddenFields": ["peekaboo"],
+                    "summaryFields": ["brief", "short"],
+                }
+            ]
+        }
+    }
