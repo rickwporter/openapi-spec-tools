@@ -47,6 +47,69 @@ def test_node_find(search_args, expected) -> None:
 
 
 @pytest.mark.parametrize(
+    ["node", "num_ops_all", "num_ops_live", "num_sub_all", "num_sub_live"],
+    [
+        pytest.param(
+            LayoutNode(command="foo", identifier="bar"), 0, 0, 0, 0, id="none"
+        ),
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+                children=[
+                    LayoutNode("sna", "foo"),
+                    LayoutNode("sna", "foo", children=[LayoutNode("a", "b")])
+                ]
+            ),
+            1,
+            1,
+            1,
+            1,
+            id="no-skip",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+                children=[
+                    LayoutNode("sna", "foo"),
+                    LayoutNode("sna", "foo", ignore=True),
+                    LayoutNode("sna", "foo", bugs=["a"]),
+                ]
+            ),
+            3,
+            1,
+            0,
+            0,
+            id="ops",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+                children=[
+                    LayoutNode("sna", "foo", children=[LayoutNode("a", "b")]),
+                    LayoutNode("sna", "foo", ignore=True, children=[LayoutNode("a", "b")]),
+                    LayoutNode("sna", "foo", bugs=["a"], children=[LayoutNode("a", "b")]),
+                ]
+            ),
+            0,
+            0,
+            3,
+            1,
+            id="subs",
+        ),
+    ]
+)
+def test_node_children(node: LayoutNode, num_ops_all, num_ops_live, num_sub_all, num_sub_live):
+    assert num_ops_all == len(node.operations(include_all=True))
+    assert num_ops_live == len(node.operations())
+
+    assert num_sub_all == len(node.subcommands(include_all=True))
+    assert num_sub_live == len(node.subcommands())
+
+
+@pytest.mark.parametrize(
     ["page_names", "expected"],
     [
         pytest.param(PaginationNames(), False, id="empty"),

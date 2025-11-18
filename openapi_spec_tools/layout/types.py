@@ -18,6 +18,7 @@ class LayoutField(str, Enum):
     SUMMARY_FIELDS = "summaryFields"
     PAGINATION = "pagination"
     ALLOWED_FIELDS = "allowedFields"
+    IGNORE = "ignore"
 
 
 class PaginationField(str, Enum):
@@ -82,6 +83,7 @@ class LayoutNode:
     pagination: Optional[PaginationNames] = None
     hidden_fields: list[str] = dataclasses.field(default_factory=list)
     allowed_fields: list[str] = dataclasses.field(default_factory=list)
+    ignore: Optional[bool] = None
 
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
         """Convert object to dictionary."""
@@ -91,13 +93,17 @@ class LayoutNode:
 
         return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
 
-    def subcommands(self, include_bugged: bool = False) -> list["LayoutNode"]:
-        """List of LayoutNodes that have children."""
-        return [n for n in self.children if n.children and (include_bugged or not n.bugs)]
+    def skip_generation(self) -> bool:
+        """Whether to skip code generation for this node."""
+        return bool(self.bugs or self.ignore)
 
-    def operations(self, include_bugged: bool = False) -> list["LayoutNode"]:
+    def subcommands(self, include_all: bool = False) -> list["LayoutNode"]:
+        """List of LayoutNodes that have children."""
+        return [n for n in self.children if n.children and (include_all or not n.skip_generation())]
+
+    def operations(self, include_all: bool = False) -> list["LayoutNode"]:
         """List of LayoutNodes without any children."""
-        return [n for n in self.children if not n.children and (include_bugged or not n.bugs)]
+        return [n for n in self.children if not n.children and (include_all or not n.skip_generation())]
 
     def find(self, *args) -> Optional["LayoutNode"]:
         """Search for the provided commands."""

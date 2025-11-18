@@ -19,6 +19,7 @@ main:
     subcommandId: import
   - name: integrations
     subcommandId: integrations
+    ignore: true
   - name: invitations
     subcommandId: invitations
   - name: membership
@@ -116,6 +117,7 @@ grants:
     operationId: grants_destroy
   - name: delete-many
     operationId: grants_multi_destroy
+    ignore: true
   - name: list
     operationId: grants_list
     hiddenFields:

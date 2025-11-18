@@ -49,6 +49,7 @@ veterinarians:
   operations:
     - name: add
       operationId: createVet
+      ignore: true
     - name: delete
       operationId: deleteVet
 
