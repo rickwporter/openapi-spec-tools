@@ -86,6 +86,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     allowed_fields = field_to_list(item, LayoutField.ALLOWED_FIELDS)
     extra = parse_extras(item)
     pagination = parse_pagination(item.get(LayoutField.PAGINATION))
+    ignore = item.get(LayoutField.IGNORE)
 
     children = []
     for op_data in item.get(LayoutField.OPERATIONS, []):
@@ -113,6 +114,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         extra=extra,
         children=children,
         pagination=pagination,
+        ignore=ignore,
     )
 
 
@@ -299,6 +301,8 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
             LayoutField.NAME.value: child.command,
             flavor: child.identifier,
         }
+        if child.ignore:
+            op_data[LayoutField.IGNORE.value] = True
         if child.bugs:
             op_data[LayoutField.BUG_IDS.value] = child.bugs
         if child.allowed_fields:
@@ -319,7 +323,7 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
     }
 
     # recursively generate sections for sub-commands
-    sorted_subcommands = sorted(node.subcommands(), key=lambda x: x.identifier)
+    sorted_subcommands = sorted(node.subcommands(include_all=True), key=lambda x: x.identifier)
     for child in sorted_subcommands:
         result.update(layout_node_to_dict(child))
 

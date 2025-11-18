@@ -532,9 +532,9 @@ def test_lists_bugged() -> None:
     assert 0 == len(operations)
 
     # test including bugged items
-    subcommands = uut.subcommands(include_bugged=True)
+    subcommands = uut.subcommands(include_all=True)
     assert 1 == len(subcommands)
-    operations = uut.operations(include_bugged=True)
+    operations = uut.operations(include_all=True)
     assert 1 == len(operations)
 
 
@@ -604,7 +604,7 @@ def test_layout_node_to_dict():
                 allowed_fields=["a", "b", "c"],
             ),
             LayoutNode(command="child1", identifier="my_child", pagination=PaginationNames(page_size="page")),
-            LayoutNode(command="child2", identifier="another_op")
+            LayoutNode(command="child2", identifier="another_op", ignore=True)
         ]
     )
     actual = layout_node_to_dict(node)
@@ -620,6 +620,7 @@ def test_layout_node_to_dict():
                 {
                     "name": "child2",
                     "operationId": "another_op",
+                    "ignore": True,
                 },
                 {
                     "name": "child3",
