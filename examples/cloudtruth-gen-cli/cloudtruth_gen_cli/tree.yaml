@@ -129,12 +129,6 @@ grants:
     name: delete
     operationId: grants_destroy
     path: /api/v1/grants/{id}/
-  - function: grants_multi_destroy
-    help: Removes grants matching the query parameters atomically.
-    method: DELETE
-    name: delete-many
-    operationId: grants_multi_destroy
-    path: /api/v1/grants/multi/
   - function: grants_list
     help: Grants allow you to enable access control on Environments and Projects.
     method: GET

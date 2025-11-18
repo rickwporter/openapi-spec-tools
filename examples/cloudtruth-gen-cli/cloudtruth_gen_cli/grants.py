@@ -134,42 +134,6 @@ def grants_destroy(
     return
 
 
-@app.command("delete-many", short_help="Removes grants matching the query parameters atomically.")
-def grants_multi_destroy(
-    _api_host: _a.ApiHostOption = "",
-    _api_key: _a.ApiKeyOption = None,
-    _api_timeout: _a.ApiTimeoutOption = 5,
-    _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
-    _out_fmt: _a.OutputFormatOption = _a.OutputFormat.TABLE,
-    _out_style: _a.OutputStyleOption = _a.OutputStyle.ALL,
-) -> None:
-    '''
-    Removes grants matching the query parameters atomically.
-
-    Use this technique to disable access control on a scope,
-    or remove all grants for a user.
-    '''
-    # handler for grants_multi_destroy: DELETE /api/v1/grants/multi/
-    _l.init_logging(_log_level)
-    headers = _r.request_headers(_api_key)
-    url = _r.create_url(_api_host, "api/v1/grants/multi/")
-    missing = []
-    if _api_key is None:
-        missing.append("--api-key")
-    if missing:
-        _e.handle_exceptions(_e.MissingRequiredError(missing))
-
-    params = {}
-
-    try:
-        data = _r.request("DELETE", url, headers=headers, params=params, timeout=_api_timeout)
-        _d.display(data, _out_fmt, _out_style)
-    except Exception as ex:
-        _e.handle_exceptions(ex)
-
-    return
-
-
 class Role(str, Enum):  # noqa: F811
     ADMIN = "ADMIN"
     CONTRIB = "CONTRIB"
