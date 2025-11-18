@@ -99,6 +99,29 @@ def test_node_find(search_args, expected) -> None:
             1,
             id="subs",
         ),
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+                children=[
+                    LayoutNode(
+                        "sna",
+                        "foo",
+                        children=[LayoutNode("a", "b"), LayoutNode("c", "d", ignore=True)]
+                    ),
+                    LayoutNode(
+                        "sna",
+                        "foo",
+                        children=[LayoutNode("w", "x", ignore=True), LayoutNode("y", "z", bugs=["1"])],
+                    )
+                ]
+            ),
+            0,
+            0,
+            2,
+            1,
+            id="subs-children",
+        )
     ]
 )
 def test_node_children(node: LayoutNode, num_ops_all, num_ops_live, num_sub_all, num_sub_live):
