@@ -95,7 +95,13 @@ class LayoutNode:
 
     def skip_generation(self) -> bool:
         """Whether to skip code generation for this node."""
-        return bool(self.bugs or self.ignore)
+        if self.bugs or self.ignore:
+            return True
+
+        if not self.children:
+            return False
+
+        return all(c.skip_generation() for c in self.children)
 
     def subcommands(self, include_all: bool = False) -> list["LayoutNode"]:
         """List of LayoutNodes that have children."""
