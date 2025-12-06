@@ -72,6 +72,14 @@ SUMMARY_LIST = [
     {"name": "bar", "data": None},
 ]
 
+COLUMN_LIST = [
+    {"name": "a", "id": 1, "help": "hello", "service": "army"},
+    {"name": "b", "id": 2, "help": "world", "service": "navy"},
+    {"name": "c", "id": 3, "help": "jazzy", "service": "air-force"},
+    {"name": "d", "id": 4, "help": "buzzy", "service": "marines"},
+    {"name": "e", "id": 5, "help": "fuzzy", "service": "space-force"},
+    {"name": "f", "id": 6, "help": "jiggy", "service": "coast guard"},
+]
 
 def test_rich_table_defaults_outer():
     columns = ["col 1", "Column B", "III"]
@@ -534,3 +542,81 @@ def test_allowed(data, properties, expected):
 )
 def test_remove(data, properties, expected):
     assert expected == remove(data, properties)
+
+
+SIMPLE_TABLE = """\
+┏━━━━━━━━━━━━━┳━━━━━━┓
+┃ Service     ┃ Name ┃
+┡━━━━━━━━━━━━━╇━━━━━━┩
+│ army        │ a    │
+├─────────────┼──────┤
+│ navy        │ b    │
+├─────────────┼──────┤
+│ air-force   │ c    │
+├─────────────┼──────┤
+│ marines     │ d    │
+├─────────────┼──────┤
+│ space-force │ e    │
+├─────────────┼──────┤
+│ coast guard │ f    │
+└─────────────┴──────┘
+"""
+
+WILD_TABLE = """\
+┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┓
+┃ Service     ┃ Properties    ┃ Id ┃
+┡━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━┩
+│ army        │  name  a      │ 1  │
+│             │  help  hello  │    │
+├─────────────┼───────────────┼────┤
+│ navy        │  name  b      │ 2  │
+│             │  help  world  │    │
+├─────────────┼───────────────┼────┤
+│ air-force   │  name  c      │ 3  │
+│             │  help  jazzy  │    │
+├─────────────┼───────────────┼────┤
+│ marines     │  name  d      │ 4  │
+│             │  help  buzzy  │    │
+├─────────────┼───────────────┼────┤
+│ space-force │  name  e      │ 5  │
+│             │  help  fuzzy  │    │
+├─────────────┼───────────────┼────┤
+│ coast guard │  name  f      │ 6  │
+│             │  help  jiggy  │    │
+└─────────────┴───────────────┴────┘
+"""
+
+MISSING_TABLE = """\
+┏━━━━┳━━━━━━━━━┳━━━━━━┓
+┃ Id ┃ Missing ┃ Name ┃
+┡━━━━╇━━━━━━━━━╇━━━━━━┩
+│ 1  │ None    │ a    │
+├────┼─────────┼──────┤
+│ 2  │ None    │ b    │
+├────┼─────────┼──────┤
+│ 3  │ None    │ c    │
+├────┼─────────┼──────┤
+│ 4  │ None    │ d    │
+├────┼─────────┼──────┤
+│ 5  │ None    │ e    │
+├────┼─────────┼──────┤
+│ 6  │ None    │ f    │
+└────┴─────────┴──────┘
+"""
+
+@pytest.mark.parametrize(
+    ["columns", "out_fmt", "expected"],
+    [
+        pytest.param(["service", "name"], OutputFormat.TABLE, SIMPLE_TABLE, id="simple"),
+        pytest.param(["service", "*", "id"], OutputFormat.TABLE, WILD_TABLE, id="wildcard"),
+        pytest.param(["id", "missing", "name"], OutputFormat.TABLE, MISSING_TABLE, id="missing"),
+    ]
+)
+def test_column_list_table(columns: list[str], out_fmt, expected: str):
+    with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+        display(COLUMN_LIST, out_fmt, OutputStyle.NONE, columns=columns)
+        _actual = to_ascii(mock_stdout.getvalue())
+        _expected = to_ascii(expected)
+
+        assert _expected == _actual
+

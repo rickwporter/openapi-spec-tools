@@ -36,9 +36,19 @@ KEY_MAX_LEN = 35
 VALUE_MAX_LEN = 50
 URL_MAX_LEN = 100
 
+# this is value used to denote all other properties (not specified in list)
+WILDCARD_COLUMN = '*'
+
 
 # NOTE: the key field of dictionaries are expected to be be `str`, `int`, `float`, but use
 #       `Any` readability.
+
+
+def headerize(s: str) -> str:
+    """Create a table header from the provided string."""
+    if s == WILDCARD_COLUMN:
+        return PROPERTIES
+    return s[0].upper() + s[1:]
 
 
 class TableConfig:
@@ -171,10 +181,10 @@ def _create_list_table(
         return table
 
     # if there's just one property besides the key, use that as the label
-    name_label = name_key[0].upper() + name_key[1:]
+    name_label = headerize(name_key)
     other_key = _get_other_key(items[0], name_key)
     if other_key:
-        other_name = other_key[0].upper() + other_key[1:]
+        other_name = headerize(other_key)
         fields = [name_label, other_name]
         table = RichTable(
             *fields,
@@ -254,13 +264,39 @@ def _table_cell_value(obj: Any, config: TableConfig) -> Any:
     return value
 
 
-def rich_table_factory(obj: Any, config: Optional[TableConfig] = None) -> RichTable:
+def _create_list_columns_table(items: list[dict[str, Any]], columns: list[str], config: TableConfig) -> RichTable:
+    """Create a table with the provided columns."""
+    headers = [headerize(c) for c in columns]
+    table = RichTable(
+        *headers, outer=True, show_lines=True, row_props=config.row_properties
+    )
+    for item in items:
+        values = []
+        for c in columns:
+            if c == WILDCARD_COLUMN:
+                sub_value = {k: v for k, v in item.items() if k not in columns}
+                values.append(_table_cell_value(sub_value, config))
+                continue
+            values.append(_table_cell_value(item.get(c), config))
+        table.add_row(*values)
+
+    return table
+
+
+def rich_table_factory(
+    obj: Any,
+    config: Optional[TableConfig] = None,
+    columns: Optional[list[str]] = None,
+) -> RichTable:
     """Create a RichTable (alias for rich.table.Table) from the object."""
     config = config or TableConfig()
     if isinstance(obj, dict):
         return _create_object_table(obj, outer=True, config=config)
 
     if isinstance(obj, list) and obj and isinstance(obj[0], dict):
+        if columns:
+            return _create_list_columns_table(obj, columns=columns, config=config)
+
         return _create_list_table(obj, outer=True, config=config)
 
     # this is a list of "simple" properties
@@ -333,7 +369,13 @@ def remove(obj: Any, properties: list[str]) -> Any:
     return obj
 
 
-def display(obj: Any, fmt: OutputFormat, style: OutputStyle, indent: int = 2) -> None:
+def display(
+    obj: Any,
+    fmt: OutputFormat,
+    style: OutputStyle,
+    indent: int = 2,
+    columns: Optional[list[str]] = None,
+) -> None:
     """Display the data provided in obj, according to the formating arguments."""
     no_color = style != OutputStyle.ALL
     highlight = style != OutputStyle.NONE
@@ -355,6 +397,6 @@ def display(obj: Any, fmt: OutputFormat, style: OutputStyle, indent: int = 2) ->
         console.print("Nothing found")
         return
 
-    table = rich_table_factory(obj)
+    table = rich_table_factory(obj, columns=columns)
     console.print(table)
     return
