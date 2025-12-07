@@ -36,6 +36,7 @@ def test_node_dict(node, sparse, expected):
                 summary_fields=["name"],
                 hidden_fields=["sna", "foo", "bar"],
                 allowed_fields=["red-sox", "bruins"],
+                display_columns=["east", "south", "north"],
             ),
             id="child",
         ),

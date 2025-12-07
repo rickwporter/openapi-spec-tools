@@ -84,6 +84,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     summary_fields = field_to_list(item, LayoutField.SUMMARY_FIELDS)
     hidden_fields = field_to_list(item, LayoutField.HIDDEN_FIELDS)
     allowed_fields = field_to_list(item, LayoutField.ALLOWED_FIELDS)
+    columns = field_to_list(item, LayoutField.COLUMNS)
     extra = parse_extras(item)
     pagination = parse_pagination(item.get(LayoutField.PAGINATION))
     ignore = item.get(LayoutField.IGNORE)
@@ -111,6 +112,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         summary_fields=summary_fields,
         hidden_fields=hidden_fields,
         allowed_fields=allowed_fields,
+        display_columns=columns,
         extra=extra,
         children=children,
         pagination=pagination,
@@ -311,6 +313,8 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
             op_data[LayoutField.HIDDEN_FIELDS.value] = child.hidden_fields
         if child.summary_fields:
             op_data[LayoutField.SUMMARY_FIELDS.value] = child.summary_fields
+        if child.display_columns:
+            op_data[LayoutField.COLUMNS.value] = child.display_columns
         if child.pagination:
             op_data[LayoutField.PAGINATION.value] = pagination_to_dict(child.pagination)
         operations.append(op_data)

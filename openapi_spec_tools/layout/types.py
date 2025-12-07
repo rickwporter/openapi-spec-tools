@@ -19,6 +19,7 @@ class LayoutField(str, Enum):
     PAGINATION = "pagination"
     ALLOWED_FIELDS = "allowedFields"
     IGNORE = "ignore"
+    COLUMNS = "columns"
 
 
 class PaginationField(str, Enum):
@@ -83,6 +84,7 @@ class LayoutNode:
     pagination: Optional[PaginationNames] = None
     hidden_fields: list[str] = dataclasses.field(default_factory=list)
     allowed_fields: list[str] = dataclasses.field(default_factory=list)
+    display_columns: list[str] = dataclasses.field(default_factory=list)
     ignore: Optional[bool] = None
 
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
