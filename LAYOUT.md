@@ -68,6 +68,7 @@ Optional:
 * `summaryFields` - used to display just the listed fields with a `--details` (or `-v`) flag to display all the fields
 * `hiddenFields` - used to always remove the listed fields
 * `allowedFields` - used to only show the listed fields
+* `columns` - used to specify order and columns display in the table. Use `*` to denote all other columns.
 
 #### Pagination Schema
 
