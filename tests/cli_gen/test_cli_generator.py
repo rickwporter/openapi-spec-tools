@@ -414,11 +414,12 @@ def test_function_definition_item():
     assert "_l.init_logging(_log_level)" in text
     assert 'headers = _r.request_headers(_api_key, content_type="application/json")' in text
     assert 'url = _r.create_url(_api_host, "pets")' in text
+    assert 'columns = ["east", "south", "north"]' in text
     assert 'params = {}' in text
     assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)' in text
     assert 'data = _d.remove(data, ["sna", "foo", "bar"])' in text
     assert 'data = _d.allowed(data, ["red-sox", "bruins"])' in text
-    assert '_d.display(data, _out_fmt, _out_style)' in text
+    assert '_d.display(data, _out_fmt, _out_style, columns=columns)' in text
     assert '_e.handle_exceptions(ex)' in text
     assert 'data = _d.allowed(data, ["name"])' in text
 

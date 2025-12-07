@@ -237,6 +237,15 @@ if __name__ == "__main__":
         args = [quoted(v) for v in node.allowed_fields]
         return f"{SEP2}data = _d.allowed(data, [{', '.join(args)}])"
 
+
+    def columns(self, node: LayoutNode) -> str:
+        """Add column formation variable."""
+        if not node.display_columns:
+            return ""
+
+        args = [quoted(v) for v in node.display_columns]
+        return f"{SEP1}columns = [{', '.join(args)}]"
+
     def pagination_creation(self, command: LayoutNode) -> str:
         """Create the 'page_info' variable."""
         if not command.pagination:
@@ -277,6 +286,7 @@ if __name__ == "__main__":
         header_params = self.params_to_settable_properties(self.op_params(op, "header"))
         body_params = self.op_body_settable_properties(op)
         command_args = [quoted(node.command)]
+        columns = self.columns(node)
 
         req_args = []
         if node.pagination:
@@ -337,7 +347,7 @@ def {func_name}({args_str}) -> None:
     {self.op_doc_string(op)}# handler for {node.identifier}: {method} {path}
     _l.init_logging(_log_level){deprecation_warning}{user_header_init}
     headers = _r.request_headers(_api_key{self.op_content_header(op)}{user_header_arg})
-    url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}
+    url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}{columns}
     missing = {self.op_check_missing(query_params + header_params, body_params)}
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
@@ -346,7 +356,7 @@ def {func_name}({args_str}) -> None:
 
     try:
         data = _r.{req_func}({', '.join(req_args)}){self.hidden(node)}{self.allowed(node)}{self.summary_display(node)}
-        _d.display(data, _out_fmt, _out_style)
+        _d.display(data, _out_fmt, _out_style{"" if not columns else ", columns=columns"})
     except Exception as ex:
         _e.handle_exceptions(ex)
 
