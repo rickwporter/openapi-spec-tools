@@ -254,6 +254,7 @@ def test_parse_pagination(data, expected) -> None:
                 "hiddenFields": ["east", "west"],
                 "allowedFields": ["patriots", "celtics"],
                 "my-party": {"cry": "if i want to"},
+                "columns": "a, b, c",
                 OP_ID: "op1",
                 OPS: [],
             },
@@ -267,6 +268,7 @@ def test_parse_pagination(data, expected) -> None:
                 children=[],
                 hidden_fields=["east", "west"],
                 allowed_fields=["patriots", "celtics"],
+                display_columns=["a", "b", "c"],
             ),
             id="fields",
         ),
@@ -602,6 +604,7 @@ def test_layout_node_to_dict():
                 hidden_fields=["peekaboo"],
                 summary_fields=["brief", "short"],
                 allowed_fields=["a", "b", "c"],
+                display_columns=["west", "east"]
             ),
             LayoutNode(command="child1", identifier="my_child", pagination=PaginationNames(page_size="page")),
             LayoutNode(command="child2", identifier="another_op", ignore=True)
@@ -629,6 +632,7 @@ def test_layout_node_to_dict():
                     "allowedFields": ["a", "b", "c"],
                     "hiddenFields": ["peekaboo"],
                     "summaryFields": ["brief", "short"],
+                    "columns": ["west", "east"],
                 }
             ]
         }

@@ -33,6 +33,10 @@ pets:
       allowedFields:
       - red-sox
       - bruins
+      columns:
+      - east
+      - south
+      - north
     - name: delete
       operationId: deletePetById
     - name: examine
