@@ -38,7 +38,7 @@ def test_subcommand_imports():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     uut = CliGenerator("cli_package", oas)
-    text = uut.subcommand_imports(tree.subcommands())
+    text = uut.subcommand_imports(tree)
     for name in ["pets", "owners", "veterinarians"]:
         line = f"from cli_package.{name} import app as {name}"
         assert line in text

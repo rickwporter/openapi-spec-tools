@@ -53,7 +53,7 @@ def generate_node(generator: CliGenerator, node: LayoutNode, directory: str) -> 
     text = generator.shebang()
     text += copyright()
     text += generator.standard_imports()
-    text += generator.subcommand_imports(node.subcommands())
+    text += generator.subcommand_imports(node)
     text += generator.app_definition(node)
     text += generator.tree_function(node)
     for command in node.operations():

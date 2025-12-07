@@ -53,11 +53,11 @@ from {self.package_name} import _requests as _r  # noqa: F401
 from {self.package_name} import _tree as _t
 """
 
-    def subcommand_imports(self, subcommands: list[LayoutNode]) -> str:
+    def subcommand_imports(self, node: LayoutNode) -> str:
         """Get the imports needed for the subcommands/children."""
         imports = [
             f"from {self.package_name}.{to_snake_case(n.identifier)} import app as {to_snake_case(n.identifier)}"
-            for n in subcommands
+            for n in node.subcommands()
         ]
         # NOTE: use sorted to avoid issue if user has used unsorted sub-commands
         return NL.join(sorted(imports))
