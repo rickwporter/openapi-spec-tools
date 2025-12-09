@@ -20,6 +20,7 @@ class LayoutField(str, Enum):
     ALLOWED_FIELDS = "allowedFields"
     IGNORE = "ignore"
     COLUMNS = "columns"
+    REFERENCE = "reference"
 
 
 class PaginationField(str, Enum):
@@ -43,6 +44,13 @@ class PaginationField(str, Enum):
             return True
         except ValueError:
             return False
+
+
+class ReferenceField(str, Enum):
+    """Field names for reference sub-objects in the layout."""
+
+    PACKAGE = "package"
+    APP_NAME = "appName"
 
 
 @dataclasses.dataclass
@@ -71,6 +79,14 @@ class PaginationNames:
 
 
 @dataclasses.dataclass
+class ReferenceSubcommand:
+    """Data structure for holding manual parameters."""
+
+    package: str
+    app_name: str = "app"
+
+
+@dataclasses.dataclass
 class LayoutNode:
     """Info for handling the layout file in a hierachical fashion."""
 
@@ -82,6 +98,7 @@ class LayoutNode:
     extra: dict[str, Any] = dataclasses.field(default_factory=dict)
     children: list["LayoutNode"] = dataclasses.field(default_factory=list)
     pagination: Optional[PaginationNames] = None
+    reference: Optional[ReferenceSubcommand] = None
     hidden_fields: list[str] = dataclasses.field(default_factory=list)
     allowed_fields: list[str] = dataclasses.field(default_factory=list)
     display_columns: list[str] = dataclasses.field(default_factory=list)
@@ -107,11 +124,24 @@ class LayoutNode:
 
     def subcommands(self, include_all: bool = False) -> list["LayoutNode"]:
         """List of LayoutNodes that have children."""
-        return [n for n in self.children if n.children and (include_all or not n.skip_generation())]
+        return [
+            n for n in self.children
+            if n.children and not n.reference and (include_all or not n.skip_generation())
+        ]
 
     def operations(self, include_all: bool = False) -> list["LayoutNode"]:
         """List of LayoutNodes without any children."""
-        return [n for n in self.children if not n.children and (include_all or not n.skip_generation())]
+        return [
+            n for n in self.children
+            if not n.children and not n.reference and (include_all or not n.skip_generation())
+        ]
+
+    def references(self, include_all: bool = False) -> list["LayoutNode"]:
+        """List of LayoutNodes with manual configuration."""
+        return [
+            n for n in self.children
+            if n.reference and (include_all or not n.skip_generation())
+        ]
 
     def find(self, *args) -> Optional["LayoutNode"]:
         """Search for the provided commands."""

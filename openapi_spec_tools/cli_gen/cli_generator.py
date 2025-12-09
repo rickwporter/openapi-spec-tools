@@ -53,12 +53,16 @@ from {self.package_name} import _requests as _r  # noqa: F401
 from {self.package_name} import _tree as _t
 """
 
-    def subcommand_imports(self, subcommands: list[LayoutNode]) -> str:
+    def subcommand_imports(self, node: LayoutNode) -> str:
         """Get the imports needed for the subcommands/children."""
         imports = [
             f"from {self.package_name}.{to_snake_case(n.identifier)} import app as {to_snake_case(n.identifier)}"
-            for n in subcommands
+            for n in node.subcommands()
         ]
+        for n in node.references():
+            var_name = self.variable_name(n.command)
+            imports.append(f"from {n.reference.package} import {n.reference.app_name} as {var_name}")
+
         # NOTE: use sorted to avoid issue if user has used unsorted sub-commands
         return NL.join(sorted(imports))
 
@@ -71,6 +75,10 @@ app = typer.Typer(no_args_is_help=True, help="{simple_escape(node.description)}"
         for child in node.subcommands():
             result += f"""\
 app.add_typer({to_snake_case(child.identifier)}, name="{child.command}")
+"""
+        for child in node.references():
+            result += f"""\
+app.add_typer({self.variable_name(child.command)}, name="{child.command}")
 """
         result += "\n"
 
