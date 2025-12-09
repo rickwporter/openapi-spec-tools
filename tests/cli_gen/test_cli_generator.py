@@ -36,24 +36,29 @@ def test_standard_imports():
 
 def test_subcommand_imports():
     oas = open_oas(asset_filename("pet2.yaml"))
-    tree = file_to_tree(asset_filename("layout_pets2.yaml"))
+    tree = file_to_tree(asset_filename("layout_pets3.yaml"))
     uut = CliGenerator("cli_package", oas)
     text = uut.subcommand_imports(tree)
-    for name in ["pets", "owners", "veterinarians"]:
+    for name in ["pets", "owners"]:
         line = f"from cli_package.{name} import app as {name}"
         assert line in text
+
+    # check the references are added, too
+    assert "from other.foo.bar import stype as other_command" in text
+    assert "from sna import app as child" in text
 
 
 def test_app_definition():
     oas = open_oas(asset_filename("pet2.yaml"))
-    tree = file_to_tree(asset_filename("layout_pets2.yaml"))
+    tree = file_to_tree(asset_filename("layout_pets3.yaml"))
     uut = CliGenerator("cli_package", oas)
     text = uut.app_definition(tree)
     assert 'app = typer.Typer(no_args_is_help=True, help="Pet management application")' in text
     for name, command in {
         "pets": "pet",
         "owners": "owners",
-        "veterinarians": "vets",
+        "other_command": "other-command",
+        "child": "child",
     }.items():
         # NOTE: this is not universal, but works here
         line = f'app.add_typer({name}, name="{command}")'
