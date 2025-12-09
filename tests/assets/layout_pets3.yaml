@@ -9,6 +9,13 @@ main:
     - name: vets
       subcommandId: veterinarians
       bugIds: fake-bug-on-subcommand
+    - name: other-command
+      reference:
+        package: other.foo.bar
+        appName: stype
+    - name: child
+      reference:
+        package: sna
 
 owners:
   description: Keepers of the pets

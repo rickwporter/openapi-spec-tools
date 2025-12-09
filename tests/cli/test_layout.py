@@ -33,7 +33,7 @@ Sub-commands are misordered:
 ERR_OPS_PROPS = """\
 Sub-commands have missing properties:
     owners: description, operations
-    veterinarians: add operationId or subcommandId, delete operationId or subcommandId
+    veterinarians: add operationId, subcommandId, or reference, delete operationId, subcommandId, or reference
 """
 ERR_OPS_DUPES = """\
 Duplicate operations in sub-commands:

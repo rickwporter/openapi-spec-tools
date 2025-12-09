@@ -2,6 +2,7 @@ import pytest
 
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
+from openapi_spec_tools.layout.types import ReferenceSubcommand
 from openapi_spec_tools.layout.utils import file_to_tree
 from tests.helpers import asset_filename
 
@@ -131,6 +132,67 @@ def test_node_children(node: LayoutNode, num_ops_all, num_ops_live, num_sub_all,
 
     assert num_sub_all == len(node.subcommands(include_all=True))
     assert num_sub_live == len(node.subcommands())
+
+    assert 0 == len(node.references())
+
+
+@pytest.mark.parametrize(
+    ["node", "num_ref_live", "num_ref_all"],
+    [
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+            ),
+            0,
+            0,
+            id="empty"
+        ),
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+                children=[
+                    LayoutNode("sna", "foo", reference=ReferenceSubcommand("pkg")),
+                ],
+            ),
+            1,
+            1,
+            id="single",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+                children=[
+                    LayoutNode("sna", "foo", reference=ReferenceSubcommand("pkg")),
+                    LayoutNode("foo", "bar", reference=ReferenceSubcommand("pkg"), bugs=["1"]),
+                ],
+            ),
+            1,
+            2,
+            id="multi",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="foo",
+                identifier="bar",
+                children=[
+                    LayoutNode("sna", "foo", reference=ReferenceSubcommand("pkg")),
+                    LayoutNode("more", "work"),
+                    LayoutNode("foo", "bar", reference=ReferenceSubcommand("pkg")),
+                    LayoutNode("even", "more", reference=ReferenceSubcommand("pkg", "app"), bugs=["abc"]),
+                ],
+            ),
+            2,
+            3,
+            id="full",
+        ),
+    ]
+)
+def test_node_references(node, num_ref_live, num_ref_all):
+    assert num_ref_live == len(node.references())
+    assert num_ref_all == len(node.references(include_all=True))
 
 
 @pytest.mark.parametrize(

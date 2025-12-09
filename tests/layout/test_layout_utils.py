@@ -26,6 +26,8 @@ NAME = "name"
 OP_ID = "operationId"
 PAGE = "pagination"
 SUB_ID = "subcommandId"
+REF = "reference"
+ONE_OF_MSG = f"{OP_ID}, {SUB_ID}, or {REF}"
 
 
 def test_open_layout() -> None:
@@ -45,7 +47,7 @@ def test_open_layout() -> None:
         pytest.param({"cmd": {OPS: []}}, {"cmd": DESC}, id="description"),
         pytest.param(
             {"cmd": {DESC: "foo", OPS: [{NAME: "sub1"}]}},
-            {"cmd": f"sub1 {OP_ID} or {SUB_ID}"},
+            {"cmd": f"sub1 {ONE_OF_MSG}"},
             id="op-sub-or-id",
         ),
         pytest.param(
@@ -55,7 +57,7 @@ def test_open_layout() -> None:
         ),
         pytest.param(
             {"cmd": {DESC: "foo", OPS: [{}]}},
-            {"cmd": f"operation[0] name, operation[0] {OP_ID} or {SUB_ID}"},
+            {"cmd": f"operation[0] name, operation[0] {ONE_OF_MSG}"},
             id="op-all",
         ),
         pytest.param(
@@ -64,7 +66,7 @@ def test_open_layout() -> None:
                 "prov": {DESC: "foo", OPS: [{NAME: "bar"}]},
                 "resp": {DESC: "short", OPS: [{NAME: "blah", OP_ID: "op1"}]},
             },
-            {"cmd": OPS, "prov": f"bar {OP_ID} or {SUB_ID}"},
+            {"cmd": OPS, "prov": f"bar {ONE_OF_MSG}"},
             id="many",
         )
     ]

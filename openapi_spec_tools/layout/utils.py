@@ -10,8 +10,12 @@ from openapi_spec_tools.layout.types import LayoutField
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationField
 from openapi_spec_tools.layout.types import PaginationNames
+from openapi_spec_tools.layout.types import ReferenceField
+from openapi_spec_tools.layout.types import ReferenceSubcommand
 
 DEFAULT_START = "main"
+ONE_OF = [LayoutField.OP_ID, LayoutField.SUB_ID, LayoutField.REFERENCE]
+MISSING_ONE_OF = ", ".join(v.value for v in ONE_OF[:-1]) + f", or {ONE_OF[-1].value}"
 
 
 def open_layout(filename: str) -> Any:
@@ -75,6 +79,17 @@ def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames
     )
 
 
+def parse_reference(data: Optional[dict[str, Any]]) -> Optional[ReferenceSubcommand]:
+    """Parse the data into a reference object."""
+    if not data:
+        return None
+
+    return ReferenceSubcommand(
+        package=data.get(ReferenceField.PACKAGE),
+        app_name=data.get(ReferenceField.APP_NAME) or "app",
+    )
+
+
 def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
     """Recursively convert elements from data to LayoutNodes."""
     description = item.get(LayoutField.DESCRIPTION, "")
@@ -88,6 +103,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     extra = parse_extras(item)
     pagination = parse_pagination(item.get(LayoutField.PAGINATION))
     ignore = item.get(LayoutField.IGNORE)
+    reference = parse_reference(item.get(LayoutField.REFERENCE))
 
     children = []
     for op_data in item.get(LayoutField.OPERATIONS, []):
@@ -117,6 +133,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         children=children,
         pagination=pagination,
         ignore=ignore,
+        reference=reference,
     )
 
 
@@ -146,8 +163,8 @@ def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:
             identifier = op_data.get(LayoutField.NAME) or f"operation[{index}]"
             if LayoutField.NAME not in op_data:
                 missing.append(f"{identifier} {LayoutField.NAME.value}")
-            if LayoutField.OP_ID not in op_data and LayoutField.SUB_ID not in op_data:
-                missing.append(f"{identifier} {LayoutField.OP_ID.value} or {LayoutField.SUB_ID.value}")
+            if not any(p in op_data for p in ONE_OF):
+                missing.append(f"{identifier} {MISSING_ONE_OF}")
 
         if missing:
             errors[sub_name] = ", ".join(missing)
@@ -294,6 +311,14 @@ def pagination_to_dict(pagination: PaginationNames) -> dict[str, Any]:
     return result
 
 
+def reference_to_dict(reference: ReferenceSubcommand) -> dict[str, Any]:
+    """Convert the ReferenceSubcommand to a dictionary for output."""
+    return {
+        ReferenceField.PACKAGE.value: reference.package,
+        ReferenceField.APP_NAME.value: reference.app_name,
+    }
+
+
 def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
     """Convert LayoutNode to a dictionary for output."""
     operations = []
@@ -301,8 +326,9 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
         flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
         op_data = {
             LayoutField.NAME.value: child.command,
-            flavor: child.identifier,
         }
+        if not child.reference:
+            op_data[flavor] = child.identifier
         if child.ignore:
             op_data[LayoutField.IGNORE.value] = True
         if child.bugs:
@@ -317,6 +343,8 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
             op_data[LayoutField.COLUMNS.value] = child.display_columns
         if child.pagination:
             op_data[LayoutField.PAGINATION.value] = pagination_to_dict(child.pagination)
+        if child.reference:
+            op_data[LayoutField.REFERENCE.value] = reference_to_dict(child.reference)
         operations.append(op_data)
 
     result = {
