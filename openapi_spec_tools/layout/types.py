@@ -1,8 +1,10 @@
 """Field enums and class definitions for objects used by the layout file."""
-import dataclasses
 from enum import Enum
 from typing import Any
 from typing import Optional
+
+from pydantic import BaseModel
+from pydantic import Field
 
 
 class LayoutField(str, Enum):
@@ -53,8 +55,7 @@ class ReferenceField(str, Enum):
     APP_NAME = "appName"
 
 
-@dataclasses.dataclass
-class PaginationNames:
+class PaginationNames(BaseModel):
     """Data structure for holding info related to pagination parameters."""
 
     # page_size - dictates the limit per request
@@ -78,39 +79,33 @@ class PaginationNames:
         return any([self.page_size, self.page_start, self.item_start, self.next_header, self.next_property])
 
 
-@dataclasses.dataclass
-class ReferenceSubcommand:
+class ReferenceSubcommand(BaseModel):
     """Data structure for holding manual parameters."""
 
     package: str
     app_name: str = "app"
 
 
-@dataclasses.dataclass
-class LayoutNode:
+class LayoutNode(BaseModel):
     """Info for handling the layout file in a hierachical fashion."""
 
     command: str
-    identifier: str
+    identifier: Optional[str]
     description: str = ""
-    bugs: list[str] = dataclasses.field(default_factory=list)
-    summary_fields: list[str] = dataclasses.field(default_factory=list)
-    extra: dict[str, Any] = dataclasses.field(default_factory=dict)
-    children: list["LayoutNode"] = dataclasses.field(default_factory=list)
+    bugs: list[str] = Field(default_factory=list)
+    summary_fields: list[str] = Field(default_factory=list)
+    extra: dict[str, Any] = Field(default_factory=dict)
+    children: list["LayoutNode"] = Field(default_factory=list)
     pagination: Optional[PaginationNames] = None
     reference: Optional[ReferenceSubcommand] = None
-    hidden_fields: list[str] = dataclasses.field(default_factory=list)
-    allowed_fields: list[str] = dataclasses.field(default_factory=list)
-    display_columns: list[str] = dataclasses.field(default_factory=list)
+    hidden_fields: list[str] = Field(default_factory=list)
+    allowed_fields: list[str] = Field(default_factory=list)
+    display_columns: list[str] = Field(default_factory=list)
     ignore: Optional[bool] = None
 
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
         """Convert object to dictionary."""
-        def filter_empty_or_none(d: list[tuple[str, Any]]) -> dict[str, Any]:
-            """Skip keys whose value is None, or an empty list/dict/set."""
-            return {k: v for (k, v) in d if v is not None and v not in ([], {})}
-
-        return dataclasses.asdict(self, dict_factory=filter_empty_or_none if sparse else None)
+        return self.model_dump(exclude_none=sparse, exclude_unset=sparse, exclude_defaults=sparse)
 
     def skip_generation(self) -> bool:
         """Whether to skip code generation for this node."""

@@ -133,11 +133,11 @@ def layout_tree(
     logger = init_logging(log_level, LOG_CLASS)
     tree = layout_tree_with_error_handling(filename, start=start, logger=logger)
     if style == TreeFormat.JSON:
-        print_json(data=tree.as_dict(), indent=indent, sort_keys=False)
+        print_json(data=tree.as_dict(sparse=True), indent=indent, sort_keys=False)
         return
 
     if style == TreeFormat.YAML:
-        print(yaml.dump(tree.as_dict(), indent=indent, sort_keys=False))
+        print(yaml.dump(tree.as_dict(sparse=True), indent=indent, sort_keys=False))
         return
 
     def add_node(table: Table, node: LayoutNode, level: int) -> None:

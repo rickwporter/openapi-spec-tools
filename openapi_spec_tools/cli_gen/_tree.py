@@ -1,8 +1,9 @@
-import dataclasses
 from enum import Enum
 from typing import Optional
 
 import yaml
+from pydantic import BaseModel
+from pydantic import Field
 from rich.panel import Panel
 from rich.table import Table
 
@@ -33,8 +34,7 @@ class TreeField(str, Enum):
     MODULE = "module"
 
 
-@dataclasses.dataclass
-class TreeNode:
+class TreeNode(BaseModel):
     """Represention of the relationship between the CLI and OAS.
 
     The structure is picked up from the layout file, and details about help, path, etc
@@ -47,7 +47,7 @@ class TreeNode:
     function: Optional[str] = None
     method: Optional[str] = None
     path: Optional[str] = None
-    children: list["TreeNode"] = dataclasses.field(default_factory=list)
+    children: list["TreeNode"] = Field(default_factory=list)
 
     def get(self, display: TreeDisplay) -> str:
         if display == TreeDisplay.HELP:

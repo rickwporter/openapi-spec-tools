@@ -189,13 +189,11 @@ EXAMINE_JSON = """\
   "children": [
     {
       "command": "blood-pressure",
-      "identifier": "checkPetBloodPressure",
-      "description": ""
+      "identifier": "checkPetBloodPressure"
     },
     {
       "command": "heart-rate",
-      "identifier": "checkPetHeartRate",
-      "description": ""
+      "identifier": "checkPetHeartRate"
     }
   ]
 }
@@ -207,10 +205,8 @@ description: Examine your pet
 children:
 - command: blood-pressure
   identifier: checkPetBloodPressure
-  description: ''
 - command: heart-rate
   identifier: checkPetHeartRate
-  description: ''
 """
 
 @pytest.mark.parametrize(

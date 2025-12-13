@@ -10,7 +10,6 @@ logging, etc.
 import importlib.metadata
 import json
 from copy import deepcopy
-from dataclasses import dataclass
 from datetime import datetime
 from datetime import timedelta
 from typing import Any
@@ -18,6 +17,7 @@ from typing import Optional
 
 import requests
 import yaml
+from pydantic import BaseModel
 
 from pets_cli._logging import get_logger
 
@@ -65,8 +65,7 @@ EXTENSION_MAP = {
 logger = get_logger()
 
 
-@dataclass
-class PageParams:
+class PageParams(BaseModel):
     """Holds optional pagination parameter names and values."""
 
     # page_size_* dictate the limit per request

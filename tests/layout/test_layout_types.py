@@ -11,12 +11,31 @@ from tests.helpers import asset_filename
     ["node", "sparse", "expected"],
     [
         pytest.param(
-            LayoutNode("sna", "foo"),
+            LayoutNode(command="sna", identifier="foo"),
             True,
-            {"command": "sna", "identifier": "foo", "description": ""},
+            {"command": "sna", "identifier": "foo"},
             id="basic",
         ),
-        # TODO: test with non-sparse (not working)
+        pytest.param(
+            LayoutNode(command="sna", identifier="foo"),
+            False,
+            {
+                'allowed_fields': [],
+                'bugs': [],
+                'children': [],
+                'command': 'sna',
+                'description': '',
+                'display_columns': [],
+                'extra': {},
+                'hidden_fields': [],
+                'identifier': 'foo',
+                'ignore': None,
+                'pagination': None,
+                'reference': None,
+                'summary_fields': [],
+            },
+            id="full"
+        )
     ]
 )
 def test_node_dict(node, sparse, expected):
@@ -59,8 +78,8 @@ def test_node_find(search_args, expected) -> None:
                 command="foo",
                 identifier="bar",
                 children=[
-                    LayoutNode("sna", "foo"),
-                    LayoutNode("sna", "foo", children=[LayoutNode("a", "b")])
+                    LayoutNode(command="sna", identifier="foo"),
+                    LayoutNode(command="sna", identifier="foo", children=[LayoutNode(command="a", identifier="b")])
                 ]
             ),
             1,
@@ -74,9 +93,9 @@ def test_node_find(search_args, expected) -> None:
                 command="foo",
                 identifier="bar",
                 children=[
-                    LayoutNode("sna", "foo"),
-                    LayoutNode("sna", "foo", ignore=True),
-                    LayoutNode("sna", "foo", bugs=["a"]),
+                    LayoutNode(command="sna", identifier="foo"),
+                    LayoutNode(command="sna", identifier="foo", ignore=True),
+                    LayoutNode(command="sna", identifier="foo", bugs=["a"]),
                 ]
             ),
             3,
@@ -90,9 +109,23 @@ def test_node_find(search_args, expected) -> None:
                 command="foo",
                 identifier="bar",
                 children=[
-                    LayoutNode("sna", "foo", children=[LayoutNode("a", "b")]),
-                    LayoutNode("sna", "foo", ignore=True, children=[LayoutNode("a", "b")]),
-                    LayoutNode("sna", "foo", bugs=["a"], children=[LayoutNode("a", "b")]),
+                    LayoutNode(
+                        command="sna",
+                        identifier="foo",
+                        children=[LayoutNode(command="a", identifier="b")],
+                    ),
+                    LayoutNode(
+                        command="sna",
+                        identifier="foo",
+                        ignore=True,
+                        children=[LayoutNode(command="a", identifier="b")],
+                    ),
+                    LayoutNode(
+                        command="sna",
+                        identifier="foo",
+                        bugs=["a"],
+                        children=[LayoutNode(command="a", identifier="b")],
+                    ),
                 ]
             ),
             0,
@@ -107,14 +140,20 @@ def test_node_find(search_args, expected) -> None:
                 identifier="bar",
                 children=[
                     LayoutNode(
-                        "sna",
-                        "foo",
-                        children=[LayoutNode("a", "b"), LayoutNode("c", "d", ignore=True)]
+                        command="sna",
+                        identifier="foo",
+                        children=[
+                            LayoutNode(command="a", identifier="b"),
+                            LayoutNode(command="c", identifier="d", ignore=True),
+                        ],
                     ),
                     LayoutNode(
-                        "sna",
-                        "foo",
-                        children=[LayoutNode("w", "x", ignore=True), LayoutNode("y", "z", bugs=["1"])],
+                        command="sna",
+                        identifier="foo",
+                        children=[
+                            LayoutNode(command="w", identifier="x", ignore=True),
+                            LayoutNode(command="y", identifier="z", bugs=["1"]),
+                        ],
                     )
                 ]
             ),
@@ -153,7 +192,7 @@ def test_node_children(node: LayoutNode, num_ops_all, num_ops_live, num_sub_all,
                 command="foo",
                 identifier="bar",
                 children=[
-                    LayoutNode("sna", "foo", reference=ReferenceSubcommand("pkg")),
+                    LayoutNode(command="sna", identifier="foo", reference=ReferenceSubcommand(package="pkg")),
                 ],
             ),
             1,
@@ -165,8 +204,16 @@ def test_node_children(node: LayoutNode, num_ops_all, num_ops_live, num_sub_all,
                 command="foo",
                 identifier="bar",
                 children=[
-                    LayoutNode("sna", "foo", reference=ReferenceSubcommand("pkg")),
-                    LayoutNode("foo", "bar", reference=ReferenceSubcommand("pkg"), bugs=["1"]),
+                    LayoutNode(
+                        command="sna",
+                        identifier="foo",
+                        reference=ReferenceSubcommand(package="pkg"),
+                    ),
+                    LayoutNode(
+                        command="foo",
+                        identifier="bar",
+                        reference=ReferenceSubcommand(package="pkg"), bugs=["1"],
+                    ),
                 ],
             ),
             1,
@@ -178,10 +225,22 @@ def test_node_children(node: LayoutNode, num_ops_all, num_ops_live, num_sub_all,
                 command="foo",
                 identifier="bar",
                 children=[
-                    LayoutNode("sna", "foo", reference=ReferenceSubcommand("pkg")),
-                    LayoutNode("more", "work"),
-                    LayoutNode("foo", "bar", reference=ReferenceSubcommand("pkg")),
-                    LayoutNode("even", "more", reference=ReferenceSubcommand("pkg", "app"), bugs=["abc"]),
+                    LayoutNode(
+                        command="sna",
+                        identifier="foo",
+                        reference=ReferenceSubcommand(package="pkg"),
+                    ),
+                    LayoutNode(command="more", identifier="work"),
+                    LayoutNode(
+                        command="foo",
+                        identifier="bar",
+                        reference=ReferenceSubcommand(package="pkg", app_name="foo"),
+                    ),
+                    LayoutNode(
+                        command="even",
+                        identifier="more",
+                        reference=ReferenceSubcommand(package="pkg"), bugs=["abc"],
+                    ),
                 ],
             ),
             2,
