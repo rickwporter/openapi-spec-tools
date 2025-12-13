@@ -309,8 +309,8 @@ def test_pagination_creation(names, expected) -> None:
 @pytest.mark.parametrize(
     ["command", "has_details"],
     [
-        pytest.param(LayoutNode("foo", "foo"), False, id="no-summary"),
-        pytest.param(LayoutNode("foo", "foo", summary_fields=["abc"]), True, id="summary"),
+        pytest.param(LayoutNode(command="foo", identifier="foo"), False, id="no-summary"),
+        pytest.param(LayoutNode(command="foo", identifier="foo", summary_fields=["abc"]), True, id="summary"),
     ],
 )
 def test_op_infra_arguments(command, has_details):
@@ -365,34 +365,34 @@ def test_op_check_missing():
 def test_summary_display():
     uut = CliGenerator("foo", {})
 
-    command = LayoutNode("foo", "foo", summary_fields=["abc", "defGhi"])
+    command = LayoutNode(command="foo", identifier="foo", summary_fields=["abc", "defGhi"])
     text = uut.summary_display(command)
     assert 'if not _details:' in text
     assert 'data = _d.allowed(data, ["abc", "defGhi"])' in text
 
-    command = LayoutNode("foo", "foo")
+    command = LayoutNode(command="foo", identifier="foo")
     text = uut.summary_display(command)
     assert '' == text
 
 def test_hidden():
     uut = CliGenerator("foo", {})
 
-    command = LayoutNode("foo", "foo", hidden_fields=["xYz", "@bc"])
+    command = LayoutNode(command="foo", identifier="foo", hidden_fields=["xYz", "@bc"])
     text = uut.hidden(command)
     assert 'data = _d.remove(data, ["xYz", "@bc"])' in text
 
-    command = LayoutNode("foo", "foo")
+    command = LayoutNode(command="foo", identifier="foo")
     text = uut.hidden(command)
     assert '' == text
 
 def test_allowed():
     uut = CliGenerator("foo", {})
 
-    command = LayoutNode("foo", "foo", allowed_fields=["sN@", "bAr"])
+    command = LayoutNode(command="foo", identifier="foo", allowed_fields=["sN@", "bAr"])
     text = uut.allowed(command)
     assert 'data = _d.allowed(data, ["sN@", "bAr"])' in text
 
-    command = LayoutNode("foo", "foo")
+    command = LayoutNode(command="foo", identifier="foo")
     text = uut.allowed(command)
     assert '' == text
 
@@ -661,7 +661,7 @@ def test_tree_yaml(oas_filename, layout_filename, tree_filename):
 
 
 def test_tree_function():
-    node = LayoutNode("bar", "foo_bar")
+    node = LayoutNode(command="bar", identifier="foo_bar")
     uut = CliGenerator("cli", {})
 
     text = uut.tree_function(node)

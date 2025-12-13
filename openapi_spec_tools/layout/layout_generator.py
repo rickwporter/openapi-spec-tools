@@ -194,7 +194,11 @@ class LayoutGenerator:
             child = current.find(command)
             if not child:
                 description = "Manage " + " ".join(parent_cmds)
-                child = LayoutNode(command, self.commands_to_identifier(parent_cmds), description=description)
+                child = LayoutNode(
+                    command=command,
+                    identifier=self.commands_to_identifier(parent_cmds),
+                    description=description,
+                )
                 current.children.append(child)
             current = child
 
@@ -247,7 +251,7 @@ class LayoutGenerator:
     def generate(self, prefix: str, description: Optional[str] = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
         help = self.short_help(description or self.description or DEFAULT_HELP)
-        main = LayoutNode(DEFAULT_START, DEFAULT_START, help)
+        main = LayoutNode(command=DEFAULT_START, identifier=DEFAULT_START, description=help)
 
         for path_name, path_data in self.paths.items():
             path_parts = path_to_parts(path_name, prefix)

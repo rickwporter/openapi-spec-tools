@@ -82,7 +82,7 @@ def test_command_infra_arguments(
 ):
     uut = TestApiGenerator("api_package", {}, **args)
     uut.default_host = default_host
-    node = LayoutNode("foo", "bar")
+    node = LayoutNode(command="foo", identifier="bar")
     args = uut.command_infra_arguments(node)
     text = "\n".join(args)
     assert expected == text
