@@ -306,7 +306,7 @@ pydantic = "^2.12.5"
 pyyaml = "^6.0.2"
 requests = "^2.32.4"
 rich = "^14.0.0"
-typer = "^0.16.0"
+typer = "0.20.0"
 
 [package.source]
 type = "directory"
@@ -758,14 +758,14 @@ files = [
 
 [[package]]
 name = "typer"
-version = "0.16.1"
+version = "0.20.0"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 groups = ["main", "dev"]
 files = [
-    {file = "typer-0.16.1-py3-none-any.whl", hash = "sha256:90ee01cb02d9b8395ae21ee3368421faf21fa138cb2a541ed369c08cec5237c9"},
-    {file = "typer-0.16.1.tar.gz", hash = "sha256:d358c65a464a7a90f338e3bb7ff0c74ac081449e53884b12ba658cbd72990614"},
+    {file = "typer-0.20.0-py3-none-any.whl", hash = "sha256:5b463df6793ec1dca6213a3cf4c0f03bc6e322ac5e16e13ddd622a889489784a"},
+    {file = "typer-0.20.0.tar.gz", hash = "sha256:1aaf6494031793e4876fb0bacfa6a912b551cf43c1e63c800df8b1a866720c37"},
 ]
 
 [package.dependencies]
@@ -822,4 +822,4 @@ zstd = ["backports-zstd (>=1.0.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "7826c4bed13757ce2aaddb6c7da2b1625b01d48dd625902cfe8a57600c70d0c7"
+content-hash = "0f2dbb8d37fc813b5d649170d28cf234f3bad83bb233e58ebeb8497c0a87f681"
