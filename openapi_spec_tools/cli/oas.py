@@ -9,11 +9,11 @@ from typing import Optional
 
 import typer
 import yaml
+from rich_objects import console_factory
 
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
-from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling

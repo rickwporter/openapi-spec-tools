@@ -44,6 +44,7 @@ from typing import Annotated  # noqa: F401
 from typing import Optional  # noqa: F401
 
 import typer
+from rich_objects import display
 
 from {self.package_name} import _arguments as _a
 from {self.package_name} import _display as _d  # noqa: F401
@@ -364,7 +365,7 @@ def {func_name}({args_str}) -> None:
 
     try:
         data = _r.{req_func}({', '.join(req_args)}){self.hidden(node)}{self.allowed(node)}{self.summary_display(node)}
-        _d.display(data, _out_fmt, _out_style{"" if not columns else ", columns=columns"})
+        display(data, _out_fmt, _out_style{"" if not columns else ", columns=columns"})
     except Exception as ex:
         _e.handle_exceptions(ex)
 
