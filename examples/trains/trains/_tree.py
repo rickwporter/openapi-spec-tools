@@ -10,8 +10,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from rich.panel import Panel
 from rich.table import Table
-
-from trains._console import console_factory
+from rich_objects import console_factory
 
 INDENT = "  "
 

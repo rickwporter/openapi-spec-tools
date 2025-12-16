@@ -6,10 +6,10 @@ from typing import Annotated
 from typing import Optional
 
 import typer
+from rich_objects import OutputFormat
+from rich_objects import OutputStyle
 
 from trains._logging import LogLevel
-from trains._display import OutputFormat
-from trains._display import OutputStyle
 from trains._tree import TreeDisplay
 
 ENV_API_HOST = "API_HOST"

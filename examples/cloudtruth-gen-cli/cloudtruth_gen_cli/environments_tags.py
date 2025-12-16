@@ -12,6 +12,7 @@ from typing import Annotated  # noqa: F401
 from typing import Optional  # noqa: F401
 
 import typer
+from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
@@ -83,7 +84,7 @@ def environments_tags_create(
 
     try:
         data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
-        _d.display(data, _out_fmt, _out_style)
+        display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
 
@@ -121,7 +122,7 @@ def environments_tags_destroy(
 
     try:
         data = _r.request("DELETE", url, headers=headers, params=params, timeout=_api_timeout)
-        _d.display(data, _out_fmt, _out_style)
+        display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
 
@@ -195,7 +196,7 @@ def environments_tags_list(
 
     try:
         data = _r.depaginate(page_info, url, headers=headers, params=params, timeout=_api_timeout)
-        _d.display(data, _out_fmt, _out_style)
+        display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
 
@@ -247,7 +248,7 @@ def environments_tags_update(
 
     try:
         data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)
-        _d.display(data, _out_fmt, _out_style)
+        display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
 
@@ -285,7 +286,7 @@ def environments_tags_retrieve(
 
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
-        _d.display(data, _out_fmt, _out_style)
+        display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
 
@@ -336,7 +337,7 @@ def environments_tags_partial_update(
 
     try:
         data = _r.request("PATCH", url, headers=headers, params=params, body=body, timeout=_api_timeout)
-        _d.display(data, _out_fmt, _out_style)
+        display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
 

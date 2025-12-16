@@ -4,8 +4,7 @@
 #
 import typer
 from requests import HTTPError
-
-from github_gen_cli._console import console_factory
+from rich_objects import console_factory
 
 
 class MissingRequiredError(Exception):

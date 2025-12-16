@@ -12,6 +12,7 @@ from typing import Annotated  # noqa: F401
 from typing import Optional  # noqa: F401
 
 import typer
+from rich_objects import display
 
 from github_gen_cli import _arguments as _a
 from github_gen_cli import _display as _d  # noqa: F401
