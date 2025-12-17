@@ -6,10 +6,10 @@ from typing import Annotated
 from typing import Optional
 
 import typer
+from rich_objects import OutputFormat
+from rich_objects import OutputStyle
 
 from cloudtruth_gen_cli._logging import LogLevel
-from cloudtruth_gen_cli._display import OutputFormat
-from cloudtruth_gen_cli._display import OutputStyle
 from cloudtruth_gen_cli._tree import TreeDisplay
 
 ENV_API_HOST = "API_HOST"

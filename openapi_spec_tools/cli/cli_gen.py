@@ -9,6 +9,7 @@ from typing import Optional
 
 import typer
 import yaml
+from rich_objects import console_factory
 
 from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
@@ -22,7 +23,6 @@ from openapi_spec_tools.cli.arguments import PackageNameArgument
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
-from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling

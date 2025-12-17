@@ -1,7 +1,6 @@
 import typer
 from requests import HTTPError
-
-from openapi_spec_tools.cli_gen._console import console_factory
+from rich_objects import console_factory
 
 
 class MissingRequiredError(Exception):

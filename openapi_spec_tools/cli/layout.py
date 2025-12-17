@@ -8,6 +8,7 @@ import yaml
 from rich import print
 from rich import print_json
 from rich.table import Table
+from rich_objects import console_factory
 
 from openapi_spec_tools.cli.arguments import IndentOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameArgument
@@ -15,7 +16,6 @@ from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
-from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling

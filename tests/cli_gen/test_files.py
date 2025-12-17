@@ -244,7 +244,6 @@ def test_copy_infrastructure():
     filenames = {i.name for i in dst_path.iterdir()}
     expected = {
         "_arguments.py",
-        "_console.py",
         "_display.py",
         "_exceptions.py",
         "_logging.py",
@@ -265,7 +264,6 @@ def test_copy_tests():
     expected = {
         "__init__.py",
         "helpers.py",
-        "test_console.py",
         "test_display.py",
         "test_exceptions.py",
         "test_logging.py",
@@ -285,6 +283,6 @@ def test_copy_tests_long_path():
     copy_tests(dst_path.as_posix(), package, "foo")
 
     # spot check the package name updates
-    dst_file = dst_path / "test_display.py"
+    dst_file = dst_path / "test_tree.py"
     text = dst_file.read_text(encoding="utf-8", errors="ignore")
     assert 'from tests.foo.bar.helpers import to_ascii' in text
