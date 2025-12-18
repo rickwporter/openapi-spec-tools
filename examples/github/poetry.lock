@@ -441,7 +441,7 @@ files = [
 
 [[package]]
 name = "openapi-spec-tools"
-version = "0.9.7"
+version = "0.9.8"
 description = "OpenAPI specification tools for analyzing, updating, and generating a CLI."
 optional = false
 python-versions = "^3.9"
