@@ -10,10 +10,11 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-typer = "0.20.0"
-rich = "^14.0.0"
-requests = "^2.32.4"
+typer = "^0.21.1"
+rich = "^14.2.0"
+requests = "^2.32.5"
 pyyaml = "^6.0.2"
+rich-objects = "^0.2.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
