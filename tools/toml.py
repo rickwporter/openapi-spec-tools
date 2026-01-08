@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """CLI utilities for managing dependencies in sub-projects."""
+import subprocess
 from pathlib import Path
 from typing import Annotated
 from typing import Any
@@ -128,6 +129,78 @@ def show(
             message += render_short_dependencies("development", dev_deps)
 
     typer.echo(message)
+
+
+def installed_updates(
+    toml: dict[str, Any],
+    updates: dict[str, str],
+    group: Optional[str] = None,
+) -> dict[Path, list[str]]:
+    """Create a list of filenames to package updates."""
+    result = {}
+    for filename, installed in toml.items():
+        items = []
+        for name, package in updates.items():
+            if name in installed:
+                if group:
+                    items.extend(["--group", group])
+                items.append(package)
+        if items:
+            result[filename] = items
+
+    return result
+
+
+@app.command("add", short_help="Add the specified dependencies")
+def poetry_add(
+    directory: DirectoryArgument = None,
+    packages: Annotated[
+        Optional[list[str]],
+        typer.Option(
+            "--package",
+            metavar="<package>[==<version>]",
+            help="List of dependencies to udpate",
+        ),
+    ] = None,
+    group: Annotated[Optional[str], typer.Option(show_default=False, help="Group (if forced)")] = None,
+    force: Annotated[bool, typer.Option(help="Whether to force adding packages")] = False,
+):
+    """Perform 'poetry add' with each specified package/version."""
+    if not packages:
+        typer.echo("No updates provided")
+        raise typer.Exit(1)
+
+    updates = {p.split('=')[0]: p for p in packages}
+
+    path =  Path(directory) if directory else Path.cwd()
+    run_deps, dev_deps = parse_dependencies(path)
+
+    commands = installed_updates(run_deps, updates)
+    dev_updates = installed_updates(dev_deps, updates, "dev")
+    for filename, dev_items in dev_updates.items():
+        items = commands.get(filename, [])
+        items.extend(dev_items)
+        commands[filename] = items
+
+    if force:
+        # when forcing, add items not added by other means
+        for filename in run_deps.keys():
+            items = commands.get(filename, [])
+            for update in updates.values():
+                if update not in items:
+                    if group:
+                        items.extend(["--group", group])
+                    items.append(update)
+            commands[filename] = items
+
+    for filename, items in commands.items():
+        directory = Path(filename).parent
+        args = ["poetry", "add"] + items
+        print("*" * 50)
+        print(f"Updating {directory} via '{' '.join(args)}'")
+        subprocess.call(args, cwd=directory.as_posix())
+
+    typer.echo("Done")
 
 
 if __name__ == "__main__":
