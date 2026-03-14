@@ -27,7 +27,7 @@ install: ## Install the package
 	poetry install
 
 all: install gen lint ## Perform a full cycle
-	$(poetry_run) cloudtruth 
+	$(poetry_run) cloudtruth --help
 
 ###########
 ##@ Code generation
