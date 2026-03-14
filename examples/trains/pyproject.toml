@@ -21,8 +21,8 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.11.13"
-black = "^25.1.0"
+ruff = "^0.15.6"
+black = "^26.3.1"
 openapi-spec-tools = {path = "../..", develop = true}
 
 [tool.poetry.scripts]
