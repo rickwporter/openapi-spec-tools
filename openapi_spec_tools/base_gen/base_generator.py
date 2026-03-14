@@ -121,7 +121,7 @@ class BaseGenerator:
 
     def short_reference_name(self, full_name: str) -> str:
         """Transform the '#/components/schemas/Xxx' to 'Xxx'."""
-        return full_name.split('/')[-1]
+        return full_name.rsplit('/', maxsplit=1)[-1]
 
     def shebang(self) -> str:
         """Get the shebang line that goes at the top of each file."""
