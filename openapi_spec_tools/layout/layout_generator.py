@@ -99,7 +99,7 @@ class LayoutGenerator:
     def short_help(self, help: str) -> str:
         """Shortens a long help string into something more managable."""
         if len(help) > self.max_help_length:
-            help = help.split(". ")[0].strip()[:self.max_help_length] + '...'
+            help = help.split(". ", maxsplit=1)[0].strip()[:self.max_help_length] + '...'
         return simple_escape(help)
 
     def get_model(self, full_name: str) -> dict[str, Any]:
