@@ -25,7 +25,7 @@ install: ## Install the package
 	poetry install
 
 all: install gen lint cov ## Perform a full cycle
-	$(poetry_run) pets
+	$(poetry_run) pets --help
 
 ###########
 ##@ CLI generation

@@ -26,7 +26,7 @@ install: ## Install the package
 	poetry install
 
 all: install gen lint ## Perform a full cycle
-	$(poetry_run) gh-cli
+	$(poetry_run) gh-cli --help
 
 ###########
 ##@ Code generation

@@ -24,7 +24,7 @@ install: ## Install the package
 	poetry install
 
 all: install gen lint ## Perform a full cycle
-	$(poetry_run) trains
+	$(poetry_run) trains --help
 
 ###########
 ##@ CLI generation
