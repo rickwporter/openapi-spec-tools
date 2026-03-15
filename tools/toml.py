@@ -15,6 +15,20 @@ NL = "\n"
 INDENT = "  "
 DirectoryArgument = Annotated[Optional[str], typer.Argument(help="Directory to search for TOML files.")]
 
+
+def parse_project_dependencies(items: list[str]) -> dict[str, Any]:
+    """Parse the project dependencies."""
+    result = {}
+    for item in items:
+        name, value = item.split(' ', maxsplit=1)
+        value = value.replace('(', '').replace(')', '')
+        if value.startswith('>=') and ',<' in value:
+            value = value.split(',<', maxsplit=1)[0].replace('>=', '^')
+        result[name] = value
+
+    return result
+
+
 def parse_dependencies(start_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     """Parse the dependencies for all the pyproject.toml files in the path."""
     run_deps = {}
@@ -25,9 +39,15 @@ def parse_dependencies(start_path: Path) -> tuple[dict[str, Any], dict[str, Any]
             project = tomlkit.load(fp)
 
         name = str(fname.relative_to(start_path))
-        tools = project["tool"]["poetry"]
-        run_deps[name] = tools["dependencies"]
-        dev_deps[name] = tools["group"]["dev"]["dependencies"]
+
+        tools = project.get("tool", {}).get("poetry", {})
+        rd = (
+            tools.get("dependencies", {}) or
+            parse_project_dependencies(project.get('project', {}).get('dependencies', []))
+        )
+        dd = tools.get("group", {}).get("dev", {}).get("dependencies", {})
+        run_deps[name] = rd
+        dev_deps[name] = dd
 
     return (run_deps, dev_deps)
 
@@ -151,8 +171,8 @@ def installed_updates(
     return result
 
 
-@app.command("add", short_help="Add the specified dependencies")
-def poetry_add(
+@app.command("update", short_help="Update the specified dependencies")
+def poetry_update(
     directory: DirectoryArgument = None,
     packages: Annotated[
         Optional[list[str]],
@@ -165,7 +185,10 @@ def poetry_add(
     group: Annotated[Optional[str], typer.Option(show_default=False, help="Group (if forced)")] = None,
     force: Annotated[bool, typer.Option(help="Whether to force adding packages")] = False,
 ):
-    """Perform 'poetry add' with each specified package/version."""
+    """Perform 'poetry add' with each specified package/version.
+
+    Does NOT add dependencies unless they already exist, or given the --force flag.
+    """
     if not packages:
         typer.echo("No updates provided")
         raise typer.Exit(1)
