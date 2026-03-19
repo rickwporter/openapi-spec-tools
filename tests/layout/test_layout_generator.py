@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
+from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import write_layout
 from openapi_spec_tools.types import OasField
@@ -144,19 +145,19 @@ def test_generate_cloudtruth():
     assert 'CloudTruth centralizes your configuration parameters' in node.description
 
     # no direct operations -- all in sub-commands
-    assert [] == node.operations()
+    feature_node = LayoutNode(command='features', identifier='features_retrieve')
+    import_node = LayoutNode(command='import', identifier='import_create')
+    assert [feature_node, import_node] == node.operations()
 
     subcmds = node.subcommands()
-    assert 17 == len(subcmds)
+    assert 15 == len(subcmds)
 
     # a couple spot checks
     current_user = node.find("users", "current")
     assert [] == current_user.subcommands()
-    sub_ops = current_user.operations()
-    assert 1 == len(sub_ops)
-    item = sub_ops[0]
-    assert "show" == item.command
-    assert "users_current_retrieve" == item.identifier
+    assert [] == current_user.operations()
+    assert "current" == current_user.command
+    assert "users_current_retrieve" == current_user.identifier
 
     key_list = node.find("integrations", "azure", "key-vault", "list")
     assert "list" == key_list.command

@@ -58,8 +58,6 @@ def test_generate_api_node_multiple():
             'def create_owner',
             'def delete_owner',
             'def update_owner',
-        ],
-        "owners_pets": [
             "def list_owner_pets",
         ],
         "pets": [
