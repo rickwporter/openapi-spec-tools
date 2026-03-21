@@ -124,6 +124,74 @@ def test_suggest_command(op_data, expected):
     assert expected == uut.suggest_command(op_data)
 
 
+@pytest.mark.parametrize(
+    ["node", "expected"],
+    [
+        pytest.param(
+            LayoutNode(command="main", identifier="main", children=[LayoutNode(command="foo", identifier="foo_func")]),
+            LayoutNode(command="main", identifier="main", children=[LayoutNode(command="foo", identifier="foo_func")]),
+            id="unchanged",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="main",
+                identifier="main",
+                children=[
+                    LayoutNode(
+                        command="foo",
+                        identifier="foo_func",
+                        children=[LayoutNode(command="bar", identifier="bar_func")],
+                    )
+                ],
+            ),
+            LayoutNode(
+                command="main",
+                identifier="main",
+                children=[LayoutNode(command="foo", identifier="bar_func")],
+            ),
+            id="simple",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="main",
+                identifier="main",
+                children=[
+                    LayoutNode(
+                        command="a",
+                        identifier="a_func",
+                        children=[
+                            LayoutNode(command="b", identifier="b_func"),
+                            LayoutNode(command="c", identifier="c_func", children=[
+                                LayoutNode(command="d", identifier="d_func"),
+                            ]),
+                        ],
+                    )
+                ],
+            ),
+            LayoutNode(
+                command="main",
+                identifier="main",
+                children=[
+                    LayoutNode(
+                        command="a",
+                        identifier="a_func",
+                        children=[
+                            LayoutNode(command="b", identifier="b_func"),
+                            LayoutNode(command="c", identifier="d_func"),
+                        ],
+                    )
+                ],
+            ),
+            id="nested",
+        ),
+    ]
+)
+def test_condense(node: LayoutNode, expected: LayoutNode) -> None:
+    uut = LayoutGenerator({})
+    result = uut.condense(node)
+    assert expected == result
+
+
 def test_generate_pets():
     oas = open_oas(asset_filename("pet.yaml"))
 

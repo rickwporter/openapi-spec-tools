@@ -249,13 +249,32 @@ class LayoutGenerator:
         return PaginationNames(**args)
 
     def condense(self, node: LayoutNode) -> LayoutNode:
-        """Condense children."""
+        """Condense child layers.
+
+        Replaces children with just one operation with a child that references the grand-child operation.
+
+        The yaml would go from:
+        main:
+          operations:
+            - name: version
+              subcommandId: version
+        version:
+          operations:
+            - name: show
+              operationId: getVersion
+
+        to a flatter version:
+        main:
+          operations:
+            - name: version
+              operationId: getVersion
+        """
         condensed = []
         for child in node.children:
             ops = child.operations()
             if len(ops) == 1 and len(child.subcommands()) == 0:
-                updated = LayoutNode(command=child.command, identifier=ops[0].identifier)
                 # keep the "descriptive" command, and replace the identifier with the grandchild's (aka)
+                updated = LayoutNode(command=child.command, identifier=ops[0].identifier)
                 condensed.append(updated)
             else:
                 condensed.append(self.condense(child))
