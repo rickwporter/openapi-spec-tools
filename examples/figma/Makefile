@@ -7,7 +7,7 @@ help: ## This message
 
 
 LAYOUT_FILE := layout.yaml
-SUGGESTED_FILE := layout.yaml
+SUGGESTED_FILE := suggested.yaml
 OPENAPI_SPEC := openapi.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := figma_cli
