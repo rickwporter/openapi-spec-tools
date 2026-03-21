@@ -46,7 +46,7 @@ Several common options are available on commands or sub-commands:
 * `--format` - controls output format for JSON or YAML output instead of table
 * `--style` - controls various highlighting for output
 
-The `commands` sub-command allows you to see all the commands beneath the current command. Using the `--details`, you can see various help, URL, or operationIds.
+The `commands` sub-command allows you to see all the commands beneath the current command. Using the `--display`, you can see various help, URL, or operationIds.
 
 
 ## Development
