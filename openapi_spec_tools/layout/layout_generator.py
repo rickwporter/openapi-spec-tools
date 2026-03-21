@@ -248,6 +248,40 @@ class LayoutGenerator:
 
         return PaginationNames(**args)
 
+    def condense(self, node: LayoutNode) -> LayoutNode:
+        """Condense child layers.
+
+        Replaces children with just one operation with a child that references the grand-child operation.
+
+        The yaml would go from:
+        main:
+          operations:
+            - name: version
+              subcommandId: version
+        version:
+          operations:
+            - name: show
+              operationId: getVersion
+
+        to a flatter version:
+        main:
+          operations:
+            - name: version
+              operationId: getVersion
+        """
+        condensed = []
+        for child in node.children:
+            ops = child.operations()
+            if len(ops) == 1 and len(child.subcommands()) == 0:
+                # keep the "descriptive" command, and replace the identifier with the grandchild's (aka)
+                updated = LayoutNode(command=child.command, identifier=ops[0].identifier)
+                condensed.append(updated)
+            else:
+                condensed.append(self.condense(child))
+
+        node.children = condensed
+        return node
+
     def generate(self, prefix: str, description: Optional[str] = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
         help = self.short_help(description or self.description or DEFAULT_HELP)
@@ -271,6 +305,9 @@ class LayoutGenerator:
                 )
                 # sort the children to match layout linting
                 path_node.children = sorted(path_node.children, key=lambda x: x.command)
+
+        # try to condense
+        main = self.condense(main)
 
         # finally, sort the main children
         main.children = sorted(main.children, key=lambda x: x.command)

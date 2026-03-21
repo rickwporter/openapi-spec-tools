@@ -93,12 +93,10 @@ def test_api_generate_success_copyright():
         pytest.param(
             None,
             {
-                'examine_blood_pressure.py',
-                'examine_heart_rate.py',
+                'examine.py',
+                'main.py',
                 'owners.py',
-                'owners_pets.py',
                 'pets.py',
-                'version.py',
                 'vets.py',
             },
             id="all",

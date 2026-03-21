@@ -14,6 +14,30 @@ from cloudtruth_api.opaque import _logging as _l  # noqa: F401
 from cloudtruth_api.opaque import _requests as _r  # noqa: F401
 
 
+def environments_copy_create(
+    id: str,  # A unique identifier for the environment. [required]
+    body: Any = None,  # required fields: name
+    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
+    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+) -> Any:
+    # handler for environments_copy_create: POST /api/v1/environments/{id}/copy/
+    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
+    _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
+    _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
+
+    _l.init_logging(_log_level)
+    headers = _r.request_headers(_api_key, content_type="application/json")
+    url = _r.create_url(_api_host, "api/v1/environments", id, "copy/")
+
+    params = {}
+
+    data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
+    return data
+
+
 def environments_create(
     body: Any = None,  # required fields: name
     _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
@@ -89,6 +113,41 @@ def environments_list(
         params["name"] = name
     if name__icontains is not None:
         params["name__icontains"] = name__icontains
+    if ordering is not None:
+        params["ordering"] = ordering
+    if page is not None:
+        params["page"] = page
+    if page_size is not None:
+        params["page_size"] = page_size
+
+    data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
+    return data
+
+
+def environments_pushes_list(
+    environment_pk: str,  # [required]
+    ordering: Optional[str] = None,  # Which field to use when ordering the results.
+    page: Optional[int] = None,  # A page number within the paginated result set.
+    page_size: Optional[int] = None,  # Number of results to return per page.
+    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
+    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+) -> Any:
+    '''
+    The push operations that this environment was involved in.
+    '''
+    # handler for environments_pushes_list: GET /api/v1/environments/{environment_pk}/pushes/
+    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
+    _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
+    _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
+
+    _l.init_logging(_log_level)
+    headers = _r.request_headers(_api_key)
+    url = _r.create_url(_api_host, "api/v1/environments", environment_pk, "pushes/")
+
+    params = {}
     if ordering is not None:
         params["ordering"] = ordering
     if page is not None:
