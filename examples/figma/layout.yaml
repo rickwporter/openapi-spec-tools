@@ -1,0 +1,165 @@
+main:
+    description: This is the OpenAPI specification for the [Figma REST API](https://www.figma.com...
+    operations:
+    -   name: activity-logs
+        operationId: getActivityLogs
+    -   name: analytics
+        subcommandId: analytics
+    -   name: component-sets
+        operationId: getComponentSet
+    -   name: components
+        operationId: getComponent
+    -   name: dev-resources
+        subcommandId: dev_resources
+    -   name: files
+        subcommandId: files
+    -   name: images
+        operationId: getImages
+    -   name: me
+        operationId: getMe
+    -   name: payments
+        operationId: getPayments
+    -   name: projects
+        subcommandId: projects
+    -   name: styles
+        operationId: getStyle
+    -   name: teams
+        subcommandId: teams
+    -   name: webhooks
+        subcommandId: webhooks
+analytics:
+    description: Manage analytics
+    operations:
+    -   name: libraries
+        subcommandId: analytics_libraries
+analytics_libraries:
+    description: Manage analytics libraries
+    operations:
+    -   name: component
+        subcommandId: analytics_libraries_component
+    -   name: style
+        subcommandId: analytics_libraries_style
+    -   name: variable
+        subcommandId: analytics_libraries_variable
+analytics_libraries_component:
+    description: Manage analytics libraries component
+    operations:
+    -   name: actions
+        operationId: getLibraryAnalyticsComponentActions
+    -   name: usages
+        operationId: getLibraryAnalyticsComponentUsages
+analytics_libraries_style:
+    description: Manage analytics libraries style
+    operations:
+    -   name: actions
+        operationId: getLibraryAnalyticsStyleActions
+    -   name: usages
+        operationId: getLibraryAnalyticsStyleUsages
+analytics_libraries_variable:
+    description: Manage analytics libraries variable
+    operations:
+    -   name: actions
+        operationId: getLibraryAnalyticsVariableActions
+    -   name: usages
+        operationId: getLibraryAnalyticsVariableUsages
+dev_resources:
+    description: Manage dev-resources
+    operations:
+    -   name: create
+        operationId: postDevResources
+    -   name: set
+        operationId: putDevResources
+files:
+    description: Manage files
+    operations:
+    -   name: comments
+        subcommandId: files_comments
+    -   name: component-sets
+        operationId: getFileComponentSets
+    -   name: components
+        operationId: getFileComponents
+    -   name: dev-resources
+        subcommandId: files_dev_resources
+    -   name: images
+        operationId: getImageFills
+    -   name: meta
+        operationId: getFileMeta
+    -   name: nodes
+        operationId: getFileNodes
+    -   name: show
+        operationId: getFile
+    -   name: styles
+        operationId: getFileStyles
+    -   name: variables
+        subcommandId: files_variables
+    -   name: versions
+        operationId: getFileVersions
+files_comments:
+    description: Manage files comments
+    operations:
+    -   name: create
+        operationId: postComment
+    -   name: delete
+        operationId: deleteComment
+    -   name: reactions
+        subcommandId: files_comments_reactions
+    -   name: show
+        operationId: getComments
+files_comments_reactions:
+    description: Manage files comments reactions
+    operations:
+    -   name: create
+        operationId: postCommentReaction
+    -   name: delete
+        operationId: deleteCommentReaction
+    -   name: show
+        operationId: getCommentReactions
+files_dev_resources:
+    description: Manage files dev-resources
+    operations:
+    -   name: delete
+        operationId: deleteDevResource
+    -   name: show
+        operationId: getDevResources
+files_variables:
+    description: Manage files variables
+    operations:
+    -   name: create
+        operationId: postVariables
+    -   name: local
+        operationId: getLocalVariables
+    -   name: published
+        operationId: getPublishedVariables
+projects:
+    description: Manage projects
+    operations:
+    -   name: files
+        operationId: getProjectFiles
+teams:
+    description: Manage teams
+    operations:
+    -   name: component-sets
+        operationId: getTeamComponentSets
+    -   name: components
+        operationId: getTeamComponents
+    -   name: projects
+        operationId: getTeamProjects
+    -   name: styles
+        operationId: getTeamStyles
+    -   name: webhooks
+        operationId: getTeamWebhooks
+webhooks:
+    description: Manage webhooks
+    operations:
+    -   name: create
+        operationId: postWebhook
+    -   name: delete
+        operationId: deleteWebhook
+    -   name: list
+        operationId: getWebhooks
+    -   name: requests
+        operationId: getWebhookRequests
+    -   name: set
+        operationId: putWebhook
+    -   name: show
+        operationId: getWebhook

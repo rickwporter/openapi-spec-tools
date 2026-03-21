@@ -1,0 +1,180 @@
+main:
+    description: This is the OpenAPI specification for the [Figma REST API](https://www.figma.com...
+    operations:
+    -   name: v1
+        subcommandId: v1
+    -   name: v2
+        subcommandId: v2
+v1:
+    description: Manage v1
+    operations:
+    -   name: activity-logs
+        operationId: getActivityLogs
+    -   name: analytics
+        subcommandId: v1_analytics
+    -   name: component-sets
+        operationId: getComponentSet
+    -   name: components
+        operationId: getComponent
+    -   name: dev-resources
+        subcommandId: v1_dev_resources
+    -   name: files
+        subcommandId: v1_files
+    -   name: images
+        operationId: getImages
+    -   name: me
+        operationId: getMe
+    -   name: payments
+        operationId: getPayments
+    -   name: projects
+        subcommandId: v1_projects
+    -   name: styles
+        operationId: getStyle
+    -   name: teams
+        subcommandId: v1_teams
+v1_analytics:
+    description: Manage v1 analytics
+    operations:
+    -   name: libraries
+        subcommandId: v1_analytics_libraries
+v1_analytics_libraries:
+    description: Manage v1 analytics libraries
+    operations:
+    -   name: component
+        subcommandId: v1_analytics_libraries_component
+    -   name: style
+        subcommandId: v1_analytics_libraries_style
+    -   name: variable
+        subcommandId: v1_analytics_libraries_variable
+v1_analytics_libraries_component:
+    description: Manage v1 analytics libraries component
+    operations:
+    -   name: actions
+        operationId: getLibraryAnalyticsComponentActions
+    -   name: usages
+        operationId: getLibraryAnalyticsComponentUsages
+v1_analytics_libraries_style:
+    description: Manage v1 analytics libraries style
+    operations:
+    -   name: actions
+        operationId: getLibraryAnalyticsStyleActions
+    -   name: usages
+        operationId: getLibraryAnalyticsStyleUsages
+v1_analytics_libraries_variable:
+    description: Manage v1 analytics libraries variable
+    operations:
+    -   name: actions
+        operationId: getLibraryAnalyticsVariableActions
+    -   name: usages
+        operationId: getLibraryAnalyticsVariableUsages
+v1_dev_resources:
+    description: Manage v1 dev-resources
+    operations:
+    -   name: create
+        operationId: postDevResources
+    -   name: set
+        operationId: putDevResources
+v1_files:
+    description: Manage v1 files
+    operations:
+    -   name: comments
+        subcommandId: v1_files_comments
+    -   name: component-sets
+        operationId: getFileComponentSets
+    -   name: components
+        operationId: getFileComponents
+    -   name: dev-resources
+        subcommandId: v1_files_dev_resources
+    -   name: images
+        operationId: getImageFills
+    -   name: meta
+        operationId: getFileMeta
+    -   name: nodes
+        operationId: getFileNodes
+    -   name: show
+        operationId: getFile
+    -   name: styles
+        operationId: getFileStyles
+    -   name: variables
+        subcommandId: v1_files_variables
+    -   name: versions
+        operationId: getFileVersions
+v1_files_comments:
+    description: Manage v1 files comments
+    operations:
+    -   name: create
+        operationId: postComment
+    -   name: delete
+        operationId: deleteComment
+    -   name: reactions
+        subcommandId: v1_files_comments_reactions
+    -   name: show
+        operationId: getComments
+v1_files_comments_reactions:
+    description: Manage v1 files comments reactions
+    operations:
+    -   name: create
+        operationId: postCommentReaction
+    -   name: delete
+        operationId: deleteCommentReaction
+    -   name: show
+        operationId: getCommentReactions
+v1_files_dev_resources:
+    description: Manage v1 files dev-resources
+    operations:
+    -   name: delete
+        operationId: deleteDevResource
+    -   name: show
+        operationId: getDevResources
+v1_files_variables:
+    description: Manage v1 files variables
+    operations:
+    -   name: create
+        operationId: postVariables
+    -   name: local
+        operationId: getLocalVariables
+    -   name: published
+        operationId: getPublishedVariables
+v1_projects:
+    description: Manage v1 projects
+    operations:
+    -   name: files
+        operationId: getProjectFiles
+v1_teams:
+    description: Manage v1 teams
+    operations:
+    -   name: component-sets
+        operationId: getTeamComponentSets
+    -   name: components
+        operationId: getTeamComponents
+    -   name: projects
+        operationId: getTeamProjects
+    -   name: styles
+        operationId: getTeamStyles
+v2:
+    description: Manage v2
+    operations:
+    -   name: teams
+        subcommandId: v2_teams
+    -   name: webhooks
+        subcommandId: v2_webhooks
+v2_teams:
+    description: Manage v2 teams
+    operations:
+    -   name: webhooks
+        operationId: getTeamWebhooks
+v2_webhooks:
+    description: Manage v2 webhooks
+    operations:
+    -   name: create
+        operationId: postWebhook
+    -   name: delete
+        operationId: deleteWebhook
+    -   name: requests
+        operationId: getWebhookRequests
+    -   name: set
+        operationId: putWebhook
+    -   name: show
+        operationId: getWebhooks
+    -   name: show
+        operationId: getWebhook
