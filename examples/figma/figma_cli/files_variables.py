@@ -52,6 +52,39 @@ class VariableCreate(str, Enum):  # noqa: F811
     CREATE = "CREATE"
 
 
+class VariableResolvedDataType(str, Enum):  # noqa: F811
+    BOOLEAN = "BOOLEAN"
+    FLOAT_ = "FLOAT"
+    STRING = "STRING"
+    COLOR = "COLOR"
+
+
+class VariableScope(str, Enum):  # noqa: F811
+    ALL_SCOPES = "ALL_SCOPES"
+    TEXT_CONTENT = "TEXT_CONTENT"
+    CORNER_RADIUS = "CORNER_RADIUS"
+    WIDTH_HEIGHT = "WIDTH_HEIGHT"
+    GAP = "GAP"
+    ALL_FILLS = "ALL_FILLS"
+    FRAME_FILL = "FRAME_FILL"
+    SHAPE_FILL = "SHAPE_FILL"
+    TEXT_FILL = "TEXT_FILL"
+    STROKE_COLOR = "STROKE_COLOR"
+    STROKE_FLOAT = "STROKE_FLOAT"
+    EFFECT_FLOAT = "EFFECT_FLOAT"
+    EFFECT_COLOR = "EFFECT_COLOR"
+    OPACITY = "OPACITY"
+    FONT_FAMILY = "FONT_FAMILY"
+    FONT_STYLE = "FONT_STYLE"
+    FONT_WEIGHT = "FONT_WEIGHT"
+    FONT_SIZE = "FONT_SIZE"
+    LINE_HEIGHT = "LINE_HEIGHT"
+    LETTER_SPACING = "LETTER_SPACING"
+    PARAGRAPH_SPACING = "PARAGRAPH_SPACING"
+    PARAGRAPH_INDENT = "PARAGRAPH_INDENT"
+    FONT_VARIATIONS = "FONT_VARIATIONS"
+
+
 @app.command("create", short_help="Create/modify/delete variables")
 def post_variables(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to modify variables in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
@@ -70,8 +103,13 @@ def post_variables(
     variables_id: Annotated[Optional[str], typer.Option(show_default=False, help="A temporary id for this variable.")] = None,
     variables_name: Annotated[Optional[str], typer.Option(show_default=False, help="The name of this variable.")] = None,
     variables_variable_collection_id: Annotated[Optional[str], typer.Option(show_default=False, help="The variable collection that will contain the variable. You can use the temporary id of a variable collection.")] = None,
+    variables_resolved_type: Annotated[Optional[VariableResolvedDataType], typer.Option(show_default=False, case_sensitive=False, help="The resolved type of the variable.")] = None,
     variables_description: Annotated[Optional[str], typer.Option(show_default=False, help="The description of this variable.")] = None,
     variables_hidden_from_publishing: Annotated[Optional[bool], typer.Option("--variables-hidden-from-publishing/--no-variables-hidden-from-publishing", help="Whether this variable is hidden when publishing the current file as a library.")] = False,
+    variables_scopes: Annotated[Optional[list[VariableScope]], typer.Option(show_default=False, case_sensitive=False, help="An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields.")] = None,
+    variables_code_syntax_web: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    variables_code_syntax_android: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    variables_code_syntax_i_os: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -137,6 +175,7 @@ def post_variables(
     variable_collections = {}
     variable_modes = {}
     variables = {}
+    code_syntax = {}
     if variable_collections_action is not None:
         variable_collections["action"] = variable_collections_action
     if variable_collections_id is not None:
@@ -167,11 +206,23 @@ def post_variables(
         variables["name"] = variables_name
     if variables_variable_collection_id is not None:
         variables["variableCollectionId"] = variables_variable_collection_id
+    if variables_resolved_type is not None:
+        variables["resolvedType"] = variables_resolved_type
     if variables_description is not None:
         variables["description"] = variables_description
     if variables_hidden_from_publishing is not None:
         variables["hiddenFromPublishing"] = variables_hidden_from_publishing
+    if variables_scopes is not None:
+        variables["scopes"] = variables_scopes
+    if variables_code_syntax_web is not None:
+        code_syntax["WEB"] = variables_code_syntax_web
+    if variables_code_syntax_android is not None:
+        code_syntax["ANDROID"] = variables_code_syntax_android
+    if variables_code_syntax_i_os is not None:
+        code_syntax["iOS"] = variables_code_syntax_i_os
     # stitch together the sub-objects
+    if code_syntax:
+        variables["codeSyntax"] = code_syntax
     if variable_collections:
         body["variableCollections"] = variable_collections
     if variable_modes:
