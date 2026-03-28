@@ -61,6 +61,7 @@ def post_variables(
     variable_collections_initial_mode_id: Annotated[Optional[str], typer.Option(show_default=False, help="The initial mode refers to the mode that is created by default. You can set a temporary id here, in order to reference this mode later in this request.")] = None,
     variable_collections_hidden_from_publishing: Annotated[Optional[bool], typer.Option("--variable-collections-hidden-from-publishing/--no-variable-collections-hidden-from-publishing", help="Whether this variable collection is hidden when publishing the current file as a library.")] = False,
     variable_collections_parent_variable_collection_id: Annotated[Optional[str], typer.Option(show_default=False, help="The id of the parent variable collection that this variable collection is extending from.")] = None,
+    variable_collections_initial_mode_id_to_parent_mode_id_mapping: Annotated[Optional[str], typer.Option(show_default=False, help="Maps inherited modes from the parent variable collection to the initial mode ids on the extended variable collection.")] = None,
     variable_modes_action: Annotated[Optional[VariableModeCreate], typer.Option(show_default=False, case_sensitive=False, help="The action to perform for the variable mode.")] = None,
     variable_modes_id: Annotated[Optional[str], typer.Option(show_default=False, help="A temporary id for this variable mode.")] = None,
     variable_modes_name: Annotated[Optional[str], typer.Option(show_default=False, help="The name of this variable mode.")] = None,
@@ -148,6 +149,8 @@ def post_variables(
         variable_collections["hiddenFromPublishing"] = variable_collections_hidden_from_publishing
     if variable_collections_parent_variable_collection_id is not None:
         variable_collections["parentVariableCollectionId"] = variable_collections_parent_variable_collection_id
+    if variable_collections_initial_mode_id_to_parent_mode_id_mapping is not None:
+        variable_collections["initialModeIdToParentModeIdMapping"] = variable_collections_initial_mode_id_to_parent_mode_id_mapping
     if variable_modes_action is not None:
         variable_modes["action"] = variable_modes_action
     if variable_modes_id is not None:
