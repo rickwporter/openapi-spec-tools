@@ -383,6 +383,12 @@ class BaseGenerator:
         reference = model.get(OasField.REFS, "")
         short_refname = self.short_reference_name(reference)
         required_props = model.get(OasField.REQUIRED, [])
+        ref_model = self.get_model(reference)
+        if ref_model:
+            # update the non-existing fields in the model
+            set_missing(model, OasField.X_REF.value, short_refname)
+            for k, v in ref_model.items():
+                set_missing(model, k, v)
 
         # copy the individual properties
         for prop_name, prop_data in model.get(OasField.PROPS, {}).items():

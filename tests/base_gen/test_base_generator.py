@@ -455,6 +455,8 @@ def test_op_body_formation():
     assert '_l.logger().warning("--another-value is deprecated and should not be used")' in text
     assert 'body["anotherValue"] = another_value' in text  # check prop vs variable name
     assert 'if bogus is not None:' not in text
+    assert 'if flavor is not None:' in text
+    assert 'body["flavor"] = flavor' in text
     assert 'if optional_list is not None:' in text
     assert 'body["optionalList"] = optional_list' in text
     assert 'if first_choice is not None:' in text
