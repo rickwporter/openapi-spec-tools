@@ -405,6 +405,19 @@ def test_get_parameter_pytype(param_data, expected):
             "Foo",
             id="unnamed-enum"
         ),
+        pytest.param("foo", {TYPE: "object"}, None, id="object"),
+        pytest.param(
+            "foo",
+            {TYPE: "object", "additionalProperties": {TYPE: "string"}},
+            "Optional[str]",
+            id="add-props",
+        ),
+        pytest.param(
+            "foo",
+            {TYPE: "object", "additionalProperties": {TYPE: "string"}, REQUIRED: True},
+            "str",
+            id="add-props-req",
+        ),
     ],
 )
 def test_get_property_pytype(prop_name, prop_data, expected):

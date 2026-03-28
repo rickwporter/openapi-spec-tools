@@ -550,6 +550,12 @@ class BaseGenerator:
             base_name = prop_data.get(OasField.X_REF) or prop_name
             pytype = self.class_name(base_name)
         else:
+            oas_type = self.simplify_type(prop_data.get(OasField.TYPE))
+            if oas_type == "object":
+                add_prop_type = prop_data.get(OasField.ADDITIONAL_PROPS, {}).get(OasField.TYPE)
+                if add_prop_type:
+                    prop_data.update({OasField.TYPE.value: add_prop_type})
+
             pytype = self.schema_to_pytype(prop_data)
             if not pytype:
                 return pytype

@@ -5,6 +5,7 @@ from enum import Enum
 class OasField(str, Enum):
     """Collection of OpenAPI specification fields."""
 
+    ADDITIONAL_PROPS = "additionalProperties"
     ALL_OF = "allOf"
     ANY_OF = "anyOf"
     COMPONENTS = "components"
