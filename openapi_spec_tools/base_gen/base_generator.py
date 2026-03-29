@@ -403,11 +403,14 @@ class BaseGenerator:
                     self.logger.error(f"Could not find {collect_name} item model")
                     continue
                 if self.model_is_complex(item_model):
-                    self.logger.error(f"Ignoring {collect_name} -- cannot handle lists of complex")
-                    continue
-                prop_data.pop(OasField.ITEMS.value, None)
-                prop_data[OasField.X_COLLECT.value] = collection_type
-                prop_data.update(item_model)
+                    self.logger.warning(f"Treating complex collection of {collect_name} as a single item")
+                    prop_data.pop(OasField.ITEMS.value, None)
+                    prop_data.update(item_model)
+                    prop_data[OasField.X_SINGLE.value] = True
+                else:
+                    prop_data.pop(OasField.ITEMS.value, None)
+                    prop_data[OasField.X_COLLECT.value] = collection_type
+                    prop_data.update(item_model)
 
             required_sub = prop_data.get(OasField.REQUIRED, [])
             sub_properties = self.expanded_settable_properties(f"{name}.{prop_name}", prop_data)
@@ -430,6 +433,7 @@ class BaseGenerator:
                 properties[prop_name] = prop_data
                 continue
 
+            forced_single = prop_data.get(OasField.X_SINGLE, False)
             for sub_name, sub_data in sub_properties.items():
                 # these properties are "name mangled" to include the parent property name
                 full_name = f"{prop_name}.{sub_name}"
@@ -438,6 +442,9 @@ class BaseGenerator:
                     set_missing(sub_data, OasField.X_REF.value, self.short_reference_name(reference))
                 set_missing(sub_data, OasField.X_FIELD.value, sub_name)
                 prepend(sub_data, OasField.X_PARENTS.value, prop_name)
+                if forced_single:
+                    # propagate to sub-fields, since there's nothing for the parent
+                    sub_data[OasField.X_SINGLE.value] = True
                 properties[full_name] = sub_data
 
         return properties
@@ -737,11 +744,15 @@ class BaseGenerator:
         # initialize all "parent" objects
         lines = ["body = {}"]
         found = set()
+        forced_single = set()
         lineage = []
         for prop_data in body_params.values():
             parents = prop_data.get(OasField.X_PARENTS, [])
             if parents and parents not in lineage:
                 lineage.append(parents)
+
+            if prop_data.get(OasField.X_SINGLE):
+                forced_single.add(parents[-1])
 
             for parent in parents:
                 if parent not in found:
@@ -795,8 +806,11 @@ class BaseGenerator:
                     # look for a parent whose's dependents don't have any dependents
                     if all(d not in depends for d in dependents):
                         for child in dependents:
+                            rval = self.variable_name(child)
+                            if child in forced_single:
+                                rval = f"[{rval}]  # convert to list"
                             lines.append(f'if {self.variable_name(child)}:')
-                            lines.append(f'    {self.variable_name(parent)}["{child}"] = {self.variable_name(child)}')
+                            lines.append(f'    {self.variable_name(parent)}["{child}"] = {rval}')
                         removal.add(parent)
 
                 # remove items that were processed
