@@ -434,7 +434,7 @@ def test_function_definition_item():
     assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
 
 
-def test_function_definition_bad_body():
+def test_function_definition_forced_single():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command="create", identifier="snaFooCreate")
     uut = CliGenerator("cli_package", oas)
@@ -454,15 +454,19 @@ def test_function_definition_bad_body():
     # no summary field, so no details flag
     assert "_details: _a.DetailsOption" not in text
 
-    # body is just a complex list, so not added
-    assert "body = " not in text
+    # body is a complex list that gets simplified to a single item, but added to body as list
+    assert 'body = {}' in text
+    assert 'attachments = {}' in text
+    assert 'attachments["id"] = attachments_id' in text
+    assert 'attachments["edgeColor"] = attachments_edge_color' in text
+    assert 'body["attachments"] = [attachments]  # convert to list' in text
 
     # check the body of the function
     assert "_l.init_logging(_log_level)" in text
     assert 'headers = _r.request_headers(_api_key, content_type="application/json")' in text
     assert 'url = _r.create_url(_api_host, "sna/foo")' in text
     assert 'params = {}' in text
-    assert 'data = _r.request("POST", url, headers=headers, params=params, timeout=_api_timeout)' in text
+    assert 'data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)' in text
     assert 'display(data, _out_fmt, _out_style)' in text
     assert '_e.handle_exceptions(ex)' in text
 

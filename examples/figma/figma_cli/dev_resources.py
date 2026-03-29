@@ -42,6 +42,10 @@ def show_commands(
 
 @app.command("create", short_help="Create dev resources")
 def post_dev_resources(
+    dev_resources_name: Annotated[str, typer.Option(show_default=False, help="The name of the dev resource.")] = None,
+    dev_resources_url: Annotated[str, typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
+    dev_resources_file_key: Annotated[str, typer.Option(show_default=False, help="The file key where the dev resource belongs.")] = None,
+    dev_resources_node_id: Annotated[str, typer.Option(show_default=False, help="The target node to attach the dev resource to.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -67,13 +71,30 @@ def post_dev_resources(
     missing = []
     if _api_key is None:
         missing.append("--api-key")
+    if dev_resources_name is None:
+        missing.append("--dev-resources-name")
+    if dev_resources_url is None:
+        missing.append("--dev-resources-url")
+    if dev_resources_file_key is None:
+        missing.append("--dev-resources-file-key")
+    if dev_resources_node_id is None:
+        missing.append("--dev-resources-node-id")
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 
     params = {}
+    body = {}
+    dev_resources = {}
+    dev_resources["name"] = dev_resources_name
+    dev_resources["url"] = dev_resources_url
+    dev_resources["file_key"] = dev_resources_file_key
+    dev_resources["node_id"] = dev_resources_node_id
+    # stitch together the sub-objects
+    if dev_resources:
+        body["dev_resources"] = [dev_resources]  # convert to list
 
     try:
-        data = _r.request("POST", url, headers=headers, params=params, timeout=_api_timeout)
+        data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
@@ -83,6 +104,9 @@ def post_dev_resources(
 
 @app.command("set", short_help="Update dev resources")
 def put_dev_resources(
+    dev_resources_id: Annotated[str, typer.Option(show_default=False, help="Unique identifier of the dev resource")] = None,
+    dev_resources_name: Annotated[Optional[str], typer.Option(show_default=False, help="The name of the dev resource.")] = None,
+    dev_resources_url: Annotated[Optional[str], typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -105,13 +129,25 @@ def put_dev_resources(
     missing = []
     if _api_key is None:
         missing.append("--api-key")
+    if dev_resources_id is None:
+        missing.append("--dev-resources-id")
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 
     params = {}
+    body = {}
+    dev_resources = {}
+    dev_resources["id"] = dev_resources_id
+    if dev_resources_name is not None:
+        dev_resources["name"] = dev_resources_name
+    if dev_resources_url is not None:
+        dev_resources["url"] = dev_resources_url
+    # stitch together the sub-objects
+    if dev_resources:
+        body["dev_resources"] = [dev_resources]  # convert to list
 
     try:
-        data = _r.request("PUT", url, headers=headers, params=params, timeout=_api_timeout)
+        data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)

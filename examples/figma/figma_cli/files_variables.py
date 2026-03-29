@@ -110,6 +110,9 @@ def post_variables(
     variables_code_syntax_web: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     variables_code_syntax_android: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     variables_code_syntax_i_os: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    variable_mode_values_variable_id: Annotated[Optional[str], typer.Option(show_default=False, help="The target variable. You can use the temporary id of a variable.")] = None,
+    variable_mode_values_mode_id: Annotated[Optional[str], typer.Option(show_default=False, help="Must correspond to a mode in the variable collection that contains the target variable.")] = None,
+    variable_mode_values_value: Annotated[Optional[bool], typer.Option("--variable-mode-values-value/--no-variable-mode-values-value", show_default=False, help="The value for the variable. The value must match the variable\'s type. If setting to a variable alias, the alias must resolve to this type. If overriding a value, the value type must match the variable\'s type. If removing an overridden value, the value must be `null`.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -176,6 +179,7 @@ def post_variables(
     variable_modes = {}
     variables = {}
     code_syntax = {}
+    variable_mode_values = {}
     if variable_collections_action is not None:
         variable_collections["action"] = variable_collections_action
     if variable_collections_id is not None:
@@ -220,6 +224,12 @@ def post_variables(
         code_syntax["ANDROID"] = variables_code_syntax_android
     if variables_code_syntax_i_os is not None:
         code_syntax["iOS"] = variables_code_syntax_i_os
+    if variable_mode_values_variable_id is not None:
+        variable_mode_values["variableId"] = variable_mode_values_variable_id
+    if variable_mode_values_mode_id is not None:
+        variable_mode_values["modeId"] = variable_mode_values_mode_id
+    if variable_mode_values_value is not None:
+        variable_mode_values["value"] = variable_mode_values_value
     # stitch together the sub-objects
     if code_syntax:
         variables["codeSyntax"] = code_syntax
@@ -229,6 +239,8 @@ def post_variables(
         body["variableModes"] = variable_modes
     if variables:
         body["variables"] = variables
+    if variable_mode_values:
+        body["variableModeValues"] = [variable_mode_values]  # convert to list
 
     try:
         data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
