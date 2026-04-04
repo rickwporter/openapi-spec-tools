@@ -1,5 +1,6 @@
 import pytest
 
+from openapi_spec_tools.layout.merge import find_peers
 from openapi_spec_tools.layout.merge import merge
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
@@ -75,6 +76,18 @@ H = LayoutNode(
     ]
 )
 
+
+@pytest.mark.parametrize(
+    ["node", "op_id", "expected"],
+    [
+        pytest.param(A, "foo", [], id="not-found"),
+        pytest.param(A, "A", ["B"], id="single"),
+        pytest.param(C, "C", ["B", "D"], id="multiple"),
+        pytest.param(D, "X", ["Y"], id="nested"),
+    ]
+)
+def test_find_peers(node: LayoutNode, op_id: str, expected: list[str]) -> None:
+    assert expected == find_peers(node, op_id)
 
 
 @pytest.mark.parametrize(
