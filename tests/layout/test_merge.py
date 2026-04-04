@@ -75,6 +75,23 @@ H = LayoutNode(
         LayoutNode(command='c', identifier='C', pagination=PaginationNames(page_size="size")),
     ]
 )
+J = LayoutNode(
+    command='main',
+    identifier='main',
+    children=[
+        LayoutNode(command='a', identifier='A'),
+        LayoutNode(command='b', identifier='B'),
+        LayoutNode(
+            command='c',
+            identifier='C',
+            children=[
+                LayoutNode(command='x', identifier='X'),
+                LayoutNode(command='y', identifier='Y'),
+                LayoutNode(command='z', identifier='Z'),
+            ],
+        ),
+    ]
+)
 
 
 @pytest.mark.parametrize(
@@ -97,7 +114,8 @@ def test_find_peers(node: LayoutNode, op_id: str, expected: list[str]) -> None:
         pytest.param(B, A, A, id="subtract"),
         pytest.param(C, B, B, id="add-sub"),
         pytest.param(D, E, E, id="nested"),
-        pytest.param(F, G, H, id="props")
+        pytest.param(F, G, H, id="props"),
+        pytest.param(A, J, J, id="multi-children"),
     ]
 )
 def test_merge(original: LayoutNode, updates: LayoutNode, expected: LayoutNode) -> None:

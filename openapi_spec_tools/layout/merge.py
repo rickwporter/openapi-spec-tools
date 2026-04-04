@@ -67,8 +67,10 @@ def merge(original: LayoutNode, suggested: LayoutNode) -> LayoutNode:
             for peer_id in sugg_peers:
                 up_parent = up_parents.get(peer_id)
                 if up_parent:
-                    children = up_parent.children + [sugg_op]
-                    up_parent.children = sorted(children, key=lambda x: x.command)
+                    children = up_parent.children
+                    # need to check because of way parents are added
+                    if add_id not in [_.identifier for _ in children]:
+                        up_parent.children = sorted(children + [sugg_op], key=lambda x: x.command)
                     added = True
                     break
 
