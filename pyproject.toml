@@ -29,7 +29,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
-[tool.project.urls]
+[tool.poetry.urls]
 Homepage = "https://github.com/rickwporter/openapi-spec-tools"
 Repository = "https://github.com/rickwporter/openapi-spec-tools"
 
