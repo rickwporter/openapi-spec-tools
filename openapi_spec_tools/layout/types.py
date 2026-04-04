@@ -1,5 +1,4 @@
 """Field enums and class definitions for objects used by the layout file."""
-from copy import deepcopy
 from enum import Enum
 from typing import Any
 from typing import Optional
@@ -107,21 +106,6 @@ class LayoutNode(BaseModel):
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
         """Convert object to dictionary."""
         return self.model_dump(exclude_none=sparse, exclude_unset=sparse, exclude_defaults=sparse)
-
-    def copy_data(self, other: "LayoutNode") -> None:
-        """Copy data (other than children) from other into this."""
-        self.command = other.command
-        self.identifier = other.identifier
-        self.description = other.description
-        self.bugs = deepcopy(other.bugs)
-        self.summary_fields = deepcopy(other.summary_fields)
-        self.extra = deepcopy(other.extra)
-        self.pagination = deepcopy(other.pagination)
-        self.reference = deepcopy(other.reference)
-        self.hidden_fields = deepcopy(other.hidden_fields)
-        self.allowed_fields = deepcopy(other.allowed_fields)
-        self.display_columns = deepcopy(other.display_columns)
-        self.ignore = other.ignore
 
     def skip_generation(self) -> bool:
         """Whether to skip code generation for this node."""

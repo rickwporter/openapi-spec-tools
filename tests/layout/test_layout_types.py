@@ -255,64 +255,6 @@ def test_node_references(node, num_ref_live, num_ref_all):
 
 
 @pytest.mark.parametrize(
-    ["node", "other", "expected"],
-    [
-        pytest.param(
-            LayoutNode(command="a", identifier="A"),
-            LayoutNode(command="a", identifier="A"),
-            LayoutNode(command="a", identifier="A"),
-            id="unchanged",
-        ),
-        pytest.param(
-            LayoutNode(command="a", identifier="A", ignore=True),
-            LayoutNode(command="a", identifier="A", description="Today"),
-            LayoutNode(command="a", identifier="A", description="Today"),
-            id="description",
-        ),
-        pytest.param(
-            LayoutNode(command="a", identifier="A", ignore=True),
-            LayoutNode(command="a", identifier="A", bugs=["mosquitoes"]),
-            LayoutNode(command="a", identifier="A", bugs=["mosquitoes"]),
-            id="bugs",
-        ),
-        pytest.param(
-            LayoutNode(command="a", identifier="A", ignore=True),
-            LayoutNode(command="a", identifier="A", summary_fields=["sna", "foo", "bar"]),
-            LayoutNode(command="a", identifier="A", summary_fields=["sna", "foo", "bar"]),
-            id="summary",
-        ),
-        pytest.param(
-            LayoutNode(command="a", identifier="A", children=[LayoutNode(command="b", identifier="B")]),
-            LayoutNode(command="a", identifier="A", extra={"direction": "north"}),
-            LayoutNode(
-                command="a",
-                identifier="A",
-                extra={"direction": "north"},
-                children=[LayoutNode(command="b", identifier="B")],
-            ),
-            id="extra",
-        ),
-        pytest.param(
-            LayoutNode(command="a", identifier="A"),
-            LayoutNode(command="a", identifier="A", pagination=PaginationNames(page_size="size")),
-            LayoutNode(command="a", identifier="A", pagination=PaginationNames(page_size="size")),
-            id="pagination",
-        ),
-        pytest.param(
-            LayoutNode(command="a", identifier="A"),
-            LayoutNode(command="a", identifier="A", reference=ReferenceSubcommand(package="foo")),
-            LayoutNode(command="a", identifier="A", reference=ReferenceSubcommand(package="foo")),
-            id="reference",
-        ),
-    ],
-)
-def test_copy_data(node: LayoutNode, other: LayoutNode, expected: LayoutNode):
-    uut = node.model_copy(deep=True)  # make sure not to modify test data
-    uut.copy_data(other)
-    assert uut.as_dict() == expected.as_dict()
-
-
-@pytest.mark.parametrize(
     ["page_names", "expected"],
     [
         pytest.param(PaginationNames(), False, id="empty"),
