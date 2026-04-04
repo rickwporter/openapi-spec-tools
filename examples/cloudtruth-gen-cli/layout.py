@@ -13,6 +13,8 @@ from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import write_layout_tree
+from openapi_spec_tools.layout.merge import merge
+from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.types import PaginationNames
 
@@ -55,6 +57,9 @@ def layout_suggest(
         next_properties="next",
     )
     node = generator.generate(prefix)
+
+    orig = file_to_tree(output_file)
+    node = merge(orig, node)
 
     write_layout_tree(output_file, node, logger)
     print(f"Wrote {output_file}")

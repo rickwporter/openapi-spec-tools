@@ -6,6 +6,7 @@ from unittest import mock
 
 import pytest
 import typer
+import yaml
 
 from openapi_spec_tools.cli.layout import TreeFormat
 from openapi_spec_tools.cli.layout import layout_check_format
@@ -317,4 +318,32 @@ def test_layout_suggest():
     assert 'name: show' in text
     assert 'operationId: showPetById' in text
 
+    # modify the layout file
+    data = yaml.safe_load(text)
+    data['main']['description'] = "Updated CLI description"
+    data['main']['operations'][0]['summaryFields'] = "short, brief"
+    data['main']['operations'][1]['bugIds'] = "black-fly, gnat"
+    layout_file.write_text(yaml.dump(data))
 
+    layout_suggest(asset_filename("pet.yaml"), layout_file.as_posix(), prefix="/pets", indent=3, update=True)
+
+    text = layout_file.read_text(encoding="utf-8", errors="ignore")
+    assert 'description: Updated CLI description' in text
+    assert 'summaryFields:' in text
+    assert '- short' in text
+    assert '- brief' in text
+    assert 'bugIds:' in text
+    assert '- black-fly' in text
+    assert '- gnat' in text
+
+    # do it again without the update flag and see we lose the previous updates
+    layout_suggest(asset_filename("pet.yaml"), layout_file.as_posix(), prefix="/pets", indent=3, update=False)
+
+    text = layout_file.read_text(encoding="utf-8", errors="ignore")
+    assert 'description: Updated CLI description' not in text
+    assert 'summaryFields:' not in text
+    assert '- short' not in text
+    assert '- brief' not in text
+    assert 'bugIds:' not in text
+    assert '- black-fly' not in text
+    assert '- gnat' not in text

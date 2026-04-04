@@ -36,6 +36,9 @@ layout-lint:  ## Check the layout file format
 suggest: ## Generates the suggested layout for OAS
 	$(poetry_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE)
 
+layout-update: ## Suggest using updates to the hand tailored spec
+	$(poetry_run) layout suggest $(OPENAPI_SPEC) $(LAYOUT_FILE) --update
+
 gen: layout-lint ## Generate CLI code
 	$(poetry_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 

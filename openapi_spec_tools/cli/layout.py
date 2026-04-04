@@ -22,9 +22,11 @@ from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import write_layout_tree
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
+from openapi_spec_tools.layout.merge import merge
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
 from openapi_spec_tools.layout.utils import check_pagination_definitions
+from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.layout.utils import operation_duplicates
 from openapi_spec_tools.layout.utils import operation_order
 from openapi_spec_tools.layout.utils import subcommand_missing_properties
@@ -193,6 +195,10 @@ def layout_operations(
 def layout_suggest(
     openapi_file: OpenApiFilenameArgument,
     output_file: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="File name for output")],
+    update: Annotated[
+        bool,
+        typer.Option(help="Read from original file and update, rather than completely new suggestion."),
+    ] = False,
     prefix: PathPrefixOption = "",
     indent: IndentOption = 4,
     log_level: LogLevelOption = "info",
@@ -211,6 +217,10 @@ def layout_suggest(
     oas = open_oas_with_error_handling(openapi_file, logger)
     generator = LayoutGenerator(oas)
     node = generator.generate(prefix)
+
+    if update:
+        original = file_to_tree(output_file)
+        node = merge(original=original, suggested=node)
 
     write_layout_tree(output_file, node, logger, indent)
     print(f"Wrote {output_file}")
