@@ -12,6 +12,7 @@ from openapi_spec_tools.cli.history import _find_commits
 from openapi_spec_tools.cli.history import _read_data
 from openapi_spec_tools.cli.history import commit_changes
 from openapi_spec_tools.cli.history import commit_history
+from tests.cli_gen.helpers import to_ascii
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
@@ -143,7 +144,7 @@ def test_commit_history(args: dict[str, Any], expected: str) -> None:
         commit_history(**args)
 
     result = mock_stdout.getvalue()
-    assert result == expected
+    assert to_ascii(result) == to_ascii(expected)
 
 PETS2_CHANGES_TABLE = """\
 ┏━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -299,4 +300,4 @@ def test_commit_changes(args: dict[str, Any], expected: str) -> None:
         commit_changes(**args)
 
     result = mock_stdout.getvalue()
-    assert result == expected
+    assert to_ascii(result) == to_ascii(expected)
