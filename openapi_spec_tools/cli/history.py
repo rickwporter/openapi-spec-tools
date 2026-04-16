@@ -23,7 +23,6 @@ from openapi_spec_tools.cli.arguments import OutputStyleOption
 from openapi_spec_tools.utils import find_diffs
 
 app = typer.Typer(name="history", no_args_is_help=True, short_help="Git history of OAS file")
-LOG_CLASS = "history"
 
 
 AuthorOption = Annotated[
@@ -42,10 +41,16 @@ StartDateOption = Annotated[
 
 
 def _with_timezone(dt: datetime | None) -> datetime | None:
+    """Set the timezone to UTC when no timezone it provided.
+
+    The git datetime values include a timezone, and comparison to datetime objects without a
+    timezone does not work.
+    """
     return dt if not dt or dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
 def _read_data(commit: git.Commit, file: str) -> dict[str, Any]:
+    """Read the file from the commit into a dictionary."""
     relative_path = Path(file).absolute().relative_to(commit.tree.abspath).as_posix()
     target_file = commit.tree / relative_path
     data = target_file.data_stream.read().decode("utf-8")
@@ -54,6 +59,7 @@ def _read_data(commit: git.Commit, file: str) -> dict[str, Any]:
 
 
 def _author_match(commit: git.Commit, author: str) -> bool:
+    """Check if the author is part of the commit."""
     needle = author.lower()
     if needle in commit.author.name.lower() or needle in commit.author.email:
         return True
@@ -72,6 +78,7 @@ def _find_commits(
     author: Optional[str] = None,
     max_count: Optional[int] = None,
 ) -> list[git.Commit]:
+    """Get a list of commits for the provided file and parameters."""
     repo = git.Repo(oas_file, search_parent_directories=True)
 
     commits = list(repo.iter_commits(paths=oas_file))
