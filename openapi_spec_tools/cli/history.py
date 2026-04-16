@@ -46,7 +46,7 @@ def _with_timezone(dt: datetime | None) -> datetime | None:
 
 
 def _read_data(commit: git.Commit, file: str) -> dict[str, Any]:
-    relative_path = Path(file).absolute().relative_to(commit.tree.abspath)
+    relative_path = Path(file).absolute().relative_to(commit.tree.abspath).as_posix()
     target_file = commit.tree / relative_path
     data = target_file.data_stream.read().decode("utf-8")
     # NOTE: handles when data is JSON, so no special handling necessary
