@@ -14,6 +14,7 @@ from rich_objects import console_factory
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
+from openapi_spec_tools.cli.history import app as history_app
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
@@ -75,6 +76,7 @@ app = typer.Typer(
     short_help="OpenAPI specification tools",
     help="Various utilities for inspecting, analyzing and modifying OpenAPI specifications.",
 )
+app.add_typer(history_app, name="history")
 
 
 @app.command("info", short_help="Display the 'info' from the OpenAPI specification")

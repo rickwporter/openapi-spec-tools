@@ -4,6 +4,8 @@ from typing import Annotated
 from typing import Optional
 
 import typer
+from rich_objects import OutputFormat
+from rich_objects import OutputStyle
 
 DIRECTORY = "DIRECTORY"
 FILENAME = "FILENAME"
@@ -61,9 +63,33 @@ LogLevelOption = Annotated[
         help="Log level",
     ),
 ]
+MaxCountOption = Annotated[
+    Optional[int],
+    typer.Option(
+        "--max",
+        "--max-count",
+        help="Maximum number of items to get (if any)."
+    )
+]
 OpenApiFilenameArgument = Annotated[
     str,
     typer.Argument(metavar=FILENAME, show_default=False, help="OpenAPI specification filename"),
+]
+OutputFormatOption = Annotated[
+    OutputFormat,
+    typer.Option(
+        "--format",
+        case_sensitive=False,
+        help="Output format style",
+    ),
+]
+OutputStyleOption = Annotated[
+    OutputStyle,
+    typer.Option(
+        "--style",
+        case_sensitive=False,
+        help="Style for output",
+    ),
 ]
 PackageNameArgument = Annotated[str, typer.Argument(metavar="PACKAGE", show_default=False, help="Base package name")]
 PathPrefixOption = Annotated[
@@ -80,4 +106,3 @@ UpdatedOpenApiFilenameOption = Annotated[
         help="Filename for updated OpenAPI spec, overwrites original of not specified.",
     ),
 ]
-
