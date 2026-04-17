@@ -20,6 +20,7 @@ from openapi_spec_tools.cli.arguments import OutputFormat
 from openapi_spec_tools.cli.arguments import OutputFormatOption
 from openapi_spec_tools.cli.arguments import OutputStyle
 from openapi_spec_tools.cli.arguments import OutputStyleOption
+from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.utils import find_diffs
 
 app = typer.Typer(name="history", no_args_is_help=True, short_help="Git history of OAS file")
@@ -94,6 +95,17 @@ def _find_commits(
     return commits
 
 
+def _assert_exists(file: str) -> None:
+    """Assert that the file exists in the git repo, or throw an exception."""
+    try:
+        repo = git.Repo(file, search_parent_directories=True)
+        commit = repo.head.commit
+        relative_path = Path(file).absolute().relative_to(commit.tree.abspath).as_posix()
+        _ = commit.tree / relative_path
+    except Exception:
+        error_out("Unable to find file")
+
+
 @app.command("commits", short_help="Show git history of the specified OAS file.")
 def commit_history(
     oas_file: OpenApiFilenameArgument,
@@ -105,6 +117,7 @@ def commit_history(
     out_style: OutputStyleOption = OutputStyle.ALL,
 ):
     """Show git history of the specific OAS file over with the provided search parameters."""
+    _assert_exists(oas_file)
     start = _with_timezone(start)
     end = _with_timezone(end)
     commits = _find_commits(
@@ -144,6 +157,7 @@ def commit_changes(
     out_style: OutputStyleOption = OutputStyle.ALL,
 ):
     """Show OAS changes over the history of the provided search. The ."""
+    _assert_exists(oas_file)
     start = _with_timezone(start)
     end = _with_timezone(end)
     # NOTE: do not filter out commits by other authors, or before start, or will get odd comparisons

@@ -7,6 +7,7 @@ from typing import Optional
 from unittest import mock
 
 import pytest
+import typer
 
 from openapi_spec_tools.cli.history import _find_commits
 from openapi_spec_tools.cli.history import _read_data
@@ -19,6 +20,7 @@ from tests.helpers import asset_filename
 # NOTE: dates are specified to avoid needing test updates in the future
 START = datetime(2025, 1, 1, tzinfo=timezone.utc)
 END = datetime(2026, 3, 1, tzinfo=timezone.utc)
+FILE_ERROR = "ERROR: Unable to find file\n"
 
 
 @pytest.mark.parametrize(
@@ -137,7 +139,7 @@ No commits found.
         ),
     ]
 )
-def test_commit_history(args: dict[str, Any], expected: str) -> None:
+def test_commit_history_success(args: dict[str, Any], expected: str) -> None:
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
@@ -145,6 +147,19 @@ def test_commit_history(args: dict[str, Any], expected: str) -> None:
 
     result = mock_stdout.getvalue()
     assert to_ascii(result) == to_ascii(expected)
+
+
+def test_commit_history_failure() -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+        commit_history(asset_filename("foo.yaml"))
+
+    ex = context.value
+    assert ex.exit_code == 1
+    assert FILE_ERROR == mock_stdout.getvalue()
+
 
 PETS2_CHANGES_TABLE = """\
 ┏━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -293,7 +308,7 @@ MISC_YAML_CHANGES = """\
         ),
     ]
 )
-def test_commit_changes(args: dict[str, Any], expected: str) -> None:
+def test_commit_changes_success(args: dict[str, Any], expected: str) -> None:
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
@@ -301,3 +316,15 @@ def test_commit_changes(args: dict[str, Any], expected: str) -> None:
 
     result = mock_stdout.getvalue()
     assert to_ascii(result) == to_ascii(expected)
+
+
+def test_commit_changes_failure() -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+        commit_changes(asset_filename("foo.yaml"))
+
+    ex = context.value
+    assert ex.exit_code == 1
+    assert FILE_ERROR == mock_stdout.getvalue()
