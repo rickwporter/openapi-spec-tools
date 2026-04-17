@@ -37,7 +37,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install poetry
-        run: pipx install poetry
+        uses: snok/install-poetry@v1
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -78,7 +78,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install poetry
-        run: pipx install poetry
+        uses: snok/install-poetry@v1
       - name: Setup a virtual environment
         run: |
           poetry config virtualenvs.create true --local
