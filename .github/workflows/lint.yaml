@@ -19,7 +19,7 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v4
       - name: Install poetry
-        uses: abatilo/actions-poetry@v4
+        run: pipx install poetry
       - name: Set up Python
         uses: actions/setup-python@v5
       - name: Install the project dependencies
