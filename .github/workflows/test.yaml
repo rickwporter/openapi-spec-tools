@@ -37,7 +37,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install poetry
-        uses: snok/install-poetry@v1
+        uses: abatilo/actions-poetry@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -74,7 +74,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install poetry
-        uses: snok/install-poetry@v1
+        uses: abatilo/actions-poetry@v4
       - name: Setup a virtual environment
         run: |
           poetry config virtualenvs.create true --local
