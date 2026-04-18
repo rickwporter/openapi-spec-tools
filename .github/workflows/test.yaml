@@ -37,7 +37,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install poetry
-        uses: abatilo/actions-poetry@v4
+        uses: snok/install-poetry@v1
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -71,7 +71,7 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v4
       - name: Install poetry
-        uses: abatilo/actions-poetry@v4
+        uses: snok/install-poetry@v1
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
