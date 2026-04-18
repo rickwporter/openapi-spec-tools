@@ -75,10 +75,6 @@ jobs:
           python-version: '3.12'
       - name: Install poetry
         uses: abatilo/actions-poetry@v4
-      - name: Setup a virtual environment
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
       - name: Install the project dependencies
         run: poetry install
       - name: Get coverage files
