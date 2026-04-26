@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openapi-spec-tools"
-version = "0.13.0"
+version = "0.14.0"
 description = "OpenAPI specification tools for analyzing, updating, and generating a CLI."
 authors = ["Rick Porter <rickwporter@gmail.com>"]
 readme = "README.md"
@@ -36,12 +36,12 @@ Repository = "https://github.com/rickwporter/openapi-spec-tools"
 [tool.poetry.dependencies]
 python = "^3.10"
 pyyaml = "^6.0.3"
-typer = "^0.24.1"
+typer = "^0.24.2"
 rich = "^14.3.3"
-requests = "^2.32.5"
-pydantic = "^2.12.5"
+requests = "^2.33.1"
+pydantic = "^2.13.3"
 rich-objects = "^0.2.3"
-gitpython = "^3.1.46"
+gitpython = "^3.1.47"
 
 [tool.poetry.scripts]
 oas = "openapi_spec_tools.cli.oas:app"
