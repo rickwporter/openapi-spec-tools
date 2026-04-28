@@ -13,6 +13,7 @@ from openapi_spec_tools.cli.history import _find_commits
 from openapi_spec_tools.cli.history import _read_data
 from openapi_spec_tools.cli.history import commit_changes
 from openapi_spec_tools.cli.history import commit_history
+from openapi_spec_tools.cli.history import commit_show
 from tests.cli_gen.helpers import to_ascii
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
@@ -328,3 +329,93 @@ def test_commit_changes_failure() -> None:
     ex = context.value
     assert ex.exit_code == 1
     assert FILE_ERROR == mock_stdout.getvalue()
+
+
+MISC_COMMIT_TABLE = """\
+┏━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Date       ┃ Commit  ┃ Changes                      ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 2025-06-25 │ 05b302d │ components:                  │
+│            │         │   schemas:                   │
+│            │         │     PetExt:                  │
+│            │         │       allOf[1]:              │
+│            │         │         properties:          │
+│            │         │           listVarious: added │
+└────────────┴─────────┴──────────────────────────────┘
+"""
+MISC_COMMIT_JSON = """\
+[
+  {
+    "date": "2025-06-25",
+    "commit": "05b302d",
+    "changes": {
+      "components": {
+        "schemas": {
+          "PetExt": {
+            "allOf[1]": {
+              "properties": {
+                "listVarious": "added"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]
+"""
+MISC_COMMIT_NOT_FOUND = """\
+No matching commit found.
+"""
+@pytest.mark.parametrize(
+      ["args", "expected"],
+      [
+        pytest.param(
+            {
+                "oas_file": asset_filename("misc.yaml"),
+                "commit": "05b302d",
+            },
+            MISC_COMMIT_TABLE,
+            id="table",
+        ),
+        pytest.param(
+            {
+                "oas_file": asset_filename("misc.yaml"),
+                "commit": "05b3",
+                "out_fmt": "json",
+            },
+            MISC_COMMIT_JSON,
+            id="json",
+        ),
+        pytest.param(
+            {
+                "oas_file": asset_filename("misc.yaml"),
+                "commit": "05b3abcdef",
+            },
+            MISC_COMMIT_NOT_FOUND,
+            id="not-found",
+        ),
+      ]
+)
+def test_commit_show_success(args: dict[str, Any], expected: str) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+    ):
+        commit_show(**args)
+
+    result = mock_stdout.getvalue()
+    assert to_ascii(result) == to_ascii(expected)
+
+
+def test_commit_show_failure() -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+        commit_show(asset_filename("foo.yaml"), "deadbeef")
+
+    ex = context.value
+    assert ex.exit_code == 1
+    assert FILE_ERROR == mock_stdout.getvalue()
+
+
