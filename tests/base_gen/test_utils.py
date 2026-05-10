@@ -78,6 +78,8 @@ def test_prepend(obj, name, value, expected):
         pytest.param("a+b", "_", "a_b", id="underscore"),
         pytest.param("a+b", "*", "a*b", id="star"),
         pytest.param("a*b", None, "ab", id="none"),
+        pytest.param("a+-b", "_", "a_b", id="double-special"),
+        pytest.param("a1+-2b", "_", "a1_2b", id="double-number"),
     ]
 )
 def test_replace_special(orig, replacement, expected):
