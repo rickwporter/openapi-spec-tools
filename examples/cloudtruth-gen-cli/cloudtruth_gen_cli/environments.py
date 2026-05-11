@@ -115,9 +115,9 @@ def environments_destroy(
 
 @app.command("list", short_help="")
 def environments_list(
-    description__icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    description_icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     name: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    name__icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    name_icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
@@ -149,12 +149,12 @@ def environments_list(
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 
     params = {}
-    if description__icontains is not None:
-        params["description__icontains"] = description__icontains
+    if description_icontains is not None:
+        params["description__icontains"] = description_icontains
     if name is not None:
         params["name"] = name
-    if name__icontains is not None:
-        params["name__icontains"] = name__icontains
+    if name_icontains is not None:
+        params["name__icontains"] = name_icontains
     if ordering is not None:
         params["ordering"] = ordering
     if page is not None:

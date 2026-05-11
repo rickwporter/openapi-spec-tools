@@ -76,15 +76,15 @@ def environments_tags_destroy(
 
 def environments_tags_list(
     environment_pk: str,  # [required]
-    description__icontains: Optional[str] = None,
+    description_icontains: Optional[str] = None,
     name: Optional[str] = None,
-    name__icontains: Optional[str] = None,
+    name_icontains: Optional[str] = None,
     ordering: Optional[str] = None,  # Which field to use when ordering the results.
     page: Optional[int] = None,  # A page number within the paginated result set.
     page_size: Optional[int] = None,  # Number of results to return per page.
     timestamp: Optional[datetime] = None,
-    timestamp__gte: Optional[datetime] = None,
-    timestamp__lte: Optional[datetime] = None,
+    timestamp_gte: Optional[datetime] = None,
+    timestamp_lte: Optional[datetime] = None,
     _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
     _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
     _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
@@ -107,12 +107,12 @@ def environments_tags_list(
     url = _r.create_url(_api_host, "api/v1/environments", environment_pk, "tags/")
 
     params = {}
-    if description__icontains is not None:
-        params["description__icontains"] = description__icontains
+    if description_icontains is not None:
+        params["description__icontains"] = description_icontains
     if name is not None:
         params["name"] = name
-    if name__icontains is not None:
-        params["name__icontains"] = name__icontains
+    if name_icontains is not None:
+        params["name__icontains"] = name_icontains
     if ordering is not None:
         params["ordering"] = ordering
     if page is not None:
@@ -121,10 +121,10 @@ def environments_tags_list(
         params["page_size"] = page_size
     if timestamp is not None:
         params["timestamp"] = timestamp
-    if timestamp__gte is not None:
-        params["timestamp__gte"] = timestamp__gte
-    if timestamp__lte is not None:
-        params["timestamp__lte"] = timestamp__lte
+    if timestamp_gte is not None:
+        params["timestamp__gte"] = timestamp_gte
+    if timestamp_lte is not None:
+        params["timestamp__lte"] = timestamp_lte
 
     data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
     return data

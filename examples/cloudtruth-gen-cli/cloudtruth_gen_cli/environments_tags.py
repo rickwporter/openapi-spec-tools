@@ -132,15 +132,15 @@ def environments_tags_destroy(
 @app.command("list", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_list(
     environment_pk: Annotated[str, typer.Argument(show_default=False)],
-    description__icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    description_icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     name: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    name__icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    name_icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
     ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
     timestamp: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
-    timestamp__gte: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
-    timestamp__lte: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
+    timestamp_gte: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
+    timestamp_lte: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -175,12 +175,12 @@ def environments_tags_list(
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 
     params = {}
-    if description__icontains is not None:
-        params["description__icontains"] = description__icontains
+    if description_icontains is not None:
+        params["description__icontains"] = description_icontains
     if name is not None:
         params["name"] = name
-    if name__icontains is not None:
-        params["name__icontains"] = name__icontains
+    if name_icontains is not None:
+        params["name__icontains"] = name_icontains
     if ordering is not None:
         params["ordering"] = ordering
     if page is not None:
@@ -189,10 +189,10 @@ def environments_tags_list(
         params["page_size"] = page_size
     if timestamp is not None:
         params["timestamp"] = timestamp
-    if timestamp__gte is not None:
-        params["timestamp__gte"] = timestamp__gte
-    if timestamp__lte is not None:
-        params["timestamp__lte"] = timestamp__lte
+    if timestamp_gte is not None:
+        params["timestamp__gte"] = timestamp_gte
+    if timestamp_lte is not None:
+        params["timestamp__lte"] = timestamp_lte
 
     try:
         data = _r.depaginate(page_info, url, headers=headers, params=params, timeout=_api_timeout)

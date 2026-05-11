@@ -9,14 +9,7 @@ SIMPLE_TRANSLATIONS = str.maketrans(
         '"': r"\"",
     },
 )
-SPECIAL_CHARS = [
-    # mathematical
-    '/', '*', '+', '-', '^', '%', '&', '|', '~', '<', '>','=',
-    # operators/punctional
-    '.', '@', ' ', ':', ';', '#', ',', '!', '`', '?', '\'', '"',
-    # parenthesis/brackets
-    '(', ')', '{', '}', '[', ']',
-]
+SPECIAL_CHARS = re.compile(r'([^a-zA-Z0-9])+')
 
 
 def to_snake_case(text: str) -> str:
@@ -47,9 +40,7 @@ def quoted(s: str) -> str:
 def replace_special(value: str, replacement: str = '_') -> str:
     """Replace the "special" characters with the replacement."""
     _replacement = '' if replacement is None else replacement
-    for v in SPECIAL_CHARS:
-        value = value.replace(v, _replacement)
-    return value
+    return SPECIAL_CHARS.sub(_replacement, value)
 
 
 def simple_escape(text: str) -> str:

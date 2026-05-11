@@ -104,9 +104,9 @@ def environments_destroy(
 
 
 def environments_list(
-    description__icontains: Optional[str] = None,
+    description_icontains: Optional[str] = None,
     name: Optional[str] = None,
-    name__icontains: Optional[str] = None,
+    name_icontains: Optional[str] = None,
     ordering: Optional[str] = None,  # Which field to use when ordering the results.
     page: Optional[int] = None,  # A page number within the paginated result set.
     page_size: Optional[int] = None,  # Number of results to return per page.
@@ -126,12 +126,12 @@ def environments_list(
     url = _r.create_url(_api_host, "api/v1/environments/")
 
     params = {}
-    if description__icontains is not None:
-        params["description__icontains"] = description__icontains
+    if description_icontains is not None:
+        params["description__icontains"] = description_icontains
     if name is not None:
         params["name"] = name
-    if name__icontains is not None:
-        params["name__icontains"] = name__icontains
+    if name_icontains is not None:
+        params["name__icontains"] = name_icontains
     if ordering is not None:
         params["ordering"] = ordering
     if page is not None:
