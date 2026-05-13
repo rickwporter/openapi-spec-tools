@@ -179,7 +179,7 @@ def find_diffs(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
         elif left != right:
             result[k] = f"{shorten_text(str(left))} != {shorten_text(str(right))}"
 
-    return result
+    return {k: result[k] for k in sorted(result.keys())}
 
 
 def count_values(obj: dict[str, Any]) -> int:
