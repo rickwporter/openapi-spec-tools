@@ -72,6 +72,11 @@ def _author_match(commit: git.Commit, author: str) -> bool:
     return False
 
 
+def _shorthash(commit: git.Commit) -> str:
+    """Get a shortened version of the commit hash."""
+    return commit.hexsha[:7]
+
+
 def _find_commits(
     oas_file: str,
     start: Optional[datetime] = None,
@@ -136,7 +141,7 @@ def commit_history(
     data = [
         {
             "date": _.authored_datetime.date().isoformat(),
-            "commit": _.hexsha[:7],
+            "commit": _shorthash(_),
             "author": _.author.name,
             "message": _.message.strip()[:100],
         }
@@ -180,7 +185,7 @@ def commit_changes(
             data.append(
                 {
                     "date": prev_comm.authored_datetime.date().isoformat(),
-                    "commit": prev_comm.hexsha[:7],
+                    "commit": _shorthash(prev_comm),
                     "changes": changes,
                 }
             )
@@ -207,7 +212,7 @@ def commit_show(
     oas_file: OpenApiFilenameArgument,
     commit: Annotated[
         str | None,
-        typer.Argument(help="Commit hash"),
+        typer.Argument(metavar="HASH", help="Commit hash"),
     ],
     out_fmt: OutputFormatOption = OutputFormat.TABLE,
     out_style: OutputStyleOption = OutputStyle.ALL,
