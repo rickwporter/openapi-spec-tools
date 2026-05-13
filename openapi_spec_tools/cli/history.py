@@ -256,5 +256,61 @@ def commit_show(
     return
 
 
+@app.command("diff", short_help="Show difference between two points in OAS history.")
+def commit_diff(
+    oas_file: OpenApiFilenameArgument,
+    hash: Annotated[
+        str,
+        typer.Argument(metavar="HASH[..HASH]", help="Commit hash"),
+    ],
+    out_fmt: OutputFormatOption = OutputFormat.TABLE,
+    out_style: OutputStyleOption = OutputStyle.ALL,
+):
+    _assert_exists(oas_file)
+    commits = _find_commits(oas_file=oas_file)
+
+    parts = hash.split("..", maxsplit=1)
+    _start = parts[0].lower()
+    _end = parts[1].lower() if len(parts) > 1 else None
+    if not _end:
+        _end = commits[0].hexsha
+
+    columns = ["commits", "changes"]
+    data = []
+    start_comm = None
+    end_comm = None
+    for curr_comm in commits:
+        if _start in curr_comm.hexsha:
+            start_comm = curr_comm
+        if _end in curr_comm.hexsha:
+            end_comm = curr_comm
+        if start_comm and curr_comm:
+            # because we're walking backward chronologicallly, the prev/curr are different order
+            start_data = _read_data(start_comm, oas_file)
+            end_data = _read_data(end_comm, oas_file)
+            changes = find_diffs(start_data, end_data)
+            if not changes:
+                break
+            if out_fmt == OutputFormat.TABLE:
+                # YAML format is the best looking format for the diffs in a table, so force it
+                changes = yaml.dump(changes).strip()
+            data.append(
+                {
+                    "commits": f"{start_comm.hexsha[:7]}..{end_comm.hexsha[:7]}",
+                    "changes": changes,
+                }
+            )
+            break
+
+    console = console_factory()
+    if not data:
+        console.print("Unable to determine differences.")
+        return
+
+    config = TableConfig(value_max_len=1000)
+    display(data, fmt=out_fmt, style=out_style, columns=columns, config=config, console=console)
+    return
+
+
 if __name__ == "__main__":
     app()

@@ -12,6 +12,7 @@ import typer
 from openapi_spec_tools.cli.history import _find_commits
 from openapi_spec_tools.cli.history import _read_data
 from openapi_spec_tools.cli.history import commit_changes
+from openapi_spec_tools.cli.history import commit_diff
 from openapi_spec_tools.cli.history import commit_history
 from openapi_spec_tools.cli.history import commit_show
 from tests.cli_gen.helpers import to_ascii
@@ -419,3 +420,87 @@ def test_commit_show_failure() -> None:
     assert FILE_ERROR == mock_stdout.getvalue()
 
 
+HASH_DELTA1 = "dac5b6d..852fb5b"
+MISC_DIFF1_TABLE = """\
+┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Commits          ┃ Changes                     ┃
+┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ dac5b6d..852fb5b │ components:                 │
+│                  │   schemas:                  │
+│                  │     Pets:                   │
+│                  │       items: removed        │
+│                  │       maxItems: removed     │
+│                  │       properties: added     │
+│                  │       type: array != object │
+│                  │     ShapeShifter: added     │
+└──────────────────┴─────────────────────────────┘
+"""
+MISC_DIFF1_JSON = """\
+[
+  {
+    "commits": "dac5b6d..852fb5b",
+    "changes": {
+      "components": {
+        "schemas": {
+          "Pets": {
+            "items": "removed",
+            "maxItems": "removed",
+            "properties": "added",
+            "type": "array != object"
+          },
+          "ShapeShifter": "added"
+        }
+      }
+    }
+  }
+]
+"""
+MISC_DIFF1_YAML = """\
+- changes:
+    components:
+      schemas:
+        Pets:
+          items: removed
+          maxItems: removed
+          properties: added
+          type: array != object
+        ShapeShifter: added
+  commits: dac5b6d..852fb5b
+"""
+DIFF_NO_CHANGE = """\
+Unable to determine differences.
+"""
+@pytest.mark.parametrize(
+    ["args", "expected"],
+    [
+        pytest.param({"oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1}, MISC_DIFF1_TABLE, id="table"),
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1, "out_fmt": "json"},
+            MISC_DIFF1_JSON,
+            id="json",
+        ),
+        pytest.param({
+            "oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1, "out_fmt": "yaml"},
+            MISC_DIFF1_YAML,
+            id="yaml",
+        ),
+        pytest.param({
+            "oas_file": asset_filename("misc.yaml"), "hash": "dac5b6d..dac5b6d"},
+            DIFF_NO_CHANGE,
+            id="no-change",
+        ),
+        pytest.param({
+            "oas_file": asset_filename("misc.yaml"), "hash": "dac5b6d"},
+            MISC_DIFF1_TABLE,
+            id="no-end",
+        ),
+    ]
+)
+def test_commit_diff_success(args: dict[str, Any], expected: str) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+    ):
+        commit_diff(**args)
+
+    result = mock_stdout.getvalue()
+    assert to_ascii(result) == to_ascii(expected)
