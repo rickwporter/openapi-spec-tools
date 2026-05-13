@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Implement the 'oas-history' CLI commands."""
+import re
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
@@ -22,6 +23,10 @@ from openapi_spec_tools.cli.arguments import OutputStyle
 from openapi_spec_tools.cli.arguments import OutputStyleOption
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.utils import find_diffs
+
+MIN_HASH_LENGTH = 4
+NON_HEX_RE = re.compile(r'[^a-fA-F0-9]')
+
 
 app = typer.Typer(name="history", no_args_is_help=True, short_help="Git history of OAS file")
 
@@ -75,6 +80,19 @@ def _author_match(commit: git.Commit, author: str) -> bool:
 def _shorthash(commit: git.Commit) -> str:
     """Get a shortened version of the commit hash."""
     return commit.hexsha[:7]
+
+
+def _commithash(hash: str) -> str:
+    """Perform basic checks on the provided hash.
+
+    If the hash does NOT meet the standard, an exception is thrown and a meaningful
+    message provided.
+    """
+    if len(hash) < MIN_HASH_LENGTH:
+        error_out(f"Hash must be at least {MIN_HASH_LENGTH} characters")
+    if NON_HEX_RE.search(hash):
+        error_out("Hash must be all hexidecimal characters")
+    return hash.lower()
 
 
 def _find_commits(
@@ -219,7 +237,7 @@ def commit_show(
 ):
     """Show OAS changes over the history of the provided search. The ."""
     _assert_exists(oas_file)
-    _commit_id = commit.lower()
+    _commit_id = _commithash(commit)
     # NOTE: do not filter out commits by other authors, or before start, or will get odd comparisons
     commits = _find_commits(oas_file=oas_file)
     columns = ["date", "commit", "changes"]
@@ -270,8 +288,8 @@ def commit_diff(
     commits = _find_commits(oas_file=oas_file)
 
     parts = hash.split("..", maxsplit=1)
-    _start = parts[0].lower()
-    _end = parts[1].lower() if len(parts) > 1 else None
+    _start = _commithash(parts[0])
+    _end = _commithash(parts[1]) if len(parts) > 1 else None
     if not _end:
         _end = commits[0].hexsha
 

@@ -9,6 +9,7 @@ from unittest import mock
 import pytest
 import typer
 
+from openapi_spec_tools.cli.history import _commithash
 from openapi_spec_tools.cli.history import _find_commits
 from openapi_spec_tools.cli.history import _read_data
 from openapi_spec_tools.cli.history import commit_changes
@@ -23,6 +24,38 @@ from tests.helpers import asset_filename
 START = datetime(2025, 1, 1, tzinfo=timezone.utc)
 END = datetime(2026, 3, 1, tzinfo=timezone.utc)
 FILE_ERROR = "ERROR: Unable to find file\n"
+
+
+@pytest.mark.parametrize(
+    ["hash", "expected"],
+    [
+        pytest.param('b2c6', 'b2c6', id="short"),
+        pytest.param('b2c68ac2afd9b9758560a869d0d4c1ace42f26a2', 'b2c68ac2afd9b9758560a869d0d4c1ace42f26a2', id="long"),
+        pytest.param('B2c68AC', 'b2c68ac', id="caps"),
+    ]
+)
+def test_commithash_success(hash: str, expected: str) -> None:
+    assert expected == _commithash(hash)
+
+
+@pytest.mark.parametrize(
+    ["hash", "message"],
+    [
+        pytest.param("", "Hash must be at least 4 characters", id="short"),
+        pytest.param("not hex", "Hash must be all hexidecimal characters", id="non-hex"),
+        pytest.param("abcd..1234", "Hash must be all hexidecimal characters", id="dots"),
+    ]
+)
+def test_commithash_failure(hash, message) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+      _commithash(hash)
+
+    ex = context.value
+    assert ex.exit_code == 1
+    assert f"ERROR: {message}" == mock_stdout.getvalue().strip()
 
 
 @pytest.mark.parametrize(
