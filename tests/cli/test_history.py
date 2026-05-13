@@ -9,9 +9,11 @@ from unittest import mock
 import pytest
 import typer
 
+from openapi_spec_tools.cli.history import _commithash
 from openapi_spec_tools.cli.history import _find_commits
 from openapi_spec_tools.cli.history import _read_data
 from openapi_spec_tools.cli.history import commit_changes
+from openapi_spec_tools.cli.history import commit_diff
 from openapi_spec_tools.cli.history import commit_history
 from openapi_spec_tools.cli.history import commit_show
 from tests.cli_gen.helpers import to_ascii
@@ -22,6 +24,38 @@ from tests.helpers import asset_filename
 START = datetime(2025, 1, 1, tzinfo=timezone.utc)
 END = datetime(2026, 3, 1, tzinfo=timezone.utc)
 FILE_ERROR = "ERROR: Unable to find file\n"
+
+
+@pytest.mark.parametrize(
+    ["hash", "expected"],
+    [
+        pytest.param('b2c6', 'b2c6', id="short"),
+        pytest.param('b2c68ac2afd9b9758560a869d0d4c1ace42f26a2', 'b2c68ac2afd9b9758560a869d0d4c1ace42f26a2', id="long"),
+        pytest.param('B2c68AC', 'b2c68ac', id="caps"),
+    ]
+)
+def test_commithash_success(hash: str, expected: str) -> None:
+    assert expected == _commithash(hash)
+
+
+@pytest.mark.parametrize(
+    ["hash", "message"],
+    [
+        pytest.param("", "Hash must be at least 4 characters", id="short"),
+        pytest.param("not hex", "Hash must be all hexidecimal characters", id="non-hex"),
+        pytest.param("abcd..1234", "Hash must be all hexidecimal characters", id="dots"),
+    ]
+)
+def test_commithash_failure(hash, message) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+      _commithash(hash)
+
+    ex = context.value
+    assert ex.exit_code == 1
+    assert f"ERROR: {message}" == mock_stdout.getvalue().strip()
 
 
 @pytest.mark.parametrize(
@@ -419,3 +453,87 @@ def test_commit_show_failure() -> None:
     assert FILE_ERROR == mock_stdout.getvalue()
 
 
+HASH_DELTA1 = "dac5b6d..852fb5b"
+MISC_DIFF1_TABLE = """\
+┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Commits          ┃ Changes                     ┃
+┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ dac5b6d..852fb5b │ components:                 │
+│                  │   schemas:                  │
+│                  │     Pets:                   │
+│                  │       items: removed        │
+│                  │       maxItems: removed     │
+│                  │       properties: added     │
+│                  │       type: array != object │
+│                  │     ShapeShifter: added     │
+└──────────────────┴─────────────────────────────┘
+"""
+MISC_DIFF1_JSON = """\
+[
+  {
+    "commits": "dac5b6d..852fb5b",
+    "changes": {
+      "components": {
+        "schemas": {
+          "Pets": {
+            "items": "removed",
+            "maxItems": "removed",
+            "properties": "added",
+            "type": "array != object"
+          },
+          "ShapeShifter": "added"
+        }
+      }
+    }
+  }
+]
+"""
+MISC_DIFF1_YAML = """\
+- changes:
+    components:
+      schemas:
+        Pets:
+          items: removed
+          maxItems: removed
+          properties: added
+          type: array != object
+        ShapeShifter: added
+  commits: dac5b6d..852fb5b
+"""
+DIFF_NO_CHANGE = """\
+Unable to determine differences.
+"""
+@pytest.mark.parametrize(
+    ["args", "expected"],
+    [
+        pytest.param({"oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1}, MISC_DIFF1_TABLE, id="table"),
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1, "out_fmt": "json"},
+            MISC_DIFF1_JSON,
+            id="json",
+        ),
+        pytest.param({
+            "oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1, "out_fmt": "yaml"},
+            MISC_DIFF1_YAML,
+            id="yaml",
+        ),
+        pytest.param({
+            "oas_file": asset_filename("misc.yaml"), "hash": "dac5b6d..dac5b6d"},
+            DIFF_NO_CHANGE,
+            id="no-change",
+        ),
+        pytest.param({
+            "oas_file": asset_filename("misc.yaml"), "hash": "dac5b6d"},
+            MISC_DIFF1_TABLE,
+            id="no-end",
+        ),
+    ]
+)
+def test_commit_diff_success(args: dict[str, Any], expected: str) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+    ):
+        commit_diff(**args)
+
+    result = mock_stdout.getvalue()
+    assert to_ascii(result) == to_ascii(expected)

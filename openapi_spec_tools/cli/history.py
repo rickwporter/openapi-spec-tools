@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Implement the 'oas-history' CLI commands."""
+import re
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
@@ -22,6 +23,10 @@ from openapi_spec_tools.cli.arguments import OutputStyle
 from openapi_spec_tools.cli.arguments import OutputStyleOption
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.utils import find_diffs
+
+MIN_HASH_LENGTH = 4
+NON_HEX_RE = re.compile(r'[^a-fA-F0-9]')
+
 
 app = typer.Typer(name="history", no_args_is_help=True, short_help="Git history of OAS file")
 
@@ -70,6 +75,24 @@ def _author_match(commit: git.Commit, author: str) -> bool:
             return True
 
     return False
+
+
+def _shorthash(commit: git.Commit) -> str:
+    """Get a shortened version of the commit hash."""
+    return commit.hexsha[:7]
+
+
+def _commithash(hash: str) -> str:
+    """Perform basic checks on the provided hash.
+
+    If the hash does NOT meet the standard, an exception is thrown and a meaningful
+    message provided.
+    """
+    if len(hash) < MIN_HASH_LENGTH:
+        error_out(f"Hash must be at least {MIN_HASH_LENGTH} characters")
+    if NON_HEX_RE.search(hash):
+        error_out("Hash must be all hexidecimal characters")
+    return hash.lower()
 
 
 def _find_commits(
@@ -136,7 +159,7 @@ def commit_history(
     data = [
         {
             "date": _.authored_datetime.date().isoformat(),
-            "commit": _.hexsha[:7],
+            "commit": _shorthash(_),
             "author": _.author.name,
             "message": _.message.strip()[:100],
         }
@@ -180,7 +203,7 @@ def commit_changes(
             data.append(
                 {
                     "date": prev_comm.authored_datetime.date().isoformat(),
-                    "commit": prev_comm.hexsha[:7],
+                    "commit": _shorthash(prev_comm),
                     "changes": changes,
                 }
             )
@@ -207,14 +230,14 @@ def commit_show(
     oas_file: OpenApiFilenameArgument,
     commit: Annotated[
         str | None,
-        typer.Argument(help="Commit hash"),
+        typer.Argument(metavar="HASH", help="Commit hash"),
     ],
     out_fmt: OutputFormatOption = OutputFormat.TABLE,
     out_style: OutputStyleOption = OutputStyle.ALL,
 ):
     """Show OAS changes over the history of the provided search. The ."""
     _assert_exists(oas_file)
-    _commit_id = commit.lower()
+    _commit_id = _commithash(commit)
     # NOTE: do not filter out commits by other authors, or before start, or will get odd comparisons
     commits = _find_commits(oas_file=oas_file)
     columns = ["date", "commit", "changes"]
@@ -244,6 +267,62 @@ def commit_show(
     console = console_factory()
     if not data:
         console.print("No matching commit found.")
+        return
+
+    config = TableConfig(value_max_len=1000)
+    display(data, fmt=out_fmt, style=out_style, columns=columns, config=config, console=console)
+    return
+
+
+@app.command("diff", short_help="Show difference between two points in OAS history.")
+def commit_diff(
+    oas_file: OpenApiFilenameArgument,
+    hash: Annotated[
+        str,
+        typer.Argument(metavar="HASH[..HASH]", help="Commit hash"),
+    ],
+    out_fmt: OutputFormatOption = OutputFormat.TABLE,
+    out_style: OutputStyleOption = OutputStyle.ALL,
+):
+    _assert_exists(oas_file)
+    commits = _find_commits(oas_file=oas_file)
+
+    parts = hash.split("..", maxsplit=1)
+    _start = _commithash(parts[0])
+    _end = _commithash(parts[1]) if len(parts) > 1 else None
+    if not _end:
+        _end = commits[0].hexsha
+
+    columns = ["commits", "changes"]
+    data = []
+    start_comm = None
+    end_comm = None
+    for curr_comm in commits:
+        if _start in curr_comm.hexsha:
+            start_comm = curr_comm
+        if _end in curr_comm.hexsha:
+            end_comm = curr_comm
+        if start_comm and curr_comm:
+            # because we're walking backward chronologicallly, the prev/curr are different order
+            start_data = _read_data(start_comm, oas_file)
+            end_data = _read_data(end_comm, oas_file)
+            changes = find_diffs(start_data, end_data)
+            if not changes:
+                break
+            if out_fmt == OutputFormat.TABLE:
+                # YAML format is the best looking format for the diffs in a table, so force it
+                changes = yaml.dump(changes).strip()
+            data.append(
+                {
+                    "commits": f"{start_comm.hexsha[:7]}..{end_comm.hexsha[:7]}",
+                    "changes": changes,
+                }
+            )
+            break
+
+    console = console_factory()
+    if not data:
+        console.print("Unable to determine differences.")
         return
 
     config = TableConfig(value_max_len=1000)
