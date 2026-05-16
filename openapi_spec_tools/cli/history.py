@@ -134,46 +134,6 @@ def _assert_exists(file: str) -> None:
         error_out("Unable to find file")
 
 
-@app.command("commits", short_help="Show git history of the specified OAS file.")
-def commit_history(
-    oas_file: OpenApiFilenameArgument,
-    start: StartDateOption = None,
-    end: EndDateOption = None,
-    author: AuthorOption = None,
-    max_count: MaxCountOption = 30,
-    out_fmt: OutputFormatOption = OutputFormat.TABLE,
-    out_style: OutputStyleOption = OutputStyle.ALL,
-):
-    """Show git history of the specific OAS file over with the provided search parameters."""
-    _assert_exists(oas_file)
-    start = _with_timezone(start)
-    end = _with_timezone(end)
-    commits = _find_commits(
-        oas_file=oas_file,
-        start=start,
-        end=end,
-        author=author,
-        max_count=max_count,
-    )
-    console = console_factory()
-    if not commits:
-        console.print("No commits found.")
-        return
-
-    columns = ["date", "commit", "*"]
-    data = [
-        {
-            "date": _.authored_datetime.date().isoformat(),
-            "commit": _shorthash(_),
-            "author": _.author.name,
-            "message": _.message.strip()[:100],
-        }
-        for _ in commits
-    ]
-    display(data, fmt=out_fmt, style=out_style, columns=columns, console=console)
-    return
-
-
 @app.command("changes", short_help="Show OAS changes over git history.")
 def commit_changes(
     oas_file: OpenApiFilenameArgument,
@@ -230,52 +190,43 @@ def commit_changes(
     return
 
 
-@app.command("show", short_help="Show single OAS change in git history.")
-def commit_show(
+@app.command("commits", short_help="Show git history of the specified OAS file.")
+def commit_history(
     oas_file: OpenApiFilenameArgument,
-    commit: Annotated[
-        str | None,
-        typer.Argument(metavar="HASH", help="Commit hash"),
-    ],
+    start: StartDateOption = None,
+    end: EndDateOption = None,
+    author: AuthorOption = None,
+    max_count: MaxCountOption = 30,
     out_fmt: OutputFormatOption = OutputFormat.TABLE,
     out_style: OutputStyleOption = OutputStyle.ALL,
 ):
-    """Show OAS changes over the history of the provided search. The ."""
+    """Show git history of the specific OAS file over with the provided search parameters."""
     _assert_exists(oas_file)
-    _commit_id = _commithash(commit)
-    # NOTE: do not filter out commits by other authors, or before start, or will get odd comparisons
-    commits = _find_commits(oas_file=oas_file)
-    columns = ["date", "commit", "changes"]
-    data = []
-    prev_comm = commits[0]
-    prev_data = _read_data(prev_comm, oas_file)
-    for curr_comm in commits[1:]:
-        if _commit_id in prev_comm.hexsha:
-            # because we're walking backward chronologicallly, the prev/curr are different order
-            curr_data = _read_data(curr_comm, oas_file)
-            prev_data = _read_data(prev_comm, oas_file)
-            changes = find_diffs(curr_data, prev_data)
-            if out_fmt == OutputFormat.TABLE:
-                # YAML format is the best looking format for the diffs in a table, so force it
-                changes = yaml.dump(changes).strip()
-            data.append(
-                {
-                    "date": prev_comm.authored_datetime.date().isoformat(),
-                    "commit": prev_comm.hexsha[:7],
-                    "changes": changes,
-                }
-            )
-            break
-
-        prev_comm = curr_comm
-
+    start = _with_timezone(start)
+    end = _with_timezone(end)
+    commits = _find_commits(
+        oas_file=oas_file,
+        start=start,
+        end=end,
+        author=author,
+        max_count=max_count,
+    )
     console = console_factory()
-    if not data:
-        console.print("No matching commit found.")
+    if not commits:
+        console.print("No commits found.")
         return
 
-    config = TableConfig(value_max_len=1000)
-    display(data, fmt=out_fmt, style=out_style, columns=columns, config=config, console=console)
+    columns = ["date", "commit", "*"]
+    data = [
+        {
+            "date": _.authored_datetime.date().isoformat(),
+            "commit": _shorthash(_),
+            "author": _.author.name,
+            "message": _.message.strip()[:100],
+        }
+        for _ in commits
+    ]
+    display(data, fmt=out_fmt, style=out_style, columns=columns, console=console)
     return
 
 
@@ -328,6 +279,55 @@ def commit_diff(
     console = console_factory()
     if not data:
         console.print("Unable to determine differences.")
+        return
+
+    config = TableConfig(value_max_len=1000)
+    display(data, fmt=out_fmt, style=out_style, columns=columns, config=config, console=console)
+    return
+
+
+@app.command("show", short_help="Show single OAS change in git history.")
+def commit_show(
+    oas_file: OpenApiFilenameArgument,
+    commit: Annotated[
+        str | None,
+        typer.Argument(metavar="HASH", help="Commit hash"),
+    ],
+    out_fmt: OutputFormatOption = OutputFormat.TABLE,
+    out_style: OutputStyleOption = OutputStyle.ALL,
+):
+    """Show OAS changes over the history of the provided search. The ."""
+    _assert_exists(oas_file)
+    _commit_id = _commithash(commit)
+    # NOTE: do not filter out commits by other authors, or before start, or will get odd comparisons
+    commits = _find_commits(oas_file=oas_file)
+    columns = ["date", "commit", "changes"]
+    data = []
+    prev_comm = commits[0]
+    prev_data = _read_data(prev_comm, oas_file)
+    for curr_comm in commits[1:]:
+        if _commit_id in prev_comm.hexsha:
+            # because we're walking backward chronologicallly, the prev/curr are different order
+            curr_data = _read_data(curr_comm, oas_file)
+            prev_data = _read_data(prev_comm, oas_file)
+            changes = find_diffs(curr_data, prev_data)
+            if out_fmt == OutputFormat.TABLE:
+                # YAML format is the best looking format for the diffs in a table, so force it
+                changes = yaml.dump(changes).strip()
+            data.append(
+                {
+                    "date": prev_comm.authored_datetime.date().isoformat(),
+                    "commit": prev_comm.hexsha[:7],
+                    "changes": changes,
+                }
+            )
+            break
+
+        prev_comm = curr_comm
+
+    console = console_factory()
+    if not data:
+        console.print("No matching commit found.")
         return
 
     config = TableConfig(value_max_len=1000)
