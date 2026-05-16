@@ -33,7 +33,12 @@ app = typer.Typer(name="history", no_args_is_help=True, short_help="Git history 
 
 AuthorOption = Annotated[
     Optional[str],
-    typer.Option("--author", show_default=False, help="Name, or partial name, of author or coauthor (case insensitive)")
+    typer.Option(
+        "--author",
+        metavar="NAME",
+        show_default=False,
+        help="Name, or partial name, of author or coauthor (case insensitive)",
+    )
 ]
 EndDateOption = Annotated[
     Optional[datetime],
