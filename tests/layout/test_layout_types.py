@@ -8,6 +8,53 @@ from tests.helpers import asset_filename
 
 
 @pytest.mark.parametrize(
+    ["node", "expected"],
+    [
+        pytest.param(
+            LayoutNode(command="sna", identifier="foo"),
+            "LayoutNode(sna, id=foo)",
+            id="simple",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="sna",
+                identifier="foo",
+                description="This is it",
+                bugs=["abc"],
+                summary_fields=["def"],
+                extra={},
+                pagination=PaginationNames(page_size="10"),
+                reference=ReferenceSubcommand(package="other"),
+                hidden_fields=["field1"],
+                allowed_fields=["field2"],
+                display_columns=["field3"],
+                ignore=True,
+            ),
+            "LayoutNode(sna, id=foo)",
+            id="extra-fields",
+        ),
+        pytest.param(
+            LayoutNode(
+                command="sna",
+                identifier="foo",
+                children=[
+                    LayoutNode(command="a", identifier="A"),
+                    LayoutNode(command="b", identifier="B", children=[LayoutNode(command="x", identifier="X")])
+                ]),
+            (
+                "LayoutNode(sna, id=foo, children=[LayoutNode(a, id=A), "
+                "LayoutNode(b, id=B, children=[LayoutNode(x, id=X)])])"
+            ),
+            id="nested",
+        ),
+    ],
+)
+def test_node_str(node, expected):
+    assert expected == str(node)
+    assert expected == repr(node)
+
+
+@pytest.mark.parametrize(
     ["node", "args", "expected"],
     [
         pytest.param(

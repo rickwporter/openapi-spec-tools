@@ -103,6 +103,14 @@ class LayoutNode(BaseModel):
     display_columns: list[str] = Field(default_factory=list)
     ignore: Optional[bool] = None
 
+    def __str__(self):
+        """Display shorter version of LayoutNode."""
+        return self.display()
+
+    def __repr__(self):
+        """Display shorter version of LayoutNode."""
+        return self.display()
+
     def display(self, depth: int = 2, max_children: int = 3) -> str:
         """Display a shorter version of the node."""
         class_name = self.__class__.__name__
