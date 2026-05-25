@@ -103,6 +103,21 @@ class LayoutNode(BaseModel):
     display_columns: list[str] = Field(default_factory=list)
     ignore: Optional[bool] = None
 
+    def display(self, depth: int = 2, max_children: int = 3) -> str:
+        """Display a shorter version of the node."""
+        class_name = self.__class__.__name__
+        items = [
+            self.command,
+            f"id={self.identifier}",
+        ]
+        if self.children:
+            if not depth or len(self.children) > max_children:
+                items.append(f'children={len(self.children)}')
+            else:
+                child_disp = [child.display(depth-1) for child in self.children]
+                items.append(f"children=[{', '.join(child_disp)}]")
+        return f"{class_name}({', '.join(items)})"
+
     def as_dict(self, sparse: bool = True) -> dict[str, Any]:
         """Convert object to dictionary."""
         return self.model_dump(exclude_none=sparse, exclude_unset=sparse, exclude_defaults=sparse)
