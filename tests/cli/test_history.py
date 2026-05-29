@@ -506,26 +506,31 @@ Unable to determine differences.
 @pytest.mark.parametrize(
     ["args", "expected"],
     [
-        pytest.param({"oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1}, MISC_DIFF1_TABLE, id="table"),
+        pytest.param({"oas_file": asset_filename("misc.yaml"), "commit_id": HASH_DELTA1}, MISC_DIFF1_TABLE, id="table"),
         pytest.param(
-            {"oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1, "out_fmt": "json"},
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": HASH_DELTA1, "out_fmt": "json"},
             MISC_DIFF1_JSON,
             id="json",
         ),
         pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "hash": HASH_DELTA1, "out_fmt": "yaml"},
+            "oas_file": asset_filename("misc.yaml"), "commit_id": HASH_DELTA1, "out_fmt": "yaml"},
             MISC_DIFF1_YAML,
             id="yaml",
         ),
         pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "hash": "dac5b6d..dac5b6d"},
+            "oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d..dac5b6d"},
             DIFF_NO_CHANGE,
             id="no-change",
         ),
         pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "hash": "dac5b6d"},
+            "oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d"},
             MISC_DIFF1_TABLE,
             id="no-end",
+        ),
+        pytest.param({
+            "oas_file": asset_filename("misc.yaml"), "commit_id": "v0.9.0..v0.11.1"},
+            MISC_DIFF1_TABLE.replace("852fb5b", "66902aa").replace("dac5b6d", "f668cbf"),
+            id="tags",
         ),
     ]
 )
@@ -537,3 +542,40 @@ def test_commit_diff_success(args: dict[str, Any], expected: str) -> None:
 
     result = mock_stdout.getvalue()
     assert to_ascii(result) == to_ascii(expected)
+
+
+@pytest.mark.parametrize(
+    ["args", "error"],
+    [
+        pytest.param(
+            {"oas_file": asset_filename("nofile.yaml"), "commit_id": "dac5b6d"},
+            "Unable to find file",
+            id="file",
+        ),
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": "foobar"},
+            "Unable to find specified commit",
+            id="single-commit",
+        ),
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": "foobar..dac5b6d"},
+            "Unable to find specified commit",
+            id="start-commit",
+        ),
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d..foobar"},
+            "Unable to find specified commit",
+            id="end-commit",
+        ),
+    ],
+)
+def test_commit_diff_failure(args: dict[str, Any], error: str) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+        commit_diff(**args)
+
+    ex = context.value
+    assert ex.exit_code == 1
+    assert error in mock_stdout.getvalue()

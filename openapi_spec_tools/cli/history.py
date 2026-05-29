@@ -123,6 +123,33 @@ def _find_commits(
     return commits
 
 
+def _get_commit(
+    oas_file: str,
+    commit_id: str,
+) -> git.Commit | None:
+    """Search the commits looking for a match."""
+    repo = git.Repo(oas_file, search_parent_directories=True)
+    for tag in repo.tags:
+        if commit_id == tag.name:
+            return tag.commit
+
+    for branch in repo.branches:
+        if commit_id == branch.name:
+            # unfortunatley, testing in CI pipeline complicates covering this too much
+            return branch.commit  # pragma: no cover
+
+
+    for commit in repo.iter_commits(paths=oas_file):
+        if not commit_id:
+            # gets the latest commit if no commit is specified
+            return commit
+
+        if commit_id.lower() in commit.hexsha:
+            return commit
+
+    error_out(f"Unable to find specified commit for '{commit_id}'")
+
+
 def _assert_exists(file: str) -> None:
     """Assert that the file exists in the git repo, or throw an exception."""
     try:
@@ -233,53 +260,39 @@ def commit_history(
 @app.command("diff", short_help="Show difference between two points in OAS history.")
 def commit_diff(
     oas_file: OpenApiFilenameArgument,
-    hash: Annotated[
+    commit_id: Annotated[
         str,
-        typer.Argument(metavar="HASH[..HASH]", help="Commit hash"),
+        typer.Argument(metavar="COMMIT[..COMMIT]", help="Commit hash(es), tag(s), or branch(es)"),
     ],
     out_fmt: OutputFormatOption = OutputFormat.TABLE,
     out_style: OutputStyleOption = OutputStyle.ALL,
 ):
     _assert_exists(oas_file)
-    commits = _find_commits(oas_file=oas_file)
 
-    parts = hash.split("..", maxsplit=1)
-    _start = _commithash(parts[0])
-    _end = _commithash(parts[1]) if len(parts) > 1 else None
-    if not _end:
-        _end = commits[0].hexsha
-
-    columns = ["commits", "changes"]
-    data = []
-    start_comm = None
-    end_comm = None
-    for curr_comm in commits:
-        if _start in curr_comm.hexsha:
-            start_comm = curr_comm
-        if _end in curr_comm.hexsha:
-            end_comm = curr_comm
-        if start_comm and curr_comm:
-            # because we're walking backward chronologicallly, the prev/curr are different order
-            start_data = _read_data(start_comm, oas_file)
-            end_data = _read_data(end_comm, oas_file)
-            changes = find_diffs(start_data, end_data)
-            if not changes:
-                break
-            if out_fmt == OutputFormat.TABLE:
-                # YAML format is the best looking format for the diffs in a table, so force it
-                changes = yaml.dump(changes).strip()
-            data.append(
-                {
-                    "commits": f"{start_comm.hexsha[:7]}..{end_comm.hexsha[:7]}",
-                    "changes": changes,
-                }
-            )
-            break
+    parts = commit_id.split("..", maxsplit=1)
+    start_comm = _get_commit(oas_file, parts[0])
+    end_comm = _get_commit(oas_file, parts[1] if len(parts) > 1 else None)
 
     console = console_factory()
-    if not data:
+
+    start_data = _read_data(start_comm, oas_file)
+    end_data = _read_data(end_comm, oas_file)
+    changes = find_diffs(start_data, end_data)
+    if not changes:
         console.print("Unable to determine differences.")
         return
+
+    if out_fmt == OutputFormat.TABLE:
+        # YAML format is the best looking format for the diffs in a table, so force it
+        changes = yaml.dump(changes).strip()
+
+    columns = ["commits", "changes"]
+    data = [
+        {
+            "commits": f"{_shorthash(start_comm)}..{_shorthash(end_comm)}",
+            "changes": changes,
+        }
+    ]
 
     config = TableConfig(value_max_len=1000)
     display(data, fmt=out_fmt, style=out_style, columns=columns, config=config, console=console)
