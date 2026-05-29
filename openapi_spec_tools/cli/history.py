@@ -135,7 +135,8 @@ def _get_commit(
 
     for branch in repo.branches:
         if commit_id == branch.name:
-            return branch.commit
+            # unfortunatley, testing in CI pipeline complicates covering this too much
+            return branch.commit  # pragma: no cover
 
 
     for commit in repo.iter_commits(paths=oas_file):

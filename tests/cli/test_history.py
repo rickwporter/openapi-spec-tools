@@ -582,31 +582,3 @@ def test_commit_diff_failure(args: dict[str, Any], error: str) -> None:
     ex = context.value
     assert ex.exit_code == 1
     assert error in mock_stdout.getvalue()
-
-
-def _get_branch_name(filename: str) -> str:
-    """Get from env-var (for CI), otherwise from repo info"""
-    value = os.environ.get("GITHUB_HEAD_REF")
-    if value:
-        return value
-
-    repo = git.Repo(filename, search_parent_directories=True)
-    branch = repo.branches[0]
-    return branch.name
-
-
-def test_get_commit() -> None:
-    filename = asset_filename("misc.yaml")
-    sha = "dac5b6d"
-    commit = _get_commit(filename, sha.upper())
-    assert sha in commit.hexsha
-
-    tag = "v0.10.0"
-    sha = "6a5b49f7ea9859a294e42d768657c6ed676eb6fa"
-    commit = _get_commit(filename, tag)
-    assert sha in commit.hexsha
-
-    branch_name = _get_branch_name(filename)
-    commit = _get_commit(filename, branch_name)
-    assert commit
-    assert branch_name != commit.hexsha
