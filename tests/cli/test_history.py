@@ -6,11 +6,13 @@ from typing import Any
 from typing import Optional
 from unittest import mock
 
+import git
 import pytest
 import typer
 
 from openapi_spec_tools.cli.history import _commithash
 from openapi_spec_tools.cli.history import _find_commits
+from openapi_spec_tools.cli.history import _get_commit
 from openapi_spec_tools.cli.history import _read_data
 from openapi_spec_tools.cli.history import commit_changes
 from openapi_spec_tools.cli.history import commit_diff
@@ -528,19 +530,9 @@ Unable to determine differences.
             id="no-end",
         ),
         pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "commit_id": "main..main"},
-            DIFF_NO_CHANGE,
-            id="branch",
-        ),
-        pytest.param({
             "oas_file": asset_filename("misc.yaml"), "commit_id": "v0.9.0..v0.11.1"},
             MISC_DIFF1_TABLE.replace("852fb5b", "66902aa").replace("dac5b6d", "f668cbf"),
             id="tags",
-        ),
-        pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "commit_id": "v0.10.0..history-test"},
-            DIFF_NO_CHANGE,
-            id="tag-branch",
         ),
     ]
 )
@@ -589,3 +581,20 @@ def test_commit_diff_failure(args: dict[str, Any], error: str) -> None:
     ex = context.value
     assert ex.exit_code == 1
     assert error in mock_stdout.getvalue()
+
+
+def test_get_commit() -> None:
+    filename = asset_filename("misc.yaml")
+    sha = "dac5b6d"
+    commit = _get_commit(filename, sha.upper())
+    assert sha in commit.hexsha
+
+    tag = "v0.10.0"
+    sha = "6a5b49f7ea9859a294e42d768657c6ed676eb6fa"
+    commit = _get_commit(filename, tag)
+    assert sha in commit.hexsha
+
+    repo = git.Repo(filename, search_parent_directories=True)
+    branch = repo.branches[0]
+    commit = _get_commit(filename, branch.name)
+    assert commit == branch.commit
