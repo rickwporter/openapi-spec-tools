@@ -595,6 +595,6 @@ def test_get_commit() -> None:
     assert sha in commit.hexsha
 
     repo = git.Repo(filename, search_parent_directories=True)
-    branch = repo.branches[0]
+    branch = repo.refs[0]
     commit = _get_commit(filename, branch.name)
     assert commit == branch.commit
