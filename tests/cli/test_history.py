@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
@@ -7,13 +6,11 @@ from typing import Any
 from typing import Optional
 from unittest import mock
 
-import git
 import pytest
 import typer
 
 from openapi_spec_tools.cli.history import _commithash
 from openapi_spec_tools.cli.history import _find_commits
-from openapi_spec_tools.cli.history import _get_commit
 from openapi_spec_tools.cli.history import _read_data
 from openapi_spec_tools.cli.history import commit_changes
 from openapi_spec_tools.cli.history import commit_diff
