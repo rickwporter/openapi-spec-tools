@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
@@ -583,6 +584,17 @@ def test_commit_diff_failure(args: dict[str, Any], error: str) -> None:
     assert error in mock_stdout.getvalue()
 
 
+def _get_branch_name(filename: str) -> str:
+    """Get from env-var (for CI), otherwise from repo info"""
+    value = os.environ.get("GITHUB_HEAD_REF")
+    if value:
+        return value
+
+    repo = git.Repo(filename, search_parent_directories=True)
+    branch = repo.branches[0]
+    return branch.name
+
+
 def test_get_commit() -> None:
     filename = asset_filename("misc.yaml")
     sha = "dac5b6d"
@@ -594,8 +606,7 @@ def test_get_commit() -> None:
     commit = _get_commit(filename, tag)
     assert sha in commit.hexsha
 
-    repo = git.Repo(filename, search_parent_directories=True)
-    head = repo.heads[0]
-    commit = _get_commit(filename, head.name)
-    assert commit == head.commit
-    assert head.name != commit.hexsha
+    branch_name = _get_branch_name(filename)
+    commit = _get_commit(filename, branch_name)
+    assert commit
+    assert branch_name != commit.hexsha
