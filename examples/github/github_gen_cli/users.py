@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -45,10 +44,10 @@ def show_commands(
 def users_list_attestations(
     username: Annotated[str, typer.Argument(show_default=False, help="The handle for the GitHub user account.")],
     subject_digest: Annotated[str, typer.Argument(show_default=False, help="Subject Digest")],
-    per_page: Annotated[Optional[int], typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
-    before: Annotated[Optional[str], typer.Option(show_default=False, help="A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = None,
-    after: Annotated[Optional[str], typer.Option(show_default=False, help="A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = None,
-    predicate_type: Annotated[Optional[str], typer.Option(show_default=False, help="Optional filter for fetching attestations with a given predicate type.")] = None,
+    per_page: Annotated[int | None, typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
+    before: Annotated[str | None, typer.Option(show_default=False, help="A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = None,
+    after: Annotated[str | None, typer.Option(show_default=False, help="A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = None,
+    predicate_type: Annotated[str | None, typer.Option(show_default=False, help="Optional filter for fetching attestations with a given predicate type.")] = None,
     _api_host: _a.ApiHostOption = "https://api.github.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -143,8 +142,8 @@ def users_get_authenticated(
 
 @app.command("list", short_help="List users")
 def users_list(
-    since: Annotated[Optional[int], typer.Option(show_default=False, help="A user ID. Only return users with an ID greater than this ID.")] = None,
-    per_page: Annotated[Optional[int], typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
+    since: Annotated[int | None, typer.Option(show_default=False, help="A user ID. Only return users with an ID greater than this ID.")] = None,
+    per_page: Annotated[int | None, typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
     _api_host: _a.ApiHostOption = "https://api.github.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -45,9 +44,9 @@ def show_commands(
 def post_comment(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to add comments in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
     message: Annotated[str, typer.Option(show_default=False, help="The text contents of the comment to post.")] = None,
-    comment_id: Annotated[Optional[str], typer.Option(show_default=False, help="The ID of the comment to reply to, if any. This must be a root comment. You cannot reply to other replies (a comment that has a parent_id).")] = None,
-    client_meta_x: Annotated[Optional[float], typer.Option(show_default=False, help="X coordinate of the vector.")] = None,
-    client_meta_y: Annotated[Optional[float], typer.Option(show_default=False, help="Y coordinate of the vector.")] = None,
+    comment_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the comment to reply to, if any. This must be a root comment. You cannot reply to other replies (a comment that has a parent_id).")] = None,
+    client_meta_x: Annotated[float | None, typer.Option(show_default=False, help="X coordinate of the vector.")] = None,
+    client_meta_y: Annotated[float | None, typer.Option(show_default=False, help="Y coordinate of the vector.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -131,7 +130,7 @@ def delete_comment(
 @app.command("show", short_help="Get comments in a file")
 def get_comments(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to get comments from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    as_md: Annotated[Optional[bool], typer.Option("--as-md/--no-as-md", show_default=False, help="If enabled, will return comments as their markdown equivalents when applicable.")] = None,
+    as_md: Annotated[bool | None, typer.Option("--as-md/--no-as-md", show_default=False, help="If enabled, will return comments as their markdown equivalents when applicable.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

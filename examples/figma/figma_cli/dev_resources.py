@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -105,8 +104,8 @@ def post_dev_resources(
 @app.command("set", short_help="Update dev resources")
 def put_dev_resources(
     dev_resources_id: Annotated[str, typer.Option(show_default=False, help="Unique identifier of the dev resource")] = None,
-    dev_resources_name: Annotated[Optional[str], typer.Option(show_default=False, help="The name of the dev resource.")] = None,
-    dev_resources_url: Annotated[Optional[str], typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
+    dev_resources_name: Annotated[str | None, typer.Option(show_default=False, help="The name of the dev resource.")] = None,
+    dev_resources_url: Annotated[str | None, typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

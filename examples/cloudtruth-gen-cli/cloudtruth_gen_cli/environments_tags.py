@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -44,9 +43,9 @@ def show_commands(
 def environments_tags_create(
     environment_pk: Annotated[str, typer.Argument(show_default=False)],
     name: Annotated[str, typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
-    description: Annotated[Optional[str], typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
-    timestamp: Annotated[Optional[datetime], typer.Option(show_default=False, help="The point in time this tag represents. If not specified then the current time will be used.")] = None,
-    immutable: Annotated[Optional[bool], typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
+    description: Annotated[str | None, typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
+    timestamp: Annotated[datetime | None, typer.Option(show_default=False, help="The point in time this tag represents. If not specified then the current time will be used.")] = None,
+    immutable: Annotated[bool | None, typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -132,15 +131,15 @@ def environments_tags_destroy(
 @app.command("list", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_list(
     environment_pk: Annotated[str, typer.Argument(show_default=False)],
-    description_icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    name: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    name_icontains: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
-    page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
-    page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
-    timestamp: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
-    timestamp_gte: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
-    timestamp_lte: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
+    description_icontains: Annotated[str | None, typer.Option(show_default=False)] = None,
+    name: Annotated[str | None, typer.Option(show_default=False)] = None,
+    name_icontains: Annotated[str | None, typer.Option(show_default=False)] = None,
+    ordering: Annotated[str | None, typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
+    page: Annotated[int | None, typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
+    page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
+    timestamp: Annotated[datetime | None, typer.Option(show_default=False)] = None,
+    timestamp_gte: Annotated[datetime | None, typer.Option(show_default=False)] = None,
+    timestamp_lte: Annotated[datetime | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -208,9 +207,9 @@ def environments_tags_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False)],
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
     name: Annotated[str, typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
-    description: Annotated[Optional[str], typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
-    timestamp: Annotated[Optional[datetime], typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,
-    immutable: Annotated[Optional[bool], typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
+    description: Annotated[str | None, typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
+    timestamp: Annotated[datetime | None, typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,
+    immutable: Annotated[bool | None, typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -297,10 +296,10 @@ def environments_tags_retrieve(
 def environments_tags_partial_update(
     environment_pk: Annotated[str, typer.Argument(show_default=False)],
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
-    name: Annotated[Optional[str], typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
-    description: Annotated[Optional[str], typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
-    timestamp: Annotated[Optional[datetime], typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,
-    immutable: Annotated[Optional[bool], typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
+    name: Annotated[str | None, typer.Option(show_default=False, help="The tag name. Tag names may contain alphanumeric, hyphen, underscore, or period characters. Tag names are case sensitive. The name cannot be modified.")] = None,
+    description: Annotated[str | None, typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
+    timestamp: Annotated[datetime | None, typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,
+    immutable: Annotated[bool | None, typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

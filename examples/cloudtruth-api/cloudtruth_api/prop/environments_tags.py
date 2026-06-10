@@ -7,7 +7,6 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
-from typing import Optional  # noqa: F401
 
 from cloudtruth_api.prop import _environment as _e  # noqa: F401
 from cloudtruth_api.prop import _logging as _l  # noqa: F401
@@ -17,13 +16,13 @@ from cloudtruth_api.prop import _requests as _r  # noqa: F401
 def environments_tags_create(
     environment_pk: str,  # [required]
     name: str = None,  # The tag name... [required]
-    description: Optional[str] = None,  # A description of the tag...
-    timestamp: Optional[datetime] = None,  # The point in time this tag represents. If not specified then the current time will be used.
-    immutable: Optional[bool] = None,  # If True, this tag cannot be modified once it is created.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    description: str | None = None,  # A description of the tag...
+    timestamp: datetime | None = None,  # The point in time this tag represents. If not specified then the current time will be used.
+    immutable: bool | None = None,  # If True, this tag cannot be modified once it is created.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Tags allow you to name stable points for your configuration.
@@ -58,10 +57,10 @@ def environments_tags_create(
 def environments_tags_destroy(
     environment_pk: str,  # [required]
     id: str,  # A unique identifier for the tag. [required]
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Tags allow you to name stable points for your configuration.
@@ -87,19 +86,19 @@ def environments_tags_destroy(
 
 def environments_tags_list(
     environment_pk: str,  # [required]
-    description_icontains: Optional[str] = None,
-    name: Optional[str] = None,
-    name_icontains: Optional[str] = None,
-    ordering: Optional[str] = None,  # Which field to use when ordering the results.
-    page: Optional[int] = None,  # A page number within the paginated result set.
-    page_size: Optional[int] = None,  # Number of results to return per page.
-    timestamp: Optional[datetime] = None,
-    timestamp_gte: Optional[datetime] = None,
-    timestamp_lte: Optional[datetime] = None,
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    description_icontains: str | None = None,
+    name: str | None = None,
+    name_icontains: str | None = None,
+    ordering: str | None = None,  # Which field to use when ordering the results.
+    page: int | None = None,  # A page number within the paginated result set.
+    page_size: int | None = None,  # Number of results to return per page.
+    timestamp: datetime | None = None,
+    timestamp_gte: datetime | None = None,
+    timestamp_lte: datetime | None = None,
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Tags allow you to name stable points for your configuration.
@@ -145,13 +144,13 @@ def environments_tags_update(
     environment_pk: str,  # [required]
     id: str,  # A unique identifier for the tag. [required]
     name: str = None,  # The tag name... [required]
-    description: Optional[str] = None,  # A description of the tag...
-    timestamp: Optional[datetime] = None,  # The point in time this tag represents.  If explicitly set to `null` then the current time will be used.
-    immutable: Optional[bool] = None,  # If True, this tag cannot be modified once it is created.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    description: str | None = None,  # A description of the tag...
+    timestamp: datetime | None = None,  # The point in time this tag represents.  If explicitly set to `null` then the current time will be used.
+    immutable: bool | None = None,  # If True, this tag cannot be modified once it is created.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Tags allow you to name stable points for your configuration.
@@ -186,10 +185,10 @@ def environments_tags_update(
 def environments_tags_retrieve(
     environment_pk: str,  # [required]
     id: str,  # A unique identifier for the tag. [required]
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Tags allow you to name stable points for your configuration.
@@ -216,14 +215,14 @@ def environments_tags_retrieve(
 def environments_tags_partial_update(
     environment_pk: str,  # [required]
     id: str,  # A unique identifier for the tag. [required]
-    name: Optional[str] = None,  # The tag name...
-    description: Optional[str] = None,  # A description of the tag...
-    timestamp: Optional[datetime] = None,  # The point in time this tag represents.  If explicitly set to `null` then the current time will be used.
-    immutable: Optional[bool] = None,  # If True, this tag cannot be modified once it is created.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    name: str | None = None,  # The tag name...
+    description: str | None = None,  # A description of the tag...
+    timestamp: datetime | None = None,  # The point in time this tag represents.  If explicitly set to `null` then the current time will be used.
+    immutable: bool | None = None,  # If True, this tag cannot be modified once it is created.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Tags allow you to name stable points for your configuration.

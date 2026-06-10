@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -50,18 +49,18 @@ class Action(str, Enum):  # noqa: F811
 
 @app.command("list", short_help="A searchable log of all the actions taken by users and service accounts within the organization.")
 def audit_list(
-    action: Annotated[Optional[Action], typer.Option(show_default=False, case_sensitive=False, help="The action that was taken.")] = None,
-    earliest: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
-    environment_id: Annotated[Optional[str], typer.Option(show_default=False, help="Returns records for the environment, associated tags, and values.")] = None,
-    latest: Annotated[Optional[datetime], typer.Option(show_default=False)] = None,
-    object_id: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    object_type: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
-    page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
-    page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
-    parameter_id: Annotated[Optional[str], typer.Option(show_default=False, help="Returns records for the parameter and associated values.")] = None,
-    project_id: Annotated[Optional[str], typer.Option(show_default=False, help="Returns records for the project, it\'s parameters, and associated values.")] = None,
-    user_id: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    action: Annotated[Action | None, typer.Option(show_default=False, case_sensitive=False, help="The action that was taken.")] = None,
+    earliest: Annotated[datetime | None, typer.Option(show_default=False)] = None,
+    environment_id: Annotated[str | None, typer.Option(show_default=False, help="Returns records for the environment, associated tags, and values.")] = None,
+    latest: Annotated[datetime | None, typer.Option(show_default=False)] = None,
+    object_id: Annotated[str | None, typer.Option(show_default=False)] = None,
+    object_type: Annotated[str | None, typer.Option(show_default=False)] = None,
+    ordering: Annotated[str | None, typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
+    page: Annotated[int | None, typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
+    page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
+    parameter_id: Annotated[str | None, typer.Option(show_default=False, help="Returns records for the parameter and associated values.")] = None,
+    project_id: Annotated[str | None, typer.Option(show_default=False, help="Returns records for the project, it\'s parameters, and associated values.")] = None,
+    user_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

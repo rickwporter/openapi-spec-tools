@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -43,7 +42,7 @@ def show_commands(
 @app.command("files", short_help="Get files in a project")
 def get_project_files(
     project_id: Annotated[str, typer.Argument(show_default=False, help="ID of the project to list files from")],
-    branch_data: Annotated[Optional[bool], typer.Option("--branch-data/--no-branch-data", help="Returns branch metadata in the response for each main file with a branch inside the project.")] = False,
+    branch_data: Annotated[bool | None, typer.Option("--branch-data/--no-branch-data", help="Returns branch metadata in the response for each main file with a branch inside the project.")] = False,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -58,13 +57,13 @@ class WebhookV2Status(str, Enum):  # noqa: F811
 @app.command("create", short_help="Create a webhook")
 def post_webhook(
     event_type: Annotated[WebhookV2Event, typer.Option(show_default=False, case_sensitive=False, help="An enum representing the possible events that a webhook can subscribe to")] = None,
-    team_id: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, help="Team id to receive updates about. This is deprecated, use \'context\' and \'context_id\' instead.")] = None,
+    team_id: Annotated[str | None, typer.Option(show_default=False, hidden=True, help="Team id to receive updates about. This is deprecated, use \'context\' and \'context_id\' instead.")] = None,
     context: Annotated[str, typer.Option(show_default=False, help="Context to create the webhook for. Must be \"team\", \"project\", or \"file\".")] = None,
     context_id: Annotated[str, typer.Option(show_default=False, help="The id of the context you want to receive updates about.")] = None,
     endpoint: Annotated[str, typer.Option(show_default=False, help="The HTTP endpoint that will receive a POST request when the event triggers. Max length 2048 characters.")] = None,
     passcode: Annotated[str, typer.Option(show_default=False, help="String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters.")] = None,
-    status: Annotated[Optional[WebhookV2Status], typer.Option(show_default=False, case_sensitive=False, help="An enum representing the possible statuses you can set a webhook to:")] = None,
-    description: Annotated[Optional[str], typer.Option(show_default=False, help="User provided description or name for the webhook. Max length 150 characters.")] = None,
+    status: Annotated[WebhookV2Status | None, typer.Option(show_default=False, case_sensitive=False, help="An enum representing the possible statuses you can set a webhook to:")] = None,
+    description: Annotated[str | None, typer.Option(show_default=False, help="User provided description or name for the webhook. Max length 150 characters.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -157,10 +156,10 @@ def delete_webhook(
 
 @app.command("list", short_help="Get webhooks by context or plan")
 def get_webhooks(
-    context: Annotated[Optional[str], typer.Option(show_default=False, help="Context to create the resource on. Should be \"team\", \"project\", or \"file\".")] = None,
-    context_id: Annotated[Optional[str], typer.Option(show_default=False, help="The id of the context that you want to get attached webhooks for. If you\'re using context_id, you cannot use plan_api_id.")] = None,
-    plan_api_id: Annotated[Optional[str], typer.Option(show_default=False, help="The id of your plan. Use this to get all webhooks for all contexts you have access to. If you\'re using plan_api_id, you cannot use context or context_id. When you use plan_api_id, the response is paginated.")] = None,
-    cursor: Annotated[Optional[str], typer.Option(show_default=False, help="If you\'re using plan_api_id, this is the cursor to use for pagination. If you\'re using context or context_id, this parameter is ignored. Provide the next_page or prev_page value from the previous response to get the next or previous page of results.")] = None,
+    context: Annotated[str | None, typer.Option(show_default=False, help="Context to create the resource on. Should be \"team\", \"project\", or \"file\".")] = None,
+    context_id: Annotated[str | None, typer.Option(show_default=False, help="The id of the context that you want to get attached webhooks for. If you\'re using context_id, you cannot use plan_api_id.")] = None,
+    plan_api_id: Annotated[str | None, typer.Option(show_default=False, help="The id of your plan. Use this to get all webhooks for all contexts you have access to. If you\'re using plan_api_id, you cannot use context or context_id. When you use plan_api_id, the response is paginated.")] = None,
+    cursor: Annotated[str | None, typer.Option(show_default=False, help="If you\'re using plan_api_id, this is the cursor to use for pagination. If you\'re using context or context_id, this parameter is ignored. Provide the next_page or prev_page value from the previous response to get the next or previous page of results.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -256,8 +255,8 @@ def put_webhook(
     event_type: Annotated[WebhookV2Event, typer.Option(show_default=False, case_sensitive=False, help="An enum representing the possible events that a webhook can subscribe to")] = None,
     endpoint: Annotated[str, typer.Option(show_default=False, help="The HTTP endpoint that will receive a POST request when the event triggers. Max length 2048 characters.")] = None,
     passcode: Annotated[str, typer.Option(show_default=False, help="String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters.")] = None,
-    status: Annotated[Optional[WebhookV2Status], typer.Option(show_default=False, case_sensitive=False, help="An enum representing the possible statuses you can set a webhook to:")] = None,
-    description: Annotated[Optional[str], typer.Option(show_default=False, help="User provided description or name for the webhook. Max length 150 characters.")] = None,
+    status: Annotated[WebhookV2Status | None, typer.Option(show_default=False, case_sensitive=False, help="An enum representing the possible statuses you can set a webhook to:")] = None,
+    description: Annotated[str | None, typer.Option(show_default=False, help="User provided description or name for the webhook. Max length 150 characters.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

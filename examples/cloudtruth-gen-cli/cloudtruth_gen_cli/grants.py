@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -144,12 +143,12 @@ class Role(str, Enum):  # noqa: F811
 
 @app.command("list", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_list(
-    ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
-    page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
-    page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
-    principal: Annotated[Optional[str], typer.Option(show_default=False, help="Filter by principal (User, Group). Returns direct grant assignments, not indirect (user via group).")] = None,
-    role: Annotated[Optional[Role], typer.Option(show_default=False, case_sensitive=False, help="Filter by role.")] = None,
-    scope: Annotated[Optional[str], typer.Option(show_default=False, help="Filter by grant scope (Environment, Project).")] = None,
+    ordering: Annotated[str | None, typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
+    page: Annotated[int | None, typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
+    page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
+    principal: Annotated[str | None, typer.Option(show_default=False, help="Filter by principal (User, Group). Returns direct grant assignments, not indirect (user via group).")] = None,
+    role: Annotated[Role | None, typer.Option(show_default=False, case_sensitive=False, help="Filter by role.")] = None,
+    scope: Annotated[str | None, typer.Option(show_default=False, help="Filter by grant scope (Environment, Project).")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -314,9 +313,9 @@ class RoleEnum(str, Enum):  # noqa: F811
 @app.command("update", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_partial_update(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the grant.")],
-    principal: Annotated[Optional[str], typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
-    scope: Annotated[Optional[str], typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
-    role: Annotated[Optional[RoleEnum], typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
+    principal: Annotated[str | None, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
+    scope: Annotated[str | None, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
+    role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
