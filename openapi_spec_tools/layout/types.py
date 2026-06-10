@@ -59,20 +59,20 @@ class PaginationNames(BaseModel):
     """Data structure for holding info related to pagination parameters."""
 
     # page_size - dictates the limit per request
-    page_size: Optional[str] = None
+    page_size: str | None = None
 
     # page_start - dictates the starting point when it is in page increments
-    page_start: Optional[str] = None
+    page_start: str | None = None
 
     # offset_start - dictates the starting point when it is specified in item increments
-    item_start: Optional[str] = None
+    item_start: str | None = None
 
     # items property specifies the property name to pull out the data from
-    items_property: Optional[str] = None
+    items_property: str | None = None
 
     # locations for next url
-    next_header: Optional[str] = None
-    next_property: Optional[str] = None
+    next_header: str | None = None
+    next_property: str | None = None
 
     def sizeable(self) -> bool:
         """Check if any variables are defined that should lead to allow specifying a size."""
@@ -90,18 +90,18 @@ class LayoutNode(BaseModel):
     """Info for handling the layout file in a hierachical fashion."""
 
     command: str
-    identifier: Optional[str]
+    identifier: str | None
     description: str = ""
     bugs: list[str] = Field(default_factory=list)
     summary_fields: list[str] = Field(default_factory=list)
     extra: dict[str, Any] = Field(default_factory=dict)
     children: list["LayoutNode"] = Field(default_factory=list)
-    pagination: Optional[PaginationNames] = None
-    reference: Optional[ReferenceSubcommand] = None
+    pagination: PaginationNames | None = None
+    reference: ReferenceSubcommand | None = None
     hidden_fields: list[str] = Field(default_factory=list)
     allowed_fields: list[str] = Field(default_factory=list)
     display_columns: list[str] = Field(default_factory=list)
-    ignore: Optional[bool] = None
+    ignore: bool | None = None
 
     def __str__(self):
         """Display shorter version of LayoutNode."""

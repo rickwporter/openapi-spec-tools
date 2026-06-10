@@ -1,7 +1,6 @@
 """typer argument definitions to improve consistency amongst CLI commands."""
 from enum import Enum
 from typing import Annotated
-from typing import Optional
 
 import typer
 from rich_objects import OutputFormat
@@ -21,11 +20,11 @@ class LogLevel(str, Enum):
 
 
 CodeDirectoryOption = Annotated[
-    Optional[str],
+    str | None,
     typer.Option("--code-dir", metavar=DIRECTORY, show_default=False, help="Directory for code -- overrides default")
 ]
 CopyrightFileOption = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
         "--copyright-file",
         metavar=FILENAME,
@@ -47,7 +46,7 @@ LayoutFilenameArgument = Annotated[
     typer.Argument(metavar=FILENAME, show_default=False, help="Layout file YAML definition"),
 ]
 LayoutFilenameOption = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
         "--layout-file",
         metavar=FILENAME,
@@ -64,7 +63,7 @@ LogLevelOption = Annotated[
     ),
 ]
 MaxCountOption = Annotated[
-    Optional[int],
+    int | None,
     typer.Option(
         "--max",
         "--max-count",
@@ -98,7 +97,7 @@ PathPrefixOption = Annotated[
 ]
 StartPointOption = Annotated[str, typer.Option("--start", metavar="START", help="Start point for CLI in layout file")]
 UpdatedOpenApiFilenameOption = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
         "--updated-file",
         metavar=FILENAME,

@@ -1,5 +1,4 @@
 from typing import Annotated
-from typing import Optional
 
 import typer
 from rich_objects import OutputFormat
@@ -67,7 +66,7 @@ MaxDepthOption = Annotated[
     ),
 ]
 MaxCountOption = Annotated[
-    Optional[int],
+    int | None,
     typer.Option(
         "--max",
         "--max-count",
@@ -100,7 +99,7 @@ TreeDisplayOption = Annotated[
     ),
 ]
 TreeSearchOption = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
         "--search",
         help="Value to look for in command info."

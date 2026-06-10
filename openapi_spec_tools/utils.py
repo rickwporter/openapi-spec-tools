@@ -4,8 +4,6 @@ from copy import deepcopy
 from itertools import zip_longest
 from pathlib import Path
 from typing import Any
-from typing import Optional
-from typing import Union
 
 import yaml
 
@@ -275,7 +273,7 @@ def unmap_models(models: dict[str, Any]) -> dict[str, Any]:
     return components
 
 
-def model_full_name(models: dict[str, Any], name: str) -> Optional[str]:
+def model_full_name(models: dict[str, Any], name: str) -> str | None:
     """Search for a model matching the specified name. The name may be a partial name."""
     if name in models:
         return name
@@ -352,7 +350,7 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def find_paths(paths: dict[str, Any], search: Optional[str] = None, sub_paths: bool = False) -> dict[str, Any]:
+def find_paths(paths: dict[str, Any], search: str | None = None, sub_paths: bool = False) -> dict[str, Any]:
     """Search the 'paths' dictionary for path names including the 'search' string (if provided)."""
     def anon(s: str) -> str:
         return s.lower().rstrip("/")
@@ -401,7 +399,7 @@ def _is_nullable(prop_data: dict[str, Any]) -> bool:
     if prop_data.get(OasField.NULLABLE, False):
         return True
 
-    def _includes_null(types: Union[str, list[str]]) -> bool:
+    def _includes_null(types: str | list[str]) -> bool:
         if isinstance(types, str) and types in NULL_TYPES:
             return True
         return any(x in types for x in NULL_TYPES)
@@ -484,8 +482,8 @@ def set_nullable_not_required(schema: dict[str, Any]) -> dict[str, Any]:
 
 def schema_operations_filter(
     schema: dict[str, Any],
-    remove: Optional[set[str]] = None,
-    allow: Optional[set[str]] = None,
+    remove: set[str] | None = None,
+    allow: set[str] | None = None,
 ) -> dict[str, Any]:
     """Filter the schema operations to either the 'allow_ops' or those not in the 'remove_ops'.
 

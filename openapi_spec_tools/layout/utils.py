@@ -2,7 +2,6 @@
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
-from typing import Optional
 
 import yaml
 
@@ -64,7 +63,7 @@ def path_to_parts(path_name: str, prefix: str) -> list[str]:
     return parts
 
 
-def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames]:
+def parse_pagination(data: dict[str, Any] | None) -> PaginationNames | None:
     """Parse the data into pagination parameters."""
     if not data:
         return None
@@ -79,7 +78,7 @@ def parse_pagination(data: Optional[dict[str, Any]]) -> Optional[PaginationNames
     )
 
 
-def parse_reference(data: Optional[dict[str, Any]]) -> Optional[ReferenceSubcommand]:
+def parse_reference(data: dict[str, Any] | None) -> ReferenceSubcommand | None:
     """Parse the data into a reference object."""
     if not data:
         return None

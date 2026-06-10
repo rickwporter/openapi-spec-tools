@@ -1,6 +1,5 @@
 import logging
 from enum import Enum
-from typing import Optional
 
 LOG_CLASS = "cli"
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s %(message)s"
@@ -15,11 +14,11 @@ class LogLevel(str, Enum):
     DEBUG = "debug"
 
 
-def get_logger(name: Optional[str] = LOG_CLASS) -> logging.Logger:
+def get_logger(name: str | None = LOG_CLASS) -> logging.Logger:
     return logging.getLogger(name=name)
 
 
-def init_logging(level: LogLevel, name: Optional[str] = LOG_CLASS) -> logging.Logger:
+def init_logging(level: LogLevel, name: str | None = LOG_CLASS) -> logging.Logger:
     logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FMT)
     logger = get_logger(name)
     logger.setLevel(level.upper())

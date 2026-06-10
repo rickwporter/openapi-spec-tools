@@ -5,7 +5,6 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Annotated
 from typing import Any
-from typing import Optional
 
 import typer
 import yaml
@@ -80,12 +79,12 @@ def generate_cli(
     package_name: PackageNameArgument,
     layout_file: LayoutFilenameOption = None,
     project_dir: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(metavar=DIRECTORY, show_default=False, help="Project directory name")
     ] = None,
     code_dir: CodeDirectoryOption = None,
     test_dir: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(metavar=DIRECTORY, show_default=False, help="Directory for tests -- overrides default")
     ] = None,
     copyright_file: CopyrightFileOption = None,
@@ -222,7 +221,7 @@ def find_parent(
     operations: dict[str, Any],
     path_parts: list[str],
     prefix: str,
-) -> Optional[LayoutNode]:
+) -> LayoutNode | None:
     """Find the parent node (if any) where an operation matches the path parts.
 
     The LayoutNode's only know the operationId (not the path), so the operations are needed to
@@ -247,7 +246,7 @@ def update_layout(
     layout_file: LayoutFilenameArgument,
     openapi_file: OpenApiFilenameArgument,
     new_file: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(metavar="FILENAME", help="New filename (if different than original)")
     ] = None,
     start: StartPointOption = DEFAULT_START,
@@ -299,7 +298,7 @@ def show_cli_tree(
     ] = TreeDisplay.ALL,
     max_depth: Annotated[int, typer.Option(metavar="DEPTH", help="Maximum tree depth to show")] = 10,
     search: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(metavar="NEEDLE", help="Only show the tree for items with this needle.")
     ] = None,
     log_level: LogLevelOption = "info",
@@ -330,7 +329,7 @@ def trim_oas(
     openapi_file: OpenApiFilenameArgument,
     updated_file: UpdatedOpenApiFilenameOption = None,
     remove_properties: Annotated[
-        Optional[list[str]],
+        list[str] | None,
         typer.Option("--remove", metavar="PROPERTIES", show_default=False, help="List of properties to remove."),
     ] = None,
     start: StartPointOption = DEFAULT_START,

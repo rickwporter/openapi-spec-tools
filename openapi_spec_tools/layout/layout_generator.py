@@ -1,7 +1,5 @@
 """Declares the LayoutGenerator for inferring a layout from an OpenAPI specification."""
 from typing import Any
-from typing import Optional
-from typing import Union
 
 from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_snake_case
@@ -40,7 +38,7 @@ DEFAULT_OPERATION_MAP = {
 }
 
 
-def _to_list(data: Union[None, str, list[str]]) -> list[str]:
+def _to_list(data: str | list[str] | None) -> list[str]:
     """Convert the data (either a str or list[str]) to a list[str]."""
     if not data:
         return []
@@ -56,12 +54,12 @@ class LayoutGenerator:
         max_help_length: int = DEFAULT_MAX_HELP_LENGTH,
         supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
         common_operations: dict[str, str] = DEFAULT_OPERATION_MAP,
-        page_size_params: Union[None, str, list[str]] = None,
-        page_start_params: Union[None, str, list[str]] = None,
-        item_start_params: Union[None, str, list[str]] = None,
-        items_properties: Union[None, str, list[str]] = None,
-        next_properties: Union[None, str, list[str]] = None,
-        next_headers: Union[None, str, list[str]] = None,
+        page_size_params: str | list[str] | None = None,
+        page_start_params: str | list[str] | None = None,
+        item_start_params: str | list[str] | None = None,
+        items_properties: str | list[str] | None = None,
+        next_properties: str | list[str] | None = None,
+        next_headers: str | list[str] | None = None,
     ):
         """Initialize the generator with internal values."""
         self.paths = oas.get(OasField.PATHS, {})
@@ -89,7 +87,7 @@ class LayoutGenerator:
         return "_".join([to_snake_case(x).replace("-", "_") for x in commands])
 
     @staticmethod
-    def find_parameter(params: list[dict[str, Any]], name: str) -> Optional[dict[str, Any]]:
+    def find_parameter(params: list[dict[str, Any]], name: str) -> dict[str, Any] | None:
         """Find the parameter matching the provided name (if possible)."""
         for p in params:
             if p.get(OasField.NAME) == name:
@@ -119,7 +117,7 @@ class LayoutGenerator:
 
         return value
 
-    def get_response_headers(self, op_data: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def get_response_headers(self, op_data: dict[str, Any]) -> dict[str, Any] | None:
         """Get the response headers (if any)."""
         responses = op_data.get(OasField.RESPONSES, {})
         for code, data in responses.items():
@@ -133,7 +131,7 @@ class LayoutGenerator:
 
         return None
 
-    def get_response_body(self, op_data: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def get_response_body(self, op_data: dict[str, Any]) -> dict[str, Any] | None:
         """Get the response body data (if any)."""
         responses = op_data.get(OasField.RESPONSES, {})
         for code, data in responses.items():
@@ -208,7 +206,7 @@ class LayoutGenerator:
         current.children.append(path_node)
         return path_node
 
-    def get_pagination(self, op_data: dict[str, Any]) -> Optional[PaginationNames]:
+    def get_pagination(self, op_data: dict[str, Any]) -> PaginationNames | None:
         """Determine pagination parameters from the operation data."""
         args = {}
         params = op_data.get(OasField.PARAMS, [])
@@ -282,7 +280,7 @@ class LayoutGenerator:
         node.children = condensed
         return node
 
-    def generate(self, prefix: str, description: Optional[str] = None) -> LayoutNode:
+    def generate(self, prefix: str, description: str | None = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
         help = self.short_help(description or self.description or DEFAULT_HELP)
         main = LayoutNode(command=DEFAULT_START, identifier=DEFAULT_START, description=help)
