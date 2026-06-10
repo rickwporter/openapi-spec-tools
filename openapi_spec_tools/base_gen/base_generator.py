@@ -576,7 +576,7 @@ class BaseGenerator:
         if collection:
             pytype = f"{collection}[{pytype}]"
         if not prop_data.get(OasField.REQUIRED):
-            pytype = f"Optional[{pytype}]"
+            pytype = f"{pytype} | None"
 
         return pytype
 

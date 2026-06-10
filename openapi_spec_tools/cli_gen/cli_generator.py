@@ -40,7 +40,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -149,7 +148,7 @@ if __name__ == "__main__":
                 # when the variable name is changed to avoid conflict with builtins, add an option with "original" name
                 typer_args.insert(0, quoted(self.option_name(prop_name)))
             if not required:
-                py_type = f"Optional[{py_type}]"
+                py_type = f"{py_type} | None"
             if schema_default is None:
                 arg_default = " = None"
                 typer_args.append('show_default=False')

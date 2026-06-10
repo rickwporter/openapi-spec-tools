@@ -95,7 +95,6 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
-from typing import Optional  # noqa: F401
 
 from {self.package_name} import _environment as _e  # noqa: F401
 from {self.package_name} import _logging as _l  # noqa: F401
@@ -132,10 +131,10 @@ from {self.package_name} import _requests as _r  # noqa: F401
         )
         log_help = f'log level, read from {self.env_log_level} if not provided, defaults to {self.default_log}'
         args = [
-            f'_api_host: Optional[str] = None,  # {host_help}',
-            f'_api_key: Optional[str] = None,  # {key_help}',
-            f'_api_timeout: Optional[int] = None,  # {timeout_help}',
-            f'_log_level: Optional[str] = None,  # {log_help}',
+            f'_api_host: str | None = None,  # {host_help}',
+            f'_api_key: str | None = None,  # {key_help}',
+            f'_api_timeout: int | None = None,  # {timeout_help}',
+            f'_log_level: str | None = None,  # {log_help}',
         ]
         return args
 
@@ -158,7 +157,7 @@ from {self.package_name} import _requests as _r  # noqa: F401
             arg_default = ""
         else:
             if not required:
-                py_type = f"Optional[{py_type}]"
+                py_type = f"{py_type} | None"
             if schema_default is None:
                 arg_default = " = None"
             elif collection and not isinstance(schema_default, list):
