@@ -75,22 +75,22 @@ def test_op_path_arguments():
     lines = uut.op_path_arguments(path_params)
     text = "\n".join(lines)
 
-    assert 'num_feet: Annotated[Optional[int], typer.Option(show_default=False, help="Number of feet")] = None' in text
+    assert 'num_feet: Annotated[int | None, typer.Option(show_default=False, help="Number of feet")] = None' in text
     assert (
-        'species: Annotated[Optional[str], typer.Option(help="Species name in Latin without spaces")] = "monkey"'
+        'species: Annotated[str | None, typer.Option(help="Species name in Latin without spaces")] = "monkey"'
         in text
     )
     assert (
-        'neutered: Annotated[Optional[bool], typer.Option("--neutered/--no-neutered", hidden=True, help="Ouch")] = True'
+        'neutered: Annotated[bool | None, typer.Option("--neutered/--no-neutered", hidden=True, help="Ouch")] = True'
         in text
     )
     assert (
-        'birthday: Annotated[Optional[datetime], typer.Option(show_default=False, help="When is the party?")] = None'
+        'birthday: Annotated[datetime | None, typer.Option(show_default=False, help="When is the party?")] = None'
         in text
     )
     assert 'must_have: Annotated[str, typer.Argument(show_default=False)]' in text
     assert 'your_boat: Annotated[float, typer.Option(help="Pi is always good")] = 3.14159' in text
-    assert 'foobar: Annotated[Optional[Any], typer.Option(show_default=False, hidden=True)] = None' in text
+    assert 'foobar: Annotated[Any | None, typer.Option(show_default=False, hidden=True)] = None' in text
 
     # make sure we ignore the query params
     assert 'situation: Annotated' not in text
@@ -113,7 +113,7 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'limit: Annotated[Optional[int], typer.Option(min=1, max=100, '
+        'limit: Annotated[int | None, typer.Option(min=1, max=100, '
         'show_default=False, help="How many items to return at one time (max 100)")] = None'
         in text
     )
@@ -121,48 +121,48 @@ def test_op_query_arguments():
         'another_qparam: Annotated[str, typer.Option(show_default=False, help="Query parameter")] = None'
         in text
     )
-    assert 'more: Annotated[Optional[bool], typer.Option("--more/--no-more", hidden=True)] = False' in text
+    assert 'more: Annotated[bool | None, typer.Option("--more/--no-more", hidden=True)] = False' in text
     assert (
-        'day_value: Annotated[Optional[DayValue], '
+        'day_value: Annotated[DayValue | None, '
         'typer.Option(show_default=False, case_sensitive=False, hidden=True)] = None'
         in text
     )
     assert (
-        'page_size: Annotated[Optional[int], typer.Option(help="Maximum items per page")] = 100'
+        'page_size: Annotated[int | None, typer.Option(help="Maximum items per page")] = 100'
         in text
     )
     assert (
-        'str_list_prop: Annotated[Optional[list[str]], typer.Option(show_default=False)] = None'
+        'str_list_prop: Annotated[list[str] | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'enum_with_default: Annotated[Optional[EnumWithDefault], typer.Option(case_sensitive=False)] = "TheOtherThing"'
+        'enum_with_default: Annotated[EnumWithDefault | None, typer.Option(case_sensitive=False)] = "TheOtherThing"'
         in text
     )
     assert (
-        'str_enum_with_int_values: Annotated[Optional[StrEnumWithIntValues], typer.Option(case_sensitive=False)] = "1"'
+        'str_enum_with_int_values: Annotated[StrEnumWithIntValues | None, typer.Option(case_sensitive=False)] = "1"'
         in text
     )
     assert (
-        'type_: Annotated[Optional[int], typer.Option("--type", show_default=False)] = None'
+        'type_: Annotated[int | None, typer.Option("--type", show_default=False)] = None'
         in text
     )
     assert (
-        'param_with_enum_ref: Annotated[Optional[ParamWithEnumRef], typer.Option(case_sensitive=False, '
+        'param_with_enum_ref: Annotated[ParamWithEnumRef | None, typer.Option(case_sensitive=False, '
         'help="Species type")] = "frog"'
         in text
     )
     assert (
-        'addr_street: Annotated[Optional[str], typer.Option(show_default=False, '
+        'addr_street: Annotated[str | None, typer.Option(show_default=False, '
         'help="Street address (e.g. 123 Main Street, POBox 507)")] = None'
         in text
     )
     assert (
-        'addr_city: Annotated[Optional[str], typer.Option(show_default=False)] = None'
+        'addr_city: Annotated[str | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'addr_state: Annotated[Optional[str], typer.Option(show_default=False)] = None'
+        'addr_state: Annotated[str | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
@@ -170,21 +170,21 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'favorite_day: Annotated[Optional[FavoriteDay], typer.Option(show_default=False, '
+        'favorite_day: Annotated[FavoriteDay | None, typer.Option(show_default=False, '
         'case_sensitive=True)] = None'
         in text
     )
     assert (
-        'crazy_enum: Annotated[Optional[CrazyEnum], typer.Option(case_sensitive=False)] = "1.0"'
+        'crazy_enum: Annotated[CrazyEnum | None, typer.Option(case_sensitive=False)] = "1.0"'
         in text
     )
     assert (
-        'list_enum_def_list: Annotated[Optional[list[ListEnumDefList]], typer.Option(case_sensitive=False)] '
+        'list_enum_def_list: Annotated[list[ListEnumDefList] | None, typer.Option(case_sensitive=False)] '
         "= ['1', '8']"
         in text
     )
     assert (
-        'list_int_enum: Annotated[Optional[list[ListIntEnum]], typer.Option(case_sensitive=False)] = [7]'
+        'list_int_enum: Annotated[list[ListIntEnum] | None, typer.Option(case_sensitive=False)] = [7]'
         in text
     )
 
@@ -203,53 +203,53 @@ def test_op_body_arguments():
     lines = uut.op_body_arguments(body_params)
     text = "\n".join(lines)
     assert 'name: Annotated[str, typer.Option(show_default=False, help="Pet name")] = None' in text
-    assert 'tag: Annotated[Optional[str], typer.Option(show_default=False, help="Pet classification")] = None' in text
+    assert 'tag: Annotated[str | None, typer.Option(show_default=False, help="Pet classification")] = None' in text
     assert (
-        'another_value: Annotated[Optional[str], typer.Option(hidden=True, '
+        'another_value: Annotated[str | None, typer.Option(hidden=True, '
         'help="A string with a default")] = "Anything goes"'
         in text
     )
     assert (
-        'flavor: Annotated[Optional[Species], '
+        'flavor: Annotated[Species | None, '
         'typer.Option(show_default=False, case_sensitive=False, help="Species type")] = None'
         in text
     )
     assert (
-        'bin_string: Annotated[Optional[BinString], typer.Option(case_sensitive=False)] = "4"'
+        'bin_string: Annotated[BinString | None, typer.Option(case_sensitive=False)] = "4"'
         in text
     )
     assert(
-        'optional_list: Annotated[Optional[list[str]], typer.Option(show_default=False)] = None'
+        'optional_list: Annotated[list[str] | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert(
-        'first_choice: Annotated[Optional[int], typer.Option(show_default=False)] = None'
+        'first_choice: Annotated[int | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'list_various: Annotated[Optional[list[bool]], typer.Option(show_default=False)] = None'
+        'list_various: Annotated[list[bool] | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'format_: Annotated[Optional[str], typer.Option("--format")] = "text"'
+        'format_: Annotated[str | None, typer.Option("--format")] = "text"'
         in text
     )
     assert (
-        'gone: Annotated[Optional[str], typer.Option(show_default=False, hidden=True, '
+        'gone: Annotated[str | None, typer.Option(show_default=False, hidden=True, '
         'help="To be removed")] = None'
         in text
     )
     assert (
-        'best_day: Annotated[Optional[DayOfWeek], typer.Option(show_default=False, '
+        'best_day: Annotated[DayOfWeek | None, typer.Option(show_default=False, '
         'case_sensitive=True, help="enum buried in all-of")] = None'
         in text
     )
     assert (
-        'inconsistent: Annotated[Optional[Inconsistent], typer.Option(case_sensitive=False)] = "2"'
+        'inconsistent: Annotated[Inconsistent | None, typer.Option(case_sensitive=False)] = "2"'
         in text
     )
     assert (
-        'non_list_def: Annotated[Optional[list[NonListDef]], typer.Option(case_sensitive=False)] = ["1.1"]'
+        'non_list_def: Annotated[list[NonListDef] | None, typer.Option(case_sensitive=False)] = ["1.1"]'
         in text
     )
 
@@ -487,7 +487,7 @@ def test_function_definition_paged():
 
     # check arguments
     assert (
-        'limit: Annotated[Optional[int], typer.Option(max=100, show_default=False, '
+        'limit: Annotated[int | None, typer.Option(max=100, show_default=False, '
         'help="How many items to return at one time (max 100)")]'
         in text
     )
@@ -552,7 +552,7 @@ def test_function_header_params():
         in text
     )
     assert (
-        'color: Annotated[Optional[Color], typer.Option(show_default=False, case_sensitive=False)] = None'
+        'color: Annotated[Color | None, typer.Option(show_default=False, case_sensitive=False)] = None'
         in text
     )
 

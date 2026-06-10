@@ -378,8 +378,8 @@ def test_get_parameter_pytype(param_data, expected):
     [
         pytest.param("foo", {TYPE: "string", REQUIRED: True}, "str", id="str"),
         pytest.param("foo", {TYPE: "string", FORMAT: "date-time", REQUIRED: True}, "datetime", id="datetime"),
-        pytest.param("foo", {TYPE: "string", FORMAT: "unknown", REQUIRED: False}, "Optional[str]", id="optional-str"),
-        pytest.param("foo", {TYPE: "integer"}, "Optional[int]", id="optional-int"),
+        pytest.param("foo", {TYPE: "string", FORMAT: "unknown", REQUIRED: False}, "str | None", id="optional-str"),
+        pytest.param("foo", {TYPE: "integer"}, "int | None", id="optional-int"),
         pytest.param(
             "foo",
             {TYPE: "string", FORMAT: "date", COLLECT: "array", REQUIRED: True},
@@ -389,7 +389,7 @@ def test_get_parameter_pytype(param_data, expected):
         pytest.param(
             "foo",
             {TYPE: "numeric", COLLECT: "array", REQUIRED: False},
-            "Optional[list[float]]",
+            "list[float] | None",
             id="optional-list-float",
         ),
         pytest.param("foo", {TYPE: "foo"}, None, id="unknown"),
@@ -409,7 +409,7 @@ def test_get_parameter_pytype(param_data, expected):
         pytest.param(
             "foo",
             {TYPE: "object", "additionalProperties": {TYPE: "string"}},
-            "Optional[str]",
+            "str | None",
             id="add-props",
         ),
         pytest.param(

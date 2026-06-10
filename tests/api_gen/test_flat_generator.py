@@ -19,18 +19,18 @@ def test_op_body_arguments():
     text = "\n".join(args)
 
     assert 'name: str = None,  # Pet name' in text
-    assert 'tag: Optional[str] = None,  # Pet classification' in text
-    assert 'another_value: Optional[str] = "Anything goes",  # A string with a default' in text
-    assert 'flavor: Optional[Species] = None,  # Species type' in text
-    assert 'bin_string: Optional[BinString] = "4",' in text
-    assert 'optional_list: Optional[list[str]] = None,' in text
-    assert 'first_choice: Optional[int] = None,' in text
-    assert 'list_various: Optional[list[bool]] = None,' in text
-    assert 'format_: Optional[str] = "text",' in text
-    assert 'gone: Optional[str] = None,  # To be removed' in text
-    assert 'best_day: Optional[DayOfWeek] = None,  # enum buried in all-of' in text
-    assert 'inconsistent: Optional[Inconsistent] = "2",' in text
-    assert 'non_list_def: Optional[list[NonListDef]] = ["1.1"],' in text
+    assert 'tag: str | None = None,  # Pet classification' in text
+    assert 'another_value: str | None = "Anything goes",  # A string with a default' in text
+    assert 'flavor: Species | None = None,  # Species type' in text
+    assert 'bin_string: BinString | None = "4",' in text
+    assert 'optional_list: list[str] | None = None,' in text
+    assert 'first_choice: int | None = None,' in text
+    assert 'list_various: list[bool] | None = None,' in text
+    assert 'format_: str | None = "text",' in text
+    assert 'gone: str | None = None,  # To be removed' in text
+    assert 'best_day: DayOfWeek | None = None,  # enum buried in all-of' in text
+    assert 'inconsistent: Inconsistent | None = "2",' in text
+    assert 'non_list_def: list[NonListDef] | None = ["1.1"],' in text
 
     # this is filtered out bu the op_body_settable_properties
     assert 'bogus: Annodated' not in text
@@ -49,10 +49,10 @@ def test_function_definition():
     assert '# handler for createPets: POST /pets' in text
 
     # check infra arguments
-    assert '_api_host: Optional[str] = None,' in text
-    assert '_api_key: Optional[str] = None,' in text
-    assert '_api_timeout: Optional[int] = None,' in text
-    assert '_log_level: Optional[str] = None,' in text
+    assert '_api_host: str | None = None,' in text
+    assert '_api_key: str | None = None,' in text
+    assert '_api_timeout: int | None = None,' in text
+    assert '_log_level: str | None = None,' in text
 
     # check infra initialization/defaults
     assert '_api_host = _api_host or _e.env_string("API_HOST"' in text
@@ -76,10 +76,10 @@ def test_function_deprecated():
     assert 'def snafoo_check(' in text
 
     # check infra arguments
-    assert '_api_host: Optional[str] = None,' in text
-    assert '_api_key: Optional[str] = None,' in text
-    assert '_api_timeout: Optional[int] = None,' in text
-    assert '_log_level: Optional[str] = None,' in text
+    assert '_api_host: str | None = None,' in text
+    assert '_api_key: str | None = None,' in text
+    assert '_api_timeout: int | None = None,' in text
+    assert '_log_level: str | None = None,' in text
 
     # check the warning log
     assert '_l.logger().warning("snafooCheck is deprecated and should not be used.")' in text
@@ -94,10 +94,10 @@ def test_function_x_deprecated():
     assert 'def snafoo_delete(' in text
 
     # check infra arguments
-    assert '_api_host: Optional[str] = None,' in text
-    assert '_api_key: Optional[str] = None,' in text
-    assert '_api_timeout: Optional[int] = None,' in text
-    assert '_log_level: Optional[str] = None,' in text
+    assert '_api_host: str | None = None,' in text
+    assert '_api_key: str | None = None,' in text
+    assert '_api_timeout: int | None = None,' in text
+    assert '_log_level: str | None = None,' in text
 
     # check the warning log
     assert '_l.logger().warning("snafooDelete was deprecated in 3.2.1, and should not be used.")' in text
@@ -114,7 +114,7 @@ def test_function_header_params():
 
     # check function argument (aka CLI option)
     assert 'has_param: int = None,  # Parameter in header' in text
-    assert 'color: Optional[Color] = None,' in text
+    assert 'color: Color | None = None,' in text
 
     # make sure we add to headers
     assert 'user_headers = {}' in text
