@@ -1,7 +1,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
-from typing import Optional
 from unittest import mock
 
 import pytest
@@ -220,7 +219,7 @@ children:
         pytest.param("pets_examine", TreeFormat.YAML, EXAMINE_YAML, id="examine-yaml"),
     ]
 )
-def test_layout_tree(start: Optional[str], style: TreeFormat, expected: str) -> None:
+def test_layout_tree(start: str | None, style: TreeFormat, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         layout_tree(asset_filename("layout_pets2.yaml"), start=start, style=style)
 

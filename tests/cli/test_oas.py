@@ -1,7 +1,6 @@
 import tempfile
 from pathlib import Path
 from typing import Any
-from typing import Optional
 from unittest import mock
 
 import pytest
@@ -424,7 +423,7 @@ def test_operation_models_failure() -> None:
         pytest.param(PET_YAML, "/pets/name", False, "No paths found matching '/pets/name'\n", id="search-none"),
     ]
 )
-def test_paths_list(filename: str, search: Optional[str], subpaths: bool, expected: str) -> None:
+def test_paths_list(filename: str, search: str | None, subpaths: bool, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         paths_list(filename, search, subpaths)
 
@@ -635,7 +634,7 @@ def test_paths_show_failure() -> None:
         ),
     ]
 )
-def test_paths_operations_successs(filename: str, search: Optional[str], subpaths: bool, expected: str) -> None:
+def test_paths_operations_successs(filename: str, search: str | None, subpaths: bool, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         paths_operations(filename, search, subpaths)
 
@@ -663,7 +662,7 @@ def test_paths_operations_failure() -> None:
         pytest.param(PET_YAML, "Elliot", "No models found matching 'Elliot'\n", id="not-found"),
     ]
 )
-def test_models_list(filename: str, search: Optional[str], expected: str) -> None:
+def test_models_list(filename: str, search: str | None, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         models_list(filename, search)
 
@@ -809,7 +808,7 @@ def test_models_operations_failures() -> None:
         pytest.param(PET2_YAML, "you're it", "No tags found matching 'you're it'\n", id="not-found"),
     ]
 )
-def test_tags_list(filename: str, search: Optional[str], expected: str) -> None:
+def test_tags_list(filename: str, search: str | None, expected: str) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         tags_list(filename, search)
 
