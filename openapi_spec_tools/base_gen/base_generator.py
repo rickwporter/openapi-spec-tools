@@ -3,7 +3,6 @@ import logging
 import textwrap
 from copy import deepcopy
 from typing import Any
-from typing import Optional
 
 from openapi_spec_tools.base_gen._logging import init_logging
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
@@ -72,7 +71,7 @@ class BaseGenerator:
     def __init__(
         self,
         oas: dict[str, Any],
-        logger: Optional[logging.Logger] = None,
+        logger: logging.Logger | None = None,
         supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
         max_help_length: int = DEFAULT_MAX_HELP_LENGTH,
         reserved: set[str] = DEFAULT_RESERVED,
@@ -277,7 +276,7 @@ class BaseGenerator:
         """Get the `content` (if any) from the `requestBody`."""
         return operation.get(OasField.REQ_BODY, {}).get(OasField.CONTENT, {})
 
-    def op_get_content_type(self, operation: dict[str, Any]) -> Optional[str]:
+    def op_get_content_type(self, operation: dict[str, Any]) -> str | None:
         """Get the first content-type matching a supported type."""
         content = self.op_request_content(operation)
         for ct in self.supported:
@@ -285,7 +284,7 @@ class BaseGenerator:
                 return ct.value
         return None
 
-    def op_request_body(self, operation: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def op_request_body(self, operation: dict[str, Any]) -> dict[str, Any] | None:
         """Get the first request body matching a supported type."""
         content = self.op_request_content(operation)
         for ct in self.supported:
@@ -295,7 +294,7 @@ class BaseGenerator:
 
         return None
 
-    def model_collection_type(self, model: str) -> Optional[str]:
+    def model_collection_type(self, model: str) -> str | None:
         """Determine the collection type (current just an array)."""
         model_type = self.simplify_type(model.get(OasField.TYPE))
         if model_type in COLLECTIONS.keys():
@@ -483,7 +482,7 @@ class BaseGenerator:
 
         return properties
 
-    def schema_to_type(self, schema: str, fmt: Optional[str]) -> Optional[str]:
+    def schema_to_type(self, schema: str, fmt: str | None) -> str | None:
         """Get the base Python type for simple schema types.
 
         The fmt is really the "format" field, but renamed to avoid masking builtin.
@@ -528,7 +527,7 @@ class BaseGenerator:
         return None
 
 
-    def schema_to_pytype(self, schema: dict[str, Any]) -> Optional[str]:
+    def schema_to_pytype(self, schema: dict[str, Any]) -> str | None:
         """Determine the basic Python type from the schema object."""
         oas_type = self.simplify_type(schema.get(OasField.TYPE))
         oas_format = schema.get(OasField.FORMAT)
@@ -554,7 +553,7 @@ class BaseGenerator:
 
         return None
 
-    def get_property_pytype(self, prop_name: str, prop_data: dict[str, Any]) -> Optional[str]:
+    def get_property_pytype(self, prop_name: str, prop_data: dict[str, Any]) -> str | None:
         """Get the "basic" Python type from a property object.
 
         Each property potentially has 'type' and 'format' fields.
@@ -577,7 +576,7 @@ class BaseGenerator:
         if collection:
             pytype = f"{collection}[{pytype}]"
         if not prop_data.get(OasField.REQUIRED):
-            pytype = f"Optional[{pytype}]"
+            pytype = f"{pytype} | None"
 
         return pytype
 

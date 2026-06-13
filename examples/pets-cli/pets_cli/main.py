@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -44,7 +43,7 @@ def show_commands(
 def create_pets(
     id: Annotated[int, typer.Option(show_default=False)] = None,
     name: Annotated[str, typer.Option(show_default=False)] = None,
-    tag: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    tag: Annotated[str | None, typer.Option(show_default=False)] = None,
     owner: Annotated[str, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
     _api_key: _a.ApiKeyOption = None,
@@ -125,7 +124,7 @@ def delete_pet_by_id(
 
 @app.command("list", short_help="List all pets")
 def list_pets(
-    limit: Annotated[Optional[int], typer.Option(max=100, show_default=False, help="How many items to return at one time (max 100)")] = None,
+    limit: Annotated[int | None, typer.Option(max=100, show_default=False, help="How many items to return at one time (max 100)")] = None,
     _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

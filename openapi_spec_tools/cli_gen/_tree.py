@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 import yaml
 from pydantic import BaseModel
@@ -41,11 +40,11 @@ class TreeNode(BaseModel):
     """
 
     name: str
-    help: Optional[str] = None
-    operation: Optional[str] = None
-    function: Optional[str] = None
-    method: Optional[str] = None
-    path: Optional[str] = None
+    help: str | None = None
+    operation: str | None = None
+    function: str | None = None
+    method: str | None = None
+    path: str | None = None
     children: list["TreeNode"] = Field(default_factory=list)
 
     def get(self, display: TreeDisplay) -> str:
@@ -61,7 +60,7 @@ class TreeNode(BaseModel):
 
     def contains(self, needle: str) -> bool:
         """Check if the needle is found in this node, or any children."""
-        def _has_needle(value: Optional[str]) -> bool:
+        def _has_needle(value: str | None) -> bool:
             return value and needle in value
 
         if any(_has_needle(p) for p in [self.name, self.help, self.function, self.operation, self.path, self.method]):
@@ -73,7 +72,7 @@ class TreeNode(BaseModel):
         return False
 
 
-def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> Optional[TreeNode]:
+def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> TreeNode | None:
     """Parse the specified file into a tree."""
     item = data.get(identifier)
     children = []
@@ -134,7 +133,7 @@ def add_node_to_table(
     display: TreeDisplay,
     depth: int,
     max_depth: int,
-    needle: Optional[str],
+    needle: str | None,
 ) -> None:
     """Add a node (with children) to the table."""
     indent = INDENT * depth
@@ -158,7 +157,7 @@ def create_tree_table(
     node: TreeNode,
     display: TreeDisplay,
     max_depth: int,
-    needle: Optional[str] = None,
+    needle: str | None = None,
 ) -> Table:
     """Create the tree table.
 
@@ -189,7 +188,7 @@ def create_tree_table(
     return table
 
 
-def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int, needle: Optional[str] = None) -> None:
+def tree(filename: str, identifier: str, display: TreeDisplay, max_depth: int, needle: str | None = None) -> None:
     """Print the tree table for the specified command."""
     with open(filename, "r", encoding="utf-8", newline="\n") as fp:
         data = yaml.safe_load(fp)

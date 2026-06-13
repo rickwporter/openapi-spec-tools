@@ -36,10 +36,10 @@ def test_function_definition():
     assert '# handler for createPets: POST /pets' in text
 
     # check infra arguments
-    assert '_api_host: Optional[str] = None,' in text
-    assert '_api_key: Optional[str] = None,' in text
-    assert '_api_timeout: Optional[int] = None,' in text
-    assert '_log_level: Optional[str] = None,' in text
+    assert '_api_host: str | None = None,' in text
+    assert '_api_key: str | None = None,' in text
+    assert '_api_timeout: int | None = None,' in text
+    assert '_log_level: str | None = None,' in text
 
     # check infra initialization/defaults
     assert '_api_host = _api_host or _e.env_string("API_HOST"' in text
@@ -63,10 +63,10 @@ def test_function_deprecated():
     assert 'def snafoo_check(' in text
 
     # check infra arguments
-    assert '_api_host: Optional[str] = None,' in text
-    assert '_api_key: Optional[str] = None,' in text
-    assert '_api_timeout: Optional[int] = None,' in text
-    assert '_log_level: Optional[str] = None,' in text
+    assert '_api_host: str | None = None,' in text
+    assert '_api_key: str | None = None,' in text
+    assert '_api_timeout: int | None = None,' in text
+    assert '_log_level: str | None = None,' in text
 
     # check the warning log
     assert '_l.logger().warning("snafooCheck is deprecated and should not be used.")' in text
@@ -81,10 +81,10 @@ def test_function_x_deprecated():
     assert 'def snafoo_delete(' in text
 
     # check infra arguments
-    assert '_api_host: Optional[str] = None,' in text
-    assert '_api_key: Optional[str] = None,' in text
-    assert '_api_timeout: Optional[int] = None,' in text
-    assert '_log_level: Optional[str] = None,' in text
+    assert '_api_host: str | None = None,' in text
+    assert '_api_key: str | None = None,' in text
+    assert '_api_timeout: int | None = None,' in text
+    assert '_log_level: str | None = None,' in text
 
     # check the warning log
     assert '_l.logger().warning("snafooDelete was deprecated in 3.2.1, and should not be used.")' in text
@@ -101,7 +101,7 @@ def test_function_header_params():
 
     # check function argument (aka CLI option)
     assert 'has_param: int = None,  # Parameter in header' in text
-    assert 'color: Optional[Color] = None,' in text
+    assert 'color: Color | None = None,' in text
 
     # make sure we add to headers
     assert 'user_headers = {}' in text

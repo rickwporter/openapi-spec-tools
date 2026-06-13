@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -126,11 +125,11 @@ class Role(str, Enum):  # noqa: F811
 
 @app.command("list", short_help="")
 def memberships_list(
-    ordering: Annotated[Optional[str], typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
-    page: Annotated[Optional[int], typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
-    page_size: Annotated[Optional[int], typer.Option(show_default=False, help="Number of results to return per page.")] = None,
-    role: Annotated[Optional[Role], typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
-    user: Annotated[Optional[str], typer.Option(show_default=False, help="The unique identifier of a user.")] = None,
+    ordering: Annotated[str | None, typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
+    page: Annotated[int | None, typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
+    page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
+    role: Annotated[Role | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
+    user: Annotated[str | None, typer.Option(show_default=False, help="The unique identifier of a user.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -271,9 +270,9 @@ class RoleEnum(str, Enum):  # noqa: F811
 @app.command("update", short_help="")
 def memberships_partial_update(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the membership.")],
-    user: Annotated[Optional[str], typer.Option(show_default=False, help="The user of the membership.")] = None,
-    organization: Annotated[Optional[str], typer.Option(show_default=False, help="The organization that the user is a member of.")] = None,
-    role: Annotated[Optional[RoleEnum], typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
+    user: Annotated[str | None, typer.Option(show_default=False, help="The user of the membership.")] = None,
+    organization: Annotated[str | None, typer.Option(show_default=False, help="The organization that the user is a member of.")] = None,
+    role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

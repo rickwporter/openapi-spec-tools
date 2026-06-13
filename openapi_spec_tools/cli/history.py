@@ -6,7 +6,6 @@ from datetime import timezone
 from pathlib import Path
 from typing import Annotated
 from typing import Any
-from typing import Optional
 
 import git
 import typer
@@ -32,7 +31,7 @@ app = typer.Typer(name="history", no_args_is_help=True, short_help="Git history 
 
 
 AuthorOption = Annotated[
-    Optional[str],
+    str | None,
     typer.Option(
         "--author",
         metavar="NAME",
@@ -41,11 +40,11 @@ AuthorOption = Annotated[
     )
 ]
 EndDateOption = Annotated[
-    Optional[datetime],
+    datetime | None,
     typer.Option("--end", show_default=False, help="Date/time of latest commit.")
 ]
 StartDateOption = Annotated[
-    Optional[datetime],
+    datetime | None,
     typer.Option("--start", show_default=False, help="Date/time of first commit.")
 ]
 
@@ -102,10 +101,10 @@ def _commithash(hash: str) -> str:
 
 def _find_commits(
     oas_file: str,
-    start: Optional[datetime] = None,
-    end: Optional[datetime] = None,
-    author: Optional[str] = None,
-    max_count: Optional[int] = None,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    author: str | None = None,
+    max_count: int | None = None,
 ) -> list[git.Commit]:
     """Get a list of commits for the provided file and parameters."""
     repo = git.Repo(oas_file, search_parent_directories=True)

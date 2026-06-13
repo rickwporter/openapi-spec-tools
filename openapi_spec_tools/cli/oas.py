@@ -5,7 +5,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Annotated
 from typing import Any
-from typing import Optional
 
 import typer
 import yaml
@@ -180,15 +179,15 @@ def update(
     ] = False,
     remove_all_tags: Annotated[bool, typer.Option(help="Remove all tags")] = False,
     remove_operations: Annotated[
-        Optional[list[str]],
+        list[str] | None,
         typer.Option("--remove-op", show_default=False, help="List of operations to remove"),
     ] = None,
     allowed_operations: Annotated[
-        Optional[list[str]],
+        list[str] | None,
         typer.Option("--allow-op", show_default=False, help="List of operations to keep"),
     ] = None,
     remove_properties: Annotated[
-        Optional[list[str]],
+        list[str] | None,
         typer.Option("--remove", show_default=False, help="List of properties to remove."),
     ] = None,
     display_option: Annotated[
@@ -261,7 +260,7 @@ analyze_typer.add_typer(op_typer, name="ops")
 def operation_list(
     filename: OpenApiFilenameArgument,
     search: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--contains", help="Search for this value in the operation names"),
     ] = None,
     log_level: LogLevelOption = "info",
@@ -349,7 +348,7 @@ def operation_models(
 path_typer = typer.Typer(no_args_is_help=True, short_help="Inspect things related to paths")
 analyze_typer.add_typer(path_typer, name="paths")
 
-PathSearchOption = Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the path")]
+PathSearchOption = Annotated[str | None, typer.Option("--contains", help="Search for this value in the path")]
 PathSubpathOption = Annotated[
     bool,
     typer.Option("--sub-paths", help="Include sub-paths of the search value"),
@@ -454,7 +453,7 @@ analyze_typer.add_typer(models_typer, name="models")
 def models_list(
     filename: OpenApiFilenameArgument,
     search: Annotated[
-        Optional[str],
+        str | None,
         typer.Option("--contains", help="Search for this value in the model names"),
     ] = None,
     log_level: LogLevelOption = "info",
@@ -608,7 +607,7 @@ analyze_typer.add_typer(tag_typer, name="tags")
 @tag_typer.command(name="list", short_help="List tags in OpenAPI spec")
 def tags_list(
     filename: OpenApiFilenameArgument,
-    search: Annotated[Optional[str], typer.Option("--contains", help="Search for this value in the tag names")] = None,
+    search: Annotated[str | None, typer.Option("--contains", help="Search for this value in the tag names")] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -685,7 +684,7 @@ analyze_typer.add_typer(content_typer, name="content")
 def content_type_list(
     filename: OpenApiFilenameArgument,
     max_size: Annotated[int, typer.Option(help="Maximum number of operations to show")] = 10,
-    content_type: Annotated[Optional[str], typer.Option(help="Only display for specified content type")] = None,
+    content_type: Annotated[str | None, typer.Option(help="Only display for specified content type")] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)

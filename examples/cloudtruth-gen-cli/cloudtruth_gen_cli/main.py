@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -85,12 +84,12 @@ def backup_snapshot_create(
 @app.command("generate-password", short_help="Get a randomly generated password using AWS Secrets Manager, with fallback to /dev/urandom.")
 def utils_generate_password_create(
     length: Annotated[int, typer.Option(show_default=False, help="The length of the password to generate.  Minimum of 8, maximum of 4095.")] = None,
-    require_hardware_generation: Annotated[Optional[bool], typer.Option("--require-hardware-generation/--no-require-hardware-generation", help="Default behavior is to fallback to /dev/urandom if we fail to get a random password from AWS Secrets Manager.  If set to \'True\', we will not fallback to local password generation using /dev/urandom.  Default: False")] = False,
-    require_lowercase: Annotated[Optional[bool], typer.Option("--require-lowercase/--no-require-lowercase", help="The password must include lowercase letters [a-z]. Default: True.")] = True,
-    require_numbers: Annotated[Optional[bool], typer.Option("--require-numbers/--no-require-numbers", help="The password must include numbers [0-9].  Default: True.")] = True,
-    require_spaces: Annotated[Optional[bool], typer.Option("--require-spaces/--no-require-spaces", help="The password must include spaces [ ].  Default: False.")] = False,
-    require_symbols: Annotated[Optional[bool], typer.Option("--require-symbols/--no-require-symbols", help="The password must include symbols [!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~].  Default: False.")] = False,
-    require_uppercase: Annotated[Optional[bool], typer.Option("--require-uppercase/--no-require-uppercase", help="The password must include uppercase letters [A-Z].  Default: True.")] = True,
+    require_hardware_generation: Annotated[bool | None, typer.Option("--require-hardware-generation/--no-require-hardware-generation", help="Default behavior is to fallback to /dev/urandom if we fail to get a random password from AWS Secrets Manager.  If set to \'True\', we will not fallback to local password generation using /dev/urandom.  Default: False")] = False,
+    require_lowercase: Annotated[bool | None, typer.Option("--require-lowercase/--no-require-lowercase", help="The password must include lowercase letters [a-z]. Default: True.")] = True,
+    require_numbers: Annotated[bool | None, typer.Option("--require-numbers/--no-require-numbers", help="The password must include numbers [0-9].  Default: True.")] = True,
+    require_spaces: Annotated[bool | None, typer.Option("--require-spaces/--no-require-spaces", help="The password must include spaces [ ].  Default: False.")] = False,
+    require_symbols: Annotated[bool | None, typer.Option("--require-symbols/--no-require-symbols", help="The password must include symbols [!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~].  Default: False.")] = False,
+    require_uppercase: Annotated[bool | None, typer.Option("--require-uppercase/--no-require-uppercase", help="The password must include uppercase letters [A-Z].  Default: True.")] = True,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -244,8 +243,8 @@ class Lang(str, Enum):  # noqa: F811
 
 @app.command("schema", short_help="OpenApi3 schema for this API")
 def api_schema_retrieve(
-    format_: Annotated[Optional[Format], typer.Option("--format", show_default=False, case_sensitive=False)] = None,
-    lang: Annotated[Optional[Lang], typer.Option(show_default=False, case_sensitive=False)] = None,
+    format_: Annotated[Format | None, typer.Option("--format", show_default=False, case_sensitive=False)] = None,
+    lang: Annotated[Lang | None, typer.Option(show_default=False, case_sensitive=False)] = None,
     _api_host: _a.ApiHostOption = "",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

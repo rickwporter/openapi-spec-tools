@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -58,11 +57,11 @@ class Order(str, Enum):  # noqa: F811
 
 @app.command("activity-logs", short_help="Get activity logs")
 def get_activity_logs(
-    events: Annotated[Optional[str], typer.Option(show_default=False, help="Event type(s) to include in the response. Can have multiple values separated by comma. All events are returned by default.")] = None,
-    start_time: Annotated[Optional[float], typer.Option(show_default=False, help="Unix timestamp of the least recent event to include. This param defaults to one year ago if unspecified.")] = None,
-    end_time: Annotated[Optional[float], typer.Option(show_default=False, help="Unix timestamp of the most recent event to include. This param defaults to the current timestamp if unspecified.")] = None,
-    limit: Annotated[Optional[float], typer.Option(show_default=False, help="Maximum number of events to return. This param defaults to 1000 if unspecified.")] = None,
-    order: Annotated[Optional[Order], typer.Option(case_sensitive=False, help="Event order by timestamp. This param can be either \"asc\" (default) or \"desc\".")] = "asc",
+    events: Annotated[str | None, typer.Option(show_default=False, help="Event type(s) to include in the response. Can have multiple values separated by comma. All events are returned by default.")] = None,
+    start_time: Annotated[float | None, typer.Option(show_default=False, help="Unix timestamp of the least recent event to include. This param defaults to one year ago if unspecified.")] = None,
+    end_time: Annotated[float | None, typer.Option(show_default=False, help="Unix timestamp of the most recent event to include. This param defaults to the current timestamp if unspecified.")] = None,
+    limit: Annotated[float | None, typer.Option(show_default=False, help="Maximum number of events to return. This param defaults to 1000 if unspecified.")] = None,
+    order: Annotated[Order | None, typer.Option(case_sensitive=False, help="Event order by timestamp. This param can be either \"asc\" (default) or \"desc\".")] = "asc",
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -183,15 +182,15 @@ class Format(str, Enum):  # noqa: F811
 def get_images(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to export images from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
     ids: Annotated[str, typer.Option(show_default=False, help="A comma separated list of node IDs to render.")] = None,
-    version: Annotated[Optional[str], typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
-    scale: Annotated[Optional[float], typer.Option(min=0.01, max=4, show_default=False, help="A number between 0.01 and 4, the image scaling factor.")] = None,
-    format_: Annotated[Optional[Format], typer.Option("--format", case_sensitive=False, help="A string enum for the image output format.")] = "png",
-    svg_outline_text: Annotated[Optional[bool], typer.Option("--svg-outline-text/--no-svg-outline-text", help="Whether text elements are rendered as outlines (vector paths) or as `<text>` elements in SVGs.")] = True,
-    svg_include_id: Annotated[Optional[bool], typer.Option("--svg-include-id/--no-svg-include-id", help="Whether to include id attributes for all SVG elements. Adds the layer name to the `id` attribute of an svg element.")] = False,
-    svg_include_node_id: Annotated[Optional[bool], typer.Option("--svg-include-node-id/--no-svg-include-node-id", help="Whether to include node id attributes for all SVG elements. Adds the node id to a `data-node-id` attribute of an svg element.")] = False,
-    svg_simplify_stroke: Annotated[Optional[bool], typer.Option("--svg-simplify-stroke/--no-svg-simplify-stroke", help="Whether to simplify inside/outside strokes and use stroke attribute if possible instead of `<mask>`.")] = True,
-    contents_only: Annotated[Optional[bool], typer.Option("--contents-only/--no-contents-only", help="Whether content that overlaps the node should be excluded from rendering. Passing false (i.e., rendering overlaps) may increase processing time, since more of the document must be included in rendering.")] = True,
-    use_absolute_bounds: Annotated[Optional[bool], typer.Option("--use-absolute-bounds/--no-use-absolute-bounds", help="Use the full dimensions of the node regardless of whether or not it is cropped or the space around it is empty. Use this to export text nodes without cropping.")] = False,
+    version: Annotated[str | None, typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
+    scale: Annotated[float | None, typer.Option(min=0.01, max=4, show_default=False, help="A number between 0.01 and 4, the image scaling factor.")] = None,
+    format_: Annotated[Format | None, typer.Option("--format", case_sensitive=False, help="A string enum for the image output format.")] = "png",
+    svg_outline_text: Annotated[bool | None, typer.Option("--svg-outline-text/--no-svg-outline-text", help="Whether text elements are rendered as outlines (vector paths) or as `<text>` elements in SVGs.")] = True,
+    svg_include_id: Annotated[bool | None, typer.Option("--svg-include-id/--no-svg-include-id", help="Whether to include id attributes for all SVG elements. Adds the layer name to the `id` attribute of an svg element.")] = False,
+    svg_include_node_id: Annotated[bool | None, typer.Option("--svg-include-node-id/--no-svg-include-node-id", help="Whether to include node id attributes for all SVG elements. Adds the node id to a `data-node-id` attribute of an svg element.")] = False,
+    svg_simplify_stroke: Annotated[bool | None, typer.Option("--svg-simplify-stroke/--no-svg-simplify-stroke", help="Whether to simplify inside/outside strokes and use stroke attribute if possible instead of `<mask>`.")] = True,
+    contents_only: Annotated[bool | None, typer.Option("--contents-only/--no-contents-only", help="Whether content that overlaps the node should be excluded from rendering. Passing false (i.e., rendering overlaps) may increase processing time, since more of the document must be included in rendering.")] = True,
+    use_absolute_bounds: Annotated[bool | None, typer.Option("--use-absolute-bounds/--no-use-absolute-bounds", help="Use the full dimensions of the node regardless of whether or not it is cropped or the space around it is empty. Use this to export text nodes without cropping.")] = False,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -294,11 +293,11 @@ def get_me(
 
 @app.command("payments", short_help="Get payments")
 def get_payments(
-    plugin_payment_token: Annotated[Optional[str], typer.Option(show_default=False, help="Short-lived token returned from \"getPluginPaymentTokenAsync\" in the plugin payments API and used to authenticate to this endpoint. Read more about generating this token through \"Calling the Payments REST API from a plugin or widget\" below.")] = None,
-    user_id: Annotated[Optional[str], typer.Option(show_default=False, help="The ID of the user to query payment information about. You can get the user ID by having the user OAuth2 to the Figma REST API.")] = None,
-    community_file_id: Annotated[Optional[str], typer.Option(show_default=False, help="The ID of the Community file to query a user\'s payment information on. You can get the Community file ID from the file\'s Community page (look for the number after \"file/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
-    plugin_id: Annotated[Optional[str], typer.Option(show_default=False, help="The ID of the plugin to query a user\'s payment information on. You can get the plugin ID from the plugin\'s manifest, or from the plugin\'s Community page (look for the number after \"plugin/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
-    widget_id: Annotated[Optional[str], typer.Option(show_default=False, help="The ID of the widget to query a user\'s payment information on. You can get the widget ID from the widget\'s manifest, or from the widget\'s Community page (look for the number after \"widget/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
+    plugin_payment_token: Annotated[str | None, typer.Option(show_default=False, help="Short-lived token returned from \"getPluginPaymentTokenAsync\" in the plugin payments API and used to authenticate to this endpoint. Read more about generating this token through \"Calling the Payments REST API from a plugin or widget\" below.")] = None,
+    user_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the user to query payment information about. You can get the user ID by having the user OAuth2 to the Figma REST API.")] = None,
+    community_file_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the Community file to query a user\'s payment information on. You can get the Community file ID from the file\'s Community page (look for the number after \"file/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
+    plugin_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the plugin to query a user\'s payment information on. You can get the plugin ID from the plugin\'s manifest, or from the plugin\'s Community page (look for the number after \"plugin/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
+    widget_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the widget to query a user\'s payment information on. You can get the widget ID from the widget\'s manifest, or from the widget\'s Community page (look for the number after \"widget/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

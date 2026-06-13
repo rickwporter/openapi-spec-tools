@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -191,10 +190,10 @@ def get_file_meta(
 def get_file_nodes(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to export JSON from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
     ids: Annotated[str, typer.Option(show_default=False, help="A comma separated list of node IDs to retrieve and convert.")] = None,
-    version: Annotated[Optional[str], typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
-    depth: Annotated[Optional[float], typer.Option(show_default=False, help="Positive integer representing how deep into the node tree to traverse. For example, setting this to 1 will return only the children directly underneath the desired nodes. Not setting this parameter returns all nodes.")] = None,
-    geometry: Annotated[Optional[str], typer.Option(show_default=False, help="Set to \"paths\" to export vector data.")] = None,
-    plugin_data: Annotated[Optional[str], typer.Option(show_default=False, help="A comma separated list of plugin IDs and/or the string \"shared\". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties.")] = None,
+    version: Annotated[str | None, typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
+    depth: Annotated[float | None, typer.Option(show_default=False, help="Positive integer representing how deep into the node tree to traverse. For example, setting this to 1 will return only the children directly underneath the desired nodes. Not setting this parameter returns all nodes.")] = None,
+    geometry: Annotated[str | None, typer.Option(show_default=False, help="Set to \"paths\" to export vector data.")] = None,
+    plugin_data: Annotated[str | None, typer.Option(show_default=False, help="A comma separated list of plugin IDs and/or the string \"shared\". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -264,12 +263,12 @@ def get_file_nodes(
 @app.command("show", short_help="Get file JSON")
 def get_file(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to export JSON from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    version: Annotated[Optional[str], typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
-    ids: Annotated[Optional[str], typer.Option(show_default=False, help="Comma separated list of nodes that you care about in the document. If specified, only a subset of the document will be returned corresponding to the nodes listed, their children, and everything between the root node and the listed nodes.")] = None,
-    depth: Annotated[Optional[float], typer.Option(show_default=False, help="Positive integer representing how deep into the document tree to traverse. For example, setting this to 1 returns only Pages, setting it to 2 returns Pages and all top level objects on each page. Not setting this parameter returns all nodes.")] = None,
-    geometry: Annotated[Optional[str], typer.Option(show_default=False, help="Set to \"paths\" to export vector data.")] = None,
-    plugin_data: Annotated[Optional[str], typer.Option(show_default=False, help="A comma separated list of plugin IDs and/or the string \"shared\". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties.")] = None,
-    branch_data: Annotated[Optional[bool], typer.Option("--branch-data/--no-branch-data", help="Returns branch metadata for the requested file. If the file is a branch, the main file\'s key will be included in the returned response. If the file has branches, their metadata will be included in the returned response. Default: false.")] = False,
+    version: Annotated[str | None, typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
+    ids: Annotated[str | None, typer.Option(show_default=False, help="Comma separated list of nodes that you care about in the document. If specified, only a subset of the document will be returned corresponding to the nodes listed, their children, and everything between the root node and the listed nodes.")] = None,
+    depth: Annotated[float | None, typer.Option(show_default=False, help="Positive integer representing how deep into the document tree to traverse. For example, setting this to 1 returns only Pages, setting it to 2 returns Pages and all top level objects on each page. Not setting this parameter returns all nodes.")] = None,
+    geometry: Annotated[str | None, typer.Option(show_default=False, help="Set to \"paths\" to export vector data.")] = None,
+    plugin_data: Annotated[str | None, typer.Option(show_default=False, help="A comma separated list of plugin IDs and/or the string \"shared\". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties.")] = None,
+    branch_data: Annotated[bool | None, typer.Option("--branch-data/--no-branch-data", help="Returns branch metadata for the requested file. If the file is a branch, the main file\'s key will be included in the returned response. If the file has branches, their metadata will be included in the returned response. Default: false.")] = False,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -356,9 +355,9 @@ def get_file_styles(
 @app.command("versions", short_help="Get versions of a file")
 def get_file_versions(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to get version history from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    page_size: Annotated[Optional[float], typer.Option(max=50, show_default=False, help="The number of items returned in a page of the response. If not included, `page_size` is `30`.")] = None,
-    before: Annotated[Optional[float], typer.Option(show_default=False, help="A version ID for one of the versions in the history. Gets versions before this ID. Used for paginating. If the response is not paginated, this link returns the same data in the current response.")] = None,
-    after: Annotated[Optional[float], typer.Option(show_default=False, help="A version ID for one of the versions in the history. Gets versions after this ID. Used for paginating. If the response is not paginated, this property is not included.")] = None,
+    page_size: Annotated[float | None, typer.Option(max=50, show_default=False, help="The number of items returned in a page of the response. If not included, `page_size` is `30`.")] = None,
+    before: Annotated[float | None, typer.Option(show_default=False, help="A version ID for one of the versions in the history. Gets versions before this ID. Used for paginating. If the response is not paginated, this link returns the same data in the current response.")] = None,
+    after: Annotated[float | None, typer.Option(show_default=False, help="A version ID for one of the versions in the history. Gets versions after this ID. Used for paginating. If the response is not paginated, this property is not included.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

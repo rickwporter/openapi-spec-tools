@@ -4,7 +4,6 @@ import subprocess
 from pathlib import Path
 from typing import Annotated
 from typing import Any
-from typing import Optional
 
 import tomlkit
 import typer
@@ -13,7 +12,7 @@ app = typer.Typer(no_args_is_help=True, help="Utilities for managing Poetry depe
 
 NL = "\n"
 INDENT = "  "
-DirectoryArgument = Annotated[Optional[str], typer.Argument(help="Directory to search for TOML files.")]
+DirectoryArgument = Annotated[str | None, typer.Argument(help="Directory to search for TOML files.")]
 
 
 def parse_project_dependencies(items: list[str]) -> dict[str, Any]:
@@ -154,7 +153,7 @@ def show(
 def installed_updates(
     toml: dict[str, Any],
     updates: dict[str, str],
-    group: Optional[str] = None,
+    group: str | None = None,
 ) -> dict[Path, list[str]]:
     """Create a list of filenames to package updates."""
     result = {}
@@ -175,14 +174,14 @@ def installed_updates(
 def poetry_update(
     directory: DirectoryArgument = None,
     packages: Annotated[
-        Optional[list[str]],
+        list[str] | None,
         typer.Option(
             "--package",
             metavar="<package>[==<version>]",
             help="List of dependencies to udpate",
         ),
     ] = None,
-    group: Annotated[Optional[str], typer.Option(show_default=False, help="Group (if forced)")] = None,
+    group: Annotated[str | None, typer.Option(show_default=False, help="Group (if forced)")] = None,
     force: Annotated[bool, typer.Option(help="Whether to force adding packages")] = False,
 ):
     """Perform 'poetry add' with each specified package/version.

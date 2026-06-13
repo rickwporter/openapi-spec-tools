@@ -13,7 +13,6 @@ from copy import deepcopy
 from datetime import datetime
 from datetime import timedelta
 from typing import Any
-from typing import Optional
 
 import requests
 import yaml
@@ -69,26 +68,26 @@ class PageParams(BaseModel):
     """Holds optional pagination parameter names and values."""
 
     # page_size_* dictate the limit per request
-    page_size_value: Optional[int] = None
-    page_size_name: Optional[str] = None
+    page_size_value: int | None = None
+    page_size_name: str | None = None
 
     # page_start_* dictate the starting point when it is in page increments
-    page_start_value: Optional[int] = None
-    page_start_name: Optional[str] = None
+    page_start_value: int | None = None
+    page_start_name: str | None = None
 
     # offset_start_* dictate the starting point when it is specified in item increments
-    item_start_value: Optional[int] = None
-    item_start_name: Optional[str] = None
+    item_start_value: int | None = None
+    item_start_name: str | None = None
 
     # max_count specifies the maximim number of items to fetch
-    max_count: Optional[int] = None
+    max_count: int | None = None
 
     # items property specifies the property name to pull out the data from
-    items_property_name: Optional[str] = None
+    items_property_name: str | None = None
 
     # locations for next url
-    next_header_name: Optional[str] = None
-    next_property_name: Optional[str] = None
+    next_header_name: str | None = None
+    next_property_name: str | None = None
 
 
 def create_url(host_or_base_url: str, *args) -> str:
@@ -108,8 +107,8 @@ def create_url(host_or_base_url: str, *args) -> str:
 
 
 def request_headers(
-    api_key: Optional[str] = None,
-    content_type: Optional[str] = None,
+    api_key: str | None = None,
+    content_type: str | None = None,
     **kwargs,
 ) -> dict[str, str]:
     """Create a set of request headers based on the arguments.
@@ -152,7 +151,7 @@ def raise_for_error(response: requests.Response) -> None:
     raise requests.HTTPError(message, response=response)
 
 
-def _pretty_params(params: Optional[dict[str, Any]]) -> str:
+def _pretty_params(params: dict[str, Any] | None) -> str:
     if not params:
         return ""
 
@@ -162,10 +161,10 @@ def _pretty_params(params: Optional[dict[str, Any]]) -> str:
 def request(
     method: str,
     url: str,
-    headers: Optional[dict[str, Any]] = None,
-    params: Optional[dict[str, Any]] = None,
-    body: Optional[dict[str, Any]] = None,
-    timeout: Optional[int] = None,
+    headers: dict[str, Any] | None = None,
+    params: dict[str, Any] | None = None,
+    body: dict[str, Any] | None = None,
+    timeout: int | None = None,
     **kwargs,  # allows passing through additional named parameters
 ) -> Any:
     """Perform the specified REST request."""
@@ -217,9 +216,9 @@ def request(
 def depaginate(
     page_params: PageParams,
     url: str,
-    headers: Optional[dict[str, Any]] = None,
-    params: Optional[dict[str, Any]] = None,
-    timeout: Optional[int] = None,
+    headers: dict[str, Any] | None = None,
+    params: dict[str, Any] | None = None,
+    timeout: int | None = None,
 ) -> Any:
     """Get a list of items that may be chunked across several pages."""
     items = []

@@ -49,10 +49,10 @@ def test_standard_imports():
             {},
             None,
             """\
-_api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-_api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-_api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-_log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info\
+_api_host: str | None = None,  # API host, read from API_HOST if not provided
+_api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+_api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+_log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info\
 """,
             id="defaults",
         ),
@@ -67,10 +67,10 @@ _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not p
             },
             "localhost",
             """\
-_api_host: Optional[str] = None,  # API host, read from MY_HOST if not provided, defaults to localhost
-_api_key: Optional[str] = None,  # API key for bearer auth, read from YOUR_KEY if not provided
-_api_timeout: Optional[int] = None,  # timeout for operation, read from THEIR_TIME if not provided, defaults to 30
-_log_level: Optional[str] = None,  # log level, read from SOME_LOG_LEVEL if not provided, defaults to blah\
+_api_host: str | None = None,  # API host, read from MY_HOST if not provided, defaults to localhost
+_api_key: str | None = None,  # API key for bearer auth, read from YOUR_KEY if not provided
+_api_timeout: int | None = None,  # timeout for operation, read from THEIR_TIME if not provided, defaults to 30
+_log_level: str | None = None,  # log level, read from SOME_LOG_LEVEL if not provided, defaults to blah\
 """,
             id="updates",
         )
@@ -98,13 +98,13 @@ def test_op_path_arguments():
     args = uut.op_path_arguments(path_params)
     text = "\n".join(args)
 
-    assert 'num_feet: Optional[int] = None,  # Number of feet' in text
-    assert 'species: Optional[str] = "monkey",  # Species name in Latin without spaces' in text
-    assert 'neutered: Optional[bool] = True,  # Ouch' in text
-    assert 'birthday: Optional[datetime] = None,  # When is the party?' in text
+    assert 'num_feet: int | None = None,  # Number of feet' in text
+    assert 'species: str | None = "monkey",  # Species name in Latin without spaces' in text
+    assert 'neutered: bool | None = True,  # Ouch' in text
+    assert 'birthday: datetime | None = None,  # When is the party?' in text
     assert 'must_have: str,' in text
     assert 'your_boat: float = 3.14159,  # Pi is always good' in text
-    assert 'foobar: Optional[Any] = None,' in text
+    assert 'foobar: Any | None = None,' in text
 
     # make sure we ignore the query params
     assert 'situation: ' not in text
@@ -123,24 +123,24 @@ def test_op_query_arguments():
     text = "\n".join(args)
 
     assert 'situation: str = "anything goes",  # Query param at path level, likely unused' in text
-    assert 'limit: Optional[int] = None,  # How many items to return at one time (max 100)' in text
+    assert 'limit: int | None = None,  # How many items to return at one time (max 100)' in text
     assert 'another_qparam: str = None,  # Query parameter' in text
-    assert 'more: Optional[bool] = False,' in text
-    assert 'day_value: Optional[DayValue] = None,' in text
-    assert 'page_size: Optional[int] = 100,  # Maximum items per page' in text
-    assert 'str_list_prop: Optional[list[str]] = None,' in text
-    assert 'enum_with_default: Optional[EnumWithDefault] = "TheOtherThing",' in text
-    assert 'str_enum_with_int_values: Optional[StrEnumWithIntValues] = "1",' in text
-    assert 'type_: Optional[int] = None,' in text
-    assert 'param_with_enum_ref: Optional[ParamWithEnumRef] = "frog",  # Species type' in text
-    assert 'addr_street: Optional[str] = None,  # Street address (e.g. 123 Main Street, POBox 507)' in text
-    assert 'addr_city: Optional[str] = None,' in text
-    assert 'addr_state: Optional[str] = None,' in text
+    assert 'more: bool | None = False,' in text
+    assert 'day_value: DayValue | None = None,' in text
+    assert 'page_size: int | None = 100,  # Maximum items per page' in text
+    assert 'str_list_prop: list[str] | None = None,' in text
+    assert 'enum_with_default: EnumWithDefault | None = "TheOtherThing",' in text
+    assert 'str_enum_with_int_values: StrEnumWithIntValues | None = "1",' in text
+    assert 'type_: int | None = None,' in text
+    assert 'param_with_enum_ref: ParamWithEnumRef | None = "frog",  # Species type' in text
+    assert 'addr_street: str | None = None,  # Street address (e.g. 123 Main Street, POBox 507)' in text
+    assert 'addr_city: str | None = None,' in text
+    assert 'addr_state: str | None = None,' in text
     assert 'addr_zip_code: str = None,' in text
-    assert 'favorite_day: Optional[FavoriteDay] = None,' in text
-    assert 'crazy_enum: Optional[CrazyEnum] = "1.0",' in text
-    assert 'list_enum_def_list: Optional[list[ListEnumDefList]] = [\'1\', \'8\'],' in text
-    assert 'list_int_enum: Optional[list[ListIntEnum]] = [7],' in text
+    assert 'favorite_day: FavoriteDay | None = None,' in text
+    assert 'crazy_enum: CrazyEnum | None = "1.0",' in text
+    assert 'list_enum_def_list: list[ListEnumDefList] | None = [\'1\', \'8\'],' in text
+    assert 'list_int_enum: list[ListIntEnum] | None = [7],' in text
 
     # make sure path params not included
     assert 'num_feet: Annotated' not in text

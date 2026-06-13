@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -42,10 +41,10 @@ def show_commands(
 
 @app.command("create", short_help="Create a booking")
 def create_booking(
-    trip_id: Annotated[Optional[str], typer.Option(show_default=False, help="Identifier of the booked trip")] = None,
-    passenger_name: Annotated[Optional[str], typer.Option(show_default=False, help="Name of the passenger")] = None,
-    has_bicycle: Annotated[Optional[bool], typer.Option("--has-bicycle/--no-has-bicycle", show_default=False, help="Indicates whether the passenger has a bicycle.")] = None,
-    has_dog: Annotated[Optional[bool], typer.Option("--has-dog/--no-has-dog", show_default=False, help="Indicates whether the passenger has a dog.")] = None,
+    trip_id: Annotated[str | None, typer.Option(show_default=False, help="Identifier of the booked trip")] = None,
+    passenger_name: Annotated[str | None, typer.Option(show_default=False, help="Name of the passenger")] = None,
+    has_bicycle: Annotated[bool | None, typer.Option("--has-bicycle/--no-has-bicycle", show_default=False, help="Indicates whether the passenger has a bicycle.")] = None,
+    has_dog: Annotated[bool | None, typer.Option("--has-dog/--no-has-dog", show_default=False, help="Indicates whether the passenger has a dog.")] = None,
     _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -122,8 +121,8 @@ def delete_booking(
 
 @app.command("list", short_help="List existing bookings")
 def get_bookings(
-    page: Annotated[Optional[int], typer.Option(min=1, help="The page number to return")] = 1,
-    limit: Annotated[Optional[int], typer.Option(min=1, max=100, help="The number of items to return per page")] = 10,
+    page: Annotated[int | None, typer.Option(min=1, help="The page number to return")] = 1,
+    limit: Annotated[int | None, typer.Option(min=1, max=100, help="The number of items to return per page")] = 10,
     _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -182,19 +181,19 @@ class Currency(str, Enum):  # noqa: F811
 @app.command("payment", short_help="Pay for a Booking")
 def create_booking_payment(
     booking_id: Annotated[str, typer.Argument(show_default=False, help="The ID of the booking to pay for.")],
-    amount: Annotated[Optional[float], typer.Option(show_default=False, help="Amount intended to be collected by this payment. A positive decimal figure describing the amount to be collected.")] = None,
-    currency: Annotated[Optional[Currency], typer.Option(show_default=False, case_sensitive=False, help="Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase.")] = None,
-    source_object: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    source_name: Annotated[Optional[str], typer.Option(show_default=False, help="Cardholder\'s full name as it appears on the card.")] = None,
-    source_number: Annotated[Optional[str], typer.Option(show_default=False, help="The card number, as a string without any separators. On read all but the last four digits will be masked for security.")] = None,
-    source_cvc: Annotated[Optional[str], typer.Option(show_default=False, help="Card security code, 3 or 4 digits usually found on the back of the card.")] = None,
-    source_exp_month: Annotated[Optional[int], typer.Option(show_default=False, help="Two-digit number representing the card\'s expiration month.")] = None,
-    source_exp_year: Annotated[Optional[int], typer.Option(show_default=False, help="Four-digit number representing the card\'s expiration year.")] = None,
-    source_address_line1: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    source_address_line2: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    source_address_city: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    source_address_country: Annotated[Optional[str], typer.Option(show_default=False)] = None,
-    source_address_post_code: Annotated[Optional[str], typer.Option(show_default=False)] = None,
+    amount: Annotated[float | None, typer.Option(show_default=False, help="Amount intended to be collected by this payment. A positive decimal figure describing the amount to be collected.")] = None,
+    currency: Annotated[Currency | None, typer.Option(show_default=False, case_sensitive=False, help="Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase.")] = None,
+    source_object: Annotated[str | None, typer.Option(show_default=False)] = None,
+    source_name: Annotated[str | None, typer.Option(show_default=False, help="Cardholder\'s full name as it appears on the card.")] = None,
+    source_number: Annotated[str | None, typer.Option(show_default=False, help="The card number, as a string without any separators. On read all but the last four digits will be masked for security.")] = None,
+    source_cvc: Annotated[str | None, typer.Option(show_default=False, help="Card security code, 3 or 4 digits usually found on the back of the card.")] = None,
+    source_exp_month: Annotated[int | None, typer.Option(show_default=False, help="Two-digit number representing the card\'s expiration month.")] = None,
+    source_exp_year: Annotated[int | None, typer.Option(show_default=False, help="Four-digit number representing the card\'s expiration year.")] = None,
+    source_address_line1: Annotated[str | None, typer.Option(show_default=False)] = None,
+    source_address_line2: Annotated[str | None, typer.Option(show_default=False)] = None,
+    source_address_city: Annotated[str | None, typer.Option(show_default=False)] = None,
+    source_address_country: Annotated[str | None, typer.Option(show_default=False)] = None,
+    source_address_post_code: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

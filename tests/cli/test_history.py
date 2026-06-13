@@ -3,7 +3,6 @@ from datetime import datetime
 from datetime import timezone
 from pathlib import Path
 from typing import Any
-from typing import Optional
 from unittest import mock
 
 import pytest
@@ -75,10 +74,10 @@ def test_commithash_failure(hash, message) -> None:
 )
 def test_find_commits(
     asset_name: str,
-    start: Optional[datetime],
-    end: Optional[datetime],
-    author: Optional[str],
-    max_count: Optional[int],
+    start: datetime | None,
+    end: datetime | None,
+    author: str | None,
+    max_count: int | None,
     expected: set[str],
 ) -> None:
     commits = _find_commits(asset_filename(asset_name), start=start, end=end, author=author, max_count=max_count)

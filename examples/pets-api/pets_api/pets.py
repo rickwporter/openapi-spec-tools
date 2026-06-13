@@ -7,7 +7,6 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
-from typing import Optional  # noqa: F401
 
 from pets_api import _environment as _e  # noqa: F401
 from pets_api import _logging as _l  # noqa: F401
@@ -17,12 +16,12 @@ from pets_api import _requests as _r  # noqa: F401
 def create_pets(
     id: int = None,  # [required]
     name: str = None,  # [required]
-    tag: Optional[str] = None,
+    tag: str | None = None,
     owner: str = None,  # [required]
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Create a pet
@@ -51,10 +50,10 @@ def create_pets(
 
 def delete_pet_by_id(
     pet_id: str,  # The id of the pet to retrieve [required]
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Delete a pet
@@ -76,11 +75,11 @@ def delete_pet_by_id(
 
 
 def list_pets(
-    limit: Optional[int] = None,  # How many items to return at one time (max 100)
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    limit: int | None = None,  # How many items to return at one time (max 100)
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     List all pets
@@ -105,10 +104,10 @@ def list_pets(
 
 def show_pet_by_id(
     pet_id: str,  # The id of the pet to retrieve [required]
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     Info for a specific pet

@@ -7,7 +7,6 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
-from typing import Optional  # noqa: F401
 
 from cloudtruth_api.prop import _environment as _e  # noqa: F401
 from cloudtruth_api.prop import _logging as _l  # noqa: F401
@@ -17,13 +16,13 @@ from cloudtruth_api.prop import _requests as _r  # noqa: F401
 def environments_copy_create(
     id: str,  # A unique identifier for the environment. [required]
     name: str = None,  # The environment name. [required]
-    description: Optional[str] = None,  # A description of the environment...
-    child_environment_names: Optional[dict[str, Any]] = None,  # When copying child Environments, this indicates what name to use for each Environment...
-    recursive: Optional[bool] = None,  # If true, copy child environments recursively.  If false, only copy the specified project.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    description: str | None = None,  # A description of the environment...
+    child_environment_names: dict[str, Any] | None = None,  # When copying child Environments, this indicates what name to use for each Environment...
+    recursive: bool | None = None,  # If true, copy child environments recursively.  If false, only copy the specified project.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_copy_create: POST /api/v1/environments/{id}/copy/
     _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
@@ -51,12 +50,12 @@ def environments_copy_create(
 
 def environments_create(
     name: str = None,  # The environment name. [required]
-    description: Optional[str] = None,  # A description of the environment...
-    parent: Optional[str] = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    description: str | None = None,  # A description of the environment...
+    parent: str | None = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_create: POST /api/v1/environments/
     _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
@@ -82,10 +81,10 @@ def environments_create(
 
 def environments_destroy(
     id: str,  # A unique identifier for the environment. [required]
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_destroy: DELETE /api/v1/environments/{id}/
     _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
@@ -104,16 +103,16 @@ def environments_destroy(
 
 
 def environments_list(
-    description_icontains: Optional[str] = None,
-    name: Optional[str] = None,
-    name_icontains: Optional[str] = None,
-    ordering: Optional[str] = None,  # Which field to use when ordering the results.
-    page: Optional[int] = None,  # A page number within the paginated result set.
-    page_size: Optional[int] = None,  # Number of results to return per page.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    description_icontains: str | None = None,
+    name: str | None = None,
+    name_icontains: str | None = None,
+    ordering: str | None = None,  # Which field to use when ordering the results.
+    page: int | None = None,  # A page number within the paginated result set.
+    page_size: int | None = None,  # Number of results to return per page.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_list: GET /api/v1/environments/
     _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
@@ -145,13 +144,13 @@ def environments_list(
 
 def environments_pushes_list(
     environment_pk: str,  # [required]
-    ordering: Optional[str] = None,  # Which field to use when ordering the results.
-    page: Optional[int] = None,  # A page number within the paginated result set.
-    page_size: Optional[int] = None,  # Number of results to return per page.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    ordering: str | None = None,  # Which field to use when ordering the results.
+    page: int | None = None,  # A page number within the paginated result set.
+    page_size: int | None = None,  # Number of results to return per page.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     '''
     The push operations that this environment was involved in.
@@ -181,13 +180,13 @@ def environments_pushes_list(
 def environments_update(
     id: str,  # A unique identifier for the environment. [required]
     name: str = None,  # The environment name. [required]
-    description: Optional[str] = None,  # A description of the environment...
-    parent: Optional[str] = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
-    access_controlled: Optional[bool] = None,  # Indicates if access control is being enforced through grants.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    description: str | None = None,  # A description of the environment...
+    parent: str | None = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
+    access_controlled: bool | None = None,  # Indicates if access control is being enforced through grants.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_update: PUT /api/v1/environments/{id}/
     _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
@@ -215,10 +214,10 @@ def environments_update(
 
 def environments_retrieve(
     id: str,  # A UUID string identifying this environment ledger. [required]
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_retrieve: GET /api/v1/environments/{id}/
     _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
@@ -238,14 +237,14 @@ def environments_retrieve(
 
 def environments_partial_update(
     id: str,  # A unique identifier for the environment. [required]
-    name: Optional[str] = None,  # The environment name.
-    description: Optional[str] = None,  # A description of the environment...
-    parent: Optional[str] = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
-    access_controlled: Optional[bool] = None,  # Indicates if access control is being enforced through grants.
-    _api_host: Optional[str] = None,  # API host, read from API_HOST if not provided
-    _api_key: Optional[str] = None,  # API key for bearer auth, read from API_KEY if not provided
-    _api_timeout: Optional[int] = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
-    _log_level: Optional[str] = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
+    name: str | None = None,  # The environment name.
+    description: str | None = None,  # A description of the environment...
+    parent: str | None = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
+    access_controlled: bool | None = None,  # Indicates if access control is being enforced through grants.
+    _api_host: str | None = None,  # API host, read from API_HOST if not provided
+    _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
+    _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
+    _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_partial_update: PATCH /api/v1/environments/{id}/
     _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)

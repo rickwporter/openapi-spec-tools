@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -43,9 +42,9 @@ def show_commands(
 @app.command("component-sets", short_help="Get team component sets")
 def get_team_component_sets(
     team_id: Annotated[str, typer.Argument(show_default=False, help="Id of the team to list component sets from.")],
-    page_size: Annotated[Optional[float], typer.Option(help="Number of items to return in a paged list of results. Defaults to 30.")] = 30,
-    after: Annotated[Optional[float], typer.Option(show_default=False, help="Cursor indicating which id after which to start retrieving component sets for. Exclusive with before. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
-    before: Annotated[Optional[float], typer.Option(show_default=False, help="Cursor indicating which id before which to start retrieving component sets for. Exclusive with after. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
+    page_size: Annotated[float | None, typer.Option(help="Number of items to return in a paged list of results. Defaults to 30.")] = 30,
+    after: Annotated[float | None, typer.Option(show_default=False, help="Cursor indicating which id after which to start retrieving component sets for. Exclusive with before. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
+    before: Annotated[float | None, typer.Option(show_default=False, help="Cursor indicating which id before which to start retrieving component sets for. Exclusive with after. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -86,9 +85,9 @@ def get_team_component_sets(
 @app.command("components", short_help="Get team components")
 def get_team_components(
     team_id: Annotated[str, typer.Argument(show_default=False, help="Id of the team to list components from.")],
-    page_size: Annotated[Optional[float], typer.Option(help="Number of items to return in a paged list of results. Defaults to 30. Maximum of 1000.")] = 30,
-    after: Annotated[Optional[float], typer.Option(show_default=False, help="Cursor indicating which id after which to start retrieving components for. Exclusive with before. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
-    before: Annotated[Optional[float], typer.Option(show_default=False, help="Cursor indicating which id before which to start retrieving components for. Exclusive with after. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
+    page_size: Annotated[float | None, typer.Option(help="Number of items to return in a paged list of results. Defaults to 30. Maximum of 1000.")] = 30,
+    after: Annotated[float | None, typer.Option(show_default=False, help="Cursor indicating which id after which to start retrieving components for. Exclusive with before. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
+    before: Annotated[float | None, typer.Option(show_default=False, help="Cursor indicating which id before which to start retrieving components for. Exclusive with after. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -166,9 +165,9 @@ def get_team_projects(
 @app.command("styles", short_help="Get team styles")
 def get_team_styles(
     team_id: Annotated[str, typer.Argument(show_default=False, help="Id of the team to list styles from.")],
-    page_size: Annotated[Optional[float], typer.Option(help="Number of items to return in a paged list of results. Defaults to 30.")] = 30,
-    after: Annotated[Optional[float], typer.Option(show_default=False, help="Cursor indicating which id after which to start retrieving styles for. Exclusive with before. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
-    before: Annotated[Optional[float], typer.Option(show_default=False, help="Cursor indicating which id before which to start retrieving styles for. Exclusive with after. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
+    page_size: Annotated[float | None, typer.Option(help="Number of items to return in a paged list of results. Defaults to 30.")] = 30,
+    after: Annotated[float | None, typer.Option(show_default=False, help="Cursor indicating which id after which to start retrieving styles for. Exclusive with before. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
+    before: Annotated[float | None, typer.Option(show_default=False, help="Cursor indicating which id before which to start retrieving styles for. Exclusive with after. The cursor value is an internally tracked integer that doesn\'t correspond to any Ids.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

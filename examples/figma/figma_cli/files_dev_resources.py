@@ -9,7 +9,6 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
 from typing import Annotated  # noqa: F401
-from typing import Optional  # noqa: F401
 
 import typer
 from rich_objects import display
@@ -78,7 +77,7 @@ def delete_dev_resource(
 @app.command("show", short_help="Get dev resources")
 def get_dev_resources(
     file_key: Annotated[str, typer.Argument(show_default=False, help="The file to get the dev resources from. This must be a main file key, not a branch key.")],
-    node_ids: Annotated[Optional[str], typer.Option(show_default=False, help="Comma separated list of nodes that you care about in the document. If specified, only dev resources attached to these nodes will be returned. If not specified, all dev resources in the file will be returned.")] = None,
+    node_ids: Annotated[str | None, typer.Option(show_default=False, help="Comma separated list of nodes that you care about in the document. If specified, only dev resources attached to these nodes will be returned. If not specified, all dev resources in the file will be returned.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
