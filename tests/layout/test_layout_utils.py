@@ -12,6 +12,7 @@ from openapi_spec_tools.layout.utils import operation_duplicates
 from openapi_spec_tools.layout.utils import operation_order
 from openapi_spec_tools.layout.utils import pagination_to_dict
 from openapi_spec_tools.layout.utils import parse_extras
+from openapi_spec_tools.layout.utils import parse_hardcoded
 from openapi_spec_tools.layout.utils import parse_pagination
 from openapi_spec_tools.layout.utils import parse_to_tree
 from openapi_spec_tools.layout.utils import path_to_parts
@@ -234,6 +235,27 @@ def test_path_to_parts(path, prefix, expected):
 )
 def test_parse_pagination(data, expected) -> None:
     assert expected == parse_pagination(data)
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param(None, {}, id="none"),
+        pytest.param("not a list", {}, id="str"),
+        pytest.param({"A": None}, {}, id="dict"),
+        pytest.param([], {}, id="empty"),
+        pytest.param([{"name": "a", "value": 1}], {"a": 1}, id="simple"),
+        pytest.param([{"name": "a", "value": 1}, {"name": "b", "value": True}], {"a": 1, "b": True}, id="multiple"),
+        pytest.param(
+            [{"value": 1}, {"name": "b"}, {"name": "c", "value": "mystr"}, {"d": 0}],
+            {"c": "mystr"},
+            id="bad-entries",
+        ),
+    ]
+)
+def test_parse_hardcoded(data, expected) -> None:
+    assert expected == parse_hardcoded(data)
+
 
 @pytest.mark.parametrize(
     [NAME, "item", "expected"],
@@ -609,7 +631,8 @@ def test_layout_node_to_dict():
                 display_columns=["west", "east"]
             ),
             LayoutNode(command="child1", identifier="my_child", pagination=PaginationNames(page_size="page")),
-            LayoutNode(command="child2", identifier="another_op", ignore=True)
+            LayoutNode(command="child2", identifier="another_op", ignore=True),
+            LayoutNode(command="child4", identifier="with_hardcoded", hardcoded={"c": True, "x": "y", "a": 1}),
         ]
     )
     actual = layout_node_to_dict(node)
@@ -635,7 +658,12 @@ def test_layout_node_to_dict():
                     "hiddenFields": ["peekaboo"],
                     "summaryFields": ["brief", "short"],
                     "columns": ["west", "east"],
-                }
+                },
+                {
+                    "hardCoded": {"a": 1, "c": True, "x": "y"},
+                    "name": "child4",
+                    "operationId": "with_hardcoded",
+                },
             ]
         }
     }

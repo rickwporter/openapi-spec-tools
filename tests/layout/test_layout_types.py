@@ -147,6 +147,7 @@ def test_node_display(node, args, expected):
                 'description': '',
                 'display_columns': [],
                 'extra': {},
+                'hardcoded': {},
                 'hidden_fields': [],
                 'identifier': 'foo',
                 'ignore': None,

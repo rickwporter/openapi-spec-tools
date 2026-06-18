@@ -23,6 +23,7 @@ class LayoutField(str, Enum):
     IGNORE = "ignore"
     COLUMNS = "columns"
     REFERENCE = "reference"
+    HARDCODED = "hardCoded"
 
 
 class PaginationField(str, Enum):
@@ -86,6 +87,13 @@ class ReferenceSubcommand(BaseModel):
     app_name: str = "app"
 
 
+class HardcodedField(str, Enum):
+    """Field names for reference to hard-coded values."""
+
+    NAME = "name"
+    VALUE = "value"
+
+
 class LayoutNode(BaseModel):
     """Info for handling the layout file in a hierachical fashion."""
 
@@ -102,6 +110,7 @@ class LayoutNode(BaseModel):
     allowed_fields: list[str] = Field(default_factory=list)
     display_columns: list[str] = Field(default_factory=list)
     ignore: bool | None = None
+    hardcoded: dict[str, Any] = Field(default_factory=dict)
 
     def __str__(self):
         """Display shorter version of LayoutNode."""

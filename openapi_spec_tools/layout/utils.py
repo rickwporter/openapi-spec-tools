@@ -5,6 +5,7 @@ from typing import Any
 
 import yaml
 
+from openapi_spec_tools.layout.types import HardcodedField
 from openapi_spec_tools.layout.types import LayoutField
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationField
@@ -89,6 +90,24 @@ def parse_reference(data: dict[str, Any] | None) -> ReferenceSubcommand | None:
     )
 
 
+def parse_hardcoded(data: dict[str, Any] | None) -> dict[str, Any]:
+    """Parse the data into dictionary of name to value."""
+    if not data:
+        return {}
+
+    if not isinstance(data, list):
+        return {}
+
+    result = {}
+    for item in data:
+        name = item.get(HardcodedField.NAME)
+        value = item.get(HardcodedField.VALUE)
+        if name and value is not None:
+            result[name] = value
+
+    return result
+
+
 def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
     """Recursively convert elements from data to LayoutNodes."""
     description = item.get(LayoutField.DESCRIPTION, "")
@@ -103,6 +122,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     pagination = parse_pagination(item.get(LayoutField.PAGINATION))
     ignore = item.get(LayoutField.IGNORE)
     reference = parse_reference(item.get(LayoutField.REFERENCE))
+    hardcoded = parse_hardcoded(item.get(LayoutField.HARDCODED))
 
     children = []
     for op_data in item.get(LayoutField.OPERATIONS, []):
@@ -133,6 +153,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         pagination=pagination,
         ignore=ignore,
         reference=reference,
+        hardcoded=hardcoded,
     )
 
 
@@ -285,6 +306,7 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
 
     return errors
 
+
 def file_to_tree(filename: str, start: str = DEFAULT_START) -> LayoutNode:
     """Open filename and parse to a LayoutNode tree."""
     data = open_layout(filename)
@@ -344,6 +366,8 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
             op_data[LayoutField.PAGINATION.value] = pagination_to_dict(child.pagination)
         if child.reference:
             op_data[LayoutField.REFERENCE.value] = reference_to_dict(child.reference)
+        if child.hardcoded:
+            op_data[LayoutField.HARDCODED.value] = dict(sorted(child.hardcoded.items()))
         operations.append(op_data)
 
     result = {
