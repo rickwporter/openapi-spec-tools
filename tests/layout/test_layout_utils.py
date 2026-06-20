@@ -258,6 +258,22 @@ def test_parse_hardcoded(data, expected) -> None:
 
 
 @pytest.mark.parametrize(
+    ["name", "expected"],
+    [
+        pytest.param("update", {}, id="none"),
+        pytest.param("create", {"name": "toulouse"}, id="simple"),
+        pytest.param("delete", {"sna": "foo"}, id="errors"),
+        pytest.param("examine", {}, id="bad"),
+    ]
+)
+def test_parse_with_hardcoded(name, expected) -> None:
+    node = file_to_tree(asset_filename("layout_hardcoded.yaml"))
+
+    item = node.find("pet", name)
+    assert expected == item.hardcoded
+
+
+@pytest.mark.parametrize(
     [NAME, "item", "expected"],
     [
         pytest.param(

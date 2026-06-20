@@ -1,0 +1,26 @@
+main:
+  description: Pet management application
+  operations:
+    - name: pet
+      subcommandId: pets
+
+pets:
+  description: Manage your pets
+  operations:
+    - name: create
+      operationId: createPets
+      hardCoded:
+      - name: name
+        value: toulouse
+    - name: delete
+      operationId: deletePetById
+      hardCoded:
+      - name: id
+      - value: 1
+      - name: sna
+        value: foo
+    - name: examine
+      subcommandId: pets_examine
+      hardCoded: my string
+    - name: update
+      operationId: showPetById
