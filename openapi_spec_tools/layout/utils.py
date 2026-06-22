@@ -307,6 +307,42 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
     return errors
 
 
+def check_hardcoded(data: dict[str, Any]) -> dict[str, str]:
+    """Check for issues within the hardcoded parameters."""
+    errors = {}
+    required_values = (HardcodedField.NAME.value, HardcodedField.VALUE.value)
+    all_values = (HardcodedField.NAME.value, HardcodedField.VALUE.value)
+
+    for sub_name, _sub_data in data.items():
+        sub_data = _sub_data or {}
+        for op_data in sub_data.get(LayoutField.OPERATIONS, []):
+            hard_params = op_data.get(LayoutField.HARDCODED)
+            if not hard_params:
+                continue
+
+            full_name = f"{sub_name}.{op_data.get(LayoutField.NAME)}"
+            if not isinstance(hard_params, list):
+                errors[full_name] = "must be a list of parameter name/values"
+                continue
+
+            reasons = []
+            for index, item in enumerate(hard_params):
+                if not isinstance(item, dict):
+                    reasons.append(f"index#{index} must be a dictionary")
+                    continue
+                missing = {key for key in required_values if key not in item}
+                if missing:
+                    reasons.append(f"index#{index} missing {', '.join(missing)}")
+                extra_keys = [k for k in item.keys() if k not in all_values]
+                if extra_keys:
+                    reasons.append(f"index#{index} unsupported parameters: {', '.join(extra_keys)}")
+
+            if reasons:
+                errors[full_name] = '; '.join(reasons)
+
+    return errors
+
+
 def file_to_tree(filename: str, start: str = DEFAULT_START) -> LayoutNode:
     """Open filename and parse to a LayoutNode tree."""
     data = open_layout(filename)

@@ -28,7 +28,7 @@ Unused sub-commands for:
 """
 ERR_SUB_ORDER = """\
 Sub-commands are misordered:
-    owners < pets_examine
+    owners < pets_health
 """
 ERR_OPS_PROPS = """\
 Sub-commands have missing properties:
@@ -42,12 +42,16 @@ Duplicate operations in sub-commands:
 ERR_OPS_ORDER = """\
 Sub-command operation orders should be:
     main: owners, pet, shows, vets
-    pets: create, delete, examine, update
+    pets: create, delete, examine, health, update
     shelters: list, list, rescue
 """
 ERR_PAGINATION = """\
 Pagination parameter errors:
     shelters.list: cannot have next URL in both header and body property
+"""
+ERR_HARDCODED = """\
+Hardcoded parameter errors:
+    pets_health.someOperation: index#0 missing value
 """
 
 
@@ -60,6 +64,7 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
         "op_dups": False,
         "op_order": False,
         "pagination": False,
+        "hardcoded": False,
     }
 
     values = options.copy()
@@ -80,6 +85,7 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
                 ERR_OPS_DUPES,
                 ERR_OPS_ORDER,
                 ERR_PAGINATION,
+                ERR_HARDCODED,
             ]),
             id="all"
         ),
@@ -112,6 +118,11 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
             args_disabled({"pagination": True}),
             ERR_PAGINATION,
             id="pagination",
+        ),
+        pytest.param(
+            args_disabled({"hardcoded": True}),
+            ERR_HARDCODED,
+            id="hardcoded",
         ),
     ]
 )

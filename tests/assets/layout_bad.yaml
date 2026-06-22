@@ -21,6 +21,8 @@ pets:
       operationId: deletePetById
     - name: examine
       subcommandId: pets_examine
+    - name: health
+      subcommandId: pets_health
 
 pets_examine:
   description: Examine your pet
@@ -29,6 +31,14 @@ pets_examine:
       operationId: checkPetBloodPressure
     - name: heart-rate
       operationId: checkPetHeartRate
+
+pets_health:
+  description: Some health stuff
+  operations:
+    - name: someOperation
+      operationId: whoKnows
+      hardCoded:
+        - name: foo
 
 owners:
   # no description, or opertations
@@ -51,4 +61,3 @@ veterinarians:
   operations:
     - name: add
     - name: delete
-

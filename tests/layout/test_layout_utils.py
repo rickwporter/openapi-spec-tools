@@ -2,6 +2,7 @@ import pytest
 
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
+from openapi_spec_tools.layout.utils import check_hardcoded
 from openapi_spec_tools.layout.utils import check_pagination_definitions
 from openapi_spec_tools.layout.utils import data_to_node
 from openapi_spec_tools.layout.utils import field_to_list
@@ -29,6 +30,8 @@ PAGE = "pagination"
 SUB_ID = "subcommandId"
 REF = "reference"
 ONE_OF_MSG = f"{OP_ID}, {SUB_ID}, or {REF}"
+HARD = "hardCoded"
+VALUE = "value"
 
 
 def test_open_layout() -> None:
@@ -512,6 +515,45 @@ def test_subcommand_order(data, start, expected) -> None:
 )
 def test_pagination_definitions(data, expected) -> None:
     assert expected == check_pagination_definitions(data)
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param(
+            {"a": {OPS: [{NAME: "foo"}]}},
+            {},
+            id="no-hard",
+        ),
+        pytest.param(
+            {"b": {OPS: [{NAME: "foo", HARD: [{NAME: "sna", VALUE: "bar"}]}]}},
+            {},
+            id="simple",
+        ),
+        pytest.param(
+            {"c": {OPS: [{NAME: "foo", HARD: {NAME: "sna", VALUE: "bar"}}]}},
+            {"c.foo": "must be a list of parameter name/values"},
+            id="non-list",
+        ),
+        pytest.param(
+            {"d": {OPS: [{NAME: "foo", HARD: ["sna: bar"]}]}},
+            {"d.foo": "index#0 must be a dictionary"},
+            id="non-dict",
+        ),
+        pytest.param(
+            {"e": {OPS: [{NAME: "foo", HARD: [{NAME: "sna"}, {VALUE: 1}]}]}},
+            {"e.foo": "index#0 missing value; index#1 missing name"},
+            id="missing",
+        ),
+        pytest.param(
+            {"f": {OPS: [{NAME: "foo", HARD: [{NAME: "sna", VALUE: "foo", "a": 1}]}]}},
+            {"f.foo": "index#0 unsupported parameters: a"},
+            id="unsupported",
+        ),
+    ],
+)
+def test_check_hardcoded(data, expected) -> None:
+    assert expected == check_hardcoded(data)
 
 
 def test_lists() -> None:
