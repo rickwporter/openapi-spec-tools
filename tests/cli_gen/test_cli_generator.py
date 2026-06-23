@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -96,6 +97,12 @@ def test_op_path_arguments():
     assert 'situation: Annotated' not in text
     assert 'more: Annotated' not in text
 
+    # retest with some hard-coded parameters
+    lines = uut.op_path_arguments(path_params, {"mustHave": None, "species": "frog"})
+    text = "\n".join(lines)
+    assert "species: Annotated" not in text
+    assert "mustHave: Annotated" not in text
+
 
 def test_op_query_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
@@ -192,6 +199,12 @@ def test_op_query_arguments():
     assert 'num_feet: Annotated' not in text
     assert 'must_have: Annotated' not in text
 
+    # retest with some hardcoded params
+    lines = uut.op_query_arguments(properties, {"favoriteDay": "1776-07-04", "addr.city": "San Fran"})
+    text = "\n".join(lines)
+    assert "favorite_day: Annotated" not in text
+    assert "addr_city: Annotated" not in text
+
 
 def test_op_body_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
@@ -259,6 +272,12 @@ def test_op_body_arguments():
     # make sure read-only not included
     assert 'id: Annotated' not in text
 
+    # retest with some hardcoded params
+    lines = uut.op_body_arguments(body_params, {"format": 1, "optionalList": None})
+    text = "\n".join(lines)
+    assert "format_: Annotated" not in text
+    assert "optional_list: Annotated" not in text
+
 
 @pytest.mark.parametrize(
     ["names", "expected"],
@@ -305,6 +324,26 @@ def test_pagination_creation(names, expected) -> None:
     uut = CliGenerator("foo", {})
     result = uut.pagination_creation(node)
     assert expected == result.strip()
+
+
+@pytest.mark.parametrize(
+    ["hardcoded", "expected"],
+    [
+        pytest.param({"node": 1}, 'node = 1', id="number"),
+        pytest.param({"fooBar": "snaFoo"}, 'foo_bar = "snaFoo"', id="camel"),
+        pytest.param({"foo": True}, 'foo = True', id="True"),
+        pytest.param({"foo": False}, 'foo = False', id="False"),
+        pytest.param({"sna": None}, 'sna = None', id="None"),
+        pytest.param({"node": []}, 'node = []', id="list-empty"),
+        pytest.param({"node": ['value1', 'item2']}, "node = ['value1', 'item2']", id="list-str"),
+    ],
+)
+def test_hardcoded(hardcoded: dict[str, Any], expected: str) -> None:
+    uut = CliGenerator("foo", {})
+    text = uut.initialize_hardcoded(hardcoded)
+    assert "# initialize hard-coded values" in text
+    assert expected in text
+
 
 @pytest.mark.parametrize(
     ["command", "has_details"],
@@ -451,6 +490,13 @@ def test_function_definition_forced_single():
     assert "_out_fmt: _a.OutputFormatOption" in text
     assert "_out_style: _a.OutputStyleOption" in text
 
+    # check a couple of the args
+    assert 'attachments_id: Annotated[str | None, typer.Option(show_default=False)] = None,' in text
+    assert (
+        'attachments_edge_color: Annotated[Color | None, typer.Option(show_default=False, case_sensitive=False)] = None'
+        in text
+    )
+
     # no summary field, so no details flag
     assert "_details: _a.DetailsOption" not in text
 
@@ -473,6 +519,18 @@ def test_function_definition_forced_single():
     # make sure the missing parameter checks are present
     assert 'missing.append("--api-key")' in text
     assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
+
+    # more testing with hardcoded parameters
+    item.hardcoded = {
+        "attachments.id": "deadbeef",
+        "attachments.edgeColor": "green",
+    }
+    text = uut.function_definition(item)
+    assert 'attachments_id: Annotated[' not in text
+    assert 'attachments_edge_color: Annotated[' not in text
+    assert '# initialize hard-coded values' in text
+    assert 'attachments_id = "deadbeef"' in text
+    assert 'attachments_edge_color = "green"' in text
 
 
 def test_function_definition_paged():
@@ -569,6 +627,14 @@ def test_function_header_params():
     assert 'if has_param is None:' in text
     assert 'missing.append("--has-param")' in text
     assert ' _e.handle_exceptions(_e.MissingRequiredError(missing))' in text
+
+    # test with a hardcoded header parameter
+    item.hardcoded["hasParam"] = 23
+    text = uut.function_definition(item)
+    assert "has_param: Annotated" not in text  # no more function parameter
+    assert "# initialize hard-coded values" in text
+    assert "has_param = 23" in text  # initialization
+    assert "if has_param is None" in text  # still checks missing
 
 
 def test_main():
