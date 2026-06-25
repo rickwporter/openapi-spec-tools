@@ -25,6 +25,7 @@ from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.merge import merge
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
+from openapi_spec_tools.layout.utils import check_hardcoded
 from openapi_spec_tools.layout.utils import check_pagination_definitions
 from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.layout.utils import operation_duplicates
@@ -57,6 +58,7 @@ def layout_check_format(
     op_dups: Annotated[bool, typer.Option(help="Check for duplicate names in sub-commands")] = True,
     op_order: Annotated[bool, typer.Option(help="Check the operations order within each sub-command")] = True,
     pagination: Annotated[bool, typer.Option(help="Check the pagination parameters for issues")] = True,
+    hardcoded: Annotated[bool, typer.Option(help="Check the hardCoded parameters")] = True,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -104,6 +106,12 @@ def layout_check_format(
         errors = check_pagination_definitions(data)
         if errors:
             typer.echo(f"Pagination parameter errors:{_dict_to_str(errors)}")
+            result = 1
+
+    if hardcoded:
+        errors = check_hardcoded(data)
+        if errors:
+            typer.echo(f"Hardcoded parameter errors:{_dict_to_str(errors)}")
             result = 1
 
     if result:

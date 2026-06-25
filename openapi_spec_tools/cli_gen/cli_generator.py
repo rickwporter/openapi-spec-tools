@@ -168,28 +168,46 @@ if __name__ == "__main__":
         typer_decl = f"{typer_type}({comma.join(typer_args)}"
         return f'{var_name}: Annotated[{py_type}, {typer_decl})]{arg_default}'
 
-    def op_path_arguments(self, path_params: list[dict[str, Any]]) -> list[str]:
+    def op_path_arguments(
+        self,
+        path_params: list[dict[str, Any]],
+        hardcoded: dict[str, Any] | None = None,
+    ) -> list[str]:
         """Convert all path parameters into typer arguments."""
         args = []
         for param in path_params:
+            if hardcoded and param.get(OasField.NAME) in hardcoded:
+                continue
             arg = self.property_to_argument(param, allow_required=True)
             args.append(arg)
 
         return args
 
-    def op_query_arguments(self, query_params: list[dict[str, Any]]) -> list[str]:
+    def op_query_arguments(
+        self,
+        query_params: list[dict[str, Any]],
+        hardcoded: dict[str, Any] | None = None,
+    ) -> list[str]:
         """Convert query parameters to typer arguments."""
         args = []
         for param in query_params:
+            if hardcoded and param.get(OasField.NAME) in hardcoded:
+                continue
             arg = self.property_to_argument(param, allow_required=False)
             args.append(arg)
 
         return args
 
-    def op_body_arguments(self, body_params: list[dict[str, Any]]) -> list[str]:
+    def op_body_arguments(
+        self,
+        body_params: dict[str, Any],
+        hardcoded: dict[str, Any] | None = None,
+    ) -> list[str]:
         """Convert the body parameters dictionary into a list of CLI function arguments."""
         args = []
         for prop_name, prop_data in body_params.items():
+            if hardcoded and prop_name in hardcoded:
+                continue
             prop_data[OasField.NAME.value] = prop_name
             arg = self.property_to_argument(prop_data, allow_required=False)
             args.append(arg)
@@ -252,6 +270,19 @@ if __name__ == "__main__":
 
         args = [quoted(v) for v in node.display_columns]
         return f"{SEP1}columns = [{', '.join(args)}]"
+
+    def initialize_hardcoded(
+        self,
+        hardcoded: dict[str, Any],
+    ) -> str:
+        """Initialize any hard-coded variables in the function."""
+        if not hardcoded:
+            return ""
+
+        lines = ["# initialize hard-coded values"]
+        for name, value in hardcoded.items():
+            lines.append(f"{self.variable_name(name)} = {maybe_quoted(value)}")
+        return NL + SEP1 + SEP1.join(lines)
 
     def pagination_creation(self, command: LayoutNode) -> str:
         """Create the 'page_info' variable."""
@@ -325,16 +356,17 @@ if __name__ == "__main__":
 
         func_name = self.function_name(node.identifier)
         func_args = []
-        func_args.extend(self.op_path_arguments(path_params))
-        func_args.extend(self.op_query_arguments(query_params))
-        func_args.extend(self.op_query_arguments(header_params))
-        func_args.extend(self.op_body_arguments(body_params))
+        func_args.extend(self.op_path_arguments(path_params, node.hardcoded))
+        func_args.extend(self.op_query_arguments(query_params, node.hardcoded))
+        func_args.extend(self.op_query_arguments(header_params, node.hardcoded))
+        func_args.extend(self.op_body_arguments(body_params, node.hardcoded))
         func_args.extend(self.command_infra_arguments(node))
         args_str = SEP1 + f",{SEP1}".join(func_args) + "," + NL
 
         command_args.append(f'short_help="{self.op_short_help(op)}"')
         self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
 
+        hardcoded_values = self.initialize_hardcoded(node.hardcoded)
         user_header_init = ""
         user_header_arg = ""
         if header_params:
@@ -352,7 +384,7 @@ if __name__ == "__main__":
 @app.command({', '.join(command_args)})
 def {func_name}({args_str}) -> None:
     {self.op_doc_string(op)}# handler for {node.identifier}: {method} {path}
-    _l.init_logging(_log_level){deprecation_warning}{user_header_init}
+    _l.init_logging(_log_level){deprecation_warning}{hardcoded_values}{user_header_init}
     headers = _r.request_headers(_api_key{self.op_content_header(op)}{user_header_arg})
     url = _r.create_url({self.op_url_params(path)}){self.pagination_creation(node)}{columns}
     missing = {self.op_check_missing(query_params + header_params, body_params)}

@@ -2,6 +2,7 @@ import pytest
 
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
+from openapi_spec_tools.layout.utils import check_hardcoded
 from openapi_spec_tools.layout.utils import check_pagination_definitions
 from openapi_spec_tools.layout.utils import data_to_node
 from openapi_spec_tools.layout.utils import field_to_list
@@ -12,6 +13,7 @@ from openapi_spec_tools.layout.utils import operation_duplicates
 from openapi_spec_tools.layout.utils import operation_order
 from openapi_spec_tools.layout.utils import pagination_to_dict
 from openapi_spec_tools.layout.utils import parse_extras
+from openapi_spec_tools.layout.utils import parse_hardcoded
 from openapi_spec_tools.layout.utils import parse_pagination
 from openapi_spec_tools.layout.utils import parse_to_tree
 from openapi_spec_tools.layout.utils import path_to_parts
@@ -28,6 +30,8 @@ PAGE = "pagination"
 SUB_ID = "subcommandId"
 REF = "reference"
 ONE_OF_MSG = f"{OP_ID}, {SUB_ID}, or {REF}"
+HARD = "hardCoded"
+VALUE = "value"
 
 
 def test_open_layout() -> None:
@@ -234,6 +238,43 @@ def test_path_to_parts(path, prefix, expected):
 )
 def test_parse_pagination(data, expected) -> None:
     assert expected == parse_pagination(data)
+
+
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param(None, {}, id="none"),
+        pytest.param("not a list", {}, id="str"),
+        pytest.param({"A": None}, {}, id="dict"),
+        pytest.param([], {}, id="empty"),
+        pytest.param([{"name": "a", "value": 1}], {"a": 1}, id="simple"),
+        pytest.param([{"name": "a", "value": 1}, {"name": "b", "value": True}], {"a": 1, "b": True}, id="multiple"),
+        pytest.param(
+            [{"value": 1}, {"name": "b"}, {"name": "c", "value": "mystr"}, {"d": 0}],
+            {"c": "mystr"},
+            id="bad-entries",
+        ),
+    ]
+)
+def test_parse_hardcoded(data, expected) -> None:
+    assert expected == parse_hardcoded(data)
+
+
+@pytest.mark.parametrize(
+    ["name", "expected"],
+    [
+        pytest.param("update", {}, id="none"),
+        pytest.param("create", {"name": "toulouse"}, id="simple"),
+        pytest.param("delete", {"sna": "foo"}, id="errors"),
+        pytest.param("examine", {}, id="bad"),
+    ]
+)
+def test_parse_with_hardcoded(name, expected) -> None:
+    node = file_to_tree(asset_filename("layout_hardcoded.yaml"))
+
+    item = node.find("pet", name)
+    assert expected == item.hardcoded
+
 
 @pytest.mark.parametrize(
     [NAME, "item", "expected"],
@@ -476,6 +517,45 @@ def test_pagination_definitions(data, expected) -> None:
     assert expected == check_pagination_definitions(data)
 
 
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param(
+            {"a": {OPS: [{NAME: "foo"}]}},
+            {},
+            id="no-hard",
+        ),
+        pytest.param(
+            {"b": {OPS: [{NAME: "foo", HARD: [{NAME: "sna", VALUE: "bar"}]}]}},
+            {},
+            id="simple",
+        ),
+        pytest.param(
+            {"c": {OPS: [{NAME: "foo", HARD: {NAME: "sna", VALUE: "bar"}}]}},
+            {"c.foo": "must be a list of parameter name/values"},
+            id="non-list",
+        ),
+        pytest.param(
+            {"d": {OPS: [{NAME: "foo", HARD: ["sna: bar"]}]}},
+            {"d.foo": "index#0 must be a dictionary"},
+            id="non-dict",
+        ),
+        pytest.param(
+            {"e": {OPS: [{NAME: "foo", HARD: [{NAME: "sna"}, {VALUE: 1}]}]}},
+            {"e.foo": "index#0 missing value; index#1 missing name"},
+            id="missing",
+        ),
+        pytest.param(
+            {"f": {OPS: [{NAME: "foo", HARD: [{NAME: "sna", VALUE: "foo", "a": 1}]}]}},
+            {"f.foo": "index#0 unsupported parameters: a"},
+            id="unsupported",
+        ),
+    ],
+)
+def test_check_hardcoded(data, expected) -> None:
+    assert expected == check_hardcoded(data)
+
+
 def test_lists() -> None:
     uut = LayoutNode(
         command="top",
@@ -609,7 +689,8 @@ def test_layout_node_to_dict():
                 display_columns=["west", "east"]
             ),
             LayoutNode(command="child1", identifier="my_child", pagination=PaginationNames(page_size="page")),
-            LayoutNode(command="child2", identifier="another_op", ignore=True)
+            LayoutNode(command="child2", identifier="another_op", ignore=True),
+            LayoutNode(command="child4", identifier="with_hardcoded", hardcoded={"c": True, "x": "y", "a": 1}),
         ]
     )
     actual = layout_node_to_dict(node)
@@ -635,7 +716,12 @@ def test_layout_node_to_dict():
                     "hiddenFields": ["peekaboo"],
                     "summaryFields": ["brief", "short"],
                     "columns": ["west", "east"],
-                }
+                },
+                {
+                    "hardCoded": {"a": 1, "c": True, "x": "y"},
+                    "name": "child4",
+                    "operationId": "with_hardcoded",
+                },
             ]
         }
     }

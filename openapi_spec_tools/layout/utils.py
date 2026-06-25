@@ -5,6 +5,7 @@ from typing import Any
 
 import yaml
 
+from openapi_spec_tools.layout.types import HardcodedField
 from openapi_spec_tools.layout.types import LayoutField
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationField
@@ -89,6 +90,24 @@ def parse_reference(data: dict[str, Any] | None) -> ReferenceSubcommand | None:
     )
 
 
+def parse_hardcoded(data: dict[str, Any] | None) -> dict[str, Any]:
+    """Parse the data into dictionary of name to value."""
+    if not data:
+        return {}
+
+    if not isinstance(data, list):
+        return {}
+
+    result = {}
+    for item in data:
+        name = item.get(HardcodedField.NAME)
+        value = item.get(HardcodedField.VALUE)
+        if name and value is not None:
+            result[name] = value
+
+    return result
+
+
 def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
     """Recursively convert elements from data to LayoutNodes."""
     description = item.get(LayoutField.DESCRIPTION, "")
@@ -103,6 +122,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
     pagination = parse_pagination(item.get(LayoutField.PAGINATION))
     ignore = item.get(LayoutField.IGNORE)
     reference = parse_reference(item.get(LayoutField.REFERENCE))
+    hardcoded = parse_hardcoded(item.get(LayoutField.HARDCODED))
 
     children = []
     for op_data in item.get(LayoutField.OPERATIONS, []):
@@ -133,6 +153,7 @@ def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict
         pagination=pagination,
         ignore=ignore,
         reference=reference,
+        hardcoded=hardcoded,
     )
 
 
@@ -285,6 +306,43 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
 
     return errors
 
+
+def check_hardcoded(data: dict[str, Any]) -> dict[str, str]:
+    """Check for issues within the hardcoded parameters."""
+    errors = {}
+    required_values = (HardcodedField.NAME.value, HardcodedField.VALUE.value)
+    all_values = (HardcodedField.NAME.value, HardcodedField.VALUE.value)
+
+    for sub_name, _sub_data in data.items():
+        sub_data = _sub_data or {}
+        for op_data in sub_data.get(LayoutField.OPERATIONS, []):
+            hard_params = op_data.get(LayoutField.HARDCODED)
+            if not hard_params:
+                continue
+
+            full_name = f"{sub_name}.{op_data.get(LayoutField.NAME)}"
+            if not isinstance(hard_params, list):
+                errors[full_name] = "must be a list of parameter name/values"
+                continue
+
+            reasons = []
+            for index, item in enumerate(hard_params):
+                if not isinstance(item, dict):
+                    reasons.append(f"index#{index} must be a dictionary")
+                    continue
+                missing = {key for key in required_values if key not in item}
+                if missing:
+                    reasons.append(f"index#{index} missing {', '.join(missing)}")
+                extra_keys = [k for k in item.keys() if k not in all_values]
+                if extra_keys:
+                    reasons.append(f"index#{index} unsupported parameters: {', '.join(extra_keys)}")
+
+            if reasons:
+                errors[full_name] = '; '.join(reasons)
+
+    return errors
+
+
 def file_to_tree(filename: str, start: str = DEFAULT_START) -> LayoutNode:
     """Open filename and parse to a LayoutNode tree."""
     data = open_layout(filename)
@@ -344,6 +402,8 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
             op_data[LayoutField.PAGINATION.value] = pagination_to_dict(child.pagination)
         if child.reference:
             op_data[LayoutField.REFERENCE.value] = reference_to_dict(child.reference)
+        if child.hardcoded:
+            op_data[LayoutField.HARDCODED.value] = dict(sorted(child.hardcoded.items()))
         operations.append(op_data)
 
     result = {
