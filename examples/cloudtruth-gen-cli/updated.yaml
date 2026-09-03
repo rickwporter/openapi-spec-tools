@@ -19,7 +19,6 @@ main:
     subcommandId: import
   - name: integrations
     subcommandId: integrations
-    ignore: true
   - name: invitations
     subcommandId: invitations
   - name: membership

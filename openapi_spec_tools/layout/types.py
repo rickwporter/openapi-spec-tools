@@ -1,4 +1,6 @@
 """Field enums and class definitions for objects used by the layout file."""
+from __future__ import annotations
+
 from enum import Enum
 from typing import Any
 from typing import Optional
@@ -7,15 +9,31 @@ from pydantic import BaseModel
 from pydantic import Field
 
 
-class LayoutField(str, Enum):
-    """Field names in the layout file, mostly inside the operations section."""
+class CommandField(str, Enum):
+    """Top-level layout file fields."""
+
+    DESCRIPTION = "description"
+    OPERATIONS = "operations"
+    BUG_IDS = "bugIds"
+
+    @classmethod
+    def required(cls) -> list[CommandField]:
+        """Layout command required fields."""
+        return [cls.DESCRIPTION, cls.OPERATIONS]
+
+    @classmethod
+    def values(cls) -> set[str]:
+        """Set of class member values."""
+        return cls._member_map_.values()
+
+
+class OperationField(str, Enum):
+    """Layout file operation fields."""
 
     NAME = "name"
     BUG_IDS = "bugIds"
-    DESCRIPTION = "description"
     HIDDEN_FIELDS = "hiddenFields"
     OP_ID = "operationId"
-    OPERATIONS = "operations"
     SUB_ID = "subcommandId"
     SUMMARY_FIELDS = "summaryFields"
     PAGINATION = "pagination"
@@ -24,6 +42,12 @@ class LayoutField(str, Enum):
     COLUMNS = "columns"
     REFERENCE = "reference"
     HARDCODED = "hardCoded"
+
+    @classmethod
+    def values(cls) -> set[str]:
+        """Set of class member values."""
+        return cls._member_map_.values()
+
 
 
 class PaginationField(str, Enum):
