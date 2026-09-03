@@ -5,16 +5,17 @@ from typing import Any
 
 import yaml
 
+from openapi_spec_tools.layout.types import CommandField
 from openapi_spec_tools.layout.types import HardcodedField
-from openapi_spec_tools.layout.types import LayoutField
 from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.layout.types import OperationField
 from openapi_spec_tools.layout.types import PaginationField
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.types import ReferenceField
 from openapi_spec_tools.layout.types import ReferenceSubcommand
 
 DEFAULT_START = "main"
-ONE_OF = [LayoutField.OP_ID, LayoutField.SUB_ID, LayoutField.REFERENCE]
+ONE_OF = [OperationField.OP_ID, OperationField.SUB_ID, OperationField.REFERENCE]
 MISSING_ONE_OF = ", ".join(v.value for v in ONE_OF[:-1]) + f", or {ONE_OF[-1].value}"
 
 
@@ -44,13 +45,9 @@ def field_to_list(data: dict[str, Any], field: str) -> list[str]:
     ]
 
 
-def parse_extras(data: dict[str, Any]) -> dict[str, Any]:
+def parse_extras(data: dict[str, Any], allowed: set[str]) -> dict[str, Any]:
     """Pass through extra user data -- ignore the keys already in the LayoutFields."""
-    return {
-        k: v
-        for k, v in data.items()
-        if k not in [v.value for v in LayoutField]
-    }
+    return {k: v for k, v in data.items() if k not in allowed}
 
 
 def path_to_parts(path_name: str, prefix: str) -> list[str]:
@@ -108,52 +105,66 @@ def parse_hardcoded(data: dict[str, Any] | None) -> dict[str, Any]:
     return result
 
 
-def data_to_node(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
-    """Recursively convert elements from data to LayoutNodes."""
-    description = item.get(LayoutField.DESCRIPTION, "")
-    # identifier = item.get(LayoutField.OP_ID) or identifier
-    # parse bugs and summary fields into a list
-    bugs = field_to_list(item, LayoutField.BUG_IDS)
-    summary_fields = field_to_list(item, LayoutField.SUMMARY_FIELDS)
-    hidden_fields = field_to_list(item, LayoutField.HIDDEN_FIELDS)
-    allowed_fields = field_to_list(item, LayoutField.ALLOWED_FIELDS)
-    columns = field_to_list(item, LayoutField.COLUMNS)
-    extra = parse_extras(item)
-    pagination = parse_pagination(item.get(LayoutField.PAGINATION))
-    ignore = item.get(LayoutField.IGNORE)
-    reference = parse_reference(item.get(LayoutField.REFERENCE))
-    hardcoded = parse_hardcoded(item.get(LayoutField.HARDCODED))
-
-    children = []
-    for op_data in item.get(LayoutField.OPERATIONS, []):
-        op_name = op_data.get(LayoutField.NAME)
-        sub_id = op_data.get(LayoutField.SUB_ID)
-        if sub_id:
-            # recursively go through this
-            subcommand = data_to_node(data, sub_id, op_name, data.get(sub_id, {}))
-            subcommand.bugs.extend(field_to_list(op_data, LayoutField.BUG_IDS))
-            children.append(subcommand)
-            continue
-
-        # use the current op-data to create a node -- it will be short
-        op_id = op_data.get(LayoutField.OP_ID)
-        children.append(data_to_node(data, op_id, op_name, op_data))
+def parse_layout_operation(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
+    """Convert a leaf node into a LayoutNode."""
+    summary_fields = field_to_list(item, OperationField.SUMMARY_FIELDS)
+    hidden_fields = field_to_list(item, OperationField.HIDDEN_FIELDS)
+    allowed_fields = field_to_list(item, OperationField.ALLOWED_FIELDS)
+    columns = field_to_list(item, OperationField.COLUMNS)
+    pagination = parse_pagination(item.get(OperationField.PAGINATION))
+    ignore = item.get(OperationField.IGNORE)
+    reference = parse_reference(item.get(OperationField.REFERENCE))
+    hardcoded = parse_hardcoded(item.get(OperationField.HARDCODED))
+    bugs = field_to_list(item, OperationField.BUG_IDS)
+    extra = parse_extras(item, OperationField.values())
 
     return LayoutNode(
         command=command,
         identifier=identifier,
-        description=description,
+        description="",
         bugs=bugs,
         summary_fields=summary_fields,
         hidden_fields=hidden_fields,
         allowed_fields=allowed_fields,
         display_columns=columns,
         extra=extra,
-        children=children,
         pagination=pagination,
         ignore=ignore,
         reference=reference,
         hardcoded=hardcoded,
+    )
+
+
+def parse_layout_command(data: dict[str, Any], identifier: str, command: str, item: dict[str, Any]) -> LayoutNode:
+    """Recursively convert elements from data to LayoutNodes."""
+    description = item.get(CommandField.DESCRIPTION, "")
+    # identifier = item.get(LayoutField.OP_ID) or identifier
+    # parse bugs and summary fields into a list
+    bugs = field_to_list(item, CommandField.BUG_IDS)
+    extra = parse_extras(item, CommandField.values())
+
+    children = []
+    for op_data in item.get(CommandField.OPERATIONS, []):
+        op_name = op_data.get(OperationField.NAME)
+        sub_id = op_data.get(OperationField.SUB_ID)
+        if sub_id:
+            # recursively go through this
+            subcommand = parse_layout_command(data, sub_id, op_name, data.get(sub_id, {}))
+            subcommand.bugs.extend(field_to_list(op_data, CommandField.BUG_IDS))
+            children.append(subcommand)
+            continue
+
+        # use the current op-data to create a node -- it will be short
+        op_id = op_data.get(OperationField.OP_ID)
+        children.append(parse_layout_operation(data, op_id, op_name, op_data))
+
+    return LayoutNode(
+        command=command,
+        identifier=identifier,
+        description=description,
+        bugs=bugs,
+        extra=extra,
+        children=children,
     )
 
 
@@ -163,7 +174,7 @@ def parse_to_tree(data: dict[str, Any], start: str = DEFAULT_START) -> LayoutNod
     if not top:
         raise ValueError(f"No start value found for '{start}'")
 
-    return data_to_node(data, start, start, top)
+    return parse_layout_command(data, start, start, top)
 
 
 def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:
@@ -174,15 +185,15 @@ def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:
         missing = []
 
         # check top-level fields
-        for k in (LayoutField.DESCRIPTION, LayoutField.OPERATIONS):
+        for k in CommandField.required():
             if k not in sub_data:
                 missing.append(k)
 
         # check each operations
-        for index, op_data in enumerate(sub_data.get(LayoutField.OPERATIONS, [])):
-            identifier = op_data.get(LayoutField.NAME) or f"operation[{index}]"
-            if LayoutField.NAME not in op_data:
-                missing.append(f"{identifier} {LayoutField.NAME.value}")
+        for index, op_data in enumerate(sub_data.get(CommandField.OPERATIONS, [])):
+            identifier = op_data.get(OperationField.NAME) or f"operation[{index}]"
+            if OperationField.NAME not in op_data:
+                missing.append(f"{identifier} {OperationField.NAME.value}")
             if not any(p in op_data for p in ONE_OF):
                 missing.append(f"{identifier} {MISSING_ONE_OF}")
 
@@ -200,8 +211,8 @@ def operation_duplicates(data: dict[str, Any]) -> dict[str, Any]:
         # check each operations
         values = {}
         sub_data = deepcopy(_sub_data or {})
-        for index, op_data in enumerate(sub_data.get(LayoutField.OPERATIONS, [])):
-            name = op_data.get(LayoutField.NAME)
+        for index, op_data in enumerate(sub_data.get(CommandField.OPERATIONS, [])):
+            name = op_data.get(OperationField.NAME)
             if not name:
                 continue
 
@@ -225,7 +236,7 @@ def operation_order(data: dict[str, Any]) -> dict[str, Any]:
 
     for sub_name, _sub_data in data.items():
         sub_data = deepcopy(_sub_data or {})
-        op_names = [op.get(LayoutField.NAME) for op in sub_data.get(LayoutField.OPERATIONS, [])]
+        op_names = [op.get(OperationField.NAME) for op in sub_data.get(CommandField.OPERATIONS, [])]
         if op_names != sorted(op_names):
             errors[sub_name] = ", ".join(sorted(op_names))
 
@@ -238,9 +249,9 @@ def subcommand_references(data: dict[str, Any], start: str = DEFAULT_START) -> t
     for _sub_data in data.values():
         sub_data = deepcopy(_sub_data or {})
         refs = [
-            op.get(LayoutField.SUB_ID)
-            for op in sub_data.get(LayoutField.OPERATIONS, [])
-            if op.get(LayoutField.SUB_ID)
+            op.get(OperationField.SUB_ID)
+            for op in sub_data.get(CommandField.OPERATIONS, [])
+            if op.get(OperationField.SUB_ID)
         ]
         referenced.update(refs)
 
@@ -285,8 +296,8 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
 
     for sub_name, _sub_data in data.items():
         sub_data = deepcopy(_sub_data or {})
-        for op in sub_data.get(LayoutField.OPERATIONS, []):
-            page_params = op.get(LayoutField.PAGINATION)
+        for op in sub_data.get(CommandField.OPERATIONS, []):
+            page_params = op.get(OperationField.PAGINATION)
             if not page_params:
                 continue
 
@@ -301,7 +312,7 @@ def check_pagination_definitions(data: dict[str, Any]) -> dict[str, str]:
                 reasons.append("start can only be specified with page or item paramter")
 
             if reasons:
-                full_name = f"{sub_name}.{op.get(LayoutField.NAME)}"
+                full_name = f"{sub_name}.{op.get(OperationField.NAME)}"
                 errors[full_name] = '; '.join(reasons)
 
     return errors
@@ -315,12 +326,12 @@ def check_hardcoded(data: dict[str, Any]) -> dict[str, str]:
 
     for sub_name, _sub_data in data.items():
         sub_data = _sub_data or {}
-        for op_data in sub_data.get(LayoutField.OPERATIONS, []):
-            hard_params = op_data.get(LayoutField.HARDCODED)
+        for op_data in sub_data.get(CommandField.OPERATIONS, []):
+            hard_params = op_data.get(OperationField.HARDCODED)
             if not hard_params:
                 continue
 
-            full_name = f"{sub_name}.{op_data.get(LayoutField.NAME)}"
+            full_name = f"{sub_name}.{op_data.get(OperationField.NAME)}"
             if not isinstance(hard_params, list):
                 errors[full_name] = "must be a list of parameter name/values"
                 continue
@@ -380,36 +391,36 @@ def layout_node_to_dict(node: LayoutNode) -> dict[str, Any]:
     """Convert LayoutNode to a dictionary for output."""
     operations = []
     for child in sorted(node.children, key=lambda x: x.command):
-        flavor = LayoutField.OP_ID.value if not child.children else LayoutField.SUB_ID.value
+        flavor = OperationField.OP_ID.value if not child.children else OperationField.SUB_ID.value
         op_data = {
-            LayoutField.NAME.value: child.command,
+            OperationField.NAME.value: child.command,
         }
         if not child.reference:
             op_data[flavor] = child.identifier
         if child.ignore:
-            op_data[LayoutField.IGNORE.value] = True
+            op_data[OperationField.IGNORE.value] = True
         if child.bugs:
-            op_data[LayoutField.BUG_IDS.value] = child.bugs
+            op_data[CommandField.BUG_IDS.value] = child.bugs
         if child.allowed_fields:
-            op_data[LayoutField.ALLOWED_FIELDS.value] = child.allowed_fields
+            op_data[OperationField.ALLOWED_FIELDS.value] = child.allowed_fields
         if child.hidden_fields:
-            op_data[LayoutField.HIDDEN_FIELDS.value] = child.hidden_fields
+            op_data[OperationField.HIDDEN_FIELDS.value] = child.hidden_fields
         if child.summary_fields:
-            op_data[LayoutField.SUMMARY_FIELDS.value] = child.summary_fields
+            op_data[OperationField.SUMMARY_FIELDS.value] = child.summary_fields
         if child.display_columns:
-            op_data[LayoutField.COLUMNS.value] = child.display_columns
+            op_data[OperationField.COLUMNS.value] = child.display_columns
         if child.pagination:
-            op_data[LayoutField.PAGINATION.value] = pagination_to_dict(child.pagination)
+            op_data[OperationField.PAGINATION.value] = pagination_to_dict(child.pagination)
         if child.reference:
-            op_data[LayoutField.REFERENCE.value] = reference_to_dict(child.reference)
+            op_data[OperationField.REFERENCE.value] = reference_to_dict(child.reference)
         if child.hardcoded:
-            op_data[LayoutField.HARDCODED.value] = dict(sorted(child.hardcoded.items()))
+            op_data[OperationField.HARDCODED.value] = dict(sorted(child.hardcoded.items()))
         operations.append(op_data)
 
     result = {
         node.identifier: {
-            LayoutField.DESCRIPTION.value: node.description,
-            LayoutField.OPERATIONS.value: operations,
+            CommandField.DESCRIPTION.value: node.description,
+            CommandField.OPERATIONS.value: operations,
         },
     }
 

@@ -11,8 +11,6 @@ main:
     operationId: utils_generate_password_create
   - name: grants
     subcommandId: grants
-  - name: integrations
-    subcommandId: integrations
   - name: membership
     subcommandId: memberships
   - name: schema
@@ -113,12 +111,6 @@ grants:
     operationId: grants_retrieve
   - name: update
     operationId: grants_partial_update
-
-# NOTE: this is a stub at the top-level, so everything below should be ignored during generation
-integrations:
-  description: Manage integrations
-  ignore: true
-  operations: []
 
 memberships:
   description: Manage CloudTruth memberships

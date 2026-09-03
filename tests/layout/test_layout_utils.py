@@ -4,7 +4,6 @@ from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import check_hardcoded
 from openapi_spec_tools.layout.utils import check_pagination_definitions
-from openapi_spec_tools.layout.utils import data_to_node
 from openapi_spec_tools.layout.utils import field_to_list
 from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.layout.utils import layout_node_to_dict
@@ -14,6 +13,7 @@ from openapi_spec_tools.layout.utils import operation_order
 from openapi_spec_tools.layout.utils import pagination_to_dict
 from openapi_spec_tools.layout.utils import parse_extras
 from openapi_spec_tools.layout.utils import parse_hardcoded
+from openapi_spec_tools.layout.utils import parse_layout_command
 from openapi_spec_tools.layout.utils import parse_pagination
 from openapi_spec_tools.layout.utils import parse_to_tree
 from openapi_spec_tools.layout.utils import path_to_parts
@@ -182,16 +182,26 @@ def test_field_list(data, field, expected) -> None:
 
 
 @pytest.mark.parametrize(
-    ["data", "expected"],
+    ["data", "allowed", "expected"],
     [
-        pytest.param({}, {}, id="empty"),
-        pytest.param({OP_ID: "op1", SUB_ID: "sub1", DESC: "desc"}, {}, id="remove-fields"),
-        pytest.param({"sna": "foo", OP_ID: "op1", "foo": "bar"}, {"sna": "foo", "foo": "bar"}, id="pass"),
-        pytest.param({"sna": {"foo": "bar"}, OP_ID: "a"}, {"sna": {"foo": "bar"}}, id="complex"),
+        pytest.param({}, {OP_ID, SUB_ID}, {}, id="empty"),
+        pytest.param(
+            {OP_ID: "op1", SUB_ID: "sub1", DESC: "desc"},
+            {OP_ID, SUB_ID},
+            {DESC: "desc"},
+            id="remove-fields",
+        ),
+        pytest.param(
+            {"sna": "foo", OP_ID: "op1", "foo": "bar"},
+            {OP_ID, SUB_ID},
+            {"sna": "foo", "foo": "bar"},
+            id="pass",
+        ),
+        pytest.param({"sna": {"foo": "bar"}, OP_ID: "a"}, {OP_ID, SUB_ID}, {"sna": {"foo": "bar"}}, id="complex"),
     ]
 )
-def test_parse_extras(data, expected) -> None:
-    assert expected == parse_extras(data)
+def test_parse_extras(data, allowed, expected) -> None:
+    assert expected == parse_extras(data, allowed)
 
 
 @pytest.mark.parametrize(
@@ -306,12 +316,15 @@ def test_parse_with_hardcoded(name, expected) -> None:
                 identifier="sna",
                 description="my desc",
                 bugs=["a", "b"],
-                summary_fields=["foo", "bar"],
-                extra={"my-party": {"cry": "if i want to"}},
-                children=[],
-                hidden_fields=["east", "west"],
-                allowed_fields=["patriots", "celtics"],
-                display_columns=["a", "b", "c"],
+                extra={
+                    # NOTE: all extras for parent node
+                    'allowedFields': ['patriots', 'celtics'],
+                    'columns': 'a, b, c',
+                    'hiddenFields': ['east', 'west'],
+                    'my-party': {'cry': 'if i want to'},
+                    'operationId': 'op1',
+                    'summaryFields': ['foo', 'bar'],
+                },
             ),
             id="fields",
         ),
@@ -372,7 +385,7 @@ def test_parse_with_hardcoded(name, expected) -> None:
         ),
     ],
 )
-def test_data_to_node_basic(name, item, expected) -> None:
+def test_parse_layout_command_basic(name, item, expected) -> None:
     data = {
         "sub1": {
             DESC: "sub-command desc",
@@ -383,8 +396,8 @@ def test_data_to_node_basic(name, item, expected) -> None:
             "bugIds": "a, bc",
         }
     }
-    node = data_to_node(data, name, name, item)
-    assert expected == node
+    node = parse_layout_command(data, name, name, item)
+    assert expected.__dict__ == node.__dict__
 
 
 @pytest.mark.parametrize(
