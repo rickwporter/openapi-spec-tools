@@ -9,6 +9,8 @@ main:
       subcommandId: veterinarians
     - name: shows
       subcommandId: dog_shows
+    - name: walkers
+      subcommandId: walkers
 
 pets:
   description: Manage your pets
@@ -61,3 +63,20 @@ veterinarians:
   operations:
     - name: add
     - name: delete
+
+walkers:
+  description: Manage dog walkers
+  foo: bar
+  operations:
+    - name: list
+      operationId: op_1
+      sna: foo
+      bugIds: abc
+    - name: show
+      another:
+         this: 1
+         that: one
+      thing:
+      - 1
+      - 2
+      operationId: op_2

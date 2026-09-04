@@ -30,6 +30,7 @@ from openapi_spec_tools.layout.utils import check_pagination_definitions
 from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.layout.utils import operation_duplicates
 from openapi_spec_tools.layout.utils import operation_order
+from openapi_spec_tools.layout.utils import subcommand_extra_properties
 from openapi_spec_tools.layout.utils import subcommand_missing_properties
 from openapi_spec_tools.layout.utils import subcommand_order
 from openapi_spec_tools.layout.utils import subcommand_references
@@ -55,6 +56,7 @@ def layout_check_format(
     references: Annotated[bool, typer.Option(help="Check for missing and unused subcommands")] = True,
     sub_order: Annotated[bool, typer.Option(help="Check the sub-command order")] = True,
     missing_props: Annotated[bool, typer.Option(help="Check for missing properties")] = True,
+    extra_props: Annotated[bool, typer.Option(help="Check for any extra properties")] = False,
     op_dups: Annotated[bool, typer.Option(help="Check for duplicate names in sub-commands")] = True,
     op_order: Annotated[bool, typer.Option(help="Check the operations order within each sub-command")] = True,
     pagination: Annotated[bool, typer.Option(help="Check the pagination parameters for issues")] = True,
@@ -88,6 +90,12 @@ def layout_check_format(
         errors = subcommand_missing_properties(data)
         if errors:
             typer.echo(f"Sub-commands have missing properties:{_dict_to_str(errors)}")
+            result = 1
+
+    if extra_props:
+        errors = subcommand_extra_properties(data)
+        if errors:
+            typer.echo(f"Commands have extra properties:{_dict_to_str(errors)}")
             result = 1
 
     if op_dups:

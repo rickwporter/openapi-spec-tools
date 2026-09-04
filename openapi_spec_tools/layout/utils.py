@@ -203,6 +203,31 @@ def subcommand_missing_properties(data: dict[str, Any]) -> dict[str, str]:
     return errors
 
 
+def subcommand_extra_properties(data: dict[str, Any]) -> dict[str, str]:
+    """Look for missing properties in the sub-commands."""
+    errors = {}
+    commands = CommandField.values()
+    operations = OperationField.values()
+    for sub_name, _sub_data in data.items():
+        sub_data = deepcopy(_sub_data or {})
+        extra = []
+
+        # check top-level fields
+        extra.extend([k for k in sub_data.keys() if k not in commands])
+
+        # check each operations
+        for index, op_data in enumerate(sub_data.get(CommandField.OPERATIONS, [])):
+            op_extra = [k for k in op_data.keys() if k not in operations]
+            if op_extra:
+                identifier = op_data.get(OperationField.NAME) or f"operation[{index}]"
+                extra.append(f"{identifier}: {', '.join(op_extra)}")
+
+        if extra:
+            errors[sub_name] = ", ".join(extra)
+
+    return errors
+
+
 def operation_duplicates(data: dict[str, Any]) -> dict[str, Any]:
     """Look for command operations with redundant names (within each command)."""
     errors = {}
