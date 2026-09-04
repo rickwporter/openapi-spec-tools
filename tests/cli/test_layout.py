@@ -166,7 +166,7 @@ def test_layout_check_format_success() -> None:
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         filename = asset_filename("layout_pets.yaml")
-        layout_check_format(filename=filename)
+        layout_check_format(filename=filename, extra_props=True)
         output = mock_stdout.getvalue()
         assert f"No errors found in {filename}\n" == output
 
