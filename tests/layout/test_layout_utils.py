@@ -17,6 +17,7 @@ from openapi_spec_tools.layout.utils import parse_layout_command
 from openapi_spec_tools.layout.utils import parse_pagination
 from openapi_spec_tools.layout.utils import parse_to_tree
 from openapi_spec_tools.layout.utils import path_to_parts
+from openapi_spec_tools.layout.utils import subcommand_extra_properties
 from openapi_spec_tools.layout.utils import subcommand_missing_properties
 from openapi_spec_tools.layout.utils import subcommand_order
 from openapi_spec_tools.layout.utils import subcommand_references
@@ -78,6 +79,36 @@ def test_open_layout() -> None:
 def test_missing_properties(data, expected) -> None:
     assert expected == subcommand_missing_properties(data)
 
+@pytest.mark.parametrize(
+    ["data", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param({"cmd": {DESC: "a"}}, {}, id="none"),
+        pytest.param({"cmd": {DESC: "a", "other": 1}}, {"cmd": "other"}, id="cmd-single"),
+        pytest.param(
+            {"cmd1": {DESC: "a", "other": 1}, "cmd2": {"more": "props"}},
+            {"cmd1": "other", "cmd2": "more"},
+            id="cmd-double",
+        ),
+        pytest.param(
+            {"cmd": {OPS: [{NAME: "me", "other": 1}]}},
+            {"cmd": "me: other"},
+            id="op-single",
+        ),
+        pytest.param(
+            {"cmd": {OPS: [{NAME: "me", "myself": 1, "eye": "blue"}]}},
+            {"cmd": "me: myself, eye"},
+            id="op-multi",
+        ),
+        pytest.param(
+            {"sna": {OPS: [{"foo": "bar"}, {NAME: "a", "extra": "prop"}]}, "foo": {"this": "that"}},
+            {"sna": "operation[0]: foo, a: extra", "foo": "this"},
+            id="complex",
+        ),
+    ],
+)
+def test_extra_properties(data, expected) -> None:
+    assert expected == subcommand_extra_properties(data)
 
 @pytest.mark.parametrize(
     ["data", "expected"],

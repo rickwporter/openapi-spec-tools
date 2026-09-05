@@ -30,10 +30,14 @@ ERR_SUB_ORDER = """\
 Sub-commands are misordered:
     owners < pets_health
 """
-ERR_OPS_PROPS = """\
+ERR_MISSING_PROPS = """\
 Sub-commands have missing properties:
     owners: description, operations
     veterinarians: add operationId, subcommandId, or reference, delete operationId, subcommandId, or reference
+"""
+ERR_EXTRA_PROPS ="""\
+Commands have extra properties:
+    walkers: foo, list: sna, show: another, thing
 """
 ERR_OPS_DUPES = """\
 Duplicate operations in sub-commands:
@@ -41,7 +45,7 @@ Duplicate operations in sub-commands:
 """
 ERR_OPS_ORDER = """\
 Sub-command operation orders should be:
-    main: owners, pet, shows, vets
+    main: owners, pet, shows, vets, walkers
     pets: create, delete, examine, health, update
     shelters: list, list, rescue
 """
@@ -81,7 +85,22 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
                 ERR_SUB_MISSIING,
                 ERR_SUB_UNUSED,
                 ERR_SUB_ORDER,
-                ERR_OPS_PROPS,
+                ERR_MISSING_PROPS,
+                ERR_OPS_DUPES,
+                ERR_OPS_ORDER,
+                ERR_PAGINATION,
+                ERR_HARDCODED,
+            ]),
+            id="default"
+        ),
+        pytest.param(
+            {"filename":BAD_LAYOUT_FILE, "extra_props": True},
+            "".join([
+                ERR_SUB_MISSIING,
+                ERR_SUB_UNUSED,
+                ERR_SUB_ORDER,
+                ERR_MISSING_PROPS,
+                ERR_EXTRA_PROPS,
                 ERR_OPS_DUPES,
                 ERR_OPS_ORDER,
                 ERR_PAGINATION,
@@ -101,8 +120,13 @@ def args_disabled(updates: dict[str, Any]) -> dict[str, Any]:
         ),
         pytest.param(
             args_disabled({"missing_props": True}),
-            ERR_OPS_PROPS,
-            id="ops-props",
+            ERR_MISSING_PROPS,
+            id="ops-missing",
+        ),
+        pytest.param(
+            args_disabled({"extra_props": True}),
+            ERR_EXTRA_PROPS,
+            id="ops-extra",
         ),
         pytest.param(
             args_disabled({"op_dups": True}),
@@ -142,7 +166,7 @@ def test_layout_check_format_success() -> None:
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
     ):
         filename = asset_filename("layout_pets.yaml")
-        layout_check_format(filename=filename)
+        layout_check_format(filename=filename, extra_props=True)
         output = mock_stdout.getvalue()
         assert f"No errors found in {filename}\n" == output
 
