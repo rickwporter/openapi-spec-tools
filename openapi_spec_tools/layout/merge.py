@@ -4,7 +4,7 @@ from copy import deepcopy
 from openapi_spec_tools.layout.types import LayoutNode
 
 
-def operations_to_node(node: LayoutNode) -> dict[str, str]:
+def operations_to_node(node: LayoutNode) -> dict[str, LayoutNode]:
     """Create map of operationId to parent LayoutNode."""
     result = {node.identifier: node}
     for child in node.children:
