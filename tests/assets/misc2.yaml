@@ -1,3 +1,7 @@
+tags:
+- name: admin
+  description: Admin interface to delete stuff
+
 paths:
   /something:
     delete:
@@ -32,6 +36,8 @@ paths:
   /something/else:
     delete:
       operationId: deleteSomethingElse
+      tags:
+      - admin
       responses:
         '200':
           content:
@@ -60,3 +66,12 @@ components:
           type: integer
         name:
           type: string
+
+    Foo:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+      required:
+      - name
