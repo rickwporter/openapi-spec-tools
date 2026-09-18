@@ -9,6 +9,7 @@ import yaml
 
 from openapi_spec_tools.cli.layout import TreeFormat
 from openapi_spec_tools.cli.layout import layout_check_format
+from openapi_spec_tools.cli.layout import layout_merge
 from openapi_spec_tools.cli.layout import layout_operations
 from openapi_spec_tools.cli.layout import layout_suggest
 from openapi_spec_tools.cli.layout import layout_tree
@@ -381,3 +382,34 @@ def test_layout_suggest():
     assert 'bugIds:' not in text
     assert '- black-fly' not in text
     assert '- gnat' not in text
+
+
+
+def test_layout_merge():
+    directory = TemporaryDirectory()
+    final_file = Path(directory.name) / "final.yaml"
+    src_file = asset_filename("layout_pets2.yaml")
+    dst_file = asset_filename("layout_pets.yaml")
+
+    # copy hidden and allowed fields, but no columns
+    layout_merge(
+        source_file=src_file,
+        dest_file=dst_file,
+        properties=["hidden_fields", "allowed_fields"],
+        out_file=final_file.as_posix(),
+    )
+
+    text = final_file.read_text(encoding="utf-8", errors="ignore")
+    assert "hiddenFields:" in text
+    assert "- sna" in text
+    assert "- foo" in text
+    assert "- bar" in text
+
+    assert "allowedFields:" in text
+    assert "- red-sox" in text
+    assert "- bruins" in text
+
+    assert "columns:" not in text
+    assert "- east" not in text
+    assert "- south" not in text
+    assert "- north" not in text

@@ -36,6 +36,29 @@ def find_peers(node: LayoutNode, op_id: str) -> list[str]:
     return []
 
 
+def merge_node_properties(properties: list[str], source: LayoutNode, destination: LayoutNode) -> LayoutNode:
+    """Merge the specified properties from the original node (and sub-nodes) into the updated."""
+    # map operations to nodes
+    result = deepcopy(destination)
+    dst_ops = operations_to_node(result)
+    src_ops = operations_to_node(source)
+
+    # iterate across the operations
+    for name, dst_op in dst_ops.items():
+        src_op = src_ops.get(name)
+        if not src_op:
+            continue
+
+        # copy all properties for each node
+        for prop in properties:
+            if hasattr(src_op, prop):
+                setattr(dst_op, prop, getattr(src_op, prop))
+            elif prop in src_op.extra:
+                dst_op.extra[prop] = src_op.extra[prop]
+
+    return result
+
+
 def merge(original: LayoutNode, suggested: LayoutNode) -> LayoutNode:
     """Merge data from suggested into original."""
     updated = deepcopy(original)

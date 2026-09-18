@@ -5,6 +5,7 @@ from typing import Annotated
 
 import typer
 import yaml
+from pydantic import Field
 from rich import print
 from rich import print_json
 from rich.table import Table
@@ -23,6 +24,7 @@ from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import write_layout_tree
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.merge import merge
+from openapi_spec_tools.layout.merge import merge_node_properties
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import DEFAULT_START
 from openapi_spec_tools.layout.utils import check_hardcoded
@@ -240,6 +242,42 @@ def layout_suggest(
 
     write_layout_tree(output_file, node, logger, indent)
     print(f"Wrote {output_file}")
+    return
+
+
+@app.command("merge", short_help="Merge properties between layouts")
+def layout_merge(
+    source_file: Annotated[
+        str,
+        typer.Argument(metavar="SOURCE", show_default=False, help="Source layout file")
+    ],
+    dest_file: Annotated[
+        str,
+        typer.Argument(metavar="DESTINATION", show_default=False, help="Destination layout file")
+    ],
+    properties: Annotated[
+        list[str],
+        typer.Argument(metavar="PROPERTY...", help="List of properties to copy from source to destination"),
+        Field(min_length=1),
+    ],
+    out_file: Annotated[
+        str | None,
+        typer.Option(metavar="OUT", help="Optional output layout file. Will reuse destination if not provided.")
+    ] = None,
+    start: StartPointOption = DEFAULT_START,
+    indent: IndentOption = 4,
+    log_level: LogLevelOption = "info",
+) -> None:
+    """Merge properties from the source file into the destination file."""
+    logger = init_logging(log_level, LOG_CLASS)
+    source_node = layout_tree_with_error_handling(source_file, start=start, logger=logger)
+    dest_node = layout_tree_with_error_handling(dest_file, start=start, logger=logger)
+
+    result = merge_node_properties(properties, source_node, dest_node)
+
+    out_file = out_file or dest_file
+    write_layout_tree(out_file, result, logger, indent)
+    print(f"Wrote {out_file}")
     return
 
 
