@@ -706,6 +706,10 @@ components:
       - $ref: '#/components/schemas/Pet'
       - $ref: '#/components/schemas/MissingItemsModel'
       type: object
+    SingleAnyOf:
+      anyOf:
+      - $ref: '#/components/schemas/Pet'
+      type: object
     DayOfWeek:
       type: string
       enum:
