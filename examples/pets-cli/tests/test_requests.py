@@ -137,6 +137,20 @@ def convert_body(data: Any, content_type: str) -> Any:
             "Complex \\(401\\): code: 303; text: something",
             id="multi-messages",
         ),
+        pytest.param(
+            401,
+            "No details",
+            {},
+            "No details \\(401\\)",
+            id="no-details",
+        ),
+        pytest.param(
+            403,
+            "List details",
+            ["foo"],
+            "List details \\(403\\)",
+            id="list-details",
+        )
     ],
 )
 def test_raise_for_error_errors(status_code, reason, body, expected) -> None:
