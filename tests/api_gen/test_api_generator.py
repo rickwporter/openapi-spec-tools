@@ -24,10 +24,11 @@ from tests.helpers import asset_filename
         pytest.param({SUM: "Short summary. With sentence."}, 10, "  # Short summ...", id="truncated"),
         pytest.param({REQUIRED: True, SUM: "some help"}, 100, "  # some help [required]", id="required"),
         pytest.param({REQUIRED: True, SUM: "Requires some help"}, 100, "  # Requires some help", id="req-desc"),
+        pytest.param({REQUIRED: True, SUM: "End with space "}, 100, "  # End with space [required]", id="req-space"),
         pytest.param({REQUIRED: True}, 100, "  # [required]", id="req-only"),
         pytest.param({REQUIRED: True, X_REF: "RefName"}, 100, "  # see RefName for info [required]", id="req-ref"),
         pytest.param({ENUM: ["a", "t", 0]}, 100, "  # choices: a, t, 0", id="enum"),
-        pytest.param({X_REF: "ShortReferenceName"}, 100, "  # see ShortReferenceName for info", id="ref")
+        pytest.param({X_REF: "ShortReferenceName"}, 100, "  # see ShortReferenceName for info", id="ref"),
     ]
 )
 def test_property_help(prop, max_len, expected):
