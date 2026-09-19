@@ -452,12 +452,12 @@ def test_commit_show_failure() -> None:
     assert FILE_ERROR == mock_stdout.getvalue()
 
 
-HASH_DELTA1 = "dac5b6d..852fb5b"
+HASH_DELTA1 = "dac5b6d..a284627"
 MISC_DIFF1_TABLE = """\
 ┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Commits          ┃ Changes                     ┃
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ dac5b6d..852fb5b │ components:                 │
+│ dac5b6d..a284627 │ components:                 │
 │                  │   schemas:                  │
 │                  │     Pets:                   │
 │                  │       items: removed        │
@@ -465,12 +465,16 @@ MISC_DIFF1_TABLE = """\
 │                  │       properties: added     │
 │                  │       type: array != object │
 │                  │     ShapeShifter: added     │
+│                  │     SingleAnyOf: added      │
 └──────────────────┴─────────────────────────────┘
 """
+MISC_DIFF2_TABLE = MISC_DIFF1_TABLE.replace("a284627", "66902aa").\
+    replace("dac5b6d", "f668cbf").\
+    replace("│                  │     SingleAnyOf: added      │\n", "")
 MISC_DIFF1_JSON = """\
 [
   {
-    "commits": "dac5b6d..852fb5b",
+    "commits": "dac5b6d..a284627",
     "changes": {
       "components": {
         "schemas": {
@@ -480,7 +484,8 @@ MISC_DIFF1_JSON = """\
             "properties": "added",
             "type": "array != object"
           },
-          "ShapeShifter": "added"
+          "ShapeShifter": "added",
+          "SingleAnyOf": "added"
         }
       }
     }
@@ -497,7 +502,8 @@ MISC_DIFF1_YAML = """\
           properties: added
           type: array != object
         ShapeShifter: added
-  commits: dac5b6d..852fb5b
+        SingleAnyOf: added
+  commits: dac5b6d..a284627
 """
 DIFF_NO_CHANGE = """\
 Unable to determine differences.
@@ -528,7 +534,7 @@ Unable to determine differences.
         ),
         pytest.param({
             "oas_file": asset_filename("misc.yaml"), "commit_id": "v0.9.0..v0.11.1"},
-            MISC_DIFF1_TABLE.replace("852fb5b", "66902aa").replace("dac5b6d", "f668cbf"),
+            MISC_DIFF2_TABLE,
             id="tags",
         ),
     ]
