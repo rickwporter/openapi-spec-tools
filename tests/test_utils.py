@@ -417,7 +417,18 @@ def test_remove_schema_tags_no_top() -> None:
                 },
             },
             id="oas31"
-        )
+        ),
+        pytest.param(
+            "misc2.yaml",
+            {
+                OasField.COMPONENTS.value: {
+                    OasField.SCHEMAS.value: {
+                        'Foo': {'required': 'removed'}
+                    },
+                },
+            },
+            id="no-required"
+        ),
     ]
 )
 def test_set_nullable_not_required(filename: str, expected: dict[str, Any]) -> None:
@@ -447,6 +458,17 @@ def test_schema_operations_filter_remove() -> None:
     assert diff == {
         OasField.COMPONENTS.value: {OasField.SCHEMAS: {"Pets": "removed"}},
         OasField.PATHS.value: {"/pets": {"get": "removed"}},
+    }
+
+
+def test_schema_operations_filter_remove_tags() -> None:
+    original = open_test_oas("misc2.yaml")
+    updated = schema_operations_filter(original, remove={"deleteSomethingElse"})
+    diff = find_diffs(original, updated)
+    assert diff == {
+        OasField.COMPONENTS.value: {OasField.SCHEMAS: {"Foo": "removed"}},
+        OasField.PATHS.value: {"/something/else": {"delete": "removed"}},
+        OasField.TAGS.value: "removed",
     }
 
 

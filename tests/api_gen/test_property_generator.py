@@ -36,7 +36,12 @@ from tests.helpers import asset_filename
         pytest.param(
             "/components/schemas/MultipleAnyOf",
             {'anotherValue', 'name', 'tag'},
-            id="any-of",
+            id="mulit-any-of",
+        ),
+        pytest.param(
+            "/components/schemas/SingleAnyOf",
+            {'anotherValue', 'name', 'tag'},
+            id="single-any-of",
         ),
         pytest.param(
             "/components/schemas/ShapeShifter",

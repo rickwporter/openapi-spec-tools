@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 import typer
+import yaml
 
 from openapi_spec_tools.cli.cli_gen import TreeDisplay
 from openapi_spec_tools.cli.cli_gen import generate_check_missing
@@ -165,12 +166,16 @@ def test_cli_generate_success_no_layout():
     pkg_name = "my_cli_pkg"
     directory = TemporaryDirectory()
     base_dir = Path(directory.name)
+    code_dir = base_dir / "other_location"
+    test_dir = base_dir / "where" / "my" / "tests" / "live"
 
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         generate_cli(
             oas_file,
             pkg_name,
-            project_dir=directory.name,
+            code_dir=code_dir.as_posix(),
+            test_dir=test_dir.as_posix(),
+            include_tests=True,
             prefix="/pets"
         )
         text = mock_stdout.getvalue()
@@ -188,9 +193,21 @@ def test_cli_generate_success_no_layout():
         "main.py",
         "tree.yaml",
     }
-    path = base_dir / pkg_name
-    found = {item.name for item in path.iterdir()}
+    found = {item.name for item in code_dir.iterdir()}
     assert filenames == found
+
+    test_files = {
+        '__init__.py',
+        'helpers.py',
+        'test_display.py',
+        'test_exceptions.py',
+        'test_logging.py',
+        'test_main.py',
+        'test_requests.py',
+        'test_tree.py'
+    }
+    found = {item.name for item in test_dir.iterdir()}
+    assert test_files == found
 
 
 @pytest.mark.parametrize(
@@ -411,7 +428,7 @@ def test_show_cli_tree(layout_file, oas_file, start, display, depth, search, exp
         assert expected == result
 
 
-def test_trim_oas():
+def test_trim_oas_changes():
     directory = TemporaryDirectory()
     updated = Path(directory.name) / "trimmed.yaml"
     trim_oas(
@@ -423,6 +440,22 @@ def test_trim_oas():
     expected = Path(asset_filename("ct_trimmed.yaml")).read_text()
     actual = updated.read_text()
     assert expected == actual
+
+
+def test_trim_oas_unchanged():
+    directory = TemporaryDirectory()
+    trimmed_file = Path(directory.name) / "trimmed_pets.yaml"
+    oas_file = asset_filename("pet2.yaml")
+    trim_oas(
+        asset_filename("layout_pets.yaml"),
+        oas_file,
+        updated_file=trimmed_file,
+        nullable_not_required=False,
+        remove_all_tags=False,
+    )
+    original = yaml.safe_load(Path(oas_file).open())
+    trimmed = yaml.safe_load(trimmed_file.open())
+    assert original == trimmed
 
 
 def test_update_layout_none():
