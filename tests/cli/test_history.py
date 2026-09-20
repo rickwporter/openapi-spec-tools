@@ -452,12 +452,12 @@ def test_commit_show_failure() -> None:
     assert FILE_ERROR == mock_stdout.getvalue()
 
 
-HASH_DELTA1 = "dac5b6d..a284627"
+HASH_DELTA1 = "dac5b6d..6fb491e"
 MISC_DIFF1_TABLE = """\
 ┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Commits          ┃ Changes                     ┃
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ dac5b6d..a284627 │ components:                 │
+│ dac5b6d..6fb491e │ components:                 │
 │                  │   schemas:                  │
 │                  │     Pets:                   │
 │                  │       items: removed        │
@@ -468,13 +468,13 @@ MISC_DIFF1_TABLE = """\
 │                  │     SingleAnyOf: added      │
 └──────────────────┴─────────────────────────────┘
 """
-MISC_DIFF2_TABLE = MISC_DIFF1_TABLE.replace("a284627", "66902aa").\
+MISC_DIFF2_TABLE = MISC_DIFF1_TABLE.replace("6fb491e", "66902aa").\
     replace("dac5b6d", "f668cbf").\
     replace("│                  │     SingleAnyOf: added      │\n", "")
 MISC_DIFF1_JSON = """\
 [
   {
-    "commits": "dac5b6d..a284627",
+    "commits": "dac5b6d..6fb491e",
     "changes": {
       "components": {
         "schemas": {
@@ -503,7 +503,7 @@ MISC_DIFF1_YAML = """\
           type: array != object
         ShapeShifter: added
         SingleAnyOf: added
-  commits: dac5b6d..a284627
+  commits: dac5b6d..6fb491e
 """
 DIFF_NO_CHANGE = """\
 Unable to determine differences.
