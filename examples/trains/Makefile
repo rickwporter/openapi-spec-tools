@@ -11,33 +11,33 @@ OPENAPI_SPEC := openapi.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := trains
 
-poetry_run ?= poetry run
+uv_run ?= uv run
 
 ###########
 ##@ General
 default: help
 
 wheel: ## Build the wheel package that is installable
-	poetry build
+	uv build
 
 install: ## Install the package
-	poetry install
+	uv sync
 
 all: install gen lint ## Perform a full cycle
-	$(poetry_run) trains --help
+	$(uv_run) trains --help
 
 ###########
 ##@ CLI generation
 gen: layout-suggest cli-regen
 
 layout-lint:  ## Check the layout file format
-	$(poetry_run) layout check $(LAYOUT_FILE)
+	$(uv_run) layout check $(LAYOUT_FILE)
 
 layout-suggest: ## Create suggested layout file
-	$(poetry_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE)
+	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE)
 
 cli-gen: layout-lint ## Generate CLI code
-	$(poetry_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --no-tests --project-dir $(PROJECT_DIRECTORY)
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --no-tests --project-dir $(PROJECT_DIRECTORY)
 
 cli-clean: ## Delete generated CLI code
 	rm -rf $(PACKAGE_NAME)
@@ -47,8 +47,8 @@ cli-regen: cli-clean cli-gen ## Regenerate CLI code
 ###########
 ##@ Linting
 lint: ## Check code formatting
-	$(poetry_run) ruff check
+	$(uv_run) ruff check
 
 delint: ## Fix formatting issues
-	$(poetry_run) ruff check --fix
+	$(uv_run) ruff check --fix
 

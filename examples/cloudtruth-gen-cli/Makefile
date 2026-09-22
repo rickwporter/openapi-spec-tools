@@ -14,53 +14,53 @@ PACKAGE_NAME := cloudtruth_gen_cli
 PATH_PREFIX := /api/v1
 
 TEST_TARGET ?= tests
-poetry_run ?= poetry run
+uv_run ?= uv run
 
 ###########
 ##@ General
 default: help
 
 wheel: ## Build the wheel package that is installable
-	poetry build
+	uv build
 
 install: ## Install the package
-	poetry install
+	uv sync
 
 all: install gen lint ## Perform a full cycle
-	$(poetry_run) cloudtruth --help
+	$(uv_run) cloudtruth --help
 
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
-	$(poetry_run) layout check $(LAYOUT_FILE)
+	$(uv_run) layout check $(LAYOUT_FILE)
 
 gen: layout-lint suggest update ## Generate CLI code
-	$(poetry_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
-	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
+	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 suggest: ## Use the local code to suggest a layout
-	$(poetry_run) ./layout.py $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix $(PATH_PREFIX)
+	$(uv_run) ./layout.py $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix $(PATH_PREFIX)
 
 update: ## Generates a new layout using the old as a guide
-	$(poetry_run) cli-gen update $(LAYOUT_FILE) $(OPENAPI_SPEC) --new-file $(UPDATED_FILE) --prefix $(PATH_PREFIX) --indent 2
+	$(uv_run) cli-gen update $(LAYOUT_FILE) $(OPENAPI_SPEC) --new-file $(UPDATED_FILE) --prefix $(PATH_PREFIX) --indent 2
 
 ###########
 ##@ Linting
 lint: ## Check code formatting
-	$(poetry_run) ruff check
+	$(uv_run) ruff check
 
 delint: ## Fix formatting issues
-	$(poetry_run) ruff check --fix
+	$(uv_run) ruff check --fix
 
 
 ###########
 ##@ Test
 test: ## Run unit tests
-	$(poetry_run) pytest -v $(TEST_TARGET)
+	$(uv_run) pytest -v $(TEST_TARGET)
 
 cov: ## Run unit tests with code coverage measurments
-	$(poetry_run) coverage run -m pytest -v $(TEST_TARGET)
-	$(poetry_run) coverage report -m
-	$(poetry_run) coverage html
+	$(uv_run) coverage run -m pytest -v $(TEST_TARGET)
+	$(uv_run) coverage report -m
+	$(uv_run) coverage html

@@ -51,7 +51,7 @@ The `commands` sub-command allows you to see all the commands beneath the curren
 
 ## Development
 
-This project is managed with Poetry. It is used to generate and update the `pyproject.toml` and `poetry.lock`.
+This project is managed with uv. It is used to generate and update the `pyproject.toml` and `uv.lock`.
 
 The `Makefile` is used to provide a means of running several different tools. It provides help for developers, so they do NOT need to recall the most useful commands.
 

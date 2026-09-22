@@ -1,32 +1,51 @@
-[tool.poetry]
+[project]
 name = "cloudtruth-gen-cli"
 version = "0.1.0"
 description = "Generated CLI for CloudTruth's service."
-authors = ["Rick Porter <rickwporter@gmail.com>"]
+authors = [{ name = "Rick Porter", email = "rickwporter@gmail.com" }]
+requires-python = ">=3.10,<4"
 readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "typer>=0.24.2,<0.25",
+    "rich>=14.3.3,<15",
+    "requests>=2.33.1,<3",
+    "pyyaml>=6.0.3,<7",
+    "rich-objects>=0.2.3,<0.3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-typer = "^0.24.2"
-rich = "^14.3.3"
-requests = "^2.33.1"
-pyyaml = "^6.0.3"
-rich-objects = "^0.2.3"
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.15.6"
-pytest = "^9.0.2"
-black = "^26.3.1"
-coverage = "^7.13.4"
-openapi-spec-tools = {path = "../..", develop = true}
-
-[tool.poetry.scripts]
+[project.scripts]
 # this adds the main CLI function to allow calling directly from a shell
 cloudtruth = "cloudtruth_gen_cli.main:app"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.6,<0.16",
+    "pytest>=9.0.2,<10",
+    "black>=26.3.1,<27",
+    "coverage>=7.13.4,<8",
+    "openapi-spec-tools",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.sources]
+openapi-spec-tools = { path = "../..", editable = true }
+
+[tool.uv.build-backend]
+module-root = ""
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10.0"]
+build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 150

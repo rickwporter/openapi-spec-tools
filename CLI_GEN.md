@@ -14,21 +14,22 @@ The sections below walks through a "widget" service. The `examples/pets-cli` is 
 
 ### Creating virtual environment
 
-Poetry is the tool that is being used in this project, but you can use almost any virtual environment.
+uv is the tool that is being used in this project, but you can use almost any virtual environment.
 
 Here are the steps used for creating a CLI:
 ```terminal
-# creates the main project
-poetry new widgets
+# creates the main project, including src/widgets and a script entry
+uv init --package widgets
+cd widgets
 
 # adds the runtime dependencies
-poetry add typer rich requests
+uv add typer rich requests
 
 # add the development tools
-poetry add --group dev ruff pytest black coverage openapi-spec-tools
+uv add --group dev ruff pytest black coverage openapi-spec-tools
 ```
 
-Add an entry to `tools.poetry.scripts` that installs a script to directly run the CLI program.
+`uv init --package` adds a `[project.scripts]` entry. After generation, point that script at the generated module, for example `widgets.main:app`.
 
 Add the `tools.ruff*` sections to help check formatting.
 
@@ -70,10 +71,10 @@ More details are provided in [LAYOUT.md](LAYOUT.md).
 
 The CLI generation tools are installed as `cli-gen`. The command to generate the CLI code looks like:
 ```terminal
-cli-gen generate layout.yaml openapi.yaml widgets .
+cli-gen generate openapi.yaml widgets --layout-file layout.yaml --code-dir src/widgets --test-dir tests
 ```
 
-This puts all the generated code into `widgets/`, and test code into `tests/`.
+This puts all the generated code into `src/widgets/`, and test code into `tests/`.
 
 The generation tool overwites existing files with new content, so it is expected that you will need to run this many times to get a complete CLI for your service. However, it does NOT delete previously generated files, so just be aware that you will need to manually delete files associated with an old sub-command.
 

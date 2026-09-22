@@ -9,18 +9,18 @@ Sections below outline how this project was setup.
 ### Setup Python project
 
 ```shell
-poetry init --name cloudtruth-api
+uv init --name cloudtruth-api
 ```
 
-This prompted for relevant information that gets added to the `pyproject.toml`. The dependencies were not done interactively, but were done as described here.
+This creates a `pyproject.toml`. The dependencies were not done interactively, but were done as described here.
 
-Add dependencies (e.g. `poetry add`) for the following that are needed at runtime:
+Add dependencies (e.g. `uv add`) for the following that are needed at runtime:
 * typer
 * rich
 * requests
 * pyyaml
 
-Add development dependencies (e.g. `poetry add --group dev`) for the following:
+Add development dependencies (e.g. `uv add --group dev`) for the following:
 * ruff
 * black
 * openapi-spec-tools
@@ -41,7 +41,7 @@ It captures the commands and arguments that avoid the need to remember for diffe
 The scope was limited to avoid repetition that did not show differences in the generated APIs. Generally, you would want to generate the code for all API interfaces, so you would not need to generate the layout file and choose a start point.
 
 1. Copy the OpenAPI spec (`ct.yaml`) into place.
-2. Generate the suggested layout file (e.g. `poetry run layout suggest ct.yaml layout.yaml --prefix /api/v1`)
+2. Generate the suggested layout file (e.g. `uv run layout suggest ct.yaml layout.yaml --prefix /api/v1`)
 3. Generate the code using `make regen`
 
 In this project, all three body types are put into the same Python package. This does result in some duplicate infrastructure, but keeps things modular.
