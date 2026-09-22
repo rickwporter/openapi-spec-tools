@@ -8,17 +8,17 @@ help: ## This message
 OPENAPI_SPEC := pet.yaml
 PACKAGE_NAME := pets_api
 
-poetry_run ?= poetry run
+uv_run ?= uv run
 
 ###########
 ##@ General
 default: help
 
 wheel: ## Build the wheel package that is installable
-	poetry build
+	uv build
 
 install: ## Install the package
-	poetry install
+	uv sync
 
 all: install gen lint ## Perform a full cycle
 
@@ -28,7 +28,7 @@ gen: api-regen ## Regenerate API code
 api-regen: rm-gen api-gen ## Regenerate the API code
 
 api-gen: ## Generate ALI code
-	$(poetry_run) api-gen $(OPENAPI_SPEC) $(PACKAGE_NAME)
+	$(uv_run) api-gen $(OPENAPI_SPEC) $(PACKAGE_NAME)
 
 rm-gen: ## Remove generated code
 	rm -rf $(PACKAGE_NAME)
@@ -36,7 +36,7 @@ rm-gen: ## Remove generated code
 ###########
 ##@ Linting
 lint: ## Check code formatting
-	$(poetry_run) ruff check
+	$(uv_run) ruff check
 
 delint: ## Fix formatting issues
-	$(poetry_run) ruff check --fix
+	$(uv_run) ruff check --fix

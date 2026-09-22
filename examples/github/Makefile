@@ -12,7 +12,7 @@ TRIMMED_SPEC := trimmed.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := github_gen_cli
 
-poetry_run ?= poetry run
+uv_run ?= uv run
 
 
 ###########
@@ -20,32 +20,32 @@ poetry_run ?= poetry run
 default: help
 
 wheel: ## Build the wheel package that is installable
-	poetry build
+	uv build
 
 install: ## Install the package
-	poetry install
+	uv sync
 
 all: install gen lint ## Perform a full cycle
-	$(poetry_run) gh-cli --help
+	$(uv_run) gh-cli --help
 
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
-	$(poetry_run) layout check $(LAYOUT_FILE)
+	$(uv_run) layout check $(LAYOUT_FILE)
 
 trim: ## Creates the skinny OpenAPI spec
-	$(poetry_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC) --remove examples
+	$(uv_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC) --remove examples
 
 gen: layout-lint trim ## Generate CLI code
-	$(poetry_run) cli-gen generate $(TRIMMED_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	$(uv_run) cli-gen generate $(TRIMMED_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
-	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
+	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 ###########
 ##@ Linting
 lint: ## Check code formatting
-	$(poetry_run) ruff check
+	$(uv_run) ruff check
 
 delint: ## Fix formatting issues
-	$(poetry_run) ruff check --fix
+	$(uv_run) ruff check --fix

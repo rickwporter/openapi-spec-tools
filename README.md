@@ -7,7 +7,7 @@ This is a collection of tools for using OpenAPI specifications. The OpenAPI comm
 The project has been published to PyPi, so you should be able to install it with something like one of the following (depending on how you do Python package management):
 ```terminal
 % pip install openapi-spec-tools
-% poetry add openapi-spec-tools
+% uv add openapi-spec-tools
 ```
 
 Generally, there are two intended ways to utilize this package:

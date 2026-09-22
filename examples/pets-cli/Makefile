@@ -12,36 +12,36 @@ PROJECT_DIRECTORY := .
 PACKAGE_NAME := pets_cli
 
 TEST_TARGET ?= tests
-poetry_run ?= poetry run
+uv_run ?= uv run
 
 ###########
 ##@ General
 default: help
 
 wheel: ## Build the wheel package that is installable
-	poetry build
+	uv build
 
 install: ## Install the package
-	poetry install
+	uv sync
 
 all: install gen lint cov ## Perform a full cycle
-	$(poetry_run) pets --help
+	$(uv_run) pets --help
 
 ###########
 ##@ CLI generation
 gen: layout-suggest cli-regen
 
 layout-lint:  ## Check the layout file format
-	$(poetry_run) layout check $(LAYOUT_FILE)
+	$(uv_run) layout check $(LAYOUT_FILE)
 
 layout-suggest: ## Create suggested layout file
-	$(poetry_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
+	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
 
 cli-gen: layout-lint ## Generate CLI code
-	$(poetry_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY)
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY)
 
 missing: ## Print the OAS operations not in the layout
-	$(poetry_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
+	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 cli-clean: ## Delete generated CLI code
 	rm -rf $(PACKAGE_NAME) tests/
@@ -51,18 +51,18 @@ cli-regen: cli-clean cli-gen ## Regenerate CLI code
 ###########
 ##@ Linting
 lint: ## Check code formatting
-	$(poetry_run) ruff check
+	$(uv_run) ruff check
 
 delint: ## Fix formatting issues
-	$(poetry_run) ruff check --fix
+	$(uv_run) ruff check --fix
 
 
 ###########
 ##@ Test
 test: ## Run unit tests
-	$(poetry_run) pytest -v $(TEST_TARGET)
+	$(uv_run) pytest -v $(TEST_TARGET)
 
 cov: ## Run unit tests with code coverage measurments
-	$(poetry_run) coverage run -m pytest -v $(TEST_TARGET)
-	$(poetry_run) coverage report -m
-	$(poetry_run) coverage html
+	$(uv_run) coverage run -m pytest -v $(TEST_TARGET)
+	$(uv_run) coverage report -m
+	$(uv_run) coverage html

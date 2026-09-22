@@ -6,7 +6,7 @@ help: ## This message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 TEST_TARGET ?= tests
-poetry_run ?= poetry run
+uv_run ?= uv run
 EXAMPLE_DIRS := examples/cloudtruth-api
 EXAMPLE_DIRS += examples/cloudtruth-gen-cli
 EXAMPLE_DIRS += examples/figma
@@ -30,21 +30,21 @@ clean: ## Remove build/test artifacts
 	rm -rf `find . -name htmlcov`
 	rm -rf `find . -name dist`
 
-poetry-update: ## Update poetry in top-level, and then all examples (part of release)
-	poetry update
+uv-update: ## Update uv lockfiles in top-level, and then all examples (part of release)
+	uv sync --upgrade
 	@for dname in $(EXAMPLE_DIRS); do \
-		echo "Entering $${dname}" && cd $${dname} && poetry update && cd - > /dev/null || exit 1; \
+		echo "Entering $${dname}" && cd $${dname} && uv sync --upgrade && cd - > /dev/null || exit 1; \
 	done
 
 ###########
 ##@ Build
 build: wheel
 wheel: ## Build the wheel file
-	poetry build
+	uv build
 
 prereq: install
 install: ## Install package(s) and development tools
-	poetry install --with dev
+	uv sync
 
 uncommitted: ## Check for uncommitted changes
 	make -f uncommitted.mk check
@@ -52,23 +52,23 @@ uncommitted: ## Check for uncommitted changes
 ###########
 ##@ Lint
 lint: ## Check code formatting
-	$(poetry_run) ruff check
+	$(uv_run) ruff check
 
 delint: ## Fix formatting issues
-	$(poetry_run) ruff check --fix
+	$(uv_run) ruff check --fix
 
 toml-check: ## Check the project/sub-projects are using the same Python package versions
-	$(poetry_run) tools/toml.py check .
+	$(uv_run) tools/toml.py check .
 
 ###########
 ##@ Test
 test: ## Run unit tests (use TEST_TARGET to scope)
-	$(poetry_run) pytest -v $(TEST_TARGET)
+	$(uv_run) pytest -v $(TEST_TARGET)
 
 cov: ## Run unit tests with code coverage measurments (use TEST_TARGET to scope)
-	$(poetry_run) coverage run --branch -m pytest -v $(TEST_TARGET)
-	$(poetry_run) coverage report -m
-	$(poetry_run) coverage html
+	$(uv_run) coverage run --branch -m pytest -v $(TEST_TARGET)
+	$(uv_run) coverage report -m
+	$(uv_run) coverage html
 
 ###########
 ##@ Examples

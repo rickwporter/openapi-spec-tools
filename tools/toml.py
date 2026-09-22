@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """CLI utilities for managing dependencies in sub-projects."""
+import re
 import subprocess
 from pathlib import Path
 from typing import Annotated
@@ -8,22 +9,39 @@ from typing import Any
 import tomlkit
 import typer
 
-app = typer.Typer(no_args_is_help=True, help="Utilities for managing Poetry dependencies in projects.")
+app = typer.Typer(no_args_is_help=True, help="Utilities for managing uv dependencies in projects.")
+
+REQUIREMENT_RE = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)\s*(.*)$")
 
 NL = "\n"
 INDENT = "  "
 DirectoryArgument = Annotated[str | None, typer.Argument(help="Directory to search for TOML files.")]
 
 
-def parse_project_dependencies(items: list[str]) -> dict[str, Any]:
-    """Parse the project dependencies."""
+def requirement_name_and_spec(item: str) -> tuple[str, str]:
+    """Split a PEP 508 requirement into a package name and version specifier."""
+    requirement = item.split(";", maxsplit=1)[0].strip()
+    match = REQUIREMENT_RE.match(requirement)
+    if not match:
+        return requirement, ""
+
+    spec = match.group(2).strip()
+    if spec.startswith("(") and spec.endswith(")"):
+        spec = spec[1:-1].strip()
+    return match.group(1), spec
+
+
+def parse_requirement_list(items: list[Any] | None, sources: dict[str, Any]) -> dict[str, str]:
+    """Parse a list of PEP 508 requirements into package name/specifier pairs."""
     result = {}
-    for item in items:
-        name, value = item.split(' ', maxsplit=1)
-        value = value.replace('(', '').replace(')', '')
-        if value.startswith('>=') and ',<' in value:
-            value = value.split(',<', maxsplit=1)[0].replace('>=', '^')
-        result[name] = value
+    for item in items or []:
+        if not isinstance(item, str):
+            continue
+        name, spec = requirement_name_and_spec(item)
+        source = sources.get(name, {})
+        if isinstance(source, dict) and source.get("path"):
+            spec = f"path={source['path']}"
+        result[name] = spec
 
     return result
 
@@ -38,15 +56,11 @@ def parse_dependencies(start_path: Path) -> tuple[dict[str, Any], dict[str, Any]
             project = tomlkit.load(fp)
 
         name = str(fname.relative_to(start_path))
-
-        tools = project.get("tool", {}).get("poetry", {})
-        rd = (
-            tools.get("dependencies", {}) or
-            parse_project_dependencies(project.get('project', {}).get('dependencies', []))
-        )
-        dd = tools.get("group", {}).get("dev", {}).get("dependencies", {})
-        run_deps[name] = rd
-        dev_deps[name] = dd
+        sources = project.get("tool", {}).get("uv", {}).get("sources", {})
+        project_table = project.get("project", {})
+        groups = project.get("dependency-groups", {})
+        run_deps[name] = parse_requirement_list(project_table.get("dependencies", []), sources)
+        dev_deps[name] = parse_requirement_list(groups.get("dev", []), sources)
 
     return (run_deps, dev_deps)
 
@@ -153,25 +167,33 @@ def show(
 def installed_updates(
     toml: dict[str, Any],
     updates: dict[str, str],
-    group: str | None = None,
-) -> dict[Path, list[str]]:
+) -> dict[str, list[str]]:
     """Create a list of filenames to package updates."""
     result = {}
     for filename, installed in toml.items():
-        items = []
-        for name, package in updates.items():
-            if name in installed:
-                if group:
-                    items.extend(["--group", group])
-                items.append(package)
+        items = [package for name, package in updates.items() if name in installed]
         if items:
             result[filename] = items
 
     return result
 
 
+def uv_add(directory: Path, items: list[str], group: str | None = None) -> None:
+    """Run `uv add` for the packages in one dependency group."""
+    if not items:
+        return
+
+    args = ["uv", "add"]
+    if group:
+        args.extend(["--group", group])
+    args.extend(items)
+    print("*" * 50)
+    print(f"Updating {directory} via '{' '.join(args)}'")
+    subprocess.call(args, cwd=directory.as_posix())
+
+
 @app.command("update", short_help="Update the specified dependencies")
-def poetry_update(
+def update_dependencies(
     directory: DirectoryArgument = None,
     packages: Annotated[
         list[str] | None,
@@ -184,7 +206,7 @@ def poetry_update(
     group: Annotated[str | None, typer.Option(show_default=False, help="Group (if forced)")] = None,
     force: Annotated[bool, typer.Option(help="Whether to force adding packages")] = False,
 ):
-    """Perform 'poetry add' with each specified package/version.
+    """Perform 'uv add' with each specified package/version.
 
     Does NOT add dependencies unless they already exist, or given the --force flag.
     """
@@ -197,30 +219,25 @@ def poetry_update(
     path =  Path(directory) if directory else Path.cwd()
     run_deps, dev_deps = parse_dependencies(path)
 
-    commands = installed_updates(run_deps, updates)
-    dev_updates = installed_updates(dev_deps, updates, "dev")
-    for filename, dev_items in dev_updates.items():
-        items = commands.get(filename, [])
-        items.extend(dev_items)
-        commands[filename] = items
+    run_commands = installed_updates(run_deps, updates)
+    dev_commands = installed_updates(dev_deps, updates)
 
     if force:
         # when forcing, add items not added by other means
         for filename in run_deps.keys():
-            items = commands.get(filename, [])
+            target = dev_commands if group == "dev" else run_commands
+            items = target.get(filename, [])
+            already = set(run_commands.get(filename, [])) | set(dev_commands.get(filename, []))
             for update in updates.values():
-                if update not in items:
-                    if group:
-                        items.extend(["--group", group])
+                if update not in already:
                     items.append(update)
-            commands[filename] = items
+            target[filename] = items
 
-    for filename, items in commands.items():
-        directory = Path(filename).parent
-        args = ["poetry", "add"] + items
-        print("*" * 50)
-        print(f"Updating {directory} via '{' '.join(args)}'")
-        subprocess.call(args, cwd=directory.as_posix())
+    filenames = set(run_commands) | set(dev_commands)
+    for filename in sorted(filenames):
+        project_dir = Path(filename).parent
+        uv_add(project_dir, run_commands.get(filename, []))
+        uv_add(project_dir, dev_commands.get(filename, []), group="dev")
 
     typer.echo("Done")
 

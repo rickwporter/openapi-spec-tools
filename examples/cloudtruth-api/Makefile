@@ -18,24 +18,24 @@ OPAQUE_DIR := cloudtruth_api/opaque
 
 BASE_API_ARGS := --layout-file $(LAYOUT_FILE) --start $(LAYOUT_START) --prefix $(PATH_PREFIX)
 
-poetry_run ?= poetry run
+uv_run ?= uv run
 
 ###########
 ##@ General
 default: help
 
 wheel: ## Build the wheel package that is installable
-	poetry build
+	uv build
 
 install: ## Install the package
-	poetry install
+	uv sync
 
 all: install regen lint ## Perform a full cycle
 
 ###########
 ##@ Code generation
 layout: ## Generate the layout file
-	$(poetry_run) layout suggest $(OPENAPI_SPEC) $(LAYOUT_FILE) --prefix $(PATH_PREFIX)
+	$(uv_run) layout suggest $(OPENAPI_SPEC) $(LAYOUT_FILE) --prefix $(PATH_PREFIX)
 
 gen: layout regen ## Generate all API code
 regen: flat-regen prop-regen opaque-regen ## Reenerate all API code
@@ -47,7 +47,7 @@ flat-rm: ## Remove generated flat API
 	rm -rf $(FLAT_DIR)
 
 flat-gen: ## Generate flat API (completely unrolled properties)
-	$(poetry_run) api-gen $(OPENAPI_SPEC) $(FLAT_PKG_NAME) $(BASE_API_ARGS) --body-type flat --code-dir $(FLAT_DIR)
+	$(uv_run) api-gen $(OPENAPI_SPEC) $(FLAT_PKG_NAME) $(BASE_API_ARGS) --body-type flat --code-dir $(FLAT_DIR)
 
 prop-regen: prop-rm prop-gen ## Regenerate API with property level arguments
 
@@ -55,7 +55,7 @@ prop-rm: ## Remove generated property API
 	rm -rf $(PROP_DIR)
 
 prop-gen: ## Generate property API (first level properties visible)
-	$(poetry_run) api-gen $(OPENAPI_SPEC) $(PROP_PKG_NAME) $(BASE_API_ARGS) --body-type property --code-dir $(PROP_DIR)
+	$(uv_run) api-gen $(OPENAPI_SPEC) $(PROP_PKG_NAME) $(BASE_API_ARGS) --body-type property --code-dir $(PROP_DIR)
 
 opaque-regen: opaque-rm opaque-gen ## Regenerate API with opaque bodies
 
@@ -63,13 +63,13 @@ opaque-rm: ## Remove generated opaque API
 	rm -rf $(OPAQUE_DIR)
 
 opaque-gen: ## Generate opaque API (body blobs)
-	$(poetry_run) api-gen $(OPENAPI_SPEC) $(OPAQUE_PKG_NAME) $(BASE_API_ARGS) --body-type opaque --code-dir $(OPAQUE_DIR)
+	$(uv_run) api-gen $(OPENAPI_SPEC) $(OPAQUE_PKG_NAME) $(BASE_API_ARGS) --body-type opaque --code-dir $(OPAQUE_DIR)
 
 
 ###########
 ##@ Linting
 lint: ## Check code formatting
-	$(poetry_run) ruff check
+	$(uv_run) ruff check
 
 delint: ## Fix formatting issues
-	$(poetry_run) ruff check --fix
+	$(uv_run) ruff check --fix

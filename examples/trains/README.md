@@ -8,7 +8,7 @@ Here are some notes about how this project came to the current state.
 
 ### Setting up Python project
 
-Install poetry and create the project.
+Install uv and create the project.
 
 ### Creating the layout
 
