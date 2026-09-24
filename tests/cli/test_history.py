@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 from unittest import mock
 
+import git
 import pytest
 import typer
 
@@ -23,6 +24,12 @@ from tests.helpers import asset_filename
 START = datetime(2025, 1, 1, tzinfo=timezone.utc)
 END = datetime(2026, 3, 1, tzinfo=timezone.utc)
 FILE_ERROR = "ERROR: Unable to find file\n"
+
+
+def _current_branch() -> str:
+    """Retrieve the current git branch name."""
+    repo = git.Repo(search_parent_directories=True)
+    return repo.active_branch.name
 
 
 @pytest.mark.parametrize(
@@ -538,7 +545,7 @@ Unable to determine differences.
             id="tags",
         ),
         pytest.param(
-            {"oas_file": asset_filename("misc.yaml"), "commit_id": "main"},
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": _current_branch()},
             DIFF_NO_CHANGE,
             id="branch",
         ),
