@@ -517,25 +517,30 @@ Unable to determine differences.
             MISC_DIFF1_JSON,
             id="json",
         ),
-        pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "commit_id": HASH_DELTA1, "out_fmt": "yaml"},
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": HASH_DELTA1, "out_fmt": "yaml"},
             MISC_DIFF1_YAML,
             id="yaml",
         ),
-        pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d..dac5b6d"},
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d..dac5b6d"},
             DIFF_NO_CHANGE,
             id="no-change",
         ),
-        pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d"},
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d"},
             MISC_DIFF1_TABLE,
             id="no-end",
         ),
-        pytest.param({
-            "oas_file": asset_filename("misc.yaml"), "commit_id": "v0.9.0..v0.11.1"},
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": "v0.9.0..v0.11.1"},
             MISC_DIFF2_TABLE,
             id="tags",
+        ),
+        pytest.param(
+            {"oas_file": asset_filename("misc.yaml"), "commit_id": "main"},
+            DIFF_NO_CHANGE,
+            id="branch",
         ),
     ]
 )
