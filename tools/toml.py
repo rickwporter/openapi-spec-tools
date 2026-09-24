@@ -199,8 +199,8 @@ def update_dependencies(
         list[str] | None,
         typer.Option(
             "--package",
-            metavar="<package>[==<version>]",
-            help="List of dependencies to udpate",
+            metavar="<package>[<specifier>]",
+            help="Dependencies to update, with an optional version specifier such as >=1.2 or <2",
         ),
     ] = None,
     group: Annotated[str | None, typer.Option(show_default=False, help="Group (if forced)")] = None,
@@ -214,7 +214,7 @@ def update_dependencies(
         typer.echo("No updates provided")
         raise typer.Exit(1)
 
-    updates = {p.split('=')[0]: p for p in packages}
+    updates = {requirement_name_and_spec(p)[0]: p for p in packages}
 
     path =  Path(directory) if directory else Path.cwd()
     run_deps, dev_deps = parse_dependencies(path)
