@@ -93,7 +93,7 @@ OutputStyleOption = Annotated[
 PackageNameArgument = Annotated[str, typer.Argument(metavar="PACKAGE", show_default=False, help="Base package name")]
 PathPrefixOption = Annotated[
     str,
-    typer.Option(metavar="PREFIX", show_default=False, help="Prefix to ignore when using path"),
+    typer.Option("--prefix", metavar="PREFIX", show_default=False, help="Prefix to ignore when using path"),
 ]
 StartPointOption = Annotated[str, typer.Option("--start", metavar="START", help="Start point for CLI in layout file")]
 UpdatedOpenApiFilenameOption = Annotated[

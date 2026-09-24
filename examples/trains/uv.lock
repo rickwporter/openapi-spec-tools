@@ -246,6 +246,15 @@ wheels = [
 ]
 
 [[package]]
+name = "colorama"
+version = "0.4.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93a6792e2acffb9d9d5cb0a5cfd8802644b7b1c9a02e4/colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44", size = 27697, upload-time = "2022-10-25T02:36:22.414Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6", size = 25335, upload-time = "2022-10-25T02:36:20.889Z" },
+]
+
+[[package]]
 name = "gitdb"
 version = "4.0.12"
 source = { registry = "https://pypi.org/simple" }
@@ -328,9 +337,9 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.13.3,<3" },
     { name = "pyyaml", specifier = ">=6.0.3,<7" },
     { name = "requests", specifier = ">=2.33.1,<3" },
-    { name = "rich", specifier = ">=14.3.3,<15" },
-    { name = "rich-objects", specifier = ">=0.2.3,<0.3" },
-    { name = "typer", specifier = ">=0.24.2,<0.25" },
+    { name = "rich", specifier = ">=15.0.0,<16" },
+    { name = "rich-objects", specifier = ">=0.3.0" },
+    { name = "typer", specifier = ">=0.27.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -629,28 +638,28 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "14.3.4"
+version = "15.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/67/cae617f1351490c25a4b8ac3b8b63a4dda609295d8222bad12242dfdc629/rich-14.3.4.tar.gz", hash = "sha256:817e02727f2b25b40ef56f5aa2217f400c8489f79ca8f46ea2b70dd5e14558a9", size = 230524, upload-time = "2026-04-11T02:57:45.419Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/76/6d163cfac87b632216f71879e6b2cf17163f773ff59c00b5ff4900a80fa3/rich-14.3.4-py3-none-any.whl", hash = "sha256:07e7adb4690f68864777b1450859253bed81a99a31ac321ac1817b2313558952", size = 310480, upload-time = "2026-04-11T02:57:47.484Z" },
+    { url = "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb", size = 310654, upload-time = "2026-04-12T08:24:02.83Z" },
 ]
 
 [[package]]
 name = "rich-objects"
-version = "0.2.3"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyyaml" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d5/a3/14e0fa4b916ad112a16f326a7643262959f3640d5b5f04f6c5debc1cb3c7/rich_objects-0.2.3.tar.gz", hash = "sha256:43fe329e96d1630e0012b0274400e039d41043aeb166b62a839eab5d0af6759b", size = 7658, upload-time = "2026-02-20T20:21:07.785Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4e/ab/1bf2c2de651c65f08844189d4b5a64de6cfa9b37c3b63e41e994d8227499/rich_objects-0.3.0.tar.gz", hash = "sha256:558ac2f55ed8aeb4577271d69efa79b206d2666bde6150fc8921d000b3b0dad3", size = 44419, upload-time = "2026-09-22T10:35:21.712Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/60/405385913f35b28880871516ee3b180c91b2aa6e40e0b7b2366e9f13eae5/rich_objects-0.2.3-py3-none-any.whl", hash = "sha256:669418c61d5dd96de42f60954cdd61a85ddcbbc6dfd56f35d1ebc360d09cd138", size = 9444, upload-time = "2026-02-20T20:21:06.701Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/8d/460c74b222611d83499b2840216a0676bf51d6000cc28c4b9524be02edc7/rich_objects-0.3.0-py3-none-any.whl", hash = "sha256:d784ffec1652a7b8bc0b80493a76be428c89e56979965fffc705d2d2301a9109", size = 9763, upload-time = "2026-09-22T10:35:20.382Z" },
 ]
 
 [[package]]
@@ -773,9 +782,9 @@ dev = [
 requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.3,<7" },
     { name = "requests", specifier = ">=2.33.1,<3" },
-    { name = "rich", specifier = ">=14.3.3,<15" },
-    { name = "rich-objects", specifier = ">=0.2.3,<0.3" },
-    { name = "typer", specifier = ">=0.24.2,<0.25" },
+    { name = "rich", specifier = ">=15.0.0,<16" },
+    { name = "rich-objects", specifier = ">=0.3.0" },
+    { name = "typer", specifier = ">=0.27.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -787,17 +796,17 @@ dev = [
 
 [[package]]
 name = "typer"
-version = "0.24.2"
+version = "0.27.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
-    { name = "click" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "rich" },
     { name = "shellingham" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/83/b8/9ebb531b6c2d377af08ac6746a5df3425b21853a5d2260876919b58a2a4a/typer-0.24.2.tar.gz", hash = "sha256:ec070dcfca1408e85ee203c6365001e818c3b7fffe686fd07ff2d68095ca0480", size = 119849, upload-time = "2026-04-22T17:45:34.413Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/f7/57713ba479fd405eb76de31404b2c744c289e336b2d999511ebf51e496f7/typer-0.27.2.tar.gz", hash = "sha256:269b7eb9d3c202ca84b4bc9618cb04ebb43d3d4d1e567e4c768607232c05f945", size = 204045, upload-time = "2026-08-28T10:26:55.046Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/39/d1/9484b497e0a0410b901c12b8251c3e746e1e863f7d28419ffe06f7892fda/typer-0.24.2-py3-none-any.whl", hash = "sha256:b618bc3d721f9a8d30f3e05565be26416d06e9bcc29d49bc491dc26aba674fa8", size = 55977, upload-time = "2026-04-22T17:45:33.055Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/bf/205d0004930ede8f542fb58f601526fccf4ae7626075ca1e6c4de5d3d652/typer-0.27.2-py3-none-any.whl", hash = "sha256:b3a5fc4342d5fc8fda8fc3010b1cf117e9249aab7fae800c2eff62fd3842d97d", size = 123130, upload-time = "2026-08-28T10:26:53.752Z" },
 ]
 
 [[package]]
