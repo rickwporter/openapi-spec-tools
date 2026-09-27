@@ -238,8 +238,9 @@ def test_copy_infrastructure():
     tempdir = TemporaryDirectory()
     dst_path = Path(tempdir.name)
     package = "another.package"
+    copyright = "# another copyright"
 
-    copy_infrastructure(dst_path.as_posix(), package)
+    copy_infrastructure(dst_path.as_posix(), package, copyright)
 
     filenames = {i.name for i in dst_path.iterdir()}
     expected = {
@@ -257,8 +258,9 @@ def test_copy_tests():
     tempdir = TemporaryDirectory()
     dst_path = Path(tempdir.name)
     package = "my.package"
+    copyright = "# Party like it's 1999."
 
-    copy_tests(dst_path.as_posix(), package, "foo")
+    copy_tests(dst_path.as_posix(), package, "foo", copyright)
 
     filenames = {i.name for i in dst_path.iterdir()}
     expected = {
@@ -279,10 +281,12 @@ def test_copy_tests_long_path():
     dst_path = Path(tempdir.name) / "tests" / "foo" / "bar"
     dst_path.mkdir(parents=True)
     package = "my.package"
+    copyright = "# Happy 250th America"
 
-    copy_tests(dst_path.as_posix(), package, "foo")
+    copy_tests(dst_path.as_posix(), package, "foo", copyright)
 
     # spot check the package name updates
     dst_file = dst_path / "test_tree.py"
     text = dst_file.read_text(encoding="utf-8", errors="ignore")
+    assert copyright in text
     assert 'from tests.foo.bar.helpers import to_ascii' in text

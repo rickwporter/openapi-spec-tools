@@ -105,7 +105,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
         assert filenames == expected
 
 
-def test_cli_generate_success_copyright(copyright_fixture):
+def test_cli_generate_success_copyright():
     layout_file = asset_filename("layout_pets.yaml")
     oas_file = asset_filename("pet2.yaml")
 

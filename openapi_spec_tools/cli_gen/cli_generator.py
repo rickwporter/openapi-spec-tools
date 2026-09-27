@@ -1,5 +1,6 @@
 """Declares the Generator class that is used for most of the CLi generation capability."""
 import logging
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -27,9 +28,15 @@ class CliGenerator(BaseGenerator):
     overridden by consumers.
     """
 
-    def __init__(self, package_name: str, oas: dict[str, Any], logger: logging.Logger | None = None):
+    def __init__(
+        self,
+        package_name: str,
+        oas: dict[str, Any],
+        logger: logging.Logger | None = None,
+        copyright: str | Path | None = None,
+    ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
-        super().__init__(oas=oas, logger=logger)
+        super().__init__(oas=oas, logger=logger, copyright=copyright)
         self.package_name = package_name
 
     def standard_imports(self) -> str:

@@ -5,7 +5,6 @@ from pathlib import Path
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.base_gen._logging import get_logger
 from openapi_spec_tools.base_gen.files import copy_and_update
-from openapi_spec_tools.base_gen.files import copyright
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.layout.types import LayoutNode
@@ -27,7 +26,7 @@ def generate_api_node(generator: ApiGenerator, node: LayoutNode, directory: str)
     if node.operations():
         module_name = to_snake_case(node.identifier)
         logger.info(f"Generating {module_name} module")
-        text = copyright()
+        text = generator.copyright
         text += generator.standard_imports()
         for command in node.operations():
             text += generator.function_definition(command)
@@ -41,7 +40,7 @@ def generate_api_node(generator: ApiGenerator, node: LayoutNode, directory: str)
         generate_api_node(generator, command, directory)
 
 
-def copy_api_infrastructure(dst_dir: str, package_name: str):
+def copy_api_infrastructure(dst_dir: str, package_name: str, copyright: str):
     """Iterate over the INFRASTRUCTURE_FILES, and copies from local to dst."""
     dpath = Path(dst_dir)
     replacements = {
@@ -51,4 +50,4 @@ def copy_api_infrastructure(dst_dir: str, package_name: str):
     }
     for src, dst in INFRASTRUCTURE_FILES.items():
         dfile = dpath / dst
-        copy_and_update(src.as_posix(), dfile.as_posix(), replacements)
+        copy_and_update(src.as_posix(), dfile.as_posix(), replacements, copyright)

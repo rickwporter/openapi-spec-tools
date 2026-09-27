@@ -53,7 +53,6 @@ def test_api_generate_success_directory(code_dir, expected_dir, temp_working_dir
     assert filenames == expected
 
 
-@pytest.mark.usefixtures("copyright_fixture")
 def test_api_generate_success_copyright():
     oas_file = asset_filename("pet2.yaml")
 

@@ -1,7 +1,10 @@
 from copy import deepcopy
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
+from openapi_spec_tools.base_gen.base_generator import DEFAULT_COPYRIGHT
 from openapi_spec_tools.base_gen.base_generator import BaseGenerator
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
@@ -23,6 +26,25 @@ DEF = "default"
 
 S1 = '\n    '
 S2 = f"{S1}    "
+
+
+def test_copyright_text():
+    assert DEFAULT_COPYRIGHT == BaseGenerator({}).copyright
+
+    text = "# this is my copyright\n"
+    assert text == BaseGenerator({}, copyright=text).copyright
+
+    missing = "/no/such/copyright.txt"
+    assert missing == BaseGenerator({}, copyright=missing).copyright
+
+    message = "# file copyright\n"
+    with TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "copyright.txt"
+        path.write_text(message, encoding="utf-8")
+        assert message == BaseGenerator({}, copyright=path.as_posix()).copyright
+        assert message == BaseGenerator({}, copyright=path).copyright
+
+        assert DEFAULT_COPYRIGHT == BaseGenerator({}, copyright={"type": "error"}).copyright
 
 
 @pytest.mark.parametrize(

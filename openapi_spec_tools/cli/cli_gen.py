@@ -2,7 +2,6 @@
 """Implementation of the CLI generation CLI."""
 import os
 from copy import deepcopy
-from pathlib import Path
 from typing import Annotated
 from typing import Any
 
@@ -10,7 +9,6 @@ import typer
 import yaml
 from rich_objects import console_factory
 
-from openapi_spec_tools.base_gen.files import set_copyright
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
 from openapi_spec_tools.cli.arguments import CopyrightFileOption
 from openapi_spec_tools.cli.arguments import IndentOption
@@ -117,10 +115,6 @@ def generate_cli(
             )
             raise typer.Exit(1)
 
-    if copyright_file:
-        text = Path(copyright_file).read_text()
-        set_copyright(text)
-
     oas = open_oas_with_error_handling(openapi_file, logger)
     if layout_file:
         commands = layout_tree_with_error_handling(layout_file, start, logger)
@@ -134,6 +128,8 @@ def generate_cli(
         commands = layout_gen.generate(prefix)
         typer.echo("Generated layout -- equivalent can be saved using 'layout suggest'.")
 
+    generator = CliGenerator(package_name, oas, logger, copyright=copyright_file)
+
     os.makedirs(code_dir, exist_ok=True)
 
     # create the init file
@@ -143,9 +139,8 @@ def generate_cli(
         pass
 
     # copy over the basic infrastructure
-    copy_infrastructure(code_dir, package_name)
+    copy_infrastructure(code_dir, package_name, generator.copyright)
 
-    generator = CliGenerator(package_name, oas, logger)
     generate_node(generator, commands, code_dir)
 
     # create the tree
@@ -153,7 +148,7 @@ def generate_cli(
 
     if include_tests:
         os.makedirs(test_dir, exist_ok=True)
-        copy_tests(test_dir, package_name, start)
+        copy_tests(test_dir, package_name, start, generator.copyright)
 
     typer.echo("Generated files")
 
