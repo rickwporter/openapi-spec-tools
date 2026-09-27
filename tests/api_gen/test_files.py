@@ -83,8 +83,9 @@ def test_copy_api_infrastructure():
     tempdir = TemporaryDirectory()
     dst_path = Path(tempdir.name)
     package = "another.package"
+    copyright = "# this is a copyright"
 
-    copy_api_infrastructure(dst_path.as_posix(), package)
+    copy_api_infrastructure(dst_path.as_posix(), package, copyright)
 
     filenames = {i.name for i in dst_path.iterdir()}
     expected = {
@@ -98,4 +99,5 @@ def test_copy_api_infrastructure():
     for fname in filenames:
         file = dst_path / fname
         text = file.read_text()
+        assert copyright in text
         assert "from openapi_spec_tools" not in text

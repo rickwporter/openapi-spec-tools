@@ -5,7 +5,6 @@ from typing import Any
 
 from openapi_spec_tools.base_gen._logging import get_logger
 from openapi_spec_tools.base_gen.files import copy_and_update
-from openapi_spec_tools.base_gen.files import copyright
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen._tree import TreeNode
@@ -49,7 +48,7 @@ def generate_node(generator: CliGenerator, node: LayoutNode, directory: str) -> 
     module_name = to_snake_case(node.identifier)
     logger.info(f"Generating {module_name} module")
     text = generator.shebang()
-    text += copyright()
+    text += generator.copyright
     text += generator.standard_imports()
     text += generator.subcommand_imports(node)
     text += generator.app_definition(node)
@@ -100,7 +99,7 @@ def generate_tree_file(generator: CliGenerator, node: LayoutNode, directory: str
     """Create the YAML file."""
     filename = os.path.join(directory, "tree.yaml")
     with open(filename, "w", encoding="utf-8", newline="\n") as fp:
-        fp.write(copyright())
+        fp.write(generator.copyright)
         fp.write(generator.get_tree_yaml(node))
 
 
@@ -149,7 +148,7 @@ def find_unreferenced(node: LayoutNode, oas: dict[str, Any]) -> dict[str, Any]:
     return unreferenced
 
 
-def copy_infrastructure(dst_dir: str, package_name: str):
+def copy_infrastructure(dst_dir: str, package_name: str, copyright: str):
     """Iterate over the INFRASTRUCTURE_FILES, and copies from local to dst."""
     dpath = Path(dst_dir)
     replacements = {
@@ -158,10 +157,15 @@ def copy_infrastructure(dst_dir: str, package_name: str):
     }
     for src, dst in INFRASTRUCTURE_FILES.items():
         dfile = dpath / dst
-        copy_and_update(src.as_posix(), dfile.as_posix(), replacements)
+        copy_and_update(src.as_posix(), dfile.as_posix(), replacements, copyright)
 
 
-def copy_tests(dst_dir: str, package_name: str, main_module: str):
+def copy_tests(
+    dst_dir: str,
+    package_name: str,
+    main_module: str,
+    copyright: str,
+):
     """Iterate over the TEST_FILES, and copies from local to dst."""
     dpath = Path(dst_dir)
     test_package = "tests"
@@ -178,4 +182,4 @@ def copy_tests(dst_dir: str, package_name: str, main_module: str):
     }
     for src, dst in TEST_FILES.items():
         dfile = dpath / dst
-        copy_and_update(src.as_posix(), dfile.as_posix(), replacements)
+        copy_and_update(src.as_posix(), dfile.as_posix(), replacements, copyright)
