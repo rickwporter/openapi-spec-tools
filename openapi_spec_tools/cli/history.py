@@ -132,10 +132,10 @@ def _get_commit(
         if commit_id == tag.name:
             return tag.commit
 
-    for branch in repo.branches:
+    for branch in repo.branches:  # pragma: no cover
+        # unfortunatley, testing in CI pipeline in headless state complicates covering this too much
         if commit_id == branch.name:
-            # unfortunatley, testing in CI pipeline complicates covering this too much
-            return branch.commit  # pragma: no cover
+            return branch.commit
 
 
     for commit in repo.iter_commits(paths=oas_file):
