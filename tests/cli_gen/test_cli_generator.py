@@ -187,7 +187,7 @@ def test_op_query_arguments():
     )
     assert (
         'list_enum_def_list: Annotated[list[ListEnumDefList] | None, typer.Option(case_sensitive=False)] '
-        "= ['1', '8']"
+        '= ["1", "8"]'
         in text
     )
     assert (
@@ -335,7 +335,7 @@ def test_pagination_creation(names, expected) -> None:
         pytest.param({"foo": False}, 'foo = False', id="False"),
         pytest.param({"sna": None}, 'sna = None', id="None"),
         pytest.param({"node": []}, 'node = []', id="list-empty"),
-        pytest.param({"node": ['value1', 'item2']}, "node = ['value1', 'item2']", id="list-str"),
+        pytest.param({"node": ['value1', 'item2']}, 'node = ["value1", "item2"]', id="list-str"),
     ],
 )
 def test_hardcoded(hardcoded: dict[str, Any], expected: str) -> None:

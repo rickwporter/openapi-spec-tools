@@ -140,7 +140,7 @@ def test_op_query_arguments():
     assert 'addr_zip_code: str = None,' in text
     assert 'favorite_day: FavoriteDay | None = None,' in text
     assert 'crazy_enum: CrazyEnum | None = "1.0",' in text
-    assert 'list_enum_def_list: list[ListEnumDefList] | None = [\'1\', \'8\'],' in text
+    assert 'list_enum_def_list: list[ListEnumDefList] | None = ["1", "8"],' in text
     assert 'list_int_enum: list[ListIntEnum] | None = [7],' in text
 
     # make sure path params not included
