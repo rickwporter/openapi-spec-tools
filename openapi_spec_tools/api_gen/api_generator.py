@@ -5,6 +5,7 @@ for various. The abstract function allows the files.py to maintain the same inte
 """
 from abc import ABC
 from abc import abstractmethod
+from pathlib import Path
 from typing import Any
 
 from openapi_spec_tools.base_gen.base_generator import BaseGenerator
@@ -34,8 +35,7 @@ class ApiGenerator(BaseGenerator, ABC):
 
     def __init__(
         self,
-        package_name: str,
-        oas: dict[str, Any],
+        *args,
         env_host: str = DEFAULT_VAR_HOST,
         env_key: str = DEFAULT_VAR_KEY,
         env_timeout: str = DEFAULT_VAR_TIMEOUT,
@@ -45,13 +45,33 @@ class ApiGenerator(BaseGenerator, ABC):
         **kwargs,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
-        super().__init__(package_name, oas, **kwargs)
+        super().__init__(*args, **kwargs)
         self.env_host = env_host
         self.env_key = env_key
         self.env_timeout = env_timeout
         self.env_log_level = env_log_level
         self.default_log = default_log_level
         self.default_timeout = default_timeout
+
+    @staticmethod
+    def default_infra_files() -> dict[Path, str]:
+        """Default files to copy from source."""
+        api_gen = Path(__file__).parent
+        base_gen = Path(__file__).parent.parent / "base_gen"
+        return {
+            base_gen / "_logging.py": "_logging.py",
+            base_gen / "_requests.py": "_requests.py",
+            api_gen / "_environment.py": "_environment.py",
+        }
+
+    @staticmethod
+    def default_infra_replacements(package_name: str) -> dict[str, str]:
+        """Default infrastruct line replacements."""
+        return {
+            __package__: package_name,
+            "openapi_spec_tools.api_gen": package_name,
+            "openapi_spec_tools.base_gen": package_name,
+        }
 
     def property_help(self, prop: dict[str, Any]) -> str:
         """Get the short help string for the specified property."""

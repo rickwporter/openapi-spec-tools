@@ -6,8 +6,6 @@ import pytest
 
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.files import check_for_missing
-from openapi_spec_tools.cli_gen.files import copy_infrastructure
-from openapi_spec_tools.cli_gen.files import copy_tests
 from openapi_spec_tools.cli_gen.files import find_unreferenced
 from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_node
@@ -232,61 +230,3 @@ def test_find_unreferenced(layout_file, oas_file, expected_keys):
     oas = open_oas(asset_filename(oas_file))
     unreferenced = find_unreferenced(tree, oas)
     assert set(expected_keys) == unreferenced.keys()
-
-
-def test_copy_infrastructure():
-    tempdir = TemporaryDirectory()
-    dst_path = Path(tempdir.name)
-    package = "another.package"
-    copyright = "# another copyright"
-
-    copy_infrastructure(dst_path.as_posix(), package, copyright)
-
-    filenames = {i.name for i in dst_path.iterdir()}
-    expected = {
-        "_arguments.py",
-        "_display.py",
-        "_exceptions.py",
-        "_logging.py",
-        "_requests.py",
-        "_tree.py",
-    }
-    assert filenames == expected
-
-
-def test_copy_tests():
-    tempdir = TemporaryDirectory()
-    dst_path = Path(tempdir.name)
-    package = "my.package"
-    copyright = "# Party like it's 1999."
-
-    copy_tests(dst_path.as_posix(), package, "foo", copyright)
-
-    filenames = {i.name for i in dst_path.iterdir()}
-    expected = {
-        "__init__.py",
-        "helpers.py",
-        "test_display.py",
-        "test_exceptions.py",
-        "test_logging.py",
-        "test_main.py",
-        "test_requests.py",
-        "test_tree.py",
-    }
-    assert filenames == expected
-
-
-def test_copy_tests_long_path():
-    tempdir = TemporaryDirectory()
-    dst_path = Path(tempdir.name) / "tests" / "foo" / "bar"
-    dst_path.mkdir(parents=True)
-    package = "my.package"
-    copyright = "# Happy 250th America"
-
-    copy_tests(dst_path.as_posix(), package, "foo", copyright)
-
-    # spot check the package name updates
-    dst_file = dst_path / "test_tree.py"
-    text = dst_file.read_text(encoding="utf-8", errors="ignore")
-    assert copyright in text
-    assert 'from tests.foo.bar.helpers import to_ascii' in text

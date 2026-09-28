@@ -2,7 +2,6 @@ from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from openapi_spec_tools.api_gen.files import copy_api_infrastructure
 from openapi_spec_tools.api_gen.files import generate_api_node
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.utils import open_oas
@@ -77,27 +76,3 @@ def test_generate_api_node_multiple():
 
         for v in expected:
             assert v in text
-
-
-def test_copy_api_infrastructure():
-    tempdir = TemporaryDirectory()
-    dst_path = Path(tempdir.name)
-    package = "another.package"
-    copyright = "# this is a copyright"
-
-    copy_api_infrastructure(dst_path.as_posix(), package, copyright)
-
-    filenames = {i.name for i in dst_path.iterdir()}
-    expected = {
-        "_environment.py",
-        "_logging.py",
-        "_requests.py",
-    }
-    assert filenames == expected
-
-    # make sure all the imports have been updated
-    for fname in filenames:
-        file = dst_path / fname
-        text = file.read_text()
-        assert copyright in text
-        assert "from openapi_spec_tools" not in text
