@@ -45,8 +45,7 @@ class ApiGenerator(BaseGenerator, ABC):
         **kwargs,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
-        super().__init__(oas, **kwargs)
-        self.package_name = package_name
+        super().__init__(package_name, oas, **kwargs)
         self.env_host = env_host
         self.env_key = env_key
         self.env_timeout = env_timeout

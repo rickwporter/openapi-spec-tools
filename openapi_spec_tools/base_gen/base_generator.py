@@ -78,6 +78,7 @@ class BaseGenerator:
 
     def __init__(
         self,
+        package_name: str,
         oas: dict[str, Any],
         logger: logging.Logger | None = None,
         supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
@@ -92,6 +93,7 @@ class BaseGenerator:
         Otherwise the provided value is used as the copyright text. The default header is used
         when copyright is omitted.
         """
+        self.package_name = package_name
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
         self.default_host = ""
