@@ -1,4 +1,5 @@
 """Declares the Generator class that is used for most of the CLi generation capability."""
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -25,6 +26,58 @@ class CliGenerator(BaseGenerator):
     is driven by an outside actor. This was done in an object-oriented fashion so pieces can be
     overridden by consumers.
     """
+
+    @staticmethod
+    def default_infra_files() -> dict[Path, str]:
+        """Default infrastructure files to be copied."""
+        base_gen =  Path(__file__).parent.parent / "base_gen"
+        cli_gen = Path(__file__).parent
+        return {
+            base_gen / "_logging.py": "_logging.py",
+            base_gen / "_requests.py": "_requests.py",
+            cli_gen / "_arguments.py": "_arguments.py",
+            cli_gen / "_display.py": "_display.py",
+            cli_gen / "_exceptions.py": "_exceptions.py",
+            cli_gen / "_tree.py": "_tree.py",
+        }
+
+    @staticmethod
+    def default_infra_replacements(package_name: str) -> dict[str, str]:
+        """Default infrastructure line replacements."""
+        return {
+            "openapi_spec_tools.base_gen": package_name,
+            __package__: package_name,
+        }
+
+    @staticmethod
+    def default_test_files() -> dict[Path, str]:
+        """Default test files to be copied."""
+        test_gen = Path(__file__).parent.parent.parent / "tests"
+        base_test = test_gen / "base_gen"
+        cli_test = test_gen / "cli_gen"
+        return {
+            base_test / "test_logging.py": "test_logging.py",
+            base_test / "test_requests.py": "test_requests.py",
+            cli_test / "__init__.py": "__init__.py",
+            cli_test / "helpers.py": "helpers.py",
+            cli_test / "test_display.py": "test_display.py",
+            cli_test / "test_exceptions.py": "test_exceptions.py",
+            cli_test / "test_main.py": "test_main.py",
+            cli_test / "test_tree.py": "test_tree.py",
+        }
+
+    @staticmethod
+    def default_test_replacements(package_name: str) -> dict[str, str]:
+        """Default test file line replacements."""
+        test_package = "tests"
+        return {
+            "tests.cli_gen": test_package,
+            "tests.base_gen": test_package,
+            "tests.assets.arg_test": f"{package_name}.main",
+            "openapi_spec_tools.base_gen": package_name,
+            "openapi_spec_tools.cli_gen": package_name,
+            __package__: package_name,
+        }
 
     def standard_imports(self) -> str:
         """Get the standard imports for all CLI modules."""

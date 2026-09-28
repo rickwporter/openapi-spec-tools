@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any
 
 from openapi_spec_tools.base_gen._logging import get_logger
-from openapi_spec_tools.base_gen.files import copy_and_update
 from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen._tree import TreeNode
@@ -15,17 +14,6 @@ from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 
 # Maps the source to destination (currently all the same).
-BASE_GEN = Path(__file__).parent.parent / "base_gen"
-CLI_GEN = Path(__file__).parent
-INFRASTRUCTURE_FILES = {
-    BASE_GEN / "_logging.py": "_logging.py",
-    BASE_GEN / "_requests.py": "_requests.py",
-    CLI_GEN / "_arguments.py": "_arguments.py",
-    CLI_GEN / "_display.py": "_display.py",
-    CLI_GEN / "_exceptions.py": "_exceptions.py",
-    CLI_GEN / "_tree.py": "_tree.py",
-}
-
 TEST_DIR = Path(__file__).parent.parent.parent / "tests"
 BASE_TEST = TEST_DIR / "base_gen"
 CLI_TEST = TEST_DIR / "cli_gen"
@@ -146,40 +134,3 @@ def find_unreferenced(node: LayoutNode, oas: dict[str, Any]) -> dict[str, Any]:
     }
 
     return unreferenced
-
-
-def copy_infrastructure(dst_dir: str, package_name: str, copyright: str):
-    """Iterate over the INFRASTRUCTURE_FILES, and copies from local to dst."""
-    dpath = Path(dst_dir)
-    replacements = {
-        __package__: package_name,
-        "openapi_spec_tools.base_gen": package_name,
-    }
-    for src, dst in INFRASTRUCTURE_FILES.items():
-        dfile = dpath / dst
-        copy_and_update(src.as_posix(), dfile.as_posix(), replacements, copyright)
-
-
-def copy_tests(
-    dst_dir: str,
-    package_name: str,
-    main_module: str,
-    copyright: str,
-):
-    """Iterate over the TEST_FILES, and copies from local to dst."""
-    dpath = Path(dst_dir)
-    test_package = "tests"
-    parts = dpath.as_posix().split("tests/", 1)
-    if len(parts) > 1:
-        test_package += '.' + parts[1].replace('/', '.').rstrip('.')
-
-    replacements = {
-        "from tests.assets.arg_test": f"from {package_name}.{main_module}",  # needed for test_main.py
-        __package__: package_name,
-        "openapi_spec_tools.base_gen": package_name,
-        "tests.cli_gen": test_package,
-        "tests.base_gen": test_package,
-    }
-    for src, dst in TEST_FILES.items():
-        dfile = dpath / dst
-        copy_and_update(src.as_posix(), dfile.as_posix(), replacements, copyright)

@@ -11,6 +11,7 @@ from openapi_spec_tools.base_gen.constants import COLLECTIONS
 from openapi_spec_tools.base_gen.constants import NL
 from openapi_spec_tools.base_gen.constants import SEP1
 from openapi_spec_tools.base_gen.constants import SEP2
+from openapi_spec_tools.base_gen.files import copy_and_update
 from openapi_spec_tools.base_gen.utils import maybe_quoted
 from openapi_spec_tools.base_gen.utils import prepend
 from openapi_spec_tools.base_gen.utils import quoted
@@ -86,6 +87,10 @@ class BaseGenerator:
         reserved: set[str] = DEFAULT_RESERVED,
         conflict_suffix: str = DEFAULT_CONFLICT_SUFFIX,
         copyright: str | Path | None = None,
+        infra_files: dict[Path, str] | None = None,
+        infra_replacements: dict[str, str] | None = None,
+        test_files: dict[Path, str] | None = None,
+        test_replacements: dict[str, str] | None = None,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules.
 
@@ -108,6 +113,46 @@ class BaseGenerator:
         self.reserved = reserved
         self.conflict_suffix = conflict_suffix
         self.copyright = self._resolve_copyright(copyright)
+        self.infra_files = (
+            infra_files
+            if infra_files is not None
+            else self.default_infra_files()
+        )
+        self.infra_replacements = (
+            infra_replacements
+            if infra_replacements is not None
+            else self.default_infra_replacements(package_name)
+        )
+        self.test_files = (
+            test_files
+            if test_files is not None
+            else self.default_test_files()
+        )
+        self.test_replacements = (
+            test_replacements
+            if test_replacements is not None
+            else self.default_test_replacements(package_name)
+        )
+
+    @staticmethod
+    def default_infra_files() -> dict[Path, str]:
+        """Default map of infrastructure files to copy."""
+        return {}
+
+    @staticmethod
+    def default_infra_replacements(package_name: str) -> dict[str, str]:
+        """Default map of infrastructure file line replacements."""
+        return {}
+
+    @staticmethod
+    def default_test_files() -> dict[Path, str]:
+        """Default map of test files to copy."""
+        return {}
+
+    @staticmethod
+    def default_test_replacements(package_name: str) -> dict[str, str]:
+        """Default map of test file line replacements."""
+        return {}
 
     @staticmethod
     def _resolve_copyright(copyright: str | Path | None) -> str:
@@ -978,4 +1023,18 @@ class BaseGenerator:
             declarations.append(self.enum_declaration(e_name, e_type, e_values))
 
         return NL + NL.join(declarations)
+
+    def copy_infrastructure_files(self, dst_dir: str) -> None:
+        """Iterate over the infra_files and copy from local to dst."""
+        dpath = Path(dst_dir)
+        for src, dst in self.infra_files.items():
+            dfile = dpath / dst
+            copy_and_update(src.as_posix(), dfile.as_posix(), self.infra_replacements, self.copyright)
+
+    def copy_test_files(self, dst_dir: str) -> None:
+        """Iterate over the test_files and copy from local to dst."""
+        dpath = Path(dst_dir)
+        for src, dst in self.test_files.items():
+            dfile = dpath / dst
+            copy_and_update(src.as_posix(), dfile.as_posix(), self.test_replacements, self.copyright)
 
