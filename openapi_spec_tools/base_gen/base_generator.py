@@ -1038,3 +1038,10 @@ class BaseGenerator:
             dfile = dpath / dst
             copy_and_update(src.as_posix(), dfile.as_posix(), self.test_replacements, self.copyright)
 
+    def add_init_file(self, dst_dir: str, content: str = "", overwrite: bool = False) -> None:
+        """Add __init__.py according to parameters."""
+        dfile = Path(dst_dir) / "__init__.py"
+        if not overwrite and dfile.exists():
+            return
+
+        dfile.write_text(content, encoding="utf-8", newline="\n")

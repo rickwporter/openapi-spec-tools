@@ -1395,3 +1395,23 @@ def test_model_settable_properties(model_name, expected):
     assert expected == properties
 
 
+def test_add_init_file() -> None:
+    uut = BaseGenerator(PKG, {})
+
+    with TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "__init__.py"
+        assert not path.exists()
+
+        uut.add_init_file(temp_dir)
+        assert path.exists()
+        assert "" == path.read_text()
+
+        text = "sna\r\nfoo\r\nbar\r\n"
+
+        # do not overwrite unless told to do so
+        uut.add_init_file(temp_dir, text)
+        assert "" == path.read_text()
+
+        uut.add_init_file(temp_dir, text, True)
+        expected = text.replace("\r\n", "\n")  # replace line endings
+        assert expected == path.read_text()

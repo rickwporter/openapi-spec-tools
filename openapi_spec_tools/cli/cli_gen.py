@@ -130,13 +130,8 @@ def generate_cli(
 
     os.makedirs(code_dir, exist_ok=True)
 
-    # create the init file
-    init_file = os.path.join(code_dir, '__init__.py')
-    with open(init_file, "w", encoding="utf-8", newline="\n"):
-        # do not bother writing anything to init file
-        pass
-
     # copy over the basic infrastructure
+    generator.add_init_file(code_dir)
     generator.copy_infrastructure_files(code_dir)
 
     generate_node(generator, commands, code_dir)
@@ -146,6 +141,7 @@ def generate_cli(
 
     if include_tests:
         os.makedirs(test_dir, exist_ok=True)
+        generator.add_init_file(test_dir)
         generator.copy_test_files(test_dir)
 
     typer.echo("Generated files")
