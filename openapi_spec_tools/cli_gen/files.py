@@ -1,5 +1,4 @@
 """Implementation for creating/copying CLI files."""
-from pathlib import Path
 from typing import Any
 
 from openapi_spec_tools.cli_gen._tree import TreeField
@@ -8,21 +7,6 @@ from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
-
-# Maps the source to destination (currently all the same).
-TEST_DIR = Path(__file__).parent.parent.parent / "tests"
-BASE_TEST = TEST_DIR / "base_gen"
-CLI_TEST = TEST_DIR / "cli_gen"
-TEST_FILES = {
-    BASE_TEST / "test_logging.py": "test_logging.py",
-    BASE_TEST / "test_requests.py": "test_requests.py",
-    CLI_TEST / "__init__.py": "__init__.py",
-    CLI_TEST / "helpers.py": "helpers.py",
-    CLI_TEST / "test_display.py": "test_display.py",
-    CLI_TEST / "test_exceptions.py": "test_exceptions.py",
-    CLI_TEST / "test_main.py": "test_main.py",
-    CLI_TEST / "test_tree.py": "test_tree.py",
-}
 
 
 def generate_tree_node(generator: CliGenerator, node: LayoutNode) -> TreeNode:
