@@ -38,10 +38,10 @@ class ApiGenerator(BaseGenerator, ABC):
     def __init__(
         self,
         *args,
-        env_host: str = DEFAULT_VAR_HOST,
-        env_key: str = DEFAULT_VAR_KEY,
-        env_timeout: str = DEFAULT_VAR_TIMEOUT,
-        env_log_level: str = DEFAULT_VAR_LOG_LEVEL,
+        env_host: str | list[str] = DEFAULT_VAR_HOST,
+        env_key: str | list[str] = DEFAULT_VAR_KEY,
+        env_timeout: str | list[str] = DEFAULT_VAR_TIMEOUT,
+        env_log_level: str | list[str] = DEFAULT_VAR_LOG_LEVEL,
         default_log_level: str = DEFAULT_VALUE_LOG_LEVEL,
         default_timeout: int = DEFAULT_VALUE_TIMEOUT,
         **kwargs,
@@ -125,12 +125,12 @@ from {self.package_name} import _requests as _r  # noqa: F401
     def init_infra_args(self, operation: dict[str, Any]) -> str:
         """Provide initialization of standard arguments inside body."""
         host_default = (
-            f'_e.env_string({quoted(self.env_host)}, '
+            f'_e.env_string({maybe_quoted(self.env_host)}, '
             f'default={quoted(self.default_host)}, except_missing=True)'
         )
-        key_default = f'_e.env_string({quoted(self.env_key)}, except_missing=True)'
-        timeout_default = f'_e.env_int({quoted(self.env_timeout)}, default={self.default_timeout})'
-        log_default = f'_e.env_string({quoted(self.env_log_level)}, default={quoted(self.default_log)})'
+        key_default = f'_e.env_string({maybe_quoted(self.env_key)}, except_missing=True)'
+        timeout_default = f'_e.env_int({maybe_quoted(self.env_timeout)}, default={self.default_timeout})'
+        log_default = f'_e.env_string({maybe_quoted(self.env_log_level)}, default={quoted(self.default_log)})'
         lines = [
             f'_api_host = _api_host or {host_default}',
             f'_api_key = _api_key or {key_default}',

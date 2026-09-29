@@ -28,6 +28,10 @@ def maybe_quoted(item: Any) -> str:
     """Add leading/trailing quotes to an item of type string, otherwise just convert item to a string."""
     if isinstance(item, str):
         return quoted(item)
+    if isinstance(item, list):
+        if len(item) == 1:
+            return maybe_quoted(item[0])
+        return "[" + ", ".join(maybe_quoted(i) for i in item) + "]"
 
     return str(item)
 
