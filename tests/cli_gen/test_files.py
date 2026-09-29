@@ -7,7 +7,6 @@ import pytest
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.files import check_for_missing
 from openapi_spec_tools.cli_gen.files import find_unreferenced
-from openapi_spec_tools.cli_gen.files import generate_node
 from openapi_spec_tools.cli_gen.files import generate_tree_node
 from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.utils import open_oas
@@ -20,7 +19,7 @@ def test_generate_node_single():
     tree = file_to_tree(asset_filename("layout_pets.yaml"))
     directory = TemporaryDirectory()
     generator = CliGenerator(pkg_name, oas)
-    generate_node(generator, tree, directory.name)
+    generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)
     file = path / "main.py"
@@ -62,7 +61,7 @@ def test_generate_node_multiple():
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     directory = TemporaryDirectory()
     generator = CliGenerator(pkg_name, oas)
-    generate_node(generator, tree, directory.name)
+    generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)
     expectations = {
@@ -122,7 +121,7 @@ def test_generate_node_skip_bugged():
     node = tree.find("pet", "delete")
     node.bugs = ["123", "456"]
 
-    generate_node(generator, tree, directory.name)
+    generator.generate_files(tree, directory.name)
 
     # test differences from above
     path = Path(directory.name)

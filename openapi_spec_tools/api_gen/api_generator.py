@@ -1,8 +1,9 @@
 """Declares the abstract ApiGenerator base class that is the basis for API generation.
 
-This functionality that is useful for all API generators, and forces addition of function_definition()
-for various. The abstract function allows the files.py to maintain the same interface.
+Shared API generation behavior lives here. Subclasses implement function_definition(), which
+generate_files() uses when writing modules.
 """
+import os
 from abc import ABC
 from abc import abstractmethod
 from pathlib import Path
@@ -14,6 +15,7 @@ from openapi_spec_tools.base_gen.constants import SEP1
 from openapi_spec_tools.base_gen.utils import maybe_quoted
 from openapi_spec_tools.base_gen.utils import quoted
 from openapi_spec_tools.base_gen.utils import simple_escape
+from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 
@@ -210,3 +212,20 @@ from {self.package_name} import _requests as _r  # noqa: F401
     def function_definition(self, command: LayoutNode) -> str:
         """Provide function definition for specified command."""
         pass  # pragma: no cover
+
+    def generate_files(self, node: LayoutNode, directory: str) -> None:
+        """Create a module for the current node, and recursively generate sub-commands."""
+        if node.operations():
+            module_name = to_snake_case(node.identifier)
+            self.logger.info(f"Generating {module_name} module")
+            text = self.copyright
+            text += self.standard_imports()
+            for command in node.operations():
+                text += self.function_definition(command)
+
+            filename = os.path.join(directory, module_name + ".py")
+            with open(filename, "w", encoding="utf-8", newline="\n") as fp:
+                fp.write(text)
+
+        for command in node.subcommands():
+            self.generate_files(command, directory)
