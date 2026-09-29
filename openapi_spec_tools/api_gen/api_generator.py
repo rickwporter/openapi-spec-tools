@@ -55,8 +55,7 @@ class ApiGenerator(BaseGenerator, ABC):
         self.default_log = default_log_level
         self.default_timeout = default_timeout
 
-    @staticmethod
-    def default_infra_files() -> dict[Path, str]:
+    def default_infra_files(self) -> dict[Path, str]:
         """Default files to copy from source."""
         api_gen = Path(__file__).parent
         base_gen = Path(__file__).parent.parent / "base_gen"
@@ -66,13 +65,12 @@ class ApiGenerator(BaseGenerator, ABC):
             api_gen / "_environment.py": "_environment.py",
         }
 
-    @staticmethod
-    def default_infra_replacements(package_name: str) -> dict[str, str]:
-        """Default infrastruct line replacements."""
+    def default_infra_replacements(self) -> dict[str, str]:
+        """Default infrastructure line replacements."""
         return {
-            __package__: package_name,
-            "openapi_spec_tools.api_gen": package_name,
-            "openapi_spec_tools.base_gen": package_name,
+            "openapi_spec_tools.api_gen": self.package_name,
+            "openapi_spec_tools.base_gen": self.package_name,
+            __package__: self.package_name,
         }
 
     def property_help(self, prop: dict[str, Any]) -> str:
