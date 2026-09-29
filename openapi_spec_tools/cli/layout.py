@@ -22,20 +22,20 @@ from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import write_layout_tree
-from openapi_spec_tools.layout.layout_generator import LayoutGenerator
-from openapi_spec_tools.layout.merge import merge
-from openapi_spec_tools.layout.merge import merge_node_properties
-from openapi_spec_tools.layout.types import LayoutNode
-from openapi_spec_tools.layout.utils import DEFAULT_START
-from openapi_spec_tools.layout.utils import check_hardcoded
-from openapi_spec_tools.layout.utils import check_pagination_definitions
-from openapi_spec_tools.layout.utils import file_to_tree
-from openapi_spec_tools.layout.utils import operation_duplicates
-from openapi_spec_tools.layout.utils import operation_order
-from openapi_spec_tools.layout.utils import subcommand_extra_properties
-from openapi_spec_tools.layout.utils import subcommand_missing_properties
-from openapi_spec_tools.layout.utils import subcommand_order
-from openapi_spec_tools.layout.utils import subcommand_references
+from openapi_spec_tools.layout import DEFAULT_START
+from openapi_spec_tools.layout import LayoutGenerator
+from openapi_spec_tools.layout import LayoutNode
+from openapi_spec_tools.layout import check_hardcoded
+from openapi_spec_tools.layout import check_pagination_definitions
+from openapi_spec_tools.layout import file_to_tree
+from openapi_spec_tools.layout import merge
+from openapi_spec_tools.layout import merge_node_properties
+from openapi_spec_tools.layout import operation_duplicates
+from openapi_spec_tools.layout import operation_order
+from openapi_spec_tools.layout import subcommand_extra_properties
+from openapi_spec_tools.layout import subcommand_missing_properties
+from openapi_spec_tools.layout import subcommand_order
+from openapi_spec_tools.layout import subcommand_references
 
 SEP = "\n    "
 LOG_CLASS = "layout"

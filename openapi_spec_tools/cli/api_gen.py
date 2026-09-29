@@ -6,9 +6,9 @@ from typing import Annotated
 
 import typer
 
-from openapi_spec_tools.api_gen.flat_generator import FlatApiGenerator
-from openapi_spec_tools.api_gen.opaque_generator import OpaqueApiGenerator
-from openapi_spec_tools.api_gen.property_generator import PropertyApiGenerator
+from openapi_spec_tools.api_gen import FlatApiGenerator
+from openapi_spec_tools.api_gen import OpaqueApiGenerator
+from openapi_spec_tools.api_gen import PropertyApiGenerator
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
 from openapi_spec_tools.cli.arguments import CopyrightFileOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameOption
@@ -20,8 +20,8 @@ from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
-from openapi_spec_tools.layout.layout_generator import DEFAULT_START
-from openapi_spec_tools.layout.layout_generator import LayoutGenerator
+from openapi_spec_tools.layout import DEFAULT_START
+from openapi_spec_tools.layout import LayoutGenerator
 
 SEP = "\n    "
 

@@ -1,5 +1,9 @@
 """Base generator which is the base class for API and CLI generoators."""
 from .base_generator import BaseGenerator
+from .constants import COLLECTIONS
+from .constants import NL
+from .constants import SEP1
+from .constants import SEP2
 from .utils import is_case_sensitive
 from .utils import maybe_quoted
 from .utils import prepend

@@ -1,8 +1,8 @@
 """Declares the LayoutGenerator for inferring a layout from an OpenAPI specification."""
 from typing import Any
 
-from openapi_spec_tools.base_gen.utils import simple_escape
-from openapi_spec_tools.base_gen.utils import to_snake_case
+from openapi_spec_tools.base_gen import simple_escape
+from openapi_spec_tools.base_gen import to_snake_case
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import DEFAULT_START

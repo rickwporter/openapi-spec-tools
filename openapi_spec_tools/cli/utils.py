@@ -9,10 +9,10 @@ import typer
 from rich import print
 from rich.console import Console
 
-from openapi_spec_tools.layout.types import LayoutNode
-from openapi_spec_tools.layout.utils import file_to_tree
-from openapi_spec_tools.layout.utils import open_layout
-from openapi_spec_tools.layout.utils import write_layout
+from openapi_spec_tools.layout import LayoutNode
+from openapi_spec_tools.layout import file_to_tree
+from openapi_spec_tools.layout import open_layout
+from openapi_spec_tools.layout import write_layout
 from openapi_spec_tools.utils import open_oas
 
 # Common argument definition
