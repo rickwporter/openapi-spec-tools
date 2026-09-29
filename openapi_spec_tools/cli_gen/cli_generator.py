@@ -1,4 +1,5 @@
 """Declares the Generator class that is used for most of the CLi generation capability."""
+import os
 from pathlib import Path
 from typing import Any
 
@@ -505,3 +506,37 @@ def show_commands(
     _t.tree(path.as_posix(), "{node.identifier}", display, depth, search)
     return
 '''
+
+    def generate_files(self, node: LayoutNode, directory: str) -> None:
+        """Generate CLI modules and the command tree for the layout node."""
+        self.generate_node(node, directory)
+        self.generate_tree_file(node, directory)
+
+    def generate_node(self, node: LayoutNode, directory: str) -> None:
+        """Create a file/module for the current node, and recursively goes through sub-commands."""
+        module_name = to_snake_case(node.identifier)
+        self.logger.info(f"Generating {module_name} module")
+        text = self.shebang()
+        text += self.copyright
+        text += self.standard_imports()
+        text += self.subcommand_imports(node)
+        text += self.app_definition(node)
+        text += self.tree_function(node)
+        for command in node.operations():
+            text += self.function_definition(command)
+        text += self.main()
+
+        filename = os.path.join(directory, module_name + ".py")
+        with open(filename, "w", encoding="utf-8", newline="\n") as fp:
+            fp.write(text)
+        os.chmod(filename, 0o755)
+
+        for command in node.subcommands():
+            self.generate_node(command, directory)
+
+    def generate_tree_file(self, node: LayoutNode, directory: str) -> None:
+        """Create the YAML file."""
+        filename = os.path.join(directory, "tree.yaml")
+        with open(filename, "w", encoding="utf-8", newline="\n") as fp:
+            fp.write(self.copyright)
+            fp.write(self.get_tree_yaml(node))

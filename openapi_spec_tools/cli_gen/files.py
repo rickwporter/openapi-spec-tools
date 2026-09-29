@@ -1,14 +1,10 @@
 """Implementation for creating/copying CLI files."""
-import os
 from pathlib import Path
 from typing import Any
 
-from openapi_spec_tools.base_gen._logging import get_logger
-from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.cli_gen._tree import TreeNode
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
-from openapi_spec_tools.cli_gen.constants import GENERATOR_LOG_CLASS
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
@@ -27,32 +23,6 @@ TEST_FILES = {
     CLI_TEST / "test_main.py": "test_main.py",
     CLI_TEST / "test_tree.py": "test_tree.py",
 }
-
-logger = get_logger(GENERATOR_LOG_CLASS)
-
-
-def generate_node(generator: CliGenerator, node: LayoutNode, directory: str) -> None:
-    """Create a file/module for the current node, and recursively goes through sub-commands."""
-    module_name = to_snake_case(node.identifier)
-    logger.info(f"Generating {module_name} module")
-    text = generator.shebang()
-    text += generator.copyright
-    text += generator.standard_imports()
-    text += generator.subcommand_imports(node)
-    text += generator.app_definition(node)
-    text += generator.tree_function(node)
-    for command in node.operations():
-        text += generator.function_definition(command)
-    text += generator.main()
-
-    filename = os.path.join(directory, module_name + ".py")
-    with open(filename, "w", encoding="utf-8", newline="\n") as fp:
-        fp.write(text)
-    os.chmod(filename, 0o755)
-
-    # recursively do the same for sub-commands
-    for command in node.subcommands():
-        generate_node(generator, command, directory)
 
 
 def generate_tree_node(generator: CliGenerator, node: LayoutNode) -> TreeNode:
@@ -81,14 +51,6 @@ def generate_tree_node(generator: CliGenerator, node: LayoutNode) -> TreeNode:
         help=data.get(TreeField.DESCRIPTION),
         children=children,
     )
-
-
-def generate_tree_file(generator: CliGenerator, node: LayoutNode, directory: str) -> None:
-    """Create the YAML file."""
-    filename = os.path.join(directory, "tree.yaml")
-    with open(filename, "w", encoding="utf-8", newline="\n") as fp:
-        fp.write(generator.copyright)
-        fp.write(generator.get_tree_yaml(node))
 
 
 def check_for_missing(node: LayoutNode, oas: dict[str, Any]) -> dict[str, list[str]]:

@@ -6,7 +6,6 @@ from typing import Annotated
 
 import typer
 
-from openapi_spec_tools.api_gen.files import generate_api_node
 from openapi_spec_tools.api_gen.flat_generator import FlatApiGenerator
 from openapi_spec_tools.api_gen.opaque_generator import OpaqueApiGenerator
 from openapi_spec_tools.api_gen.property_generator import PropertyApiGenerator
@@ -85,7 +84,7 @@ def generate_api(
     # copy over the basic infrastructure
     generator.add_init_file(code_dir)
     generator.copy_infrastructure_files(code_dir)
-    generate_api_node(generator, commands, code_dir)
+    generator.generate_files(commands, code_dir)
 
     typer.echo("Generated API files")
 

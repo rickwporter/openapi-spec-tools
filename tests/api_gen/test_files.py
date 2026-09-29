@@ -2,7 +2,6 @@ from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from openapi_spec_tools.api_gen.files import generate_api_node
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.utils import open_oas
 from tests.api_gen.helpers import TestApiGenerator
@@ -16,7 +15,7 @@ def test_generate_api_node_single():
     tree = layout_gen.generate("")
     directory = TemporaryDirectory()
     generator = TestApiGenerator(pkg_name, oas)
-    generate_api_node(generator, tree, directory.name)
+    generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)
     file = path / "pets.py"
@@ -49,7 +48,7 @@ def test_generate_api_node_multiple():
     tree = layout_gen.generate("")
     directory = TemporaryDirectory()
     generator = TestApiGenerator(pkg_name, oas)
-    generate_api_node(generator, tree, directory.name)
+    generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)
     expectations = {

@@ -29,8 +29,6 @@ from openapi_spec_tools.cli_gen._tree import create_tree_table
 from openapi_spec_tools.cli_gen.cli_generator import CliGenerator
 from openapi_spec_tools.cli_gen.files import check_for_missing
 from openapi_spec_tools.cli_gen.files import find_unreferenced
-from openapi_spec_tools.cli_gen.files import generate_node
-from openapi_spec_tools.cli_gen.files import generate_tree_file
 from openapi_spec_tools.cli_gen.files import generate_tree_node
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.types import LayoutNode
@@ -133,11 +131,7 @@ def generate_cli(
     # copy over the basic infrastructure
     generator.add_init_file(code_dir)
     generator.copy_infrastructure_files(code_dir)
-
-    generate_node(generator, commands, code_dir)
-
-    # create the tree
-    generate_tree_file(generator, commands, code_dir)
+    generator.generate_files(commands, code_dir)
 
     if include_tests:
         os.makedirs(test_dir, exist_ok=True)
