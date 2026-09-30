@@ -9,14 +9,14 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import Any
 
-from openapi_spec_tools.base_gen.base_generator import BaseGenerator
-from openapi_spec_tools.base_gen.constants import COLLECTIONS
-from openapi_spec_tools.base_gen.constants import SEP1
-from openapi_spec_tools.base_gen.utils import maybe_quoted
-from openapi_spec_tools.base_gen.utils import quoted
-from openapi_spec_tools.base_gen.utils import simple_escape
-from openapi_spec_tools.base_gen.utils import to_snake_case
-from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.base_gen import COLLECTIONS
+from openapi_spec_tools.base_gen import SEP1
+from openapi_spec_tools.base_gen import BaseGenerator
+from openapi_spec_tools.base_gen import maybe_quoted
+from openapi_spec_tools.base_gen import quoted
+from openapi_spec_tools.base_gen import simple_escape
+from openapi_spec_tools.base_gen import to_snake_case
+from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
 
 DEFAULT_VAR_HOST = "API_HOST"

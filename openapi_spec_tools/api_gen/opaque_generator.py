@@ -2,10 +2,10 @@
 from typing import Any
 
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
-from openapi_spec_tools.base_gen.constants import NL
-from openapi_spec_tools.base_gen.constants import SEP1
-from openapi_spec_tools.base_gen.utils import quoted
-from openapi_spec_tools.layout.types import LayoutNode
+from openapi_spec_tools.base_gen import NL
+from openapi_spec_tools.base_gen import SEP1
+from openapi_spec_tools.base_gen import quoted
+from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
 
 
