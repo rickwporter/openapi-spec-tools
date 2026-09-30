@@ -101,6 +101,7 @@ class BaseGenerator:
         env_key: str | list[str] = DEFAULT_VAR_KEY,
         env_timeout: str | list[str] = DEFAULT_VAR_TIMEOUT,
         env_log_level: str | list[str] = DEFAULT_VAR_LOG_LEVEL,
+        default_host: str = "",
         default_log_level: str = DEFAULT_VALUE_LOG_LEVEL,
         default_timeout: int = DEFAULT_VALUE_TIMEOUT,
     ):
@@ -109,14 +110,18 @@ class BaseGenerator:
         When copyright names an existing file, that file's contents are stored as copyright.
         Otherwise the provided value is used as the copyright text. The default header is used
         when copyright is omitted.
+
+        When the default_host is not provided, attempts to read from the OAS servers.
         """
         self.package_name = package_name
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
-        self.default_host = ""
-        servers = oas.get(OasField.SERVERS)
-        if servers:
-            self.default_host = servers[0].get(OasField.URL, "")
+        self.default_host = default_host
+        if not default_host:
+            servers = oas.get(OasField.SERVERS)
+            if servers:
+                self.default_host = servers[0].get(OasField.URL, "")
+
         # ordered list of supported types
         self.supported = supported_content
         self.max_help_length = max_help_length
