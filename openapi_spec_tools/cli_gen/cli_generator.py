@@ -28,8 +28,7 @@ class CliGenerator(BaseGenerator):
     overridden by consumers.
     """
 
-    @staticmethod
-    def default_infra_files() -> dict[Path, str]:
+    def default_infra_files(self) -> dict[Path, str]:
         """Default infrastructure files to be copied."""
         base_gen =  Path(__file__).parent.parent / "base_gen"
         cli_gen = Path(__file__).parent
@@ -42,16 +41,14 @@ class CliGenerator(BaseGenerator):
             cli_gen / "_tree.py": "_tree.py",
         }
 
-    @staticmethod
-    def default_infra_replacements(package_name: str) -> dict[str, str]:
+    def default_infra_replacements(self) -> dict[str, str]:
         """Default infrastructure line replacements."""
         return {
-            "openapi_spec_tools.base_gen": package_name,
-            __package__: package_name,
+            "openapi_spec_tools.base_gen": self.package_name,
+            __package__: self.package_name,
         }
 
-    @staticmethod
-    def default_test_files() -> dict[Path, str]:
+    def default_test_files(self) -> dict[Path, str]:
         """Default test files to be copied."""
         test_gen = Path(__file__).parent.parent.parent / "tests"
         base_test = test_gen / "base_gen"
@@ -67,17 +64,16 @@ class CliGenerator(BaseGenerator):
             cli_test / "test_tree.py": "test_tree.py",
         }
 
-    @staticmethod
-    def default_test_replacements(package_name: str) -> dict[str, str]:
+    def default_test_replacements(self) -> dict[str, str]:
         """Default test file line replacements."""
         test_package = "tests"
         return {
             "tests.cli_gen": test_package,
             "tests.base_gen": test_package,
-            "tests.assets.arg_test": f"{package_name}.main",
-            "openapi_spec_tools.base_gen": package_name,
-            "openapi_spec_tools.cli_gen": package_name,
-            __package__: package_name,
+            "tests.assets.arg_test": f"{self.package_name}.main",
+            "openapi_spec_tools.base_gen": self.package_name,
+            "openapi_spec_tools.cli_gen": self.package_name,
+            __package__: self.package_name,
         }
 
     def standard_imports(self) -> str:
