@@ -19,12 +19,8 @@ from openapi_spec_tools.base_gen import to_snake_case
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
 
-DEFAULT_VAR_HOST = "API_HOST"
-DEFAULT_VAR_KEY = "API_KEY"
-DEFAULT_VAR_TIMEOUT = "API_TIMEOUT"
 DEFAULT_VAR_LOG_LEVEL = "API_LOG_LEVEL"
 DEFAULT_VALUE_LOG_LEVEL = "info"
-DEFAULT_VALUE_TIMEOUT = 5
 
 
 class ApiGenerator(BaseGenerator, ABC):
@@ -38,22 +34,12 @@ class ApiGenerator(BaseGenerator, ABC):
     def __init__(
         self,
         *args,
-        env_host: str | list[str] = DEFAULT_VAR_HOST,
-        env_key: str | list[str] = DEFAULT_VAR_KEY,
-        env_timeout: str | list[str] = DEFAULT_VAR_TIMEOUT,
         env_log_level: str | list[str] = DEFAULT_VAR_LOG_LEVEL,
         default_log_level: str = DEFAULT_VALUE_LOG_LEVEL,
-        default_timeout: int = DEFAULT_VALUE_TIMEOUT,
         **kwargs,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules."""
-        super().__init__(*args, **kwargs)
-        self.env_host = env_host
-        self.env_key = env_key
-        self.env_timeout = env_timeout
-        self.env_log_level = env_log_level
-        self.default_log = default_log_level
-        self.default_timeout = default_timeout
+        super().__init__(*args, env_log_level=env_log_level, default_log_level=default_log_level, **kwargs)
 
     def default_infra_files(self) -> dict[Path, str]:
         """Default files to copy from source."""
