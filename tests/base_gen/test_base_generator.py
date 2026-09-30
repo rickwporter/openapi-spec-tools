@@ -1415,3 +1415,51 @@ def test_add_init_file() -> None:
         uut.add_init_file(temp_dir, text, True)
         expected = text.replace("\r\n", "\n")  # replace line endings
         assert expected == path.read_text()
+
+
+def test_copy_infrastructure() -> None:
+    uut = BaseGenerator(PKG, {})
+
+    with TemporaryDirectory() as temp_dir:
+        directory = Path(temp_dir)
+
+        # nothing present for copy/replace
+        uut.copy_infrastructure_files(temp_dir)
+        files = {_.name for _ in directory.iterdir()}
+        assert not files
+
+        # copy and replace "random" file
+        dname = "foo.yaml"
+        title = "My Favorite Petstore"
+        uut.infra_files = {Path(asset_filename("pet.yaml")) : dname}
+        uut.infra_replacements = {"Swagger Petstore": title}
+
+        uut.copy_infrastructure_files(temp_dir)
+        files = {_.name for _ in directory.iterdir()}
+        assert files == {dname}
+        content = (directory / dname).read_text()
+        assert title in content
+
+
+def test_copy_tests() -> None:
+    uut = BaseGenerator(PKG, {})
+
+    with TemporaryDirectory() as temp_dir:
+        directory = Path(temp_dir)
+
+        # nothing present for copy/replace
+        uut.copy_test_files(temp_dir)
+        files = {_.name for _ in directory.iterdir()}
+        assert not files
+
+        # copy and replace "random" file
+        dname = "bar.yaml"
+        url = "http://localhost/v1"
+        uut.test_files = {Path(asset_filename("pet.yaml")) : dname}
+        uut.test_replacements = {" http://petstore.swagger.io/v1": url}
+
+        uut.copy_test_files(temp_dir)
+        files = {_.name for _ in directory.iterdir()}
+        assert files == {dname}
+        content = (directory / dname).read_text()
+        assert url in content
