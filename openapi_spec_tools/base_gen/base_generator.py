@@ -38,6 +38,12 @@ DEFAULT_SUPPORTED_CONTENT = [
 ]
 DEFAULT_MAX_HELP_LENGTH = 120
 DEFAULT_CONFLICT_SUFFIX = "_"
+DEFAULT_VAR_HOST = "API_HOST"
+DEFAULT_VAR_KEY = "API_KEY"
+DEFAULT_VAR_TIMEOUT = "API_TIMEOUT"
+DEFAULT_VAR_LOG_LEVEL = "LOG_LEVEL"
+DEFAULT_VALUE_LOG_LEVEL = "warn"
+DEFAULT_VALUE_TIMEOUT = 5
 
 # This is an incomplete list of Python builtins and imports that should avoided in variable names
 DEFAULT_RESERVED = {
@@ -91,20 +97,31 @@ class BaseGenerator:
         infra_replacements: dict[str, str] | None = None,
         test_files: dict[Path, str] | None = None,
         test_replacements: dict[str, str] | None = None,
+        env_host: str | list[str] = DEFAULT_VAR_HOST,
+        env_key: str | list[str] = DEFAULT_VAR_KEY,
+        env_timeout: str | list[str] = DEFAULT_VAR_TIMEOUT,
+        env_log_level: str | list[str] = DEFAULT_VAR_LOG_LEVEL,
+        default_host: str = "",
+        default_log_level: str = DEFAULT_VALUE_LOG_LEVEL,
+        default_timeout: int = DEFAULT_VALUE_TIMEOUT,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules.
 
         When copyright names an existing file, that file's contents are stored as copyright.
         Otherwise the provided value is used as the copyright text. The default header is used
         when copyright is omitted.
+
+        When the default_host is not provided, attempts to read from the OAS servers.
         """
         self.package_name = package_name
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
-        self.default_host = ""
-        servers = oas.get(OasField.SERVERS)
-        if servers:
-            self.default_host = servers[0].get(OasField.URL, "")
+        self.default_host = default_host
+        if not default_host:
+            servers = oas.get(OasField.SERVERS)
+            if servers:
+                self.default_host = servers[0].get(OasField.URL, "")
+
         # ordered list of supported types
         self.supported = supported_content
         self.max_help_length = max_help_length
@@ -117,6 +134,12 @@ class BaseGenerator:
         self.infra_replacements = infra_replacements
         self.test_files = test_files
         self.test_replacements = test_replacements
+        self.env_host = env_host
+        self.env_key = env_key
+        self.env_timeout = env_timeout
+        self.env_log_level = env_log_level
+        self.default_log = default_log_level
+        self.default_timeout = default_timeout
 
     @staticmethod
     def _resolve_copyright(copyright: str | Path | None) -> str:

@@ -1,4 +1,5 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any
 
 import pytest
@@ -742,3 +743,49 @@ def test_tree_function():
     assert 'depth: _a.MaxDepthOption = 5' in text
     assert 'search: _a.TreeSearchOption = None' in text
     assert '_t.tree(path.as_posix(), "foo_bar", display, depth, search)' in text
+
+
+def test_env_vars():
+    pytest.param("pet2.yaml", "layout_pets.yaml", "tree_pets.yaml", id="simple"),
+    oas = open_oas(asset_filename("pet2.yaml"))
+    node = file_to_tree(asset_filename("layout_pets.yaml"))
+
+    default_host = "random-url"
+    default_timeout = 10
+    default_log_level = "debug"
+    env_host = ["MY_HOST", "SERVICE_URL", "API_URL"]
+    env_key = ["MY_KEY", "API_TOKEN"]
+    env_log_level = ["LEVEL"]
+    env_timeout = "TIMEOUT"
+
+    uut = CliGenerator(
+        package_name="pets",
+        oas=oas,
+        env_host=env_host,
+        env_key=env_key,
+        env_log_level=env_log_level,
+        env_timeout=env_timeout,
+        default_host=default_host,
+        default_timeout=default_timeout,
+        default_log_level=default_log_level,
+    )
+
+    with TemporaryDirectory() as temp_dir:
+        directory = Path(temp_dir)
+
+        # create the files
+        uut.copy_infrastructure_files(temp_dir)
+        uut.generate_files(node, temp_dir)
+
+        # check argument environment variable names are updated
+        content = (directory / "_arguments.py").read_text()
+        assert 'ENV_API_HOST = ["MY_HOST", "SERVICE_URL", "API_URL"]' in content
+        assert 'ENV_API_KEY = ["MY_KEY", "API_TOKEN"]' in content
+        assert 'ENV_API_TIME = "TIMEOUT"' in content
+        assert 'ENV_LOG_LEVEL = "LEVEL"' in content
+
+        # check default values are updated
+        content = (directory / "main.py").read_text()
+        assert '_api_host: _a.ApiHostOption = "random-url"' in content
+        assert '_api_timeout: _a.ApiTimeoutOption = 10' in content
+        assert '_log_level: _a.LogLevelOption = _a.LogLevel.DEBUG' in content
