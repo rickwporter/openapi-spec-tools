@@ -46,6 +46,11 @@ class CliGenerator(BaseGenerator):
         return {
             "openapi_spec_tools.base_gen": self.package_name,
             __package__: self.package_name,
+            # NOTE: these will only really impact _arguments.py -- use same mechanism for simplicity
+            'ENV_API_HOST = "API_HOST"': f'ENV_API_HOST = {maybe_quoted(self.env_host)}',
+            'ENV_API_KEY = "API_KEY"': f'ENV_API_KEY = {maybe_quoted(self.env_key)}',
+            'ENV_API_TIME = "API_TIMEOUT"': f'ENV_API_TIME = {maybe_quoted(self.env_timeout)}',
+            'ENV_LOG_LEVEL = "LOG_LEVEL"': f'ENV_LOG_LEVEL = {maybe_quoted(self.env_log_level)}',
         }
 
     def default_test_files(self) -> dict[Path, str]:
@@ -140,8 +145,8 @@ if __name__ == "__main__":
         args = [
             f'_api_host: _a.ApiHostOption = "{self.default_host}"',
             '_api_key: _a.ApiKeyOption = None',
-            '_api_timeout: _a.ApiTimeoutOption = 5',
-            '_log_level: _a.LogLevelOption = _a.LogLevel.WARN',
+            f'_api_timeout: _a.ApiTimeoutOption = {self.default_timeout}',
+            f'_log_level: _a.LogLevelOption = _a.LogLevel.{self.default_log.upper()}',
             '_out_fmt: _a.OutputFormatOption = _a.OutputFormat.TABLE',
             '_out_style: _a.OutputStyleOption = _a.OutputStyle.ALL',
         ]
