@@ -16,7 +16,7 @@ class GeneratorConfig(BaseModel):
     to allow for determining which items are set vs just using default values.
     """
 
-    package_name: str
+    package_name: str | None = None
     supported_content: list[ContentType] | None = None
     max_help_length: int | None = None
     reserved: set[str] | None = None

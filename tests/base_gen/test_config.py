@@ -10,9 +10,9 @@ PKG = "some_package"
 
 
 def test_from_config_defaults():
-    uut = GeneratorConfig(package_name=PKG)
+    uut = GeneratorConfig()
 
-    assert PKG == uut.package_name
+    assert uut.package_name is None
     assert uut.default_host is None
     assert uut.supported_content is None
     assert uut.max_help_length is None
