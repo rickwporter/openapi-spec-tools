@@ -151,7 +151,7 @@ def test_from_yaml_missing():
 def test_resolve_path_keys():
     uut = GeneratorConfig(package_name=PKG)
 
-    assert {} == uut.resolve_path_keys(None)
+    assert uut.resolve_path_keys(None) is None
     assert {} == uut.resolve_path_keys({})
 
     foo = "/tmp/foo.py"

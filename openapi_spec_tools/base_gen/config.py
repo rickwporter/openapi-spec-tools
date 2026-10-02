@@ -47,10 +47,10 @@ class GeneratorConfig(BaseModel):
         return cls.model_validate(data or {})
 
     @staticmethod
-    def resolve_path_keys(original: dict[str, str]) -> dict[Path, str]:
+    def resolve_path_keys(original: dict[str, str] | None) -> dict[Path, str]:
         """Resolve the key string to a Path."""
         if not original:
-            return {}
+            return original
 
         result: dict[Path, str] = {}
         base_dir = Path(__file__).parent.parent
