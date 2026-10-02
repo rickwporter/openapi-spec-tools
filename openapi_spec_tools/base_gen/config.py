@@ -1,6 +1,7 @@
 """Configuration data used to construct a base generator."""
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Self
 
 import yaml
 from pydantic import BaseModel
@@ -34,7 +35,7 @@ class GeneratorConfig(BaseModel):
     default_timeout: int | None = None
 
     @classmethod
-    def from_yaml(cls, filename: str | Path) -> Self:
+    def from_yaml(cls, filename: str | Path) -> GeneratorConfig:
         """Read configuration properties from a YAML file."""
         path = Path(filename)
         if not path.exists():
