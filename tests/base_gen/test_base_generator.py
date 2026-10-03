@@ -6,6 +6,7 @@ import pytest
 
 from openapi_spec_tools.base_gen.base_generator import DEFAULT_COPYRIGHT
 from openapi_spec_tools.base_gen.base_generator import BaseGenerator
+from openapi_spec_tools.base_gen.config import GeneratorConfig
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
@@ -51,6 +52,24 @@ def test_copyright_text():
         assert message == BaseGenerator(PKG, {}, copyright=path).copyright
 
         assert DEFAULT_COPYRIGHT == BaseGenerator(PKG, {}, copyright={"type": "error"}).copyright
+
+
+def test_config():
+    config = GeneratorConfig(
+        package_name="cfg.name",
+        max_help_length=3,
+        default_host="https://192.168.1.1",
+        default_log_level="error",
+    )
+    uut = BaseGenerator(PKG, {}, config=config, default_log_level="debug")
+    assert uut.package_name == PKG
+    assert uut.max_help_length == 3
+    assert uut.default_log == "debug"
+    assert uut.default_host == "https://192.168.1.1"
+
+    config = GeneratorConfig()
+    with pytest.raises(ValueError, match="Missing package_name"):
+        BaseGenerator(None, {}, config=config)
 
 
 @pytest.mark.parametrize(
