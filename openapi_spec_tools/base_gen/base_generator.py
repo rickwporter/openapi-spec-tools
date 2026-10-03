@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from openapi_spec_tools.base_gen._logging import init_logging
+from openapi_spec_tools.base_gen.config import GeneratorConfig
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
 from openapi_spec_tools.base_gen.constants import DEFAULT_CONFLICT_SUFFIX
 from openapi_spec_tools.base_gen.constants import DEFAULT_COPYRIGHT
@@ -39,6 +40,21 @@ from openapi_spec_tools.utils import map_operations
 LOG_CLASS = "base-gen"
 
 
+def _pcd(param: Any, config: Any, default: Any) -> Any:
+    """Select appropriate value in order parameter, config_value, or default.
+
+    Raises the exception if the default is an Exception.
+    """
+    if param is not None:
+        return param
+    if config is not None:
+        return config
+    if isinstance(default, Exception):
+        raise default
+
+    return default
+
+
 class BaseGenerator:
     """Provides the majority of the CLI generation functions.
 
@@ -52,22 +68,23 @@ class BaseGenerator:
         package_name: str,
         oas: dict[str, Any],
         logger: logging.Logger | None = None,
-        supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
-        max_help_length: int = DEFAULT_MAX_HELP_LENGTH,
-        reserved: set[str] = DEFAULT_RESERVED,
-        conflict_suffix: str = DEFAULT_CONFLICT_SUFFIX,
+        supported_content: list[ContentType] | None = None,
+        max_help_length: int | None = None,
+        reserved: set[str] | None = None,
+        conflict_suffix: str | None = None,
         copyright: str | Path | None = None,
         infra_files: dict[Path, str] | None = None,
         infra_replacements: dict[str, str] | None = None,
         test_files: dict[Path, str] | None = None,
         test_replacements: dict[str, str] | None = None,
-        env_host: str | list[str] = DEFAULT_VAR_HOST,
-        env_key: str | list[str] = DEFAULT_VAR_KEY,
-        env_timeout: str | list[str] = DEFAULT_VAR_TIMEOUT,
-        env_log_level: str | list[str] = DEFAULT_VAR_LOG_LEVEL,
-        default_host: str = "",
-        default_log_level: str = DEFAULT_VALUE_LOG_LEVEL,
-        default_timeout: int = DEFAULT_VALUE_TIMEOUT,
+        env_host: str | list[str] | None = None,
+        env_key: str | list[str] | None = None,
+        env_timeout: str | list[str] | None = None,
+        env_log_level: str | list[str] | None = None,
+        default_host: str | None = None,
+        default_log_level: str | None = None,
+        default_timeout: int | None = None,
+        config: GeneratorConfig | None = None,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules.
 
@@ -76,34 +93,52 @@ class BaseGenerator:
         when copyright is omitted.
 
         When the default_host is not provided, attempts to read from the OAS servers.
+
+        Default values are as follows (see openapi_spec_tools.base_gen.constants for values):
+        * package_name - no default, required
+        * supported_content - DEFAULT_SUPPORTED_CONTENT
+        * max_help_length - DEFAULT_MAX_HELP_LENGTH
+        * reserved - DEFAULT_RESERVED
+        * conflict_suffix - DEFAULT_CONFLICT_SUFFIX
+        * copyright - DEFAULT_COPYRIGHT
+        * infra_<files|replacements> - None, likely specified by derived class methods
+        * test_<files|replacements> - None, likely specified by derived class methods
+        * env_host - DEFAULT_VAR_HOST
+        * env_key - DEFAULT_VAR_KEY
+        * env_timeout - DEFAULT_VAR_TIMEOUT
+        * env_log_level - DEFAULT_VAR_LOG_LEVEL
+        * default_host - empty string
+        * default_log_level - DEFAULT_VALUE_LOG_LEVEL
+        * default_timeout - DEFAULT_VALUE_TIMEOUT
         """
-        self.package_name = package_name
+        config = config or GeneratorConfig()  # reduce logic by creating a default (if no config provided)
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
-        self.default_host = default_host
+        self.logger = logger or init_logging("INFO", LOG_CLASS)
+
+        self.package_name = _pcd(package_name, config.package_name, ValueError("Missing package_name"))
+        self.default_host = _pcd(default_host, config.default_host, "")
+        self.supported = _pcd(supported_content, config.supported_content, DEFAULT_SUPPORTED_CONTENT)
+        self.max_help_length = _pcd(max_help_length, config.max_help_length, DEFAULT_MAX_HELP_LENGTH)
+        self.reserved = _pcd(reserved, config.reserved, DEFAULT_RESERVED)
+        self.conflict_suffix = _pcd(conflict_suffix, config.conflict_suffix, DEFAULT_CONFLICT_SUFFIX)
+        self.copyright = self._resolve_copyright(_pcd(copyright, config.copyright, None))
+        self.infra_files = _pcd(infra_files, config.resolve_path_keys(config.infra_files), None)
+        self.infra_replacements = _pcd(infra_replacements, config.infra_replacements, None)
+        self.test_files = _pcd(test_files, config.resolve_path_keys(config.test_files), None)
+        self.test_replacements = _pcd(test_replacements, config.test_replacements, None)
+        self.env_host = _pcd(env_host, config.env_host, DEFAULT_VAR_HOST)
+        self.env_key = _pcd(env_key, config.env_key, DEFAULT_VAR_KEY)
+        self.env_timeout = _pcd(env_timeout, config.env_timeout, DEFAULT_VAR_TIMEOUT)
+        self.env_log_level = _pcd(env_log_level, config.env_log_level, DEFAULT_VAR_LOG_LEVEL)
+        self.default_log = _pcd(default_log_level, config.default_log_level, DEFAULT_VALUE_LOG_LEVEL)
+        self.default_timeout = _pcd(default_timeout, config.default_timeout, DEFAULT_VALUE_TIMEOUT)
+
         if not default_host:
             servers = oas.get(OasField.SERVERS)
             if servers:
                 self.default_host = servers[0].get(OasField.URL, "")
 
-        # ordered list of supported types
-        self.supported = supported_content
-        self.max_help_length = max_help_length
-        self.logger = logger or init_logging("INFO", LOG_CLASS)
-
-        self.reserved = reserved
-        self.conflict_suffix = conflict_suffix
-        self.copyright = self._resolve_copyright(copyright)
-        self.infra_files = infra_files
-        self.infra_replacements = infra_replacements
-        self.test_files = test_files
-        self.test_replacements = test_replacements
-        self.env_host = env_host
-        self.env_key = env_key
-        self.env_timeout = env_timeout
-        self.env_log_level = env_log_level
-        self.default_log = default_log_level
-        self.default_timeout = default_timeout
 
     @staticmethod
     def _resolve_copyright(copyright: str | Path | None) -> str:
