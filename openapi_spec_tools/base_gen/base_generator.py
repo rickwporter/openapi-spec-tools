@@ -134,7 +134,7 @@ class BaseGenerator:
         self.default_log = _pcd(default_log_level, config.default_log_level, DEFAULT_VALUE_LOG_LEVEL)
         self.default_timeout = _pcd(default_timeout, config.default_timeout, DEFAULT_VALUE_TIMEOUT)
 
-        if not default_host:
+        if not self.default_host:
             servers = oas.get(OasField.SERVERS)
             if servers:
                 self.default_host = servers[0].get(OasField.URL, "")
