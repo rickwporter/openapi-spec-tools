@@ -1,0 +1,2 @@
+env_host: DIFFERENT_ENV_VAR
+default_timeout: this is an unallowed string

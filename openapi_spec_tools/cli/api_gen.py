@@ -10,6 +10,7 @@ from openapi_spec_tools.api_gen import FlatApiGenerator
 from openapi_spec_tools.api_gen import OpaqueApiGenerator
 from openapi_spec_tools.api_gen import PropertyApiGenerator
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
+from openapi_spec_tools.cli.arguments import ConfigFileOption
 from openapi_spec_tools.cli.arguments import CopyrightFileOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
@@ -17,6 +18,7 @@ from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import PackageNameArgument
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
+from openapi_spec_tools.cli.utils import config_maybe_from_file
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
@@ -49,6 +51,7 @@ app = typer.Typer(
 def generate_api(
     openapi_file: OpenApiFilenameArgument,
     package_name: PackageNameArgument,
+    config_file: ConfigFileOption = None,
     code_dir: CodeDirectoryOption = None,
     copyright_file: CopyrightFileOption = None,
     prefix: PathPrefixOption = "",
@@ -72,12 +75,14 @@ def generate_api(
         layout_gen = LayoutGenerator(oas)
         commands = layout_gen.generate(prefix)
 
+    config = config_maybe_from_file(config_file)
+
     if body_type == BodyType.FLAT:
-        generator = FlatApiGenerator(package_name, oas, logger=logger, copyright=copyright_file)
+        generator = FlatApiGenerator(package_name, oas, logger=logger, copyright=copyright_file, config=config)
     elif body_type == BodyType.PROPERTY:
-        generator = PropertyApiGenerator(package_name, oas, logger=logger, copyright=copyright_file)
+        generator = PropertyApiGenerator(package_name, oas, logger=logger, copyright=copyright_file, config=config)
     else:
-        generator = OpaqueApiGenerator(package_name, oas, logger=logger, copyright=copyright_file)
+        generator = OpaqueApiGenerator(package_name, oas, logger=logger, copyright=copyright_file, config=config)
 
     os.makedirs(code_dir, exist_ok=True)
 
