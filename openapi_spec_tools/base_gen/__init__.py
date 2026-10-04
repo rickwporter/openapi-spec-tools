@@ -1,5 +1,6 @@
 """Base generator which is the base class for API and CLI generoators."""
 from .base_generator import BaseGenerator
+from .config import GeneratorConfig
 from .constants import COLLECTIONS
 from .constants import NL
 from .constants import SEP1
