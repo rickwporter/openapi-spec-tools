@@ -10,6 +10,7 @@ import yaml
 from rich_objects import console_factory
 
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
+from openapi_spec_tools.cli.arguments import ConfigFileOption
 from openapi_spec_tools.cli.arguments import CopyrightFileOption
 from openapi_spec_tools.cli.arguments import IndentOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameArgument
@@ -20,6 +21,7 @@ from openapi_spec_tools.cli.arguments import PackageNameArgument
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
+from openapi_spec_tools.cli.utils import config_maybe_from_file
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
@@ -81,8 +83,9 @@ def generate_cli(
         str | None,
         typer.Option(metavar=DIRECTORY, show_default=False, help="Directory for tests -- overrides default")
     ] = None,
+    config_file: ConfigFileOption = None,
     copyright_file: CopyrightFileOption = None,
-    include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated coode")] = True,
+    include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated code")] = True,
     prefix: PathPrefixOption = "",
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "info",
@@ -124,7 +127,8 @@ def generate_cli(
         commands = layout_gen.generate(prefix)
         typer.echo("Generated layout -- equivalent can be saved using 'layout suggest'.")
 
-    generator = CliGenerator(package_name, oas, logger, copyright=copyright_file)
+    config = config_maybe_from_file(config_file)
+    generator = CliGenerator(package_name, oas, logger, copyright=copyright_file, config=config)
 
     os.makedirs(code_dir, exist_ok=True)
 

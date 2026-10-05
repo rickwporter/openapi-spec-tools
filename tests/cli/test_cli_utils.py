@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 import typer
 
+from openapi_spec_tools.cli.utils import config_maybe_from_file
 from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
@@ -69,6 +70,26 @@ def test_layout_tree_with_error(filename, message) -> None:
         pytest.raises(typer.Exit) as err,
     ):
         layout_tree_with_error_handling(asset_filename(filename), "start", logger)
+
+    assert err.value.exit_code == 1
+    output = mock_stdout.getvalue()
+    assert output.startswith(message)
+
+
+@pytest.mark.parametrize(
+    ["filename", "message"],
+    [
+        pytest.param("foo.yaml", "ERROR: failed to find ", id="missing"),
+        pytest.param(asset_filename("bad.yaml"), "ERROR: unable to parse", id="bad"),
+        pytest.param(asset_filename("bad_config.yaml"), "ERROR: 1 validation error for GeneratorConfig", id="values"),
+    ]
+)
+def test_config_maybe_from_file_error(filename, message) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        config_maybe_from_file(filename)
 
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()

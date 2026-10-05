@@ -502,3 +502,57 @@ def test_update_layout_updates():
     # check that another already exists
     assert "operationId: showPetById" in original_text
     assert "operationId: showPetById" in updated_text
+
+
+def test_cli_generate_success_config():
+    layout_file = asset_filename("layout_pets.yaml")
+    oas_file = asset_filename("pet2.yaml")
+
+    pkg_name = "my_cli_pkg"
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+
+    copyright = "# Another simple copyright message"
+    config = {
+        "copyright": copyright,
+        "env_host": ["CLI_SERVER", "API_HOST", "CLI_HOST"],
+        "default_timeout": 42,
+    }
+    config_file = base_dir / "config.yaml"
+    config_file.write_text(yaml.dump(config))
+
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        generate_cli(
+            oas_file,
+            pkg_name,
+            layout_file=layout_file,
+            project_dir=directory.name,
+            config_file=config_file.as_posix()
+        )
+        assert "Generated files\n" == mock_stdout.getvalue()
+
+    # check the copyright in all files
+    filenames = {
+        "_arguments.py",
+        "_display.py",
+        "_exceptions.py",
+        "_logging.py",
+        "_requests.py",
+        "_tree.py",
+        "main.py",
+        "tree.yaml",
+    }
+    code_dir = base_dir / pkg_name
+    for fname in filenames:
+        file = code_dir / fname
+        text = read_text(file.as_posix())
+        assert copyright in text
+
+    # spot check others
+    file = code_dir / "_arguments.py"
+    text = read_text(file.as_posix())
+    assert 'ENV_API_HOST = ["CLI_SERVER", "API_HOST", "CLI_HOST"]' in text
+
+    file = code_dir / "main.py"
+    text = read_text(file.as_posix())
+    assert '_api_timeout: _a.ApiTimeoutOption = 42' in text

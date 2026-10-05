@@ -23,6 +23,10 @@ CodeDirectoryOption = Annotated[
     str | None,
     typer.Option("--code-dir", metavar=DIRECTORY, show_default=False, help="Directory for code -- overrides default")
 ]
+ConfigFileOption = Annotated[
+    str | None,
+    typer.Option("--config", metavar=FILENAME, show_default=False, help="Generator configuration file")
+]
 CopyrightFileOption = Annotated[
     str | None,
     typer.Option(

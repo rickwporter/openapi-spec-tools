@@ -9,6 +9,7 @@ import typer
 from rich import print
 from rich.console import Console
 
+from openapi_spec_tools.base_gen import GeneratorConfig
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.layout import file_to_tree
 from openapi_spec_tools.layout import open_layout
@@ -104,6 +105,27 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
         delta = datetime.now() - starttime
         logger.info(f"Parsing {filename} into tree took {delta.total_seconds()} seconds")
         return tree
+    except FileNotFoundError:
+        message = f"failed to find {filename}"
+    except ValueError as ex:
+        message = str(ex)
+    except Exception as ex:
+        message = f"unable to parse {filename}: {ex}"
+
+    typer.echo(f"ERROR: {message}")
+    raise typer.Exit(1)
+
+
+def config_maybe_from_file(filename: str | None) -> GeneratorConfig | None:
+    """Get the configuration from the specified filename.
+
+    If the filename is None, or unable to get the config, this returns None.
+    """
+    if not filename:
+        return None
+
+    try:
+        return GeneratorConfig.from_yaml(filename)
     except FileNotFoundError:
         message = f"failed to find {filename}"
     except ValueError as ex:

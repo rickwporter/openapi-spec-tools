@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 import pytest
+import yaml
 
 from openapi_spec_tools.cli.api_gen import generate_api
 from tests.cli.helpers import read_text
@@ -166,3 +167,48 @@ def test_api_generate_success_body_type(body_type, expected, temp_working_dir):
     text = read_text(file.as_posix())
     for item in expected:
         assert item in text
+
+
+def test_api_generate_success_config():
+    oas_file = asset_filename("pet2.yaml")
+
+    pkg_name = "my_api_pkg"
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+
+    copyright = "# Simple copyright message"
+    config = {
+        "copyright": copyright,
+        "env_key": ["MY_API_KEY", "API_TOKEN"],
+        "default_host": "https://127.0.0.1:8080",
+    }
+    config_file = base_dir / "config.yaml"
+    config_file.write_text(yaml.dump(config))
+    code_dir = base_dir / pkg_name
+
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        generate_api(
+            oas_file,
+            pkg_name,
+            code_dir=code_dir,
+            config_file=config_file.as_posix(),
+        )
+        assert "Generated API files\n" == mock_stdout.getvalue()
+
+    # check copyright onthe file
+    filenames = {
+        "_environment.py",
+        "_logging.py",
+        "_requests.py",
+        "pets.py",
+    }
+    for fname in filenames:
+        file = code_dir / fname
+        text = read_text(file.as_posix())
+        assert copyright in text
+
+    # spot check other things
+    file = code_dir / "pets.py"
+    text = read_text(file.as_posix())
+    assert '_e.env_string(["MY_API_KEY", "API_TOKEN"], except_missing=True)' in text
+    assert '"API_HOST", default="https://127.0.0.1:8080"' in text
