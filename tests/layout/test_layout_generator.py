@@ -118,6 +118,7 @@ def test_get_response_body(op_id, expected):
         pytest.param({X_METH: "delete", OP_ID: "add_item"}, "create", id="begin"),
         pytest.param({X_METH: "delete", OP_ID: "itemRetrieve"}, "show", id="end"),
         pytest.param({X_METH: "delete", OP_ID: "item"}, "delete", id="method"),
+        pytest.param({X_METH: "delete", OP_ID: "itemListGetAll"}, "list", id="segment"),
     ]
 )
 def test_suggest_command(op_data, expected):

@@ -174,6 +174,9 @@ class LayoutGenerator:
         end = operation[-1]
         if end in self.common_ops:
             return self.common_ops.get(end)
+        for segment in operation:
+            if segment in self.common_ops:
+                return self.common_ops.get(segment)
 
         # default to using the method... last resort because get single-item and list use same
         return self.common_ops.get(_method, _method)
