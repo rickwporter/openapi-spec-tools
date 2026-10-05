@@ -66,8 +66,9 @@ class BaseGenerator:
     def __init__(
         self,
         oas: dict[str, Any],
-        package_name: str | None = None,
         logger: logging.Logger | None = None,
+        config: GeneratorConfig | None = None,
+        package_name: str | None = None,
         supported_content: list[ContentType] | None = None,
         max_help_length: int | None = None,
         reserved: set[str] | None = None,
@@ -84,7 +85,6 @@ class BaseGenerator:
         default_host: str | None = None,
         default_log_level: str | None = None,
         default_timeout: int | None = None,
-        config: GeneratorConfig | None = None,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules.
 
