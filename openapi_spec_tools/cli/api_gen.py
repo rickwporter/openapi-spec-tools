@@ -78,11 +78,11 @@ def generate_api(
     config = config_maybe_from_file(config_file)
 
     if body_type == BodyType.FLAT:
-        generator = FlatApiGenerator(package_name, oas, logger=logger, copyright=copyright_file, config=config)
+        generator = FlatApiGenerator(package_name=package_name, oas=oas, logger=logger, copyright=copyright_file, config=config)
     elif body_type == BodyType.PROPERTY:
-        generator = PropertyApiGenerator(package_name, oas, logger=logger, copyright=copyright_file, config=config)
+        generator = PropertyApiGenerator(package_name=package_name, oas=oas, logger=logger, copyright=copyright_file, config=config)
     else:
-        generator = OpaqueApiGenerator(package_name, oas, logger=logger, copyright=copyright_file, config=config)
+        generator = OpaqueApiGenerator(package_name=package_name, oas=oas, logger=logger, copyright=copyright_file, config=config)
 
     os.makedirs(code_dir, exist_ok=True)
 

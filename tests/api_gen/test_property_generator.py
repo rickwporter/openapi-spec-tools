@@ -62,7 +62,7 @@ from tests.helpers import asset_filename
 )
 def test_model_properties(reference, prop_names):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = PropertyApiGenerator("api_package", oas)
+    uut = PropertyApiGenerator(package_name="api_package", oas=oas)
     model = uut.get_model(reference)
     body_params = uut.model_properties("foo", model)
 
@@ -73,7 +73,7 @@ def test_op_body_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = PropertyApiGenerator("api_package", oas)
+    uut = PropertyApiGenerator(package_name="api_package", oas=oas)
     body_params = uut.op_body_top_properties(op)
 
     args = uut.op_body_arguments(body_params)
@@ -103,7 +103,7 @@ def test_op_body_arguments():
 def test_function_definition():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snaFooCreate')
-    uut = PropertyApiGenerator("api_package", oas)
+    uut = PropertyApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
     assert 'def sna_foo_create(' in text
     assert 'attachments: list[dict[str, Any]] | None = None,  # see Attachment for info' in text
@@ -136,7 +136,7 @@ def test_function_definition():
 def test_function_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooCheck')
-    uut = PropertyApiGenerator("api_package", oas)
+    uut = PropertyApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
 
     assert 'def snafoo_check(' in text
@@ -154,7 +154,7 @@ def test_function_deprecated():
 def test_function_x_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooDelete')
-    uut = PropertyApiGenerator("api_package", oas)
+    uut = PropertyApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
 
     assert 'def snafoo_delete(' in text
@@ -172,7 +172,7 @@ def test_function_x_deprecated():
 def test_function_header_params():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='testPathParams')
-    uut = PropertyApiGenerator("api_package", oas)
+    uut = PropertyApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
 
     # check that the header enums are defined -- no need to check all the fields of each enum

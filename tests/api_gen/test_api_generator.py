@@ -32,12 +32,12 @@ from tests.helpers import asset_filename
     ]
 )
 def test_property_help(prop, max_len, expected):
-    uut = TestApiGenerator("", {}, max_help_length=max_len)
+    uut = TestApiGenerator(package_name="", oas={}, max_help_length=max_len)
     assert expected == uut.property_help(prop)
 
 
 def test_standard_imports():
-    uut = TestApiGenerator("api_package", {})
+    uut = TestApiGenerator(package_name="api_package", oas={})
     text = uut.standard_imports()
     assert 'from typing import Any' in text
     assert 'from datetime import datetime' in text
@@ -81,7 +81,7 @@ def test_command_infra_arguments(
     args, default_host,
     expected,
 ):
-    uut = TestApiGenerator("api_package", {}, **args)
+    uut = TestApiGenerator(package_name="api_package", oas={}, **args)
     uut.default_host = default_host
     node = LayoutNode(command="foo", identifier="bar")
     args = uut.command_infra_arguments(node)
@@ -93,7 +93,7 @@ def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = TestApiGenerator("api_package", oas)
+    uut = TestApiGenerator(package_name="api_package", oas=oas)
     path_params = uut.op_params(op, "path")
 
     args = uut.op_path_arguments(path_params)
@@ -116,7 +116,7 @@ def test_op_query_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = TestApiGenerator("api_package", oas)
+    uut = TestApiGenerator(package_name="api_package", oas=oas)
     query_params = uut.op_params(op, "query")
     properties = uut.params_to_settable_properties(query_params)
 

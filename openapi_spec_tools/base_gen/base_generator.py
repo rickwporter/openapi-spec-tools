@@ -65,8 +65,8 @@ class BaseGenerator:
 
     def __init__(
         self,
-        package_name: str,
         oas: dict[str, Any],
+        package_name: str | None = None,
         logger: logging.Logger | None = None,
         supported_content: list[ContentType] | None = None,
         max_help_length: int | None = None,

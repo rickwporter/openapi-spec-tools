@@ -12,7 +12,7 @@ def test_op_body_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = FlatApiGenerator("api_package", oas)
+    uut = FlatApiGenerator(package_name="api_package", oas=oas)
     body_params = uut.op_body_settable_properties(op)
 
     args = uut.op_body_arguments(body_params)
@@ -43,7 +43,7 @@ def test_function_definition():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     item = tree.find("pet", "create")
-    uut = FlatApiGenerator("api_package", oas)
+    uut = FlatApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
     assert 'def create_pets(' in text
     assert '# handler for createPets: POST /pets' in text
@@ -70,7 +70,7 @@ def test_function_definition():
 def test_function_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooCheck')
-    uut = FlatApiGenerator("api_package", oas)
+    uut = FlatApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
 
     assert 'def snafoo_check(' in text
@@ -88,7 +88,7 @@ def test_function_deprecated():
 def test_function_x_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooDelete')
-    uut = FlatApiGenerator("api_package", oas)
+    uut = FlatApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
 
     assert 'def snafoo_delete(' in text
@@ -106,7 +106,7 @@ def test_function_x_deprecated():
 def test_function_header_params():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='testPathParams')
-    uut = FlatApiGenerator("api_package", oas)
+    uut = FlatApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
 
     # check that the header enums are defined -- no need to check all the fields of each enum

@@ -30,7 +30,7 @@ S1 = '\n    '
 S2 = f"{S1}    "
 
 def test_standard_imports():
-    uut = CliGenerator("cli_package", {})
+    uut = CliGenerator(package_name="cli_package", oas={})
     text = uut.standard_imports()
     assert "import typer" in text
     assert "from typing import Annotated" in text
@@ -39,7 +39,7 @@ def test_standard_imports():
 def test_subcommand_imports():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets3.yaml"))
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.subcommand_imports(tree)
     for name in ["pets", "owners"]:
         line = f"from cli_package.{name} import app as {name}"
@@ -53,7 +53,7 @@ def test_subcommand_imports():
 def test_app_definition():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets3.yaml"))
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.app_definition(tree)
     assert 'app = typer.Typer(no_args_is_help=True, help="Pet management application")' in text
     for name, command in {
@@ -71,7 +71,7 @@ def test_op_path_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     path_params = uut.op_params(op, "path")
 
     lines = uut.op_path_arguments(path_params)
@@ -109,7 +109,7 @@ def test_op_query_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     query_params = uut.op_params(op, "query")
     properties = uut.params_to_settable_properties(query_params)
 
@@ -211,7 +211,7 @@ def test_op_body_arguments():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     body_params = uut.op_body_settable_properties(op)
 
     lines = uut.op_body_arguments(body_params)
@@ -322,7 +322,7 @@ def test_op_body_arguments():
 )
 def test_pagination_creation(names, expected) -> None:
     node = LayoutNode(command="foo", identifier="bar", pagination=names)
-    uut = CliGenerator("foo", {})
+    uut = CliGenerator(package_name="foo", oas={})
     result = uut.pagination_creation(node)
     assert expected == result.strip()
 
@@ -340,7 +340,7 @@ def test_pagination_creation(names, expected) -> None:
     ],
 )
 def test_hardcoded(hardcoded: dict[str, Any], expected: str) -> None:
-    uut = CliGenerator("foo", {})
+    uut = CliGenerator(package_name="foo", oas={})
     text = uut.initialize_hardcoded(hardcoded)
     assert "# initialize hard-coded values" in text
     assert expected in text
@@ -355,7 +355,7 @@ def test_hardcoded(hardcoded: dict[str, Any], expected: str) -> None:
 )
 def test_op_infra_arguments(command, has_details):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
 
     lines = uut.command_infra_arguments(command)
     text = "\n".join(lines)
@@ -381,7 +381,7 @@ def test_op_check_missing():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     query_params = uut.op_params(op, "query")
     body_params = uut.op_body_settable_properties(op)
 
@@ -403,7 +403,7 @@ def test_op_check_missing():
 
 
 def test_summary_display():
-    uut = CliGenerator("foo", {})
+    uut = CliGenerator(package_name="foo", oas={})
 
     command = LayoutNode(command="foo", identifier="foo", summary_fields=["abc", "defGhi"])
     text = uut.summary_display(command)
@@ -415,7 +415,7 @@ def test_summary_display():
     assert '' == text
 
 def test_hidden():
-    uut = CliGenerator("foo", {})
+    uut = CliGenerator(package_name="foo", oas={})
 
     command = LayoutNode(command="foo", identifier="foo", hidden_fields=["xYz", "@bc"])
     text = uut.hidden(command)
@@ -426,7 +426,7 @@ def test_hidden():
     assert '' == text
 
 def test_allowed():
-    uut = CliGenerator("foo", {})
+    uut = CliGenerator(package_name="foo", oas={})
 
     command = LayoutNode(command="foo", identifier="foo", allowed_fields=["sN@", "bAr"])
     text = uut.allowed(command)
@@ -440,7 +440,7 @@ def test_function_definition_item():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     item = tree.find("pet", "create")
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
     assert '@app.command("create", short_help="Create a pet")' in text
     assert 'def create_pets(' in text
@@ -477,7 +477,7 @@ def test_function_definition_item():
 def test_function_definition_forced_single():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command="create", identifier="snaFooCreate")
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
     assert '@app.command("create", short_help="Create a normally messed up situation")' in text
     assert 'def sna_foo_create(' in text
@@ -538,7 +538,7 @@ def test_function_definition_paged():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets.yaml"))
     item = tree.find("list")
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
 
     assert '@app.command("list", short_help="List all pets")' in text
@@ -565,7 +565,7 @@ def test_function_definition_paged():
 def test_function_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooCheck')
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
 
     assert '@app.command("sna", hidden=True, short_help="Check on how messed up things are")' in text
@@ -582,7 +582,7 @@ def test_function_deprecated():
 def test_function_x_deprecated():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='snafooDelete')
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
 
     assert '@app.command("sna", hidden=True, short_help="Straighten things out")' in text
@@ -599,7 +599,7 @@ def test_function_x_deprecated():
 def test_function_header_params():
     oas = open_oas(asset_filename("misc.yaml"))
     item = LayoutNode(command='sna', identifier='testPathParams')
-    uut = CliGenerator("cli_package", oas)
+    uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
 
     # check that the header enums are defined -- no need to check all the fields of each enum
@@ -639,7 +639,7 @@ def test_function_header_params():
 
 
 def test_main():
-    uut = CliGenerator("cli_package", {})
+    uut = CliGenerator(package_name="cli_package", oas={})
     text = uut.main()
     assert 'if __name__ == "__main__":' in text
     assert "app()" in text
@@ -709,7 +709,7 @@ def test_main():
 )
 def test_tree_data(oas_filename, layout_filename, expected):
     oas = open_oas(asset_filename(oas_filename))
-    uut = CliGenerator("cli", oas)
+    uut = CliGenerator(package_name="cli", oas=oas)
     node = file_to_tree(asset_filename(layout_filename))
 
     result = uut.tree_data(node)
@@ -725,7 +725,7 @@ def test_tree_data(oas_filename, layout_filename, expected):
 )
 def test_tree_yaml(oas_filename, layout_filename, tree_filename):
     oas = open_oas(asset_filename(oas_filename))
-    uut = CliGenerator("cli", oas)
+    uut = CliGenerator(package_name="cli", oas=oas)
     node = file_to_tree(asset_filename(layout_filename))
     expected = Path(asset_filename(tree_filename)).read_text()
     assert expected == uut.get_tree_yaml(node)
@@ -733,7 +733,7 @@ def test_tree_yaml(oas_filename, layout_filename, tree_filename):
 
 def test_tree_function():
     node = LayoutNode(command="bar", identifier="foo_bar")
-    uut = CliGenerator("cli", {})
+    uut = CliGenerator(package_name="cli", oas={})
 
     text = uut.tree_function(node)
     assert '@app.command("commands", short_help="Display commands tree for bar sub-commands")' in text

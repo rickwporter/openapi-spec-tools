@@ -128,7 +128,7 @@ def generate_cli(
         typer.echo("Generated layout -- equivalent can be saved using 'layout suggest'.")
 
     config = config_maybe_from_file(config_file)
-    generator = CliGenerator(package_name, oas, logger, copyright=copyright_file, config=config)
+    generator = CliGenerator(package_name=package_name, oas=oas, logger=logger, copyright=copyright_file, config=config)
 
     os.makedirs(code_dir, exist_ok=True)
 
@@ -293,7 +293,7 @@ def show_cli_tree(
     logger = init_logging(log_level, LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
     oas = open_oas_with_error_handling(openapi_file, logger)
-    generator = CliGenerator("", oas, logger)
+    generator = CliGenerator(package_name="", oas=oas, logger=logger)
 
     tree = generate_tree_node(generator, layout)
     if not tree.children:
