@@ -739,10 +739,10 @@ def test_tree_function():
     assert '@app.command("commands", short_help="Display commands tree for bar sub-commands")' in text
     assert 'def show_commands' in text
     assert '"""Show bar sub-commands.' in text
-    assert 'display: _a.TreeDisplayOption = _a.TreeDisplay.HELP' in text
+    assert 'display_opt: _a.TreeDisplayOption = _a.TreeDisplay.HELP' in text
     assert 'depth: _a.MaxDepthOption = 5' in text
     assert 'search: _a.TreeSearchOption = None' in text
-    assert '_t.tree(path.as_posix(), "foo_bar", display, depth, search)' in text
+    assert '_t.tree(path.as_posix(), "foo_bar", display_opt, depth, search)' in text
 
 
 def test_env_vars():
