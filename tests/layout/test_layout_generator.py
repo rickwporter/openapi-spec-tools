@@ -97,6 +97,7 @@ PET = {'type': 'object', 'properties': {'id': {'type': 'integer'}, 'name': {'typ
         pytest.param("postSomething", PET, id="yaml"),
         pytest.param("deleteSomethingElse", PET, id="json"),
         pytest.param("getSomethingElse", ANIMAL, id="no-ref"),
+        pytest.param("updateSomethingElse", None, id="no-schema"),
     ]
 )
 def test_get_response_body(op_id, expected):

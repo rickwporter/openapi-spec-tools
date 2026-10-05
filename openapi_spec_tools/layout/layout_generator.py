@@ -145,6 +145,8 @@ class LayoutGenerator:
                     continue
 
                 schema = content_details.get(OasField.SCHEMA)
+                if not schema:
+                    continue
 
                 # the info is directly in the schema
                 if set(schema.keys()) != {OasField.REFS.value}:

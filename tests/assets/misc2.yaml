@@ -55,6 +55,14 @@ paths:
                 properties:
                   species:
                     type: string
+    put:
+      operationId: updateSomethingElse
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                note: This response has no schema
 
 
 components:
