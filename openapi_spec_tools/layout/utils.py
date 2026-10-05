@@ -303,7 +303,7 @@ def subcommand_order(data: dict[str, Any], start: str = DEFAULT_START) -> list[s
     if len(names) < 2:  # noqa: PLR2004
         return misordered
 
-    # start by populting the last
+    # start by populating the last
     last = names[0]
     names = names[1:]
 
@@ -461,5 +461,10 @@ def write_layout(filename: str, node: LayoutNode, indent: int = 4):
     """Write the text from the node to the specified file."""
     with open(filename, "w", encoding="utf-8", newline="\n") as fp:
         node_dict = layout_node_to_dict(node)
-        yaml.dump(node_dict, fp, line_break="\n", indent=indent, sort_keys=False)
+
+        # make sure the items stay in order with main first
+        main_name = list(node_dict.keys())[0]
+        result = {main_name: node_dict.pop(main_name)}
+        result.update(sorted(node_dict.items()))
+        yaml.dump(result, fp, line_break="\n", indent=indent, sort_keys=False)
 
