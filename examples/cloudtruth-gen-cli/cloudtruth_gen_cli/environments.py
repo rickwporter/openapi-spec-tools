@@ -27,7 +27,7 @@ app.add_typer(environments_tags, name="tags")
 
 @app.command("commands", short_help="Display commands tree for environment sub-commands")
 def show_commands(
-    display: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
+    display_opt: _a.TreeDisplayOption = _a.TreeDisplay.HELP,
     depth: _a.MaxDepthOption = 5,
     search: _a.TreeSearchOption = None,
 ) -> None:
@@ -36,7 +36,7 @@ def show_commands(
     The '*' denotes a sub-command with other sub-commands, but no direct actions.
     """
     path = Path(__file__).parent / "tree.yaml"
-    _t.tree(path.as_posix(), "environments", display, depth, search)
+    _t.tree(path.as_posix(), "environments", display_opt, depth, search)
     return
 
 
