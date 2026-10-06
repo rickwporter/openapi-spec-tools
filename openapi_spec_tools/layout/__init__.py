@@ -1,4 +1,5 @@
 """Layout utilities."""
+from .config import LayoutConfig
 from .layout_generator import LayoutGenerator
 from .merge import merge
 from .merge import merge_node_properties
