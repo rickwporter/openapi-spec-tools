@@ -10,6 +10,7 @@ logging, etc.
 import importlib.metadata
 import json
 from copy import deepcopy
+from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
 from typing import Any
@@ -172,9 +173,9 @@ def request(
     params = params or {}
     pretty_url = url + _pretty_params(params)
     logger.debug(f"Requesting {method} {pretty_url}")
-    start = datetime.now()
+    start = datetime.now(tz=UTC)
     response = requests.request(method, url, params=params, headers=headers, json=body, timeout=timeout, **kwargs)
-    delta = datetime.now() - start
+    delta = datetime.now(tz=UTC) - start
     logger.info(f"Got {response.status_code} response from {method} {pretty_url} in {delta.total_seconds()}")
 
     raise_for_error(response)
@@ -260,9 +261,9 @@ def depaginate(
             pretty_url = _url + _pretty_params(_params)
 
         logger.debug(f"Requesting {GET} {pretty_url} count={page_count + 1}")
-        start = datetime.now()
+        start = datetime.now(tz=UTC)
         response = requests.get(_url, params=deepcopy(_params), headers=_headers, timeout=timeout)
-        delta = datetime.now() - start
+        delta = datetime.now(tz=UTC) - start
 
         raise_for_error(response)
 
