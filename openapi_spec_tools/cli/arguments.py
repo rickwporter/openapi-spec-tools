@@ -94,7 +94,10 @@ OutputStyleOption = Annotated[
         help="Style for output",
     ),
 ]
-PackageNameArgument = Annotated[str, typer.Argument(metavar="PACKAGE", show_default=False, help="Base package name")]
+PackageNameOption = Annotated[
+    str,
+    typer.Option("--package", metavar="PACKAGE", show_default=False, help="Base package name"),
+]
 PathPrefixOption = Annotated[
     str,
     typer.Option("--prefix", metavar="PREFIX", show_default=False, help="Prefix to ignore when using path"),

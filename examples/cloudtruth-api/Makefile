@@ -47,7 +47,7 @@ flat-rm: ## Remove generated flat API
 	rm -rf $(FLAT_DIR)
 
 flat-gen: ## Generate flat API (completely unrolled properties)
-	$(uv_run) api-gen $(OPENAPI_SPEC) $(FLAT_PKG_NAME) $(BASE_API_ARGS) --body-type flat --code-dir $(FLAT_DIR)
+	$(uv_run) api-gen $(OPENAPI_SPEC) --package $(FLAT_PKG_NAME) $(BASE_API_ARGS) --body-type flat --code-dir $(FLAT_DIR)
 
 prop-regen: prop-rm prop-gen ## Regenerate API with property level arguments
 
@@ -55,7 +55,7 @@ prop-rm: ## Remove generated property API
 	rm -rf $(PROP_DIR)
 
 prop-gen: ## Generate property API (first level properties visible)
-	$(uv_run) api-gen $(OPENAPI_SPEC) $(PROP_PKG_NAME) $(BASE_API_ARGS) --body-type property --code-dir $(PROP_DIR)
+	$(uv_run) api-gen $(OPENAPI_SPEC) --package $(PROP_PKG_NAME) $(BASE_API_ARGS) --body-type property --code-dir $(PROP_DIR)
 
 opaque-regen: opaque-rm opaque-gen ## Regenerate API with opaque bodies
 
@@ -63,7 +63,7 @@ opaque-rm: ## Remove generated opaque API
 	rm -rf $(OPAQUE_DIR)
 
 opaque-gen: ## Generate opaque API (body blobs)
-	$(uv_run) api-gen $(OPENAPI_SPEC) $(OPAQUE_PKG_NAME) $(BASE_API_ARGS) --body-type opaque --code-dir $(OPAQUE_DIR)
+	$(uv_run) api-gen $(OPENAPI_SPEC) --package $(OPAQUE_PKG_NAME) $(BASE_API_ARGS) --body-type opaque --code-dir $(OPAQUE_DIR)
 
 
 ###########

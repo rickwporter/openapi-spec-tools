@@ -37,7 +37,7 @@ trim: ## Creates the skinny OpenAPI spec
 	$(uv_run) cli-gen trim $(LAYOUT_FILE) $(OPENAPI_SPEC) --updated-file $(TRIMMED_SPEC) --remove examples
 
 gen: layout-lint trim ## Generate CLI code
-	$(uv_run) cli-gen generate $(TRIMMED_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	$(uv_run) cli-gen generate $(TRIMMED_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)

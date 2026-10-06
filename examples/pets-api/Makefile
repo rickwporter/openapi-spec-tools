@@ -28,7 +28,7 @@ gen: api-regen ## Regenerate API code
 api-regen: rm-gen api-gen ## Regenerate the API code
 
 api-gen: ## Generate ALI code
-	$(uv_run) api-gen $(OPENAPI_SPEC) $(PACKAGE_NAME)
+	$(uv_run) api-gen $(OPENAPI_SPEC) --package $(PACKAGE_NAME)
 
 rm-gen: ## Remove generated code
 	rm -rf $(PACKAGE_NAME)

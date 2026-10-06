@@ -11,3 +11,4 @@ env_host:
 env_key:
 - CT_KEY
 - API_KEY
+package_name: cloudtruth_gen_cli

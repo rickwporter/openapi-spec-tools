@@ -38,7 +38,7 @@ layout-suggest: ## Create suggested layout file
 	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
 
 cli-gen: layout-lint ## Generate CLI code
-	$(uv_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY)
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY)
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)

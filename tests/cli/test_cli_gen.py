@@ -242,16 +242,17 @@ def test_cli_generate_location_errors(code_dir, test_dir, include_tests, error):
 
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+
     ):
-        with pytest.raises(typer.Exit) as context:
-            generate_cli(
-                oas_file,
-                pkg_name,
-                layout_file=layout_file,
-                code_dir=code_dir,
-                test_dir=test_dir,
-                include_tests=include_tests,
-            )
+        generate_cli(
+            oas_file,
+            pkg_name,
+            layout_file=layout_file,
+            code_dir=code_dir,
+            test_dir=test_dir,
+            include_tests=include_tests,
+        )
         ex = context.value
         assert ex.exit_code == 1
         assert error == mock_stdout.getvalue()
@@ -271,9 +272,9 @@ Commands with missing operations:
 
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
     ):
-        with pytest.raises(typer.Exit) as context:
-            generate_cli(oas_file, pkg_name, layout_file, directory.name)
+        generate_cli(oas_file, pkg_name, layout_file, directory.name)
         ex = context.value
         assert ex.exit_code == 1
         assert message == mock_stdout.getvalue()
@@ -291,9 +292,9 @@ Commands with missing operations:
 
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
     ):
-        with pytest.raises(typer.Exit) as context:
-            generate_check_missing(layout_file, oas_file)
+        generate_check_missing(layout_file, oas_file)
         ex = context.value
         assert ex.exit_code == 1
         assert message == mock_stdout.getvalue()
@@ -556,3 +557,23 @@ def test_cli_generate_success_config():
     file = code_dir / "main.py"
     text = read_text(file.as_posix())
     assert '_api_timeout: _a.ApiTimeoutOption = 42' in text
+
+
+def test_cli_generate_failure_no_package_name():
+    oas_file = asset_filename("pet2.yaml")
+
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+    pkg_name = "some_package"
+    code_dir = base_dir / pkg_name
+    message = "Must specify package_name in arguments or configuration"
+
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+        generate_cli(oas_file, code_dir=code_dir)
+        ex = context.value
+        assert ex.exit_code == 1
+        assert message == mock_stdout.getvalue()
+
