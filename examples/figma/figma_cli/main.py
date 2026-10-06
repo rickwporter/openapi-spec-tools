@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Annotated  # noqa: F401
 
 import typer
-from rich_objects import display
+from rich_objects import display  # noqa: F401
 
 from figma_cli import _arguments as _a
 from figma_cli import _display as _d  # noqa: F401
