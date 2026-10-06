@@ -644,9 +644,11 @@ class BaseGenerator:
         else:
             oas_type = self.simplify_type(prop_data.get(OasField.TYPE))
             if oas_type == "object":
-                add_prop_type = prop_data.get(OasField.ADDITIONAL_PROPS, {}).get(OasField.TYPE)
-                if add_prop_type:
-                    prop_data.update({OasField.TYPE.value: add_prop_type})
+                add_props = prop_data.get(OasField.ADDITIONAL_PROPS)
+                if isinstance(add_props, dict):
+                    add_prop_type = add_props.get(OasField.TYPE)
+                    if add_prop_type:
+                        prop_data.update({OasField.TYPE.value: add_prop_type})
 
             pytype = self.schema_to_pytype(prop_data)
             if not pytype:
