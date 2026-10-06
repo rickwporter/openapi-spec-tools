@@ -465,6 +465,24 @@ def test_get_parameter_pytype(param_data, expected):
             "str",
             id="add-props-req",
         ),
+        pytest.param(
+            "foo",
+            {TYPE: "object", "additionalProperties": None},
+            None,
+            id="add-props-none"
+        ),
+        pytest.param(
+            "foo",
+            {TYPE: "object", "additionalProperties": True},
+            None,
+            id="add-props-bool"
+        ),
+        pytest.param(
+            "foo",
+            {TYPE: "object", "additionalProperties": {}},
+            None,
+            id="add-props-no-type"
+        ),
     ],
 )
 def test_get_property_pytype(prop_name, prop_data, expected):
