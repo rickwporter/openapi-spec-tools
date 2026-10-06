@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 import typer
 
+from openapi_spec_tools.base_gen import GeneratorConfig
 from openapi_spec_tools.cli.utils import config_maybe_from_file
 from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
@@ -59,8 +60,8 @@ def test_open_layout_with_error(filename, message) -> None:
     ["filename", "message"],
     [
         pytest.param("gone", "ERROR: failed to find", id="missing"),
-        pytest.param("bad.yaml", "ERROR: unable to parse", id="bad"),
-        pytest.param("pet2.yaml", "ERROR: No start value found for 'start'", id="bad"),
+        pytest.param("bad.yaml", "ERROR: unable to parse", id="parse"),
+        pytest.param("pet2.yaml", "ERROR: No start value found for 'start'", id="values"),
     ]
 )
 def test_layout_tree_with_error(filename, message) -> None:
@@ -77,10 +78,31 @@ def test_layout_tree_with_error(filename, message) -> None:
 
 
 @pytest.mark.parametrize(
+    ["filename", "expected"],
+    [
+        pytest.param(None, GeneratorConfig(), id="none"),
+        pytest.param("", GeneratorConfig(), id="empty"),
+        pytest.param(
+            asset_filename("simple_config.yaml"),
+            GeneratorConfig(
+                package_name="my_package",
+                env_host="DIFFERENT_ENV_VAR",
+                default_timeout=37,
+                env_key="API_TOKEN",
+            ),
+            id="simple",
+        ),
+    ]
+)
+def test_config_maybe_from_file_success(filename: str | None, expected: GeneratorConfig) -> None:
+    assert expected == config_maybe_from_file(filename)
+
+
+@pytest.mark.parametrize(
     ["filename", "message"],
     [
         pytest.param("foo.yaml", "ERROR: failed to find ", id="missing"),
-        pytest.param(asset_filename("bad.yaml"), "ERROR: unable to parse", id="bad"),
+        pytest.param(asset_filename("bad.yaml"), "ERROR: unable to parse", id="parse"),
         pytest.param(asset_filename("bad_config.yaml"), "ERROR: 1 validation error for GeneratorConfig", id="values"),
     ]
 )

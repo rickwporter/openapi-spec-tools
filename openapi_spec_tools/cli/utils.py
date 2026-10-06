@@ -116,13 +116,13 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
     raise typer.Exit(1)
 
 
-def config_maybe_from_file(filename: str | None) -> GeneratorConfig | None:
+def config_maybe_from_file(filename: str | None) -> GeneratorConfig:
     """Get the configuration from the specified filename.
 
-    If the filename is None, or unable to get the config, this returns None.
+    If no filename is provided, this returns an empty configuration.
     """
     if not filename:
-        return None
+        return GeneratorConfig()
 
     try:
         return GeneratorConfig.from_yaml(filename)

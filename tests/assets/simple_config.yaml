@@ -1,0 +1,4 @@
+env_host: DIFFERENT_ENV_VAR
+env_key: API_TOKEN
+default_timeout: 37
+package_name: my_package
