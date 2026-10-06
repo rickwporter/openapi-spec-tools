@@ -27,15 +27,6 @@ ConfigFileOption = Annotated[
     str | None,
     typer.Option("--config", metavar=FILENAME, show_default=False, help="Generator configuration file")
 ]
-CopyrightFileOption = Annotated[
-    str | None,
-    typer.Option(
-        "--copyright-file",
-        metavar=FILENAME,
-        show_default=False,
-        help="File name containing copyright message (for non-default)",
-    ),
-]
 IndentOption = Annotated[
     int,
     typer.Option(

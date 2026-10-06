@@ -11,7 +11,6 @@ from openapi_spec_tools.api_gen import OpaqueApiGenerator
 from openapi_spec_tools.api_gen import PropertyApiGenerator
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
 from openapi_spec_tools.cli.arguments import ConfigFileOption
-from openapi_spec_tools.cli.arguments import CopyrightFileOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
@@ -53,7 +52,6 @@ def generate_api(
     package_name: PackageNameOption = None,
     config_file: ConfigFileOption = None,
     code_dir: CodeDirectoryOption = None,
-    copyright_file: CopyrightFileOption = None,
     prefix: PathPrefixOption = "",
     layout_file: LayoutFilenameOption = None,
     start: StartPointOption = DEFAULT_START,
@@ -80,7 +78,7 @@ def generate_api(
         typer.echo("Must specify package_name in arguments or configuration.")
         raise typer.Exit(1)
 
-    kwargs = {"package_name": package_name, "oas": oas, "logger": logger, "copyright": copyright_file, "config": config}
+    kwargs = {"package_name": package_name, "oas": oas, "logger": logger, "config": config}
     if body_type == BodyType.FLAT:
         generator = FlatApiGenerator(**kwargs)
     elif body_type == BodyType.PROPERTY:

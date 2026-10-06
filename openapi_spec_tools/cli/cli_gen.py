@@ -11,7 +11,6 @@ from rich_objects import console_factory
 
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
 from openapi_spec_tools.cli.arguments import ConfigFileOption
-from openapi_spec_tools.cli.arguments import CopyrightFileOption
 from openapi_spec_tools.cli.arguments import IndentOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli.arguments import LayoutFilenameOption
@@ -84,7 +83,6 @@ def generate_cli(
         typer.Option(metavar=DIRECTORY, show_default=False, help="Directory for tests -- overrides default")
     ] = None,
     config_file: ConfigFileOption = None,
-    copyright_file: CopyrightFileOption = None,
     include_tests: Annotated[bool, typer.Option("--tests/--no-tests", help="Include tests in generated code")] = True,
     prefix: PathPrefixOption = "",
     start: StartPointOption = DEFAULT_START,
@@ -115,7 +113,7 @@ def generate_cli(
         typer.echo("Must specify package_name in arguments or configuration.")
         raise typer.Exit(1)
 
-    generator = CliGenerator(package_name=package_name, oas=oas, logger=logger, copyright=copyright_file, config=config)
+    generator = CliGenerator(package_name=package_name, oas=oas, logger=logger, config=config)
 
     if project_dir:
         code_dir = code_dir or os.path.join(project_dir, generator.package_name)
