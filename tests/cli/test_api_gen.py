@@ -55,24 +55,29 @@ def test_api_generate_success_directory(code_dir, expected_dir, temp_working_dir
     assert filenames == expected
 
 
-def test_api_generate_success_copyright():
+def test_api_generate_success_copyright(temp_working_dir):
     oas_file = asset_filename("pet2.yaml")
 
     pkg_name = "my_api_pkg"
-    directory = TemporaryDirectory()
-    base_dir = Path(directory.name)
+    base_dir = Path(temp_working_dir)
 
+    # create the copyright file
     copyright_text = "# Simple copyright message"
     copyright_file = base_dir / "copyright.txt"
     copyright_file.write_bytes(copyright_text.encode(encoding="utf-8"))
     code_dir = base_dir / "foo"
+
+    # create the config file which references the copyright file
+    config_file = base_dir / "config.yaml"
+    config = {"copyright": copyright_file.name}
+    config_file.write_text(yaml.dump(config, indent=4))
 
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         generate_api(
             oas_file,
             pkg_name,
             code_dir=code_dir.as_posix(),
-            copyright_file=copyright_file.as_posix()
+            config_file=config_file.as_posix()
         )
         assert "Generated API files\n" == mock_stdout.getvalue()
 
