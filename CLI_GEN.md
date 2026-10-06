@@ -71,12 +71,15 @@ More details are provided in [LAYOUT.md](LAYOUT.md).
 
 The CLI generation tools are installed as `cli-gen`. The command to generate the CLI code looks like:
 ```terminal
-cli-gen generate openapi.yaml widgets --layout-file layout.yaml --code-dir src/widgets --test-dir tests
+cli-gen generate openapi.yaml --package widgets --layout-file layout.yaml --code-dir src/widgets --test-dir tests
 ```
 
 This puts all the generated code into `src/widgets/`, and test code into `tests/`.
 
 The generation tool overwites existing files with new content, so it is expected that you will need to run this many times to get a complete CLI for your service. However, it does NOT delete previously generated files, so just be aware that you will need to manually delete files associated with an old sub-command.
+
+The CLI generator can be configured using a YAML file. For more details, see [GEN_CONFIG.md](GEN_CONFIG.md).
+
 
 ## Background
 
