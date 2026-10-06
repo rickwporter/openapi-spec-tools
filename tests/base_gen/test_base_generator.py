@@ -31,27 +31,27 @@ PKG = "some_package"
 
 
 def test_package_name():
-    assert "" == BaseGenerator("", {}).package_name
-    assert "pets" == BaseGenerator("pets", {}).package_name
+    assert "" == BaseGenerator(package_name="", oas={}).package_name
+    assert "pets" == BaseGenerator(package_name="pets", oas={}).package_name
 
 
 def test_copyright_text():
-    assert DEFAULT_COPYRIGHT == BaseGenerator(PKG, {}).copyright
+    assert DEFAULT_COPYRIGHT == BaseGenerator(oas={}, package_name=PKG).copyright
 
     text = "# this is my copyright\n"
-    assert text == BaseGenerator(PKG, {}, copyright=text).copyright
+    assert text == BaseGenerator(package_name=PKG, oas={}, copyright=text).copyright
 
     missing = "/no/such/copyright.txt"
-    assert missing == BaseGenerator(PKG, {}, copyright=missing).copyright
+    assert missing == BaseGenerator(package_name=PKG, oas={}, copyright=missing).copyright
 
     message = "# file copyright\n"
     with TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "copyright.txt"
         path.write_text(message, encoding="utf-8")
-        assert message == BaseGenerator(PKG, {}, copyright=path.as_posix()).copyright
-        assert message == BaseGenerator(PKG, {}, copyright=path).copyright
+        assert message == BaseGenerator(package_name=PKG, oas={}, copyright=path.as_posix()).copyright
+        assert message == BaseGenerator(package_name=PKG, oas={}, copyright=path).copyright
 
-        assert DEFAULT_COPYRIGHT == BaseGenerator(PKG, {}, copyright={"type": "error"}).copyright
+        assert DEFAULT_COPYRIGHT == BaseGenerator(package_name=PKG, oas={}, copyright={"type": "error"}).copyright
 
 
 def test_config():
@@ -61,7 +61,7 @@ def test_config():
         default_host="https://192.168.1.1",
         default_log_level="error",
     )
-    uut = BaseGenerator(PKG, {}, config=config, default_log_level="debug")
+    uut = BaseGenerator({}, package_name=PKG, config=config, default_log_level="debug")
     assert uut.package_name == PKG
     assert uut.max_help_length == 3
     assert uut.default_log == "debug"
@@ -69,7 +69,7 @@ def test_config():
 
     config = GeneratorConfig()
     with pytest.raises(ValueError, match="Missing package_name"):
-        BaseGenerator(None, {}, config=config)
+        BaseGenerator({}, config=config)
 
 
 @pytest.mark.parametrize(
@@ -96,7 +96,7 @@ def test_config():
     ]
 )
 def test_class_name(proposed, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.class_name(proposed)
 
 
@@ -123,7 +123,7 @@ def test_class_name(proposed, expected):
     ],
 )
 def test_function_name(proposed, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.function_name(proposed)
 
 
@@ -150,7 +150,7 @@ def test_function_name(proposed, expected):
     ],
 )
 def test_variable_name(proposed, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.variable_name(proposed)
 
 
@@ -178,12 +178,12 @@ def test_variable_name(proposed, expected):
     ],
 )
 def test_option_name(proposed, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.option_name(proposed)
 
 
 def test_shebang():
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     text = uut.shebang()
     assert text.startswith("#!/")
     assert "python3" in text
@@ -206,7 +206,7 @@ def test_shebang():
     ]
 )
 def test_op_short_help(op, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.op_short_help(op)
 
 
@@ -271,7 +271,7 @@ def test_op_short_help(op, expected):
     ]
 )
 def test_op_doc_string(op, expected):
-    uut = BaseGenerator(PKG, {}, max_help_length=30)
+    uut = BaseGenerator(package_name=PKG, oas={}, max_help_length=30)
     assert expected == uut.op_doc_string(op)
 
 
@@ -289,7 +289,7 @@ def test_op_doc_string(op, expected):
 )
 def test_model_is_complex(reference, expected):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = BaseGenerator(PKG, oas)
+    uut = BaseGenerator(oas=oas, package_name=PKG)
     model = uut.get_model(f"#/components/schemas/{reference}")
     assert expected == uut.model_is_complex(model)
 
@@ -306,7 +306,7 @@ def test_model_is_complex(reference, expected):
     ]
 )
 def test_op_url_params(path, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.op_url_params(path)
 
 
@@ -314,7 +314,7 @@ def test_op_param_formation():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = BaseGenerator(PKG, oas)
+    uut = BaseGenerator(oas=oas, package_name=PKG)
     query_params = uut.op_params(op, "query")
     properties = uut.params_to_settable_properties(query_params)
 
@@ -379,7 +379,7 @@ def test_op_param_formation():
 )
 def test_schema_to_type(schema, fmt, expected):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = BaseGenerator(PKG, oas)
+    uut = BaseGenerator(oas=oas, package_name=PKG)
 
     assert expected == uut.schema_to_type(schema, fmt)
 
@@ -396,7 +396,7 @@ def test_schema_to_type(schema, fmt, expected):
     ]
 )
 def test_simplify_type(schema, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.simplify_type(schema)
 
 @pytest.mark.parametrize(
@@ -416,7 +416,7 @@ def test_simplify_type(schema, expected):
     ],
 )
 def test_get_parameter_pytype(param_data, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.get_parameter_pytype(param_data)
 
 
@@ -468,7 +468,7 @@ def test_get_parameter_pytype(param_data, expected):
     ],
 )
 def test_get_property_pytype(prop_name, prop_data, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.get_property_pytype(prop_name, prop_data)
 
 
@@ -483,7 +483,7 @@ def test_op_content_type(op_id, expected):
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get(op_id)
-    uut = BaseGenerator(PKG, oas)
+    uut = BaseGenerator(oas=oas, package_name=PKG)
 
     assert expected == uut.op_content_header(op)
 
@@ -492,7 +492,7 @@ def test_op_body_formation():
     oas = open_oas(asset_filename("misc.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
-    uut = BaseGenerator(PKG, oas)
+    uut = BaseGenerator(oas=oas, package_name=PKG)
     body_params = uut.op_body_settable_properties(op)
     text = uut.op_body_formation(body_params)
     assert "body = {}" in text
@@ -539,7 +539,7 @@ def test_op_body_formation_none():
     oas = open_oas(asset_filename("pet.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("showPetById")
-    uut = BaseGenerator(PKG, oas)
+    uut = BaseGenerator(oas=oas, package_name=PKG)
     body_params = uut.op_body_settable_properties(op)
     assert {} == body_params
     assert "" == uut.op_body_formation(body_params)
@@ -558,7 +558,7 @@ def test_op_body_formation_none():
     ]
 )
 def test_enum_values_match_type(enum_type, values, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     assert expected == uut.enum_values_match_type(enum_type, values)
 
 SIMPLE_ENUM = """\
@@ -631,7 +631,7 @@ SIMPLE_PROP[DEF] = None
     ]
 )
 def test_enum_declaration(name, enum_type, values, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     declaration = uut.enum_declaration(name, enum_type, values)
     assert expected == declaration
 
@@ -699,7 +699,7 @@ def test_enum_declaration(name, enum_type, values, expected):
     ],
 )
 def test_enum_definitions(path_params, query_params, body_params, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     definitions = uut.enum_definitions(path_params, query_params, body_params)
     assert expected == definitions
 
@@ -756,7 +756,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
     ],
 )
 def test_param_to_property(parameter, expected):
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
     prop = uut.param_to_property(parameter)
     assert expected == prop
 
@@ -1408,14 +1408,14 @@ def test_param_to_property(parameter, expected):
 )
 def test_model_settable_properties(model_name, expected):
     oas = open_oas(asset_filename("misc.yaml"))
-    uut = BaseGenerator(PKG, oas)
+    uut = BaseGenerator(oas=oas, package_name=PKG)
     model = uut.get_model(f"#/components/schemas/{model_name}")
     properties = uut.model_settable_properties(model_name, model)
     assert expected == properties
 
 
 def test_add_init_file() -> None:
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
 
     with TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "__init__.py"
@@ -1437,7 +1437,7 @@ def test_add_init_file() -> None:
 
 
 def test_copy_infrastructure() -> None:
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
 
     with TemporaryDirectory() as temp_dir:
         directory = Path(temp_dir)
@@ -1461,7 +1461,7 @@ def test_copy_infrastructure() -> None:
 
 
 def test_copy_tests() -> None:
-    uut = BaseGenerator(PKG, {})
+    uut = BaseGenerator(oas={}, package_name=PKG)
 
     with TemporaryDirectory() as temp_dir:
         directory = Path(temp_dir)

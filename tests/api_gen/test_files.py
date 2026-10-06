@@ -14,7 +14,7 @@ def test_generate_api_node_single():
     layout_gen = LayoutGenerator(oas)
     tree = layout_gen.generate("")
     directory = TemporaryDirectory()
-    generator = TestApiGenerator(pkg_name, oas)
+    generator = TestApiGenerator(package_name=pkg_name, oas=oas)
     generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)
@@ -47,7 +47,7 @@ def test_generate_api_node_multiple():
     layout_gen = LayoutGenerator(oas)
     tree = layout_gen.generate("")
     directory = TemporaryDirectory()
-    generator = TestApiGenerator(pkg_name, oas)
+    generator = TestApiGenerator(package_name=pkg_name, oas=oas)
     generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)

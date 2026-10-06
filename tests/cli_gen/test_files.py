@@ -18,7 +18,7 @@ def test_generate_node_single():
     oas = open_oas(asset_filename("pet2.yaml"))
     tree = file_to_tree(asset_filename("layout_pets.yaml"))
     directory = TemporaryDirectory()
-    generator = CliGenerator(pkg_name, oas)
+    generator = CliGenerator(package_name=pkg_name, oas=oas)
     generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)
@@ -60,7 +60,7 @@ def test_generate_node_multiple():
     oas = open_oas(asset_filename("pets_and_vets.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     directory = TemporaryDirectory()
-    generator = CliGenerator(pkg_name, oas)
+    generator = CliGenerator(package_name=pkg_name, oas=oas)
     generator.generate_files(tree, directory.name)
 
     path = Path(directory.name)
@@ -111,7 +111,7 @@ def test_generate_node_skip_bugged():
     oas = open_oas(asset_filename("pets_and_vets.yaml"))
     tree = file_to_tree(asset_filename("layout_pets2.yaml"))
     directory = TemporaryDirectory()
-    generator = CliGenerator(pkg_name, oas)
+    generator = CliGenerator(package_name=pkg_name, oas=oas)
 
     # create a sub-command a bug
     node = tree.find("owners")
@@ -162,7 +162,7 @@ def test_generate_node_skip_bugged():
 def test_generate_tree_node(oas_filename, layout_filename, expected):
     oas = open_oas(asset_filename(oas_filename))
     layout = file_to_tree(asset_filename(layout_filename))
-    generator = CliGenerator("cli", oas)
+    generator = CliGenerator(package_name="cli", oas=oas)
     tree = generate_tree_node(generator, layout)
     names = {node.name for node in tree.children}
     assert expected == names
