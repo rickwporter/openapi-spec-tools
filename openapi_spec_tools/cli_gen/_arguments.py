@@ -94,6 +94,7 @@ OutputStyleOption = Annotated[
 TreeDisplayOption = Annotated[
     TreeDisplay,
     typer.Option(
+        "--display",
         case_sensitive=False,
         help="Details of the CLI command tree to show."
     ),
