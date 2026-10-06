@@ -15,7 +15,7 @@ from openapi_spec_tools.cli.arguments import CopyrightFileOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
-from openapi_spec_tools.cli.arguments import PackageNameArgument
+from openapi_spec_tools.cli.arguments import PackageNameOption
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.utils import config_maybe_from_file
@@ -50,7 +50,7 @@ app = typer.Typer(
 @app.command("generate", short_help="Generate API code")
 def generate_api(
     openapi_file: OpenApiFilenameArgument,
-    package_name: PackageNameArgument,
+    package_name: PackageNameOption = None,
     config_file: ConfigFileOption = None,
     code_dir: CodeDirectoryOption = None,
     copyright_file: CopyrightFileOption = None,
@@ -66,7 +66,6 @@ def generate_api(
     the function arguments, and the amount of work done to form the body.
     """
     logger = init_logging(log_level, LOG_CLASS)
-    code_dir = code_dir or package_name
 
     oas = open_oas_with_error_handling(openapi_file, logger)
     if layout_file:
@@ -77,6 +76,10 @@ def generate_api(
 
     config = config_maybe_from_file(config_file)
 
+    if not package_name and not config.package_name:
+        typer.echo("Must specify package_name in arguments or configuration.")
+        raise typer.Exit(1)
+
     kwargs = {"package_name": package_name, "oas": oas, "logger": logger, "copyright": copyright_file, "config": config}
     if body_type == BodyType.FLAT:
         generator = FlatApiGenerator(**kwargs)
@@ -85,6 +88,7 @@ def generate_api(
     else:
         generator = OpaqueApiGenerator(**kwargs)
 
+    code_dir = code_dir or generator.package_name
     os.makedirs(code_dir, exist_ok=True)
 
     # copy over the basic infrastructure

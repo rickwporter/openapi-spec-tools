@@ -40,7 +40,7 @@ layout-update: ## Suggest using updates to the hand tailored spec
 	$(uv_run) layout suggest $(OPENAPI_SPEC) $(LAYOUT_FILE) --update
 
 gen: layout-lint ## Generate CLI code
-	$(uv_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)

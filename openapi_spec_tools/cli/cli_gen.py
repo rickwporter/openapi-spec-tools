@@ -17,7 +17,7 @@ from openapi_spec_tools.cli.arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli.arguments import LayoutFilenameOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
-from openapi_spec_tools.cli.arguments import PackageNameArgument
+from openapi_spec_tools.cli.arguments import PackageNameOption
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
@@ -72,7 +72,7 @@ def render_missing(missing: dict[str, list[str]]) -> str:
 @app.command("generate", short_help="Generate CLI code")
 def generate_cli(
     openapi_file: OpenApiFilenameArgument,
-    package_name: PackageNameArgument,
+    package_name: PackageNameOption = None,
     layout_file: LayoutFilenameOption = None,
     project_dir: Annotated[
         str | None,
@@ -97,23 +97,6 @@ def generate_cli(
     """
     logger = init_logging(log_level, LOG_CLASS)
 
-    if project_dir:
-        code_dir = code_dir or os.path.join(project_dir, package_name)
-        test_dir = test_dir or os.path.join(project_dir, "tests")
-    else:
-        if not code_dir:
-            typer.echo(
-                "Must provide code directory using either `--project-dir` (which uses package"
-                " name), or `--code-dir`"
-            )
-            raise typer.Exit(1)
-        if not test_dir and include_tests:
-            typer.echo(
-                "Must provide test directory using either `--project-dir` (which uses "
-                "tests sub-directory), or `--tests-dir`"
-            )
-            raise typer.Exit(1)
-
     oas = open_oas_with_error_handling(openapi_file, logger)
     if layout_file:
         commands = layout_tree_with_error_handling(layout_file, start, logger)
@@ -128,7 +111,28 @@ def generate_cli(
         typer.echo("Generated layout -- equivalent can be saved using 'layout suggest'.")
 
     config = config_maybe_from_file(config_file)
+    if not package_name and not config.package_name:
+        typer.echo("Must specify package_name in arguments or configuration.")
+        raise typer.Exit(1)
+
     generator = CliGenerator(package_name=package_name, oas=oas, logger=logger, copyright=copyright_file, config=config)
+
+    if project_dir:
+        code_dir = code_dir or os.path.join(project_dir, generator.package_name)
+        test_dir = test_dir or os.path.join(project_dir, "tests")
+    else:
+        if not code_dir:
+            typer.echo(
+                "Must provide code directory using either `--project-dir` (which uses package"
+                " name), or `--code-dir`"
+            )
+            raise typer.Exit(1)
+        if not test_dir and include_tests:
+            typer.echo(
+                "Must provide test directory using either `--project-dir` (which uses "
+                "tests sub-directory), or `--tests-dir`"
+            )
+            raise typer.Exit(1)
 
     os.makedirs(code_dir, exist_ok=True)
 

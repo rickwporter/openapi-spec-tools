@@ -37,7 +37,7 @@ layout-suggest: ## Create suggested layout file
 	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE)
 
 cli-gen: layout-lint ## Generate CLI code
-	$(uv_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --no-tests --project-dir $(PROJECT_DIRECTORY)
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --no-tests --project-dir $(PROJECT_DIRECTORY)
 
 cli-clean: ## Delete generated CLI code
 	rm -rf $(PACKAGE_NAME)

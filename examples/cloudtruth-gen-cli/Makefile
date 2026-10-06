@@ -11,7 +11,6 @@ UPDATED_FILE := updated.yaml
 CONFIG_FILE := config.yaml
 OPENAPI_SPEC := ct.yaml
 PROJECT_DIRECTORY := .
-PACKAGE_NAME := cloudtruth_gen_cli
 PATH_PREFIX := /api/v1
 
 TEST_TARGET ?= tests
@@ -36,7 +35,7 @@ layout-lint:  ## Check the layout file format
 	$(uv_run) layout check $(LAYOUT_FILE)
 
 gen: layout-lint suggest update ## Generate CLI code
-	$(uv_run) cli-gen generate $(OPENAPI_SPEC) $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests --config $(CONFIG_FILE)
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests --config $(CONFIG_FILE)
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)

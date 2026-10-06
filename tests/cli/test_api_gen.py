@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 import pytest
+import typer
 import yaml
 
 from openapi_spec_tools.cli.api_gen import generate_api
@@ -212,3 +213,23 @@ def test_api_generate_success_config():
     text = read_text(file.as_posix())
     assert '_e.env_string(["MY_API_KEY", "API_TOKEN"], except_missing=True)' in text
     assert '"API_HOST", default="https://127.0.0.1:8080"' in text
+
+
+def test_api_generate_failure_no_package_name():
+    oas_file = asset_filename("pet2.yaml")
+
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+    pkg_name = "some_package"
+    code_dir = base_dir / pkg_name
+    message = "Must specify package_name in arguments or configuration"
+
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as context,
+    ):
+        generate_api(oas_file, code_dir=code_dir)
+        ex = context.value
+        assert ex.exit_code == 1
+        assert message == mock_stdout.getvalue()
+
