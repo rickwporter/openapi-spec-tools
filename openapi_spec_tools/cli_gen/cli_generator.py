@@ -91,7 +91,7 @@ from pathlib import Path
 from typing import Annotated  # noqa: F401
 
 import typer
-from rich_objects import display
+from rich_objects import display  # noqa: F401
 
 from {self.package_name} import _arguments as _a
 from {self.package_name} import _display as _d  # noqa: F401
@@ -111,13 +111,15 @@ from {self.package_name} import _tree as _t
             var_name = self.variable_name(n.command)
             imports.append(f"from {n.reference.package} import {n.reference.app_name} as {var_name}")
 
+        if not imports:
+            return ""
+
         # NOTE: use sorted to avoid issue if user has used unsorted sub-commands
-        return NL.join(sorted(imports))
+        return NL.join(sorted(imports)) + NL
 
     def app_definition(self, node: LayoutNode) -> str:
         """Get the main typer application/start point, and "overhead" of dealing with children."""
         result = f"""
-
 app = typer.Typer(no_args_is_help=True, help="{simple_escape(node.description)}")
 """
         for child in node.subcommands():
