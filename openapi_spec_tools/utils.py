@@ -12,6 +12,20 @@ from openapi_spec_tools.types import OasField
 NULL_TYPES = {'null', '"null"', "'null'"}
 
 
+def _default(*args) -> Any:
+    """Select the first non-None argument.
+
+    Raises the exception if the default is an Exception.
+    """
+    for a in args:
+        if isinstance(a, Exception):
+            raise a
+        if a is not None:
+            return a
+
+    return None
+
+
 def open_oas(filename: str) -> Any:
     """Open the specified filename, and return the dictionary."""
     path = Path(filename)

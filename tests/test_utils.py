@@ -4,6 +4,7 @@ from typing import Any
 import pytest
 
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import _default
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
@@ -23,6 +24,30 @@ from openapi_spec_tools.utils import set_nullable_not_required
 from openapi_spec_tools.utils import short_ref
 from tests.helpers import asset_filename
 from tests.helpers import open_test_oas
+
+
+@pytest.mark.parametrize(
+    ["args", "expected"],
+    [
+        pytest.param(["param", "config", "default"], "param", id="param"),
+        pytest.param([None, "config", "default"], "config", id="config"),
+        pytest.param([None, None, "default"], "default", id="default"),
+        pytest.param(["", "config", "default"], "", id="empty-param"),
+        pytest.param([0, 1, 2], 0, id="zero-param"),
+        pytest.param([False, True, None], False, id="false-param"),
+        pytest.param([], None, id="no-args"),
+        pytest.param([None], None, id="none-arg"),
+    ],
+)
+def test_default(args, expected):
+    assert expected == _default(*args)
+
+
+def test_default_raises():
+    with pytest.raises(ValueError, match="missing"):
+        _default(None, ValueError("missing"))
+
+    assert "param" == _default("param", None, ValueError("missing"))
 
 
 def test_open_oas() -> None:
