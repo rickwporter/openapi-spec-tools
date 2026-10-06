@@ -3,10 +3,15 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
+from openapi_spec_tools.layout.config import LayoutConfig
+from openapi_spec_tools.layout.layout_generator import DEFAULT_MAX_HELP_LENGTH
+from openapi_spec_tools.layout.layout_generator import DEFAULT_OPERATION_MAP
+from openapi_spec_tools.layout.layout_generator import DEFAULT_SUPPORTED_CONTENT
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import write_layout
+from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
@@ -21,6 +26,41 @@ ITEM_START = "item_start_params"
 ITEM_PROP = "items_properties"
 NEXT_PROP = "next_properties"
 NEXT_HEAD = "next_headers"
+
+
+def test_config():
+    config = LayoutConfig(
+        max_help_length=40,
+        supported_content=[ContentType.APP_JSON],
+        common_operations={"add": "create"},
+        page_size_params="limit",
+        page_start_params=["page", "offset"],
+        item_start_params="start",
+        items_properties=["results", "items"],
+        next_properties="next",
+        next_headers=["Link", "X-Next"],
+    )
+    uut = LayoutGenerator({}, config=config, max_help_length=12, page_size_params="count")
+    assert uut.max_help_length == 12
+    assert uut.supported_response_content == [ContentType.APP_JSON]
+    assert uut.common_ops == {"add": "create"}
+    assert uut.page_size_params == ["count"]
+    assert uut.page_start_params == ["page", "offset"]
+    assert uut.item_start_params == ["start"]
+    assert uut.items_properties == ["results", "items"]
+    assert uut.next_properties == ["next"]
+    assert uut.next_headers == ["Link", "X-Next"]
+
+    uut = LayoutGenerator({})
+    assert uut.max_help_length == DEFAULT_MAX_HELP_LENGTH
+    assert uut.supported_response_content == DEFAULT_SUPPORTED_CONTENT
+    assert uut.common_ops == DEFAULT_OPERATION_MAP
+    assert uut.page_size_params == []
+    assert uut.page_start_params == []
+    assert uut.item_start_params == []
+    assert uut.items_properties == []
+    assert uut.next_properties == []
+    assert uut.next_headers == []
 
 
 @pytest.mark.parametrize(

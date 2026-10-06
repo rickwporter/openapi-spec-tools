@@ -3,6 +3,8 @@ from typing import Any
 
 from openapi_spec_tools.base_gen import simple_escape
 from openapi_spec_tools.base_gen import to_snake_case
+from openapi_spec_tools.base_gen.base_generator import _pcd
+from openapi_spec_tools.layout.config import LayoutConfig
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import DEFAULT_START
@@ -51,9 +53,10 @@ class LayoutGenerator:
     def __init__(
         self,
         oas: dict[str, Any],
-        max_help_length: int = DEFAULT_MAX_HELP_LENGTH,
-        supported_content: list[ContentType] = DEFAULT_SUPPORTED_CONTENT,
-        common_operations: dict[str, str] = DEFAULT_OPERATION_MAP,
+        config: LayoutConfig | None = None,
+        max_help_length: int | None = None,
+        supported_content: list[ContentType] | None = None,
+        common_operations: dict[str, str] | None = None,
         page_size_params: str | list[str] | None = None,
         page_start_params: str | list[str] | None = None,
         item_start_params: str | list[str] | None = None,
@@ -61,20 +64,25 @@ class LayoutGenerator:
         next_properties: str | list[str] | None = None,
         next_headers: str | list[str] | None = None,
     ):
-        """Initialize the generator with internal values."""
+        """Initialize the generator with internal values.
+
+        Constructor arguments take precedence over ``config``, which takes precedence over the built-in defaults.
+        Pagination names default to an empty list when neither the argument nor the config sets them.
+        """
+        config = config or LayoutConfig()
         self.paths = oas.get(OasField.PATHS, {})
         self.components = oas.get(OasField.COMPONENTS, {})
         self.description = oas.get(OasField.INFO, {}).get(OasField.DESCRIPTION)
-        self.max_help_length = max_help_length
-        self.supported_response_content = supported_content
-        self.common_ops = common_operations
+        self.max_help_length = _pcd(max_help_length, config.max_help_length, DEFAULT_MAX_HELP_LENGTH)
+        self.supported_response_content = _pcd(supported_content, config.supported_content, DEFAULT_SUPPORTED_CONTENT)
+        self.common_ops = _pcd(common_operations, config.common_operations, DEFAULT_OPERATION_MAP)
 
-        self.page_size_params = _to_list(page_size_params)
-        self.page_start_params = _to_list(page_start_params)
-        self.item_start_params = _to_list(item_start_params)
-        self.items_properties = _to_list(items_properties)
-        self.next_properties = _to_list(next_properties)
-        self.next_headers = _to_list(next_headers)
+        self.page_size_params = _to_list(_pcd(page_size_params, config.page_size_params, None))
+        self.page_start_params = _to_list(_pcd(page_start_params, config.page_start_params, None))
+        self.item_start_params = _to_list(_pcd(item_start_params, config.item_start_params, None))
+        self.items_properties = _to_list(_pcd(items_properties, config.items_properties, None))
+        self.next_properties = _to_list(_pcd(next_properties, config.next_properties, None))
+        self.next_headers = _to_list(_pcd(next_headers, config.next_headers, None))
 
     @staticmethod
     def parts_to_commands(path_parts: list[str]) -> list[str]:
