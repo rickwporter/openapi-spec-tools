@@ -4,12 +4,14 @@ import os
 from datetime import datetime
 from enum import Enum
 from typing import Any
+from typing import TypeVar
 
 import typer
 from rich import print
 from rich.console import Console
 
 from openapi_spec_tools.base_gen import GeneratorConfig
+from openapi_spec_tools.layout import LayoutConfig
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.layout import file_to_tree
 from openapi_spec_tools.layout import open_layout
@@ -20,6 +22,8 @@ from openapi_spec_tools.utils import open_oas
 LOG_CLASS = "cli"
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s %(message)s"
 LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
+
+ConfigT = TypeVar("ConfigT", GeneratorConfig, LayoutConfig)
 
 
 class LogLevel(str, Enum):
@@ -116,16 +120,13 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
     raise typer.Exit(1)
 
 
-def config_maybe_from_file(filename: str | None) -> GeneratorConfig:
-    """Get the configuration from the specified filename.
-
-    If no filename is provided, this returns an empty configuration.
-    """
+def _config_from_file(filename: str | None, config_type: type[ConfigT]) -> ConfigT:
+    """Load configuration from a YAML file, or return an empty configuration."""
     if not filename:
-        return GeneratorConfig()
+        return config_type()
 
     try:
-        return GeneratorConfig.from_yaml(filename)
+        return config_type.from_yaml(filename)
     except FileNotFoundError:
         message = f"failed to find {filename}"
     except ValueError as ex:
@@ -135,6 +136,22 @@ def config_maybe_from_file(filename: str | None) -> GeneratorConfig:
 
     typer.echo(f"ERROR: {message}")
     raise typer.Exit(1)
+
+
+def gen_config_from_file(filename: str | None) -> GeneratorConfig:
+    """Get the configuration from the specified filename.
+
+    If no filename is provided, this returns an empty configuration.
+    """
+    return _config_from_file(filename, GeneratorConfig)
+
+
+def layout_config_from_file(filename: str | None) -> LayoutConfig:
+    """Get the layout configuration from the specified filename.
+
+    If no filename is provided, this returns an empty configuration.
+    """
+    return _config_from_file(filename, LayoutConfig)
 
 
 def write_layout_tree(filename: str, node: LayoutNode, logger: logging.Logger, indent: int = 4) -> None:
