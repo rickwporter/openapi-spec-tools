@@ -370,6 +370,11 @@ pets:
             PaginationNames(next_header="x-next"),
             id="next-head",
         ),
+        pytest.param(
+            {PAGE_SIZE: "page-size", PAGE_START: ["foo", "bar"]},
+            PaginationNames(page_size="page-size"),
+            id="ref",
+        ),
     ]
 )
 def test_get_pagination(gen_args, expected):
