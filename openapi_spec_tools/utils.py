@@ -12,7 +12,7 @@ from openapi_spec_tools.types import OasField
 NULL_TYPES = {'null', '"null"', "'null'"}
 
 
-def _default(*args) -> Any:
+def _or(*args) -> Any:
     """Select the first non-None argument.
 
     Raises the exception if the default is an Exception.

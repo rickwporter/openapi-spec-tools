@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _default
+from openapi_spec_tools.utils import _or
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
@@ -40,14 +40,14 @@ from tests.helpers import open_test_oas
     ],
 )
 def test_default(args, expected):
-    assert expected == _default(*args)
+    assert expected == _or(*args)
 
 
 def test_default_raises():
     with pytest.raises(ValueError, match="missing"):
-        _default(None, ValueError("missing"))
+        _or(None, ValueError("missing"))
 
-    assert "param" == _default("param", None, ValueError("missing"))
+    assert "param" == _or("param", None, ValueError("missing"))
 
 
 def test_open_oas() -> None:
