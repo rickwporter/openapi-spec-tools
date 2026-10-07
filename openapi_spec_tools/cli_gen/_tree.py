@@ -66,10 +66,7 @@ class TreeNode(BaseModel):
         if any(_has_needle(p) for p in [self.name, self.help, self.function, self.operation, self.path, self.method]):
             return True
 
-        if any(c.contains(needle) for c in self.children):
-            return True
-
-        return False
+        return any(c.contains(needle) for c in self.children)
 
 
 def parse_tree(identifier: str, command: str, data: dict[str, dict]) -> TreeNode | None:
