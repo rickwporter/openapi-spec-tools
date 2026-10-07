@@ -35,7 +35,7 @@ from openapi_spec_tools.base_gen.utils import to_snake_case
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import NULL_TYPES
-from openapi_spec_tools.utils import _default
+from openapi_spec_tools.utils import _or
 from openapi_spec_tools.utils import map_operations
 
 LOG_CLASS = "base-gen"
@@ -102,23 +102,23 @@ class BaseGenerator:
         self.components = oas.get(OasField.COMPONENTS, {})
         self.logger = logger or init_logging("INFO", LOG_CLASS)
 
-        self.package_name = _default(package_name, config.package_name, ValueError("Missing package_name"))
-        self.default_host = _default(default_host, config.default_host, "")
-        self.supported = _default(supported_content, config.supported_content, DEFAULT_SUPPORTED_CONTENT)
-        self.max_help_length = _default(max_help_length, config.max_help_length, DEFAULT_MAX_HELP_LENGTH)
-        self.reserved = _default(reserved, config.reserved, DEFAULT_RESERVED)
-        self.conflict_suffix = _default(conflict_suffix, config.conflict_suffix, DEFAULT_CONFLICT_SUFFIX)
-        self.copyright = self._resolve_copyright(_default(copyright, config.copyright, None))
-        self.infra_files = _default(infra_files, config.resolve_path_keys(config.infra_files), None)
-        self.infra_replacements = _default(infra_replacements, config.infra_replacements, None)
-        self.test_files = _default(test_files, config.resolve_path_keys(config.test_files), None)
-        self.test_replacements = _default(test_replacements, config.test_replacements, None)
-        self.env_host = _default(env_host, config.env_host, DEFAULT_VAR_HOST)
-        self.env_key = _default(env_key, config.env_key, DEFAULT_VAR_KEY)
-        self.env_timeout = _default(env_timeout, config.env_timeout, DEFAULT_VAR_TIMEOUT)
-        self.env_log_level = _default(env_log_level, config.env_log_level, DEFAULT_VAR_LOG_LEVEL)
-        self.default_log = _default(default_log_level, config.default_log_level, DEFAULT_VALUE_LOG_LEVEL)
-        self.default_timeout = _default(default_timeout, config.default_timeout, DEFAULT_VALUE_TIMEOUT)
+        self.package_name = _or(package_name, config.package_name, ValueError("Missing package_name"))
+        self.default_host = _or(default_host, config.default_host, "")
+        self.supported = _or(supported_content, config.supported_content, DEFAULT_SUPPORTED_CONTENT)
+        self.max_help_length = _or(max_help_length, config.max_help_length, DEFAULT_MAX_HELP_LENGTH)
+        self.reserved = _or(reserved, config.reserved, DEFAULT_RESERVED)
+        self.conflict_suffix = _or(conflict_suffix, config.conflict_suffix, DEFAULT_CONFLICT_SUFFIX)
+        self.copyright = self._resolve_copyright(_or(copyright, config.copyright))
+        self.infra_files = _or(infra_files, config.resolve_path_keys(config.infra_files))
+        self.infra_replacements = _or(infra_replacements, config.infra_replacements)
+        self.test_files = _or(test_files, config.resolve_path_keys(config.test_files))
+        self.test_replacements = _or(test_replacements, config.test_replacements)
+        self.env_host = _or(env_host, config.env_host, DEFAULT_VAR_HOST)
+        self.env_key = _or(env_key, config.env_key, DEFAULT_VAR_KEY)
+        self.env_timeout = _or(env_timeout, config.env_timeout, DEFAULT_VAR_TIMEOUT)
+        self.env_log_level = _or(env_log_level, config.env_log_level, DEFAULT_VAR_LOG_LEVEL)
+        self.default_log = _or(default_log_level, config.default_log_level, DEFAULT_VALUE_LOG_LEVEL)
+        self.default_timeout = _or(default_timeout, config.default_timeout, DEFAULT_VALUE_TIMEOUT)
 
         if not self.default_host:
             servers = oas.get(OasField.SERVERS)

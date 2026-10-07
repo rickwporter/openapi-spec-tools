@@ -10,7 +10,7 @@ from openapi_spec_tools.layout.utils import DEFAULT_START
 from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _default
+from openapi_spec_tools.utils import _or
 
 CREATE = "create"
 DELETE = "delete"
@@ -73,18 +73,16 @@ class LayoutGenerator:
         self.paths = oas.get(OasField.PATHS, {})
         self.components = oas.get(OasField.COMPONENTS, {})
         self.description = oas.get(OasField.INFO, {}).get(OasField.DESCRIPTION)
-        self.max_help_length = _default(max_help_length, config.max_help_length, DEFAULT_MAX_HELP_LENGTH)
-        self.supported_response_content = _default(
-            supported_content, config.supported_content, DEFAULT_SUPPORTED_CONTENT
-        )
-        self.common_ops = _default(common_operations, config.common_operations, DEFAULT_OPERATION_MAP)
+        self.max_help_length = _or(max_help_length, config.max_help_length, DEFAULT_MAX_HELP_LENGTH)
+        self.supported_response_content = _or(supported_content, config.supported_content, DEFAULT_SUPPORTED_CONTENT)
+        self.common_ops = _or(common_operations, config.common_operations, DEFAULT_OPERATION_MAP)
 
-        self.page_size_params = _to_list(_default(page_size_params, config.page_size_params))
-        self.page_start_params = _to_list(_default(page_start_params, config.page_start_params))
-        self.item_start_params = _to_list(_default(item_start_params, config.item_start_params))
-        self.items_properties = _to_list(_default(items_properties, config.items_properties))
-        self.next_properties = _to_list(_default(next_properties, config.next_properties))
-        self.next_headers = _to_list(_default(next_headers, config.next_headers))
+        self.page_size_params = _to_list(_or(page_size_params, config.page_size_params))
+        self.page_start_params = _to_list(_or(page_start_params, config.page_start_params))
+        self.item_start_params = _to_list(_or(item_start_params, config.item_start_params))
+        self.items_properties = _to_list(_or(items_properties, config.items_properties))
+        self.next_properties = _to_list(_or(next_properties, config.next_properties))
+        self.next_headers = _to_list(_or(next_headers, config.next_headers))
 
     @staticmethod
     def parts_to_commands(path_parts: list[str]) -> list[str]:
