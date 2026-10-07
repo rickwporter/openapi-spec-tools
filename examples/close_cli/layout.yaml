@@ -1,0 +1,1182 @@
+main:
+    description: Close CRM REST API
+    operations:
+    -   name: activity
+        subcommandId: activity
+    -   name: blocked-phone-number
+        subcommandId: blocked_phone_number
+    -   name: bulk-action
+        subcommandId: bulk_action
+    -   name: comment
+        subcommandId: comment
+    -   name: comment-thread
+        subcommandId: comment_thread
+    -   name: connected-account
+        subcommandId: connected_account
+    -   name: contact
+        subcommandId: contact
+    -   name: custom-activity
+        subcommandId: custom_activity
+    -   name: custom-field
+        subcommandId: custom_field
+    -   name: custom-field-schema
+        subcommandId: custom_field_schema
+    -   name: custom-object
+        subcommandId: custom_object
+    -   name: custom-object-type
+        subcommandId: custom_object_type
+    -   name: dialer
+        subcommandId: dialer
+    -   name: email-template
+        subcommandId: email_template
+    -   name: enrich-field
+        operationId: field_enrichment_create
+    -   name: event
+        subcommandId: event
+    -   name: export
+        subcommandId: export
+    -   name: files
+        subcommandId: files
+    -   name: form
+        subcommandId: form
+    -   name: group
+        subcommandId: group
+    -   name: integration-link
+        subcommandId: integration_link
+    -   name: lead
+        subcommandId: lead
+    -   name: me
+        operationId: users_get_me
+    -   name: membership
+        subcommandId: membership
+    -   name: opportunity
+        subcommandId: opportunity
+    -   name: organization
+        subcommandId: organization
+    -   name: outcome
+        subcommandId: outcome
+    -   name: phone-number
+        subcommandId: phone_number
+    -   name: pipeline
+        subcommandId: pipeline
+    -   name: playbook
+        subcommandId: playbook
+    -   name: report
+        subcommandId: report
+    -   name: role
+        subcommandId: role
+    -   name: saved-search
+        subcommandId: saved_search
+    -   name: scheduling-link
+        subcommandId: scheduling_link
+    -   name: send-as
+        subcommandId: send_as
+    -   name: sequence
+        subcommandId: sequence
+    -   name: sequence-subscription
+        subcommandId: sequence_subscription
+    -   name: shared-scheduling-link
+        subcommandId: shared_scheduling_link
+    -   name: shared-scheduling-link-association
+        subcommandId: shared_scheduling_link_association
+    -   name: sms-template
+        subcommandId: sms_template
+    -   name: status
+        subcommandId: status
+    -   name: task
+        subcommandId: task
+    -   name: unsubscribe
+        subcommandId: unsubscribe
+    -   name: user
+        subcommandId: user
+    -   name: webhook
+        subcommandId: webhook
+activity:
+    description: Manage activity
+    operations:
+    -   name: call
+        subcommandId: activity_call
+    -   name: created
+        subcommandId: activity_created
+    -   name: custom
+        subcommandId: activity_custom
+    -   name: email
+        subcommandId: activity_email
+    -   name: emailthread
+        subcommandId: activity_emailthread
+    -   name: form-submission
+        subcommandId: activity_form_submission
+    -   name: import-update
+        subcommandId: activity_import_update
+    -   name: lead-merge
+        subcommandId: activity_lead_merge
+    -   name: list
+        operationId: activities_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: meeting
+        subcommandId: activity_meeting
+    -   name: note
+        subcommandId: activity_note
+    -   name: sms
+        subcommandId: activity_sms
+    -   name: status-change
+        subcommandId: activity_status_change
+    -   name: task-completed
+        subcommandId: activity_task_completed
+    -   name: whatsapp-message
+        subcommandId: activity_whatsapp_message
+activity_call:
+    description: Manage activity call
+    operations:
+    -   name: create
+        operationId: activities.calls_create
+    -   name: delete
+        operationId: activities.calls_delete
+    -   name: list
+        operationId: activities.calls_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: activities.calls_update
+    -   name: show
+        operationId: activities.calls_get
+activity_created:
+    description: Manage activity created
+    operations:
+    -   name: list
+        operationId: activities.creations_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.creations_get
+activity_custom:
+    description: Manage activity custom
+    operations:
+    -   name: create
+        operationId: activities.custom_activities_create
+    -   name: delete
+        operationId: activities.custom_activities_delete
+    -   name: list
+        operationId: activities.custom_activities_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: activities.custom_activities_update
+    -   name: show
+        operationId: activities.custom_activities_get
+activity_email:
+    description: Manage activity email
+    operations:
+    -   name: create
+        operationId: activities.emails_create
+    -   name: delete
+        operationId: activities.emails_delete
+    -   name: list
+        operationId: activities.emails_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: activities.emails_update
+    -   name: show
+        operationId: activities.emails_get
+activity_emailthread:
+    description: Manage activity emailthread
+    operations:
+    -   name: delete
+        operationId: activities.email_threads_delete
+    -   name: list
+        operationId: activities.email_threads_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.email_threads_get
+activity_form_submission:
+    description: Manage activity form-submission
+    operations:
+    -   name: delete
+        operationId: activities.form_submissions_delete
+    -   name: list
+        operationId: activities.form_submissions_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.form_submissions_get
+activity_import_update:
+    description: Manage activity import-update
+    operations:
+    -   name: delete
+        operationId: activities.import_updates_delete
+    -   name: list
+        operationId: activities.import_updates_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.import_updates_get
+activity_lead_merge:
+    description: Manage activity lead-merge
+    operations:
+    -   name: list
+        operationId: activities.lead_merges_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.lead_merges_get
+activity_meeting:
+    description: Manage activity meeting
+    operations:
+    -   name: delete
+        operationId: activities.meetings_delete
+    -   name: integration
+        operationId: activities.meetings_create_integration
+    -   name: list
+        operationId: activities.meetings_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: activities.meetings_update
+    -   name: show
+        operationId: activities.meetings_get
+activity_note:
+    description: Manage activity note
+    operations:
+    -   name: create
+        operationId: activities.notes_create
+    -   name: delete
+        operationId: activities.notes_delete
+    -   name: list
+        operationId: activities.notes_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: activities.notes_update
+    -   name: show
+        operationId: activities.notes_get
+activity_sms:
+    description: Manage activity sms
+    operations:
+    -   name: create
+        operationId: activities.sms_create
+    -   name: delete
+        operationId: activities.sms_delete
+    -   name: list
+        operationId: activities.sms_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: activities.sms_update
+    -   name: show
+        operationId: activities.sms_get
+activity_status_change:
+    description: Manage activity status-change
+    operations:
+    -   name: lead
+        subcommandId: activity_status_change_lead
+    -   name: opportunity
+        subcommandId: activity_status_change_opportunity
+activity_status_change_lead:
+    description: Manage activity status-change lead
+    operations:
+    -   name: create
+        operationId: activities.lead_status_changes_create
+    -   name: delete
+        operationId: activities.lead_status_changes_delete
+    -   name: list
+        operationId: activities.lead_status_changes_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.lead_status_changes_get
+activity_status_change_opportunity:
+    description: Manage activity status-change opportunity
+    operations:
+    -   name: create
+        operationId: activities.opportunity_status_changes_create
+    -   name: delete
+        operationId: activities.opportunity_status_changes_delete
+    -   name: list
+        operationId: activities.opportunity_status_changes_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.opportunity_status_changes_get
+activity_task_completed:
+    description: Manage activity task-completed
+    operations:
+    -   name: delete
+        operationId: activities.task_completions_delete
+    -   name: list
+        operationId: activities.task_completions_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: activities.task_completions_get
+activity_whatsapp_message:
+    description: Manage activity whatsapp-message
+    operations:
+    -   name: create
+        operationId: activities.whatsapp_messages_create
+    -   name: delete
+        operationId: activities.whatsapp_messages_delete
+    -   name: list
+        operationId: activities.whatsapp_messages_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: activities.whatsapp_messages_update
+    -   name: show
+        operationId: activities.whatsapp_messages_get
+blocked_phone_number:
+    description: Manage blocked-phone-number
+    operations:
+    -   name: create
+        operationId: blocked_phone_numbers_create
+    -   name: delete
+        operationId: blocked_phone_numbers_delete
+    -   name: list
+        operationId: blocked_phone_numbers_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: blocked_phone_numbers_update
+    -   name: settings
+        subcommandId: blocked_phone_number_settings
+    -   name: show
+        operationId: blocked_phone_numbers_get
+blocked_phone_number_settings:
+    description: Manage blocked-phone-number settings
+    operations:
+    -   name: set
+        operationId: blocked_phone_numbers_update_settings
+    -   name: show
+        operationId: blocked_phone_numbers_get_settings
+bulk_action:
+    description: Manage bulk-action
+    operations:
+    -   name: delete
+        subcommandId: bulk_action_delete
+    -   name: edit
+        subcommandId: bulk_action_edit
+    -   name: email
+        subcommandId: bulk_action_email
+    -   name: sequence-subscription
+        subcommandId: bulk_action_sequence_subscription
+bulk_action_delete:
+    description: Manage bulk-action delete
+    operations:
+    -   name: create
+        operationId: bulk_actions.delete_create
+    -   name: list
+        operationId: bulk_actions.delete_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: bulk_actions.delete_get
+bulk_action_edit:
+    description: Manage bulk-action edit
+    operations:
+    -   name: create
+        operationId: bulk_actions.edit_create
+    -   name: list
+        operationId: bulk_actions.edit_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: bulk_actions.edit_get
+bulk_action_email:
+    description: Manage bulk-action email
+    operations:
+    -   name: create
+        operationId: bulk_actions.email_create
+    -   name: list
+        operationId: bulk_actions.email_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: bulk_actions.email_get
+bulk_action_sequence_subscription:
+    description: Manage bulk-action sequence-subscription
+    operations:
+    -   name: create
+        operationId: bulk_actions.sequence_subscriptions_create
+    -   name: list
+        operationId: bulk_actions.sequence_subscriptions_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: bulk_actions.sequence_subscriptions_get
+comment:
+    description: Manage comment
+    operations:
+    -   name: create
+        operationId: comments_create
+    -   name: delete
+        operationId: comments_delete
+    -   name: list
+        operationId: comments_list
+    -   name: set
+        operationId: comments_update
+    -   name: show
+        operationId: comments_get
+comment_thread:
+    description: Manage comment-thread
+    operations:
+    -   name: list
+        operationId: comments_list_threads
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: comments_get_thread
+connected_account:
+    description: Manage connected-account
+    operations:
+    -   name: list
+        operationId: connected_accounts_list
+    -   name: show
+        operationId: connected_accounts_get
+contact:
+    description: Manage contact
+    operations:
+    -   name: create
+        operationId: contacts_create
+    -   name: delete
+        operationId: contacts_delete
+    -   name: list
+        operationId: contacts_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: contacts_update
+    -   name: show
+        operationId: contacts_get
+custom_activity:
+    description: Manage custom-activity
+    operations:
+    -   name: create
+        operationId: custom_activity_types_create
+    -   name: delete
+        operationId: custom_activity_types_delete
+    -   name: list
+        operationId: custom_activity_types_list
+    -   name: set
+        operationId: custom_activity_types_update
+    -   name: show
+        operationId: custom_activity_types_get
+custom_field:
+    description: Manage custom-field
+    operations:
+    -   name: activity
+        subcommandId: custom_field_activity
+    -   name: contact
+        subcommandId: custom_field_contact
+    -   name: custom-object-type
+        subcommandId: custom_field_custom_object_type
+    -   name: lead
+        subcommandId: custom_field_lead
+    -   name: opportunity
+        subcommandId: custom_field_opportunity
+    -   name: shared
+        subcommandId: custom_field_shared
+custom_field_activity:
+    description: Manage custom-field activity
+    operations:
+    -   name: create
+        operationId: custom_fields.activity_create
+    -   name: delete
+        operationId: custom_fields.activity_delete
+    -   name: list
+        operationId: custom_fields.activity_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: custom_fields.activity_update
+    -   name: show
+        operationId: custom_fields.activity_get
+custom_field_contact:
+    description: Manage custom-field contact
+    operations:
+    -   name: create
+        operationId: custom_fields.contact_create
+    -   name: delete
+        operationId: custom_fields.contact_delete
+    -   name: list
+        operationId: custom_fields.contact_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: custom_fields.contact_update
+    -   name: show
+        operationId: custom_fields.contact_get
+custom_field_custom_object_type:
+    description: Manage custom-field custom-object-type
+    operations:
+    -   name: create
+        operationId: custom_fields.custom_object_create
+    -   name: delete
+        operationId: custom_fields.custom_object_delete
+    -   name: list
+        operationId: custom_fields.custom_object_list
+    -   name: set
+        operationId: custom_fields.custom_object_update
+    -   name: show
+        operationId: custom_fields.custom_object_get
+custom_field_lead:
+    description: Manage custom-field lead
+    operations:
+    -   name: create
+        operationId: custom_fields.lead_create
+    -   name: delete
+        operationId: custom_fields.lead_delete
+    -   name: list
+        operationId: custom_fields.lead_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: custom_fields.lead_update
+    -   name: show
+        operationId: custom_fields.lead_get
+custom_field_opportunity:
+    description: Manage custom-field opportunity
+    operations:
+    -   name: create
+        operationId: custom_fields.opportunity_create
+    -   name: delete
+        operationId: custom_fields.opportunity_delete
+    -   name: list
+        operationId: custom_fields.opportunity_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: custom_fields.opportunity_update
+    -   name: show
+        operationId: custom_fields.opportunity_get
+custom_field_schema:
+    description: Manage custom-field-schema
+    operations:
+    -   name: set
+        operationId: custom_field_schemas_update
+    -   name: show
+        operationId: custom_field_schemas_get
+custom_field_shared:
+    description: Manage custom-field shared
+    operations:
+    -   name: association
+        subcommandId: custom_field_shared_association
+    -   name: create
+        operationId: custom_fields.shared_create
+    -   name: delete
+        operationId: custom_fields.shared_delete
+    -   name: list
+        operationId: custom_fields.shared_list
+    -   name: set
+        operationId: custom_fields.shared_update
+    -   name: show
+        operationId: custom_fields.shared_get
+custom_field_shared_association:
+    description: Manage custom-field shared association
+    operations:
+    -   name: create
+        operationId: custom_fields.shared_create_association
+    -   name: delete
+        operationId: custom_fields.shared_delete_association
+    -   name: set
+        operationId: custom_fields.shared_update_association
+    -   name: show
+        operationId: custom_fields.shared_get_association
+custom_object:
+    description: Manage custom-object
+    operations:
+    -   name: create
+        operationId: custom_objects_create
+    -   name: delete
+        operationId: custom_objects_delete
+    -   name: list
+        operationId: custom_objects_list
+    -   name: set
+        operationId: custom_objects_update
+    -   name: show
+        operationId: custom_objects_get
+custom_object_type:
+    description: Manage custom-object-type
+    operations:
+    -   name: create
+        operationId: custom_object_types_create
+    -   name: delete
+        operationId: custom_object_types_delete
+    -   name: list
+        operationId: custom_object_types_list
+    -   name: set
+        operationId: custom_object_types_update
+    -   name: show
+        operationId: custom_object_types_get
+dialer:
+    description: Manage dialer
+    operations:
+    -   name: list
+        operationId: dialers_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: dialers_get
+email_template:
+    description: Manage email-template
+    operations:
+    -   name: create
+        operationId: email_templates_create
+    -   name: delete
+        operationId: email_templates_delete
+    -   name: list
+        operationId: email_templates_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: render
+        operationId: email_templates_render
+        bugIds:
+        - complex-sort-type
+    -   name: set
+        operationId: email_templates_update
+    -   name: show
+        operationId: email_templates_get
+event:
+    description: Manage event
+    operations:
+    -   name: list
+        operationId: events_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: events_get
+export:
+    description: Manage export
+    operations:
+    -   name: lead
+        subcommandId: export_lead
+    -   name: list
+        operationId: exports_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: opportunity
+        subcommandId: export_opportunity
+    -   name: show
+        operationId: exports_get
+export_lead:
+    description: Manage export lead
+    operations:
+    -   name: create
+        operationId: exports_create_lead
+    -   name: list
+        operationId: exports_list_lead
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: exports_get_lead
+export_opportunity:
+    description: Manage export opportunity
+    operations:
+    -   name: create
+        operationId: exports_create_opportunity
+    -   name: list
+        operationId: exports_list_opportunity
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: exports_get_opportunity
+files:
+    description: Manage files
+    operations:
+    -   name: upload
+        operationId: files_create
+form:
+    description: Manage form
+    operations:
+    -   name: list
+        operationId: forms_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: forms_fetch
+group:
+    description: Manage group
+    operations:
+    -   name: create
+        operationId: groups_create
+    -   name: delete
+        operationId: groups_delete
+    -   name: list
+        operationId: groups_list
+    -   name: member
+        subcommandId: group_member
+    -   name: set
+        operationId: groups_update
+    -   name: show
+        operationId: groups_get
+group_member:
+    description: Manage group member
+    operations:
+    -   name: create
+        operationId: groups_add_member
+    -   name: delete
+        operationId: groups_remove_member
+integration_link:
+    description: Manage integration-link
+    operations:
+    -   name: create
+        operationId: integration_links_create
+    -   name: delete
+        operationId: integration_links_delete
+    -   name: list
+        operationId: integration_links_list
+    -   name: set
+        operationId: integration_links_update
+    -   name: show
+        operationId: integration_links_get
+lead:
+    description: Manage lead
+    operations:
+    -   name: create
+        operationId: leads_create
+    -   name: delete
+        operationId: leads_delete
+    -   name: files
+        subcommandId: lead_files
+    -   name: list
+        operationId: leads_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: merge
+        operationId: leads_merge
+    -   name: set
+        operationId: leads_update
+    -   name: show
+        operationId: leads_get
+lead_files:
+    description: Manage lead files
+    operations:
+    -   name: create
+        operationId: leads_files_create
+    -   name: list
+        operationId: leads_files_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+membership:
+    description: Manage membership
+    operations:
+    -   name: create
+        operationId: memberships_create
+    -   name: delete
+        operationId: memberships_delete
+    -   name: pinned-views
+        subcommandId: membership_pinned_views
+    -   name: set
+        operationId: memberships_update
+    -   name: set-many
+        operationId: memberships_bulk_update
+membership_pinned_views:
+    description: Manage membership pinned-views
+    operations:
+    -   name: set
+        operationId: memberships_update_pinned_views
+    -   name: show
+        operationId: memberships_get_pinned_views
+opportunity:
+    description: Manage opportunity
+    operations:
+    -   name: create
+        operationId: opportunities_create
+    -   name: delete
+        operationId: opportunities_delete
+    -   name: list
+        operationId: opportunities_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: opportunities_update
+    -   name: show
+        operationId: opportunities_get
+organization:
+    description: Manage organization
+    operations:
+    -   name: set
+        operationId: organizations_update
+    -   name: show
+        operationId: organizations_get
+outcome:
+    description: Manage outcome
+    operations:
+    -   name: create
+        operationId: outcomes_create
+    -   name: delete
+        operationId: outcomes_delete
+    -   name: list
+        operationId: outcomes_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: outcomes_update
+    -   name: show
+        operationId: outcomes_get
+phone_number:
+    description: Manage phone-number
+    operations:
+    -   name: delete
+        operationId: phone_numbers_delete
+    -   name: list
+        operationId: phone_numbers_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: request
+        subcommandId: phone_number_request
+    -   name: set
+        operationId: phone_numbers_update
+    -   name: show
+        operationId: phone_numbers_get
+phone_number_request:
+    description: Manage phone-number request
+    operations:
+    -   name: internal
+        operationId: phone_numbers_create
+pipeline:
+    description: Manage pipeline
+    operations:
+    -   name: create
+        operationId: pipelines_create
+    -   name: delete
+        operationId: pipelines_delete
+    -   name: list
+        operationId: pipelines_list
+    -   name: set
+        operationId: pipelines_update
+    -   name: show
+        operationId: pipelines_get
+playbook:
+    description: Manage playbook
+    operations:
+    -   name: archive
+        operationId: playbooks_archive
+    -   name: create
+        operationId: playbooks_create
+    -   name: delete
+        operationId: playbooks_delete
+    -   name: list
+        operationId: playbooks_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: playbooks_update
+    -   name: show
+        operationId: playbooks_get
+    -   name: unarchive
+        operationId: playbooks_unarchive
+report:
+    description: Manage report
+    operations:
+    -   name: activity
+        subcommandId: report_activity
+    -   name: custom
+        operationId: reporting_get_custom
+    -   name: funnel
+        subcommandId: report_funnel
+    -   name: sent-emails
+        operationId: reporting_get_sent_emails
+    -   name: statuses
+        subcommandId: report_statuses
+report_activity:
+    description: Manage report activity
+    operations:
+    -   name: metrics
+        operationId: reporting_list_activity_metrics
+    -   name: show
+        operationId: reporting_get_activity
+report_funnel:
+    description: Manage report funnel
+    operations:
+    -   name: opportunity
+        subcommandId: report_funnel_opportunity
+report_funnel_opportunity:
+    description: Manage report funnel opportunity
+    operations:
+    -   name: stages
+        operationId: reporting_get_funnel_stages
+    -   name: totals
+        operationId: reporting_get_funnel_totals
+report_statuses:
+    description: Manage report statuses
+    operations:
+    -   name: lead
+        operationId: reporting_get_lead_statuses
+    -   name: opportunity
+        operationId: reporting_get_opportunity_statuses
+role:
+    description: Manage role
+    operations:
+    -   name: create
+        operationId: roles_create
+    -   name: delete
+        operationId: roles_delete
+    -   name: list
+        operationId: roles_list
+    -   name: set
+        operationId: roles_update
+    -   name: show
+        operationId: roles_get
+saved_search:
+    description: Manage saved-search
+    operations:
+    -   name: create
+        operationId: smart_views_create
+    -   name: delete
+        operationId: smart_views_delete
+    -   name: list
+        operationId: smart_views_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+        bugIds:
+        - complex-type
+    -   name: set
+        operationId: smart_views_update
+    -   name: show
+        operationId: smart_views_get
+scheduling_link:
+    description: Manage scheduling-link
+    operations:
+    -   name: create
+        operationId: scheduling_links_create
+    -   name: delete
+        operationId: scheduling_links_delete
+    -   name: integration
+        subcommandId: scheduling_link_integration
+    -   name: list
+        operationId: scheduling_links_list
+    -   name: set
+        operationId: scheduling_links_update
+    -   name: show
+        operationId: scheduling_links_get
+scheduling_link_integration:
+    description: Manage scheduling-link integration
+    operations:
+    -   name: create
+        operationId: scheduling_links_create_integration
+    -   name: delete
+        operationId: scheduling_links_delete_integration
+send_as:
+    description: Manage send-as
+    operations:
+    -   name: bulk
+        operationId: send_as_bulk_create
+    -   name: create
+        operationId: send_as_create
+    -   name: delete
+        operationId: send_as_delete
+    -   name: delete-by-user
+        operationId: send_as_delete_by_user
+    -   name: list
+        operationId: send_as_list
+    -   name: show
+        operationId: send_as_get
+sequence:
+    description: Manage sequence
+    operations:
+    -   name: create
+        operationId: sequences_create
+    -   name: delete
+        operationId: sequences_delete
+    -   name: list
+        operationId: sequences_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: sequences_update
+    -   name: show
+        operationId: sequences_get
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+sequence_subscription:
+    description: Manage sequence-subscription
+    operations:
+    -   name: create
+        operationId: sequences_create_subscription
+    -   name: delete
+        operationId: sequences_delete_subscription
+    -   name: list
+        operationId: sequences_list_subscriptions
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: sequences_update_subscription
+    -   name: show
+        operationId: sequences_get_subscription
+shared_scheduling_link:
+    description: Manage shared-scheduling-link
+    operations:
+    -   name: create
+        operationId: scheduling_links_create_shared
+    -   name: delete
+        operationId: scheduling_links_delete_shared
+    -   name: list
+        operationId: scheduling_links_list_shared
+    -   name: set
+        operationId: scheduling_links_update_shared
+    -   name: show
+        operationId: scheduling_links_get_shared
+shared_scheduling_link_association:
+    description: Manage shared-scheduling-link-association
+    operations:
+    -   name: create
+        operationId: scheduling_links_create_shared_association
+    -   name: unmap
+        operationId: scheduling_links_delete_shared_association
+sms_template:
+    description: Manage sms-template
+    operations:
+    -   name: create
+        operationId: sms_templates_create
+    -   name: delete
+        operationId: sms_templates_delete
+    -   name: list
+        operationId: sms_templates_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: sms_templates_update
+    -   name: show
+        operationId: sms_templates_get
+status:
+    description: Manage status
+    operations:
+    -   name: lead
+        subcommandId: status_lead
+    -   name: opportunity
+        subcommandId: status_opportunity
+status_lead:
+    description: Manage status lead
+    operations:
+    -   name: create
+        operationId: lead_statuses_create
+    -   name: delete
+        operationId: lead_statuses_delete
+    -   name: list
+        operationId: lead_statuses_list
+    -   name: set
+        operationId: lead_statuses_update
+    -   name: show
+        operationId: lead_statuses_get
+status_opportunity:
+    description: Manage status opportunity
+    operations:
+    -   name: create
+        operationId: opportunity_statuses_create
+    -   name: delete
+        operationId: opportunity_statuses_delete
+    -   name: list
+        operationId: opportunity_statuses_list
+    -   name: set
+        operationId: opportunity_statuses_update
+    -   name: show
+        operationId: opportunity_statuses_get
+task:
+    description: Manage task
+    operations:
+    -   name: create
+        operationId: tasks_create
+    -   name: delete
+        operationId: tasks_delete
+    -   name: list
+        operationId: tasks_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: set
+        operationId: tasks_update
+    -   name: set-many
+        operationId: tasks_bulk_update
+        bugIds:
+        - duplicate-params
+    -   name: show
+        operationId: tasks_get
+unsubscribe:
+    description: Manage unsubscribe
+    operations:
+    -   name: email
+        subcommandId: unsubscribe_email
+unsubscribe_email:
+    description: Manage unsubscribe email
+    operations:
+    -   name: create
+        operationId: unsubscribed_emails_create
+    -   name: delete
+        operationId: unsubscribed_emails_delete
+    -   name: list
+        operationId: unsubscribed_emails_list
+user:
+    description: Manage user
+    operations:
+    -   name: availability
+        operationId: users_list_availabilities
+    -   name: list
+        operationId: users_list
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+    -   name: show
+        operationId: users_get
+        pagination:
+            itemStart: _skip
+            pageSize: _limit
+webhook:
+    description: Manage webhook
+    operations:
+    -   name: create
+        operationId: webhooks_create
+    -   name: delete
+        operationId: webhooks_delete
+    -   name: list
+        operationId: webhooks_list
+    -   name: set
+        operationId: webhooks_update
+    -   name: show
+        operationId: webhooks_get
