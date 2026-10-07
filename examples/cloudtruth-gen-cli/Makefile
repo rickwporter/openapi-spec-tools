@@ -11,6 +11,7 @@ UPDATED_FILE := updated.yaml
 GEN_CONFIG := gen_config.yaml
 LAYOUT_CONFIG := layout_config.yaml
 OPENAPI_SPEC := ct.yaml
+PACKAGE_NAME := cloudtruth_gen_cli
 PROJECT_DIRECTORY := .
 PATH_PREFIX := /api/v1
 
@@ -46,6 +47,11 @@ suggest: ## Use the local code to suggest a layout
 
 update: ## Generates a new layout using the old as a guide
 	$(uv_run) cli-gen update $(LAYOUT_FILE) $(OPENAPI_SPEC) --new-file $(UPDATED_FILE) --prefix $(PATH_PREFIX) --indent 2
+
+rm-gen: ## Delete generated CLI code
+	rm -rf $(PACKAGE_NAME)
+
+regen: rm-gen gen ## Delete and generate CLI code
 
 ###########
 ##@ Linting
