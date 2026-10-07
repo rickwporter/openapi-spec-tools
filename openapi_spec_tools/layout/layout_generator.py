@@ -1,4 +1,5 @@
 """Declares the LayoutGenerator for inferring a layout from an OpenAPI specification."""
+from copy import deepcopy
 from typing import Any
 
 from openapi_spec_tools.base_gen import simple_escape
@@ -125,6 +126,14 @@ class LayoutGenerator:
 
         return value
 
+    def update_reference(self, prop: dict[str, Any]) -> dict[str, Any]:
+        """Update a property's reference."""
+        reference = prop.get(OasField.REFS, "")
+        sub_model = self.get_model(reference) or {}
+        prop.update(sub_model)
+
+        return prop
+
     def get_response_headers(self, op_data: dict[str, Any]) -> dict[str, Any] | None:
         """Get the response headers (if any)."""
         responses = op_data.get(OasField.RESPONSES, {})
@@ -223,6 +232,17 @@ class LayoutGenerator:
         """Determine pagination parameters from the operation data."""
         args = {}
         params = op_data.get(OasField.PARAMS, [])
+
+        def _expand_param(param: dict[str, Any]) -> dict[str, Any]:
+            # use as-is if name is present
+            if param.get(OasField.NAME):
+                return param
+
+            # otherwise, attempt to update reference
+            return self.update_reference(param)
+
+        # update/expand parameters
+        params = [_expand_param(deepcopy(param)) for param in params]
 
         def _param_args(arg_name: str, param_names: list[str]) -> None:
             for name in param_names:
