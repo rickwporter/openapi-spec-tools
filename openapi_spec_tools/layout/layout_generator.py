@@ -131,9 +131,8 @@ class LayoutGenerator:
     def update_reference(self, prop: dict[str, Any]) -> dict[str, Any]:
         """Update a property's reference."""
         reference = prop.get(OasField.REFS, "")
-        sub_model = self.get_model(reference)
-        if sub_model:
-            prop.update(sub_model)
+        sub_model = self.get_model(reference) or {}
+        prop.update(sub_model)
 
         return prop
 
