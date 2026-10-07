@@ -1,0 +1,4 @@
+page_size_params: page_size
+page_start_params: page
+items_properties: results
+next_properties: next
