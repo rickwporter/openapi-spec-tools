@@ -11,6 +11,7 @@ from rich import print_json
 from rich.table import Table
 from rich_objects import console_factory
 
+from openapi_spec_tools.cli.arguments import ConfigFileOption
 from openapi_spec_tools.cli.arguments import IndentOption
 from openapi_spec_tools.cli.arguments import LayoutFilenameArgument
 from openapi_spec_tools.cli.arguments import LogLevelOption
@@ -18,6 +19,7 @@ from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.utils import init_logging
+from openapi_spec_tools.cli.utils import layout_config_from_file
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
@@ -213,6 +215,7 @@ def layout_operations(
 def layout_suggest(
     openapi_file: OpenApiFilenameArgument,
     output_file: Annotated[str, typer.Argument(metavar="FILENAME", show_default=False, help="File name for output")],
+    config_file: ConfigFileOption = None,
     update: Annotated[
         bool,
         typer.Option(help="Read from original file and update, rather than completely new suggestion."),
@@ -227,13 +230,12 @@ def layout_suggest(
 
     * May have duplicate commands that may need to be fixed (detected with `layout check`)
 
-    * Does not consider pagaination
-
     * May have some small modules (extra layers), such as `deploy list` instead of a desired `deploy`.
     """
     logger = init_logging(log_level, LOG_CLASS)
     oas = open_oas_with_error_handling(openapi_file, logger)
-    generator = LayoutGenerator(oas)
+    config = layout_config_from_file(config_file)
+    generator = LayoutGenerator(oas, config=config)
     node = generator.generate(prefix)
 
     if update:

@@ -20,7 +20,7 @@ from openapi_spec_tools.cli.arguments import PackageNameOption
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
-from openapi_spec_tools.cli.utils import config_maybe_from_file
+from openapi_spec_tools.cli.utils import gen_config_from_file
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
@@ -108,7 +108,7 @@ def generate_cli(
         commands = layout_gen.generate(prefix)
         typer.echo("Generated layout -- equivalent can be saved using 'layout suggest'.")
 
-    config = config_maybe_from_file(config_file)
+    config = gen_config_from_file(config_file)
     if not package_name and not config.package_name:
         typer.echo("Must specify package_name in arguments or configuration.")
         raise typer.Exit(1)

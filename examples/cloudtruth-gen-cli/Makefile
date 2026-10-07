@@ -8,8 +8,10 @@ help: ## This message
 LAYOUT_FILE := layout.yaml
 SUGGESTED_FILE := suggested.yaml
 UPDATED_FILE := updated.yaml
-CONFIG_FILE := config.yaml
+GEN_CONFIG := gen_config.yaml
+LAYOUT_CONFIG := layout_config.yaml
 OPENAPI_SPEC := ct.yaml
+PACKAGE_NAME := cloudtruth_gen_cli
 PROJECT_DIRECTORY := .
 PATH_PREFIX := /api/v1
 
@@ -35,16 +37,21 @@ layout-lint:  ## Check the layout file format
 	$(uv_run) layout check $(LAYOUT_FILE)
 
 gen: layout-lint suggest update ## Generate CLI code
-	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests --config $(CONFIG_FILE)
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests --config $(GEN_CONFIG)
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 suggest: ## Use the local code to suggest a layout
-	$(uv_run) ./layout.py $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix $(PATH_PREFIX)
+	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix $(PATH_PREFIX) --config $(LAYOUT_CONFIG)
 
 update: ## Generates a new layout using the old as a guide
 	$(uv_run) cli-gen update $(LAYOUT_FILE) $(OPENAPI_SPEC) --new-file $(UPDATED_FILE) --prefix $(PATH_PREFIX) --indent 2
+
+rm-gen: ## Delete generated CLI code
+	rm -rf $(PACKAGE_NAME)
+
+regen: rm-gen gen ## Delete and generate CLI code
 
 ###########
 ##@ Linting

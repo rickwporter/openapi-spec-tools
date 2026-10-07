@@ -1,16 +1,20 @@
 import logging
 import os
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest import mock
 
 import pytest
 import typer
 
 from openapi_spec_tools.base_gen import GeneratorConfig
-from openapi_spec_tools.cli.utils import config_maybe_from_file
 from openapi_spec_tools.cli.utils import console_factory
+from openapi_spec_tools.cli.utils import gen_config_from_file
+from openapi_spec_tools.cli.utils import layout_config_from_file
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.layout import LayoutConfig
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
@@ -94,8 +98,8 @@ def test_layout_tree_with_error(filename, message) -> None:
         ),
     ]
 )
-def test_config_maybe_from_file_success(filename: str | None, expected: GeneratorConfig) -> None:
-    assert expected == config_maybe_from_file(filename)
+def test_config_from_file_success(filename: str | None, expected: GeneratorConfig) -> None:
+    assert expected == gen_config_from_file(filename)
 
 
 @pytest.mark.parametrize(
@@ -106,16 +110,70 @@ def test_config_maybe_from_file_success(filename: str | None, expected: Generato
         pytest.param(asset_filename("bad_config.yaml"), "ERROR: 1 validation error for GeneratorConfig", id="values"),
     ]
 )
-def test_config_maybe_from_file_error(filename, message) -> None:
+def test_config_from_file_error(filename, message) -> None:
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
         pytest.raises(typer.Exit) as err,
     ):
-        config_maybe_from_file(filename)
+        gen_config_from_file(filename)
 
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()
     assert output.startswith(message)
+
+
+@pytest.mark.parametrize(
+    ["filename", "expected"],
+    [
+        pytest.param(None, LayoutConfig(), id="none"),
+        pytest.param("", LayoutConfig(), id="empty"),
+    ]
+)
+def test_layout_config_from_file_success(filename: str | None, expected: LayoutConfig) -> None:
+    assert expected == layout_config_from_file(filename)
+
+
+def test_layout_config_from_file_yaml() -> None:
+    with TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "layout.yaml"
+        path.write_text("max_help_length: 40\npage_size_params: limit\n", encoding="utf-8")
+        config = layout_config_from_file(path.as_posix())
+
+    assert LayoutConfig(max_help_length=40, page_size_params="limit") == config
+
+
+@pytest.mark.parametrize(
+    ["filename", "message"],
+    [
+        pytest.param("foo.yaml", "ERROR: failed to find ", id="missing"),
+        pytest.param(asset_filename("bad.yaml"), "ERROR: unable to parse", id="parse"),
+    ]
+)
+def test_layout_config_from_file_error(filename, message) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        layout_config_from_file(filename)
+
+    assert err.value.exit_code == 1
+    output = mock_stdout.getvalue()
+    assert output.startswith(message)
+
+
+def test_layout_config_from_file_invalid() -> None:
+    with TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "layout.yaml"
+        path.write_text("max_help_length: not-a-number\n", encoding="utf-8")
+        with (
+            mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+            pytest.raises(typer.Exit) as err,
+        ):
+            layout_config_from_file(path.as_posix())
+
+    assert err.value.exit_code == 1
+    output = mock_stdout.getvalue()
+    assert output.startswith("ERROR: 1 validation error for LayoutConfig")
 
 
 def test_console_factory() -> None:

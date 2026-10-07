@@ -384,6 +384,44 @@ def test_layout_suggest():
     assert '- gnat' not in text
 
 
+def test_layout_suggest_config():
+    directory = TemporaryDirectory()
+    layout_file = Path(directory.name) / "layout.yaml"
+    config_file = Path(directory.name) / "layout_config.yaml"
+    config_file.write_text(
+        "page_size_params: limit\nnext_headers: x-next\n",
+        encoding="utf-8",
+    )
+
+    layout_suggest(
+        asset_filename("pet.yaml"),
+        layout_file.as_posix(),
+        prefix="/pets",
+        indent=3,
+        config_file=config_file.as_posix(),
+    )
+
+    text = layout_file.read_text(encoding="utf-8", errors="ignore")
+    assert "pageSize: limit" in text
+    assert "nextHeader: x-next" in text
+
+
+def test_layout_suggest_missing_config():
+    directory = TemporaryDirectory()
+    layout_file = Path(directory.name) / "layout.yaml"
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        layout_suggest(
+            asset_filename("pet.yaml"),
+            layout_file.as_posix(),
+            config_file="missing-layout-config.yaml",
+        )
+
+    assert err.value.exit_code == 1
+    assert mock_stdout.getvalue().startswith("ERROR: failed to find missing-layout-config.yaml")
+
 
 def test_layout_merge():
     directory = TemporaryDirectory()
