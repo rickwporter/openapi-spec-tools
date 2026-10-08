@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "status_opportunity", display_opt, depth, search)
-    return
 
 
 class OpportunityStatusType(str, Enum):  # noqa: F811
@@ -89,8 +88,6 @@ def opportunity_statuses_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete an opportunity status")
 def opportunity_statuses_delete(
@@ -122,8 +119,6 @@ def opportunity_statuses_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List opportunity statuses for your organization")
@@ -158,8 +153,6 @@ def opportunity_statuses_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Rename an opportunity status")
@@ -204,8 +197,6 @@ def opportunity_statuses_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single opportunity status")
 def opportunity_statuses_get(
@@ -240,8 +231,6 @@ def opportunity_statuses_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

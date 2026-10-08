@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "dialer", display_opt, depth, search)
-    return
 
 
 class SourceType(str, Enum):  # noqa: F811
@@ -105,8 +104,6 @@ def dialers_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single dialer session")
 def dialers_get(
@@ -143,8 +140,6 @@ def dialers_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_form_submission", display_opt, depth, search)
-    return
 
 
 @app.command("delete", short_help="Delete a FormSubmission activity")
@@ -68,8 +67,6 @@ def activities_form_submissions_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all FormSubmission activities")
@@ -180,8 +177,6 @@ def activities_form_submissions_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single FormSubmission activity")
 def activities_form_submissions_get(
@@ -216,8 +211,6 @@ def activities_form_submissions_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

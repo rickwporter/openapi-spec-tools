@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "form", display_opt, depth, search)
-    return
 
 
 @app.command("list", short_help="List Forms")
@@ -88,8 +87,6 @@ def forms_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve a Form")
 def forms_fetch(
@@ -124,8 +121,6 @@ def forms_fetch(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

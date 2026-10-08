@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "phone_number_request", display_opt, depth, search)
-    return
 
 
 class CarrierType(str, Enum):  # noqa: F811
@@ -115,8 +114,6 @@ def phone_numbers_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

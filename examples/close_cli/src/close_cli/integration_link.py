@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "integration_link", display_opt, depth, search)
-    return
 
 
 class IntegrationLinkType(str, Enum):  # noqa: F811
@@ -87,8 +86,6 @@ def integration_links_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete an integration link")
 def integration_links_delete(
@@ -121,8 +118,6 @@ def integration_links_delete(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="Get all integration links for your organization")
 def integration_links_list(
@@ -153,8 +148,6 @@ def integration_links_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class IntegrationLinkType(str, Enum):  # noqa: F811
@@ -204,8 +197,6 @@ def integration_links_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single integration link")
 def integration_links_get(
@@ -237,8 +228,6 @@ def integration_links_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "projects", display_opt, depth, search)
-    return
 
 
 @app.command("files", short_help="Get files in a project")
@@ -71,8 +70,6 @@ def get_project_files(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

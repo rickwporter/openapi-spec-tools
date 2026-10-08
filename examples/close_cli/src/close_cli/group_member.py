@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "group_member", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Add a User to a Group")
@@ -74,8 +73,6 @@ def groups_add_member(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Remove a User from a Group")
 def groups_remove_member(
@@ -108,8 +105,6 @@ def groups_remove_member(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

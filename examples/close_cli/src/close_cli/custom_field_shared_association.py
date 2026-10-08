@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "custom_field_shared_association", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Associate a Shared Custom Field with an object type")
@@ -86,8 +85,6 @@ def custom_fields_shared_create_association(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Disassociate a Shared Custom Field from an object type")
 def custom_fields_shared_delete_association(
@@ -126,8 +123,6 @@ def custom_fields_shared_delete_association(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Update an existing Shared Custom Field Association")
@@ -172,8 +167,6 @@ def custom_fields_shared_update_association(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a Shared Custom Field Association")
 def custom_fields_shared_get_association(
@@ -206,8 +199,6 @@ def custom_fields_shared_get_association(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

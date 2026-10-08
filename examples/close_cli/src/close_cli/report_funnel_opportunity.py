@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "report_funnel_opportunity", display_opt, depth, search)
-    return
 
 
 @app.command("stages", short_help="Get a funnel report (stages)")
@@ -108,8 +107,6 @@ def reporting_get_funnel_stages(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("totals", short_help="Get a funnel report (totals)")
 def reporting_get_funnel_totals(
@@ -180,8 +177,6 @@ def reporting_get_funnel_totals(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

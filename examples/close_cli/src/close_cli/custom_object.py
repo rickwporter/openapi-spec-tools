@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "custom_object", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a new Custom Object instance")
@@ -74,8 +73,6 @@ def custom_objects_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a Custom Object instance")
 def custom_objects_delete(
@@ -107,8 +104,6 @@ def custom_objects_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List Custom Object instances")
@@ -157,8 +152,6 @@ def custom_objects_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="Updating a Custom Object instance")
 def custom_objects_update(
@@ -191,8 +184,6 @@ def custom_objects_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve a single Custom Object instance")
 def custom_objects_get(
@@ -224,8 +215,6 @@ def custom_objects_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

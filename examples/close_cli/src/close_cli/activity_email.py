@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_email", display_opt, depth, search)
-    return
 
 
 class Status(str, Enum):  # noqa: F811
@@ -204,8 +203,6 @@ def activities_emails_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete an Email activity")
 def activities_emails_delete(
@@ -237,8 +234,6 @@ def activities_emails_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all Email activities")
@@ -329,8 +324,6 @@ def activities_emails_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class Status(str, Enum):  # noqa: F811
@@ -459,8 +452,6 @@ def activities_emails_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single Email activity")
 def activities_emails_get(
@@ -495,8 +486,6 @@ def activities_emails_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

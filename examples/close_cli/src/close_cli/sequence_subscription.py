@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "sequence_subscription", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Subscribe a Contact to a Sequence")
@@ -68,8 +67,6 @@ def sequences_create_subscription(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a Sequence Subscription")
 def sequences_delete_subscription(
@@ -101,8 +98,6 @@ def sequences_delete_subscription(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List Sequence Subscriptions")
@@ -158,8 +153,6 @@ def sequences_list_subscriptions(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="Update a specific Subscription")
 def sequences_update_subscription(
@@ -193,8 +186,6 @@ def sequences_update_subscription(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single Sequence Subscription")
 def sequences_get_subscription(
@@ -226,8 +217,6 @@ def sequences_get_subscription(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

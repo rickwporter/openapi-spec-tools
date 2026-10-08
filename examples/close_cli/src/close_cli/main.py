@@ -121,7 +121,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "main", display_opt, depth, search)
-    return
 
 
 class ObjectType(str, Enum):  # noqa: F811
@@ -191,8 +190,6 @@ def field_enrichment_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("me", short_help="Fetch information about yourself")
 def users_get_me(
@@ -227,8 +224,6 @@ def users_get_me(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

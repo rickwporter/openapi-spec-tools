@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "role", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a new role")
@@ -79,8 +78,6 @@ def roles_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a role")
 def roles_delete(
@@ -113,8 +110,6 @@ def roles_delete(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List all the roles defined for your organization")
 def roles_list(
@@ -145,8 +140,6 @@ def roles_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Update existing role")
@@ -180,8 +173,6 @@ def roles_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single role")
 def roles_get(
@@ -213,8 +204,6 @@ def roles_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

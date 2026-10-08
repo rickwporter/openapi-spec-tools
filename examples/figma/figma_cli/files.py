@@ -41,7 +41,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "files", display_opt, depth, search)
-    return
 
 
 @app.command("component-sets", short_help="Get file component sets")
@@ -75,8 +74,6 @@ def get_file_component_sets(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("components", short_help="Get file components")
 def get_file_components(
@@ -108,8 +105,6 @@ def get_file_components(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("images", short_help="Get image fills")
@@ -149,8 +144,6 @@ def get_image_fills(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("meta", short_help="Get file metadata")
 def get_file_meta(
@@ -182,8 +175,6 @@ def get_file_meta(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("nodes", short_help="Get file JSON for specific nodes")
@@ -257,8 +248,6 @@ def get_file_nodes(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get file JSON")
 def get_file(
@@ -315,8 +304,6 @@ def get_file(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("styles", short_help="Get file styles")
 def get_file_styles(
@@ -348,8 +335,6 @@ def get_file_styles(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("versions", short_help="Get versions of a file")
@@ -392,8 +377,6 @@ def get_file_versions(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "bulk_action_delete", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Initiate a new bulk delete")
@@ -67,8 +66,6 @@ def bulk_actions_delete_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List bulk deletes")
@@ -118,8 +115,6 @@ def bulk_actions_delete_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single bulk delete object")
 def bulk_actions_delete_get(
@@ -154,8 +149,6 @@ def bulk_actions_delete_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -39,7 +39,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_status_change", display_opt, depth, search)
-    return
 
 
 if __name__ == "__main__":

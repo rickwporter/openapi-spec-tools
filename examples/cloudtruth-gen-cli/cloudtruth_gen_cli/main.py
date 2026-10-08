@@ -45,7 +45,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "main", display_opt, depth, search)
-    return
 
 
 @app.command("backup", short_help="Get a snapshot of all Projects with parameters")
@@ -77,8 +76,6 @@ def backup_snapshot_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("generate-password", short_help="Get a randomly generated password using AWS Secrets Manager, with fallback to /dev/urandom.")
@@ -132,8 +129,6 @@ def utils_generate_password_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class Format(str, Enum):  # noqa: F811
@@ -279,8 +274,6 @@ def api_schema_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

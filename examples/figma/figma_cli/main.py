@@ -47,7 +47,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "main", display_opt, depth, search)
-    return
 
 
 class Order(str, Enum):  # noqa: F811
@@ -100,8 +99,6 @@ def get_activity_logs(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("component-sets", short_help="Get component set")
 def get_component_set(
@@ -134,8 +131,6 @@ def get_component_set(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("components", short_help="Get component")
 def get_component(
@@ -167,8 +162,6 @@ def get_component(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class Format(str, Enum):  # noqa: F811
@@ -255,8 +248,6 @@ def get_images(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("me", short_help="Get current user")
 def get_me(
@@ -287,8 +278,6 @@ def get_me(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("payments", short_help="Get payments")
@@ -341,8 +330,6 @@ def get_payments(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("styles", short_help="Get style")
 def get_style(
@@ -374,8 +361,6 @@ def get_style(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

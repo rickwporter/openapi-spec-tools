@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_meeting", display_opt, depth, search)
-    return
 
 
 @app.command("delete", short_help="Delete a Meeting activity")
@@ -68,8 +67,6 @@ def activities_meetings_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("integration", short_help="Create or update third-party Meeting integration")
@@ -107,8 +104,6 @@ def activities_meetings_create_integration(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all Meeting activities")
@@ -200,8 +195,6 @@ def activities_meetings_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="Update a Meeting activity")
 def activities_meetings_update(
@@ -233,8 +226,6 @@ def activities_meetings_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("show", short_help="Get a single Meeting activity")
@@ -283,8 +274,6 @@ def activities_meetings_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "playbook", display_opt, depth, search)
-    return
 
 
 @app.command("archive", short_help="Archive a playbook")
@@ -68,8 +67,6 @@ def playbooks_archive(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("create", short_help="Create a playbook")
@@ -119,8 +116,6 @@ def playbooks_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a playbook")
 def playbooks_delete(
@@ -152,8 +147,6 @@ def playbooks_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter playbooks")
@@ -209,8 +202,6 @@ def playbooks_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="Update a playbook")
 def playbooks_update(
@@ -259,8 +250,6 @@ def playbooks_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single playbook")
 def playbooks_get(
@@ -293,8 +282,6 @@ def playbooks_get(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("unarchive", short_help="Unarchive a playbook")
 def playbooks_unarchive(
@@ -326,8 +313,6 @@ def playbooks_unarchive(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

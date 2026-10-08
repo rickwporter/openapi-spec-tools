@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "analytics_libraries_style", display_opt, depth, search)
-    return
 
 
 class GroupBy(str, Enum):  # noqa: F811
@@ -87,8 +86,6 @@ def get_library_analytics_style_actions(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class GroupBy(str, Enum):  # noqa: F811
     STYLE = "style"
@@ -132,8 +129,6 @@ def get_library_analytics_style_usages(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

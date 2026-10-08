@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "webhook", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create new Webhook subscription")
@@ -88,8 +87,6 @@ def webhooks_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete Webhook subscription")
 def webhooks_delete(
@@ -122,8 +119,6 @@ def webhooks_delete(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List Webhook subscriptions")
 def webhooks_list(
@@ -154,8 +149,6 @@ def webhooks_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class WebhookStatus(str, Enum):  # noqa: F811
@@ -204,8 +197,6 @@ def webhooks_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve a single Webhook subscription")
 def webhooks_get(
@@ -237,8 +228,6 @@ def webhooks_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

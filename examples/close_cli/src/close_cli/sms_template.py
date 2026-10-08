@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "sms_template", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create an SMS template")
@@ -92,8 +91,6 @@ def sms_templates_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete an SMS template")
 def sms_templates_delete(
@@ -125,8 +122,6 @@ def sms_templates_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List SMS templates")
@@ -172,8 +167,6 @@ def sms_templates_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class SMSTemplateStatus(str, Enum):  # noqa: F811
@@ -238,8 +231,6 @@ def sms_templates_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch an SMS template")
 def sms_templates_get(
@@ -277,8 +268,6 @@ def sms_templates_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

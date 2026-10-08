@@ -37,7 +37,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "files_comments", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Add a comment to a file")
@@ -89,8 +88,6 @@ def post_comment(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a comment")
 def delete_comment(
@@ -123,8 +120,6 @@ def delete_comment(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("show", short_help="Get comments in a file")
@@ -160,8 +155,6 @@ def get_comments(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

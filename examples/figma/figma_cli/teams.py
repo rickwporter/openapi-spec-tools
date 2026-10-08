@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "teams", display_opt, depth, search)
-    return
 
 
 @app.command("component-sets", short_help="Get team component sets")
@@ -78,8 +77,6 @@ def get_team_component_sets(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("components", short_help="Get team components")
 def get_team_components(
@@ -121,8 +118,6 @@ def get_team_components(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("projects", short_help="Get projects in a team")
 def get_team_projects(
@@ -157,8 +152,6 @@ def get_team_projects(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("styles", short_help="Get team styles")
@@ -201,8 +194,6 @@ def get_team_styles(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("webhooks", hidden=True, short_help="[Deprecated] Get team webhooks")
 def get_team_webhooks(
@@ -235,8 +226,6 @@ def get_team_webhooks(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

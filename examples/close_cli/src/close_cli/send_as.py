@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "send_as", display_opt, depth, search)
-    return
 
 
 @app.command("bulk", short_help="Edit Send As Associations in bulk")
@@ -71,8 +70,6 @@ def send_as_bulk_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("create", short_help="Create a Send As Association")
 def send_as_create(
@@ -103,8 +100,6 @@ def send_as_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("delete", short_help="Delete a Send As Association by ID")
@@ -137,8 +132,6 @@ def send_as_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("delete-by-user", short_help="Delete a Send As Association by allowed user")
@@ -179,8 +172,6 @@ def send_as_delete_by_user(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List Send As Associations")
 def send_as_list(
@@ -220,8 +211,6 @@ def send_as_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve a single Send As Association")
 def send_as_get(
@@ -253,8 +242,6 @@ def send_as_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

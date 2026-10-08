@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_custom", display_opt, depth, search)
-    return
 
 
 class Status(str, Enum):  # noqa: F811
@@ -113,8 +112,6 @@ def activities_custom_activities_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a Custom Activity instance")
 def activities_custom_activities_delete(
@@ -146,8 +143,6 @@ def activities_custom_activities_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all Custom Activity instances")
@@ -252,8 +247,6 @@ def activities_custom_activities_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class Status(str, Enum):  # noqa: F811
     DRAFT = "draft"
@@ -311,8 +304,6 @@ def activities_custom_activities_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single Custom Activity instance")
 def activities_custom_activities_get(
@@ -348,8 +339,6 @@ def activities_custom_activities_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

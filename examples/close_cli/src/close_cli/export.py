@@ -39,7 +39,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "export", display_opt, depth, search)
-    return
 
 
 @app.command("list", short_help="List all the exports")
@@ -89,8 +88,6 @@ def exports_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single Export")
 def exports_get(
@@ -127,8 +124,6 @@ def exports_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

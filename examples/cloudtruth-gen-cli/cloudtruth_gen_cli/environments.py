@@ -37,7 +37,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "environments", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="")
@@ -78,8 +77,6 @@ def environments_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="")
 def environments_destroy(
@@ -108,8 +105,6 @@ def environments_destroy(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="")
@@ -167,8 +162,6 @@ def environments_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("pushes", short_help="List push operations.")
 def environments_pushes_list(
@@ -220,8 +213,6 @@ def environments_pushes_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="")
 def environments_update(
@@ -265,8 +256,6 @@ def environments_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="")
 def environments_retrieve(
@@ -295,8 +284,6 @@ def environments_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("update", short_help="")
@@ -339,8 +326,6 @@ def environments_partial_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

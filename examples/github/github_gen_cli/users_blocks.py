@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "users_blocks", display_opt, depth, search)
-    return
 
 
 @app.command("list", short_help="List users blocked by the authenticated user")
@@ -81,8 +80,6 @@ def users_list_blocked_by_authenticated_user(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

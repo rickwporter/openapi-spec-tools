@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_sms", display_opt, depth, search)
-    return
 
 
 class AttachmentsContentType(str, Enum):  # noqa: F811
@@ -225,8 +224,6 @@ def activities_sms_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete an SMS activity")
 def activities_sms_delete(
@@ -258,8 +255,6 @@ def activities_sms_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all SMS activities")
@@ -356,8 +351,6 @@ def activities_sms_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class AttachmentsContentType(str, Enum):  # noqa: F811
@@ -496,8 +489,6 @@ def activities_sms_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single SMS activity")
 def activities_sms_get(
@@ -532,8 +523,6 @@ def activities_sms_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

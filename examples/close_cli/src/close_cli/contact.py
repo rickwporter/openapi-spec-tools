@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "contact", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a new contact")
@@ -121,8 +120,6 @@ def contacts_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a contact")
 def contacts_delete(
@@ -154,8 +151,6 @@ def contacts_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List contacts")
@@ -207,8 +202,6 @@ def contacts_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Update an existing contact")
@@ -294,8 +287,6 @@ def contacts_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single contact")
 def contacts_get(
@@ -330,8 +321,6 @@ def contacts_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "environments_tags", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Tags allow you to name stable points for your configuration.")
@@ -86,8 +85,6 @@ def environments_tags_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_destroy(
@@ -123,8 +120,6 @@ def environments_tags_destroy(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="Tags allow you to name stable points for your configuration.")
@@ -198,8 +193,6 @@ def environments_tags_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_update(
@@ -250,8 +243,6 @@ def environments_tags_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Tags allow you to name stable points for your configuration.")
 def environments_tags_retrieve(
@@ -287,8 +278,6 @@ def environments_tags_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("update", short_help="Tags allow you to name stable points for your configuration.")
@@ -338,8 +327,6 @@ def environments_tags_partial_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

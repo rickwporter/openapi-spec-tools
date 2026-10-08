@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "memberships", display_opt, depth, search)
-    return
 
 
 class RoleEnum(str, Enum):  # noqa: F811
@@ -81,8 +80,6 @@ def memberships_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="")
 def memberships_destroy(
@@ -111,8 +108,6 @@ def memberships_destroy(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class Role(str, Enum):  # noqa: F811
@@ -174,8 +169,6 @@ def memberships_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class RoleEnum(str, Enum):  # noqa: F811
     OWNER = "OWNER"
@@ -225,8 +218,6 @@ def memberships_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="")
 def memberships_retrieve(
@@ -255,8 +246,6 @@ def memberships_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class RoleEnum(str, Enum):  # noqa: F811
@@ -303,8 +292,6 @@ def memberships_partial_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_status_change_opportunity", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a new OpportunityStatusChange activity")
@@ -68,8 +67,6 @@ def activities_opportunity_status_changes_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("delete", short_help="Delete a single OpportunityStatusChange activity")
@@ -106,8 +103,6 @@ def activities_opportunity_status_changes_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all OpportunityStatusChange activities")
@@ -202,8 +197,6 @@ def activities_opportunity_status_changes_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single OpportunityStatusChange activity")
 def activities_opportunity_status_changes_get(
@@ -238,8 +231,6 @@ def activities_opportunity_status_changes_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

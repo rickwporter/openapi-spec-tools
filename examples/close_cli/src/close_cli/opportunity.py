@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "opportunity", display_opt, depth, search)
-    return
 
 
 class OpportunityValuePeriod(str, Enum):  # noqa: F811
@@ -130,8 +129,6 @@ def opportunities_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete an opportunity")
 def opportunities_delete(
@@ -163,8 +160,6 @@ def opportunities_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter opportunities")
@@ -367,8 +362,6 @@ def opportunities_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class OpportunityValuePeriod(str, Enum):  # noqa: F811
     ONE_TIME = "one_time"
@@ -462,8 +455,6 @@ def opportunities_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve an opportunity")
 def opportunities_get(
@@ -498,8 +489,6 @@ def opportunities_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -37,7 +37,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "membership", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a membership")
@@ -88,8 +87,6 @@ def memberships_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a membership")
 def memberships_delete(
@@ -121,8 +118,6 @@ def memberships_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class AutoRecordCalls(str, Enum):  # noqa: F811
@@ -188,8 +183,6 @@ def memberships_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class AutoRecordCalls(str, Enum):  # noqa: F811
@@ -259,8 +252,6 @@ def memberships_bulk_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

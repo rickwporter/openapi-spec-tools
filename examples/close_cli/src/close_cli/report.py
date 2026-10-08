@@ -41,7 +41,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "report", display_opt, depth, search)
-    return
 
 
 class TransformY(str, Enum):  # noqa: F811
@@ -128,8 +127,6 @@ def reporting_get_custom(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("sent-emails", short_help="Get sent emails report")
 def reporting_get_sent_emails(
@@ -170,8 +167,6 @@ def reporting_get_sent_emails(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":
