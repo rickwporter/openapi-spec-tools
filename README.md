@@ -39,6 +39,10 @@ Found Pet is used by 3 operations:
 (.env) % 
 ```
 
+## Layout
+
+The CLI and API generation allow users to specify a layout file to reduce assumptions. More information about the layout generation, format and schema are covered in [LAYOUT.md](LAYOUT.md). 
+
 ## CLI Generation
 
 The `cli-gen` tool allows users to create a user-friendly CLI using the OpenAPI spec and a layout file. The layout file provides the CLI structure and refers to the OpenAPI spec for details of operations.  [LAYOUT.md](LAYOUT.md) has more details about the layout file, and the [CLI_GEN.md](CLI_GEN.md) has more info about CLI generation.
