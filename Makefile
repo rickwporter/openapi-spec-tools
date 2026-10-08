@@ -7,7 +7,8 @@ help: ## This message
 
 TEST_TARGET ?= tests
 uv_run ?= uv run
-EXAMPLE_DIRS := examples/cloudtruth-api
+EXAMPLE_DIRS := examples/close_cli
+EXAMPLE_DIRS += examples/cloudtruth-api
 EXAMPLE_DIRS += examples/cloudtruth-gen-cli
 EXAMPLE_DIRS += examples/figma
 EXAMPLE_DIRS += examples/github

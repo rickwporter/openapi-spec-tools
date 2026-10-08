@@ -1,0 +1,59 @@
+[project]
+name = "close-cli"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Rick Porter", email = "rickwporter@gmail.com" }
+]
+requires-python = ">=3.10, <4"
+dependencies = [
+    "pyyaml>=6.0.3,<7",
+    "requests>=2.33.1,<3",
+    "rich>=15.0.0,<16",
+    "rich-objects>=0.3.0",
+    "typer>=0.27.2",
+]
+
+[project.scripts]
+close-cli = "close_cli.main:app"
+
+[build-system]
+requires = ["uv_build>=0.12.18,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.13.4,<8",
+    "openapi-spec-tools",
+    "pytest>=9.0.2,<10",
+    "ruff>=0.15.6,<0.16",
+]
+
+[tool.uv.sources]
+openapi-spec-tools = { path = "../..", editable = true }
+
+[tool.ruff]
+line-length = 250
+
+[tool.ruff.lint.isort]
+force-single-line = true
+split-on-trailing-comma = true
+
+[tool.ruff.lint.pylint]
+max-args = 25
+max-branches = 12
+max-returns = 10
+max-statements = 75
+
+[tool.ruff.lint.per-file-ignores]
+"*.py" = [
+    "F811", # redefined: happens for enums
+    "BLE001", # blind exception: generic catch
+    "PLR1711", # useless-return: makes code more readable
+    "RUF100", # non-enabled: allow unused noqa values
+    # "RUF013", # typer.Option[str] = None
+]
+"connected_account.py" = [
+    "B006", # mutable args: used for default lists
+]
