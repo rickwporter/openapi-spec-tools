@@ -81,25 +81,36 @@ class CliGenerator(BaseGenerator):
             __package__: self.package_name,
         }
 
-    def standard_imports(self) -> str:
+    def standard_imports(self, operations: bool) -> str:
         """Get the standard imports for all CLI modules."""
-        return f"""
+        # standard packages
+        text = """
 from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
-from typing import Annotated  # noqa: F401
+"""
+        if operations:
+            text += "from typing import Annotated" + NL
 
-import typer
-from rich_objects import display  # noqa: F401
+        # third party
+        text += NL + "import typer" + NL
+        if operations:
+            text += "from rich_objects import display" + NL
 
+        # local
+        text += f"""
 from {self.package_name} import _arguments as _a
 from {self.package_name} import _display as _d  # noqa: F401
-from {self.package_name} import _exceptions as _e  # noqa: F401
-from {self.package_name} import _logging as _l  # noqa: F401
-from {self.package_name} import _requests as _r  # noqa: F401
-from {self.package_name} import _tree as _t
 """
+        if operations:
+            text += f"""\
+from {self.package_name} import _exceptions as _e
+from {self.package_name} import _logging as _l
+from {self.package_name} import _requests as _r
+"""
+        text += f"from {self.package_name} import _tree as _t" + NL
+        return text
 
     def subcommand_imports(self, node: LayoutNode) -> str:
         """Get the imports needed for the subcommands/children."""
@@ -516,13 +527,14 @@ def show_commands(
         """Create a file/module for the current node, and recursively goes through sub-commands."""
         module_name = to_snake_case(node.identifier)
         self.logger.info(f"Generating {module_name} module")
+        operations = node.operations()
         text = self.shebang()
         text += self.copyright
-        text += self.standard_imports()
+        text += self.standard_imports(bool(operations))
         text += self.subcommand_imports(node)
         text += self.app_definition(node)
         text += self.tree_function(node)
-        for command in node.operations():
+        for command in operations:
             text += self.function_definition(command)
         text += self.main()
 

@@ -57,3 +57,12 @@ max-statements = 75
 "connected_account.py" = [
     "B006", # mutable args: used for default lists
 ]
+"report_activity.py" = [
+    "F401", # Annotated is not used even though there are operations
+]
+"report_funnel_opportunity.py" = [
+    "F401", # Annotated is not used even though there are operations
+]
+"shared_scheduling_link_association.py" = [
+    "F401", # Annotated is not used even though there are operations
+]

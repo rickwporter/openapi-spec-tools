@@ -31,9 +31,18 @@ S2 = f"{S1}    "
 
 def test_standard_imports():
     uut = CliGenerator(package_name="cli_package", oas={})
-    text = uut.standard_imports()
+    annotated = "from typing import Annotated"
+    requests = "from cli_package import _requests as _r"
+
+    text = uut.standard_imports(operations=True)
     assert "import typer" in text
-    assert "from typing import Annotated" in text
+    assert annotated in text
+    assert requests in text
+
+    text = uut.standard_imports(operations=False)
+    assert "import typer" in text
+    assert annotated not in text
+    assert requests not in text
 
 
 def test_subcommand_imports():
