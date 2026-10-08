@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "membership_pinned_views", display_opt, depth, search)
-    return
 
 
 @app.command("set", short_help="Update pinned views for a membership")
@@ -74,8 +73,6 @@ def memberships_update_pinned_views(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get pinned views for a membership")
 def memberships_get_pinned_views(
@@ -107,8 +104,6 @@ def memberships_get_pinned_views(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

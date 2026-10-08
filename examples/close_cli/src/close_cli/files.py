@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "files", display_opt, depth, search)
-    return
 
 
 @app.command("upload", short_help="Generate a signed S3 POST")
@@ -76,8 +75,6 @@ def files_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

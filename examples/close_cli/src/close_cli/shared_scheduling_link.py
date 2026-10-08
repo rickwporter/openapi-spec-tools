@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "shared_scheduling_link", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a Shared Scheduling Link")
@@ -67,8 +66,6 @@ def scheduling_links_create_shared(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("delete", short_help="Delete a Shared Scheduling Link")
@@ -102,8 +99,6 @@ def scheduling_links_delete_shared(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List Shared Scheduling Links")
 def scheduling_links_list_shared(
@@ -134,8 +129,6 @@ def scheduling_links_list_shared(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Update a Shared Scheduling Link")
@@ -169,8 +162,6 @@ def scheduling_links_update_shared(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a Shared Scheduling Link")
 def scheduling_links_get_shared(
@@ -202,8 +193,6 @@ def scheduling_links_get_shared(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_whatsapp_message", display_opt, depth, search)
-    return
 
 
 class CommunicationDirection(str, Enum):  # noqa: F811
@@ -157,8 +156,6 @@ def activities_whatsapp_messages_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a WhatsAppMessage activity")
 def activities_whatsapp_messages_delete(
@@ -190,8 +187,6 @@ def activities_whatsapp_messages_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all WhatsAppMessage activities")
@@ -286,8 +281,6 @@ def activities_whatsapp_messages_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class CommunicationDirection(str, Enum):  # noqa: F811
     INCOMING = "incoming"
@@ -366,8 +359,6 @@ def activities_whatsapp_messages_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single WhatsAppMessage activity")
 def activities_whatsapp_messages_get(
@@ -402,8 +393,6 @@ def activities_whatsapp_messages_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

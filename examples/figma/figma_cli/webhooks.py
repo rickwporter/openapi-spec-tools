@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "webhooks", display_opt, depth, search)
-    return
 
 
 class WebhookV2Event(str, Enum):  # noqa: F811
@@ -116,8 +115,6 @@ def post_webhook(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a webhook")
 def delete_webhook(
@@ -149,8 +146,6 @@ def delete_webhook(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="Get webhooks by context or plan")
@@ -196,8 +191,6 @@ def get_webhooks(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("requests", short_help="Get webhook requests")
 def get_webhook_requests(
@@ -229,8 +222,6 @@ def get_webhook_requests(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class WebhookV2Event(str, Enum):  # noqa: F811
@@ -298,8 +289,6 @@ def put_webhook(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a webhook")
 def get_webhook(
@@ -331,8 +320,6 @@ def get_webhook(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -37,7 +37,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "main", display_opt, depth, search)
-    return
 
 
 @app.command("stations", short_help="Get a list of train stations")
@@ -93,8 +92,6 @@ def get_stations(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("trips", short_help="Get available train trips")
@@ -160,8 +157,6 @@ def get_trips(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

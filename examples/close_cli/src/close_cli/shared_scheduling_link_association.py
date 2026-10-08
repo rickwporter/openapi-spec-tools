@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "shared_scheduling_link_association", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Map a Shared Scheduling Link")
@@ -70,8 +69,6 @@ def scheduling_links_create_shared_association(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("unmap", short_help="Unmap a Shared Scheduling Link")
 def scheduling_links_delete_shared_association(
@@ -102,8 +99,6 @@ def scheduling_links_delete_shared_association(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

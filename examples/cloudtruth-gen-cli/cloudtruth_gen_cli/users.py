@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "users", display_opt, depth, search)
-    return
 
 
 @app.command("current", short_help="Current user information")
@@ -67,8 +66,6 @@ def users_current_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("delete", short_help="Delete the specified user.")
@@ -110,8 +107,6 @@ def users_destroy(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="")
@@ -163,8 +158,6 @@ def users_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="")
 def users_retrieve(
@@ -193,8 +186,6 @@ def users_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

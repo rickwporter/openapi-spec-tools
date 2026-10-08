@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "blocked_phone_number_settings", display_opt, depth, search)
-    return
 
 
 @app.command("set", short_help="Update Blocked Phone Number settings")
@@ -73,8 +72,6 @@ def blocked_phone_numbers_update_settings(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve Blocked Phone Number settings")
 def blocked_phone_numbers_get_settings(
@@ -105,8 +102,6 @@ def blocked_phone_numbers_get_settings(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

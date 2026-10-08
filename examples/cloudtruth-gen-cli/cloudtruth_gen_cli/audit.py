@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "audit", display_opt, depth, search)
-    return
 
 
 class Action(str, Enum):  # noqa: F811
@@ -122,8 +121,6 @@ def audit_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve one record from the audit log.")
 def audit_retrieve(
@@ -156,8 +153,6 @@ def audit_retrieve(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("summary", short_help="Summary information about the organization\'s audit trail.")
 def audit_summary_retrieve(
@@ -188,8 +183,6 @@ def audit_summary_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

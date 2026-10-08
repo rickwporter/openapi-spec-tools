@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "email_template", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create an email template")
@@ -71,8 +70,6 @@ def email_templates_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete an email template")
 def email_templates_delete(
@@ -104,8 +101,6 @@ def email_templates_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List email templates")
@@ -158,8 +153,6 @@ def email_templates_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="Update an email template")
 def email_templates_update(
@@ -194,8 +187,6 @@ def email_templates_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("show", short_help="Fetch an email template")
@@ -234,8 +225,6 @@ def email_templates_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

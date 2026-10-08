@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "report_statuses", display_opt, depth, search)
-    return
 
 
 @app.command("lead", short_help="Get lead status change report")
@@ -127,8 +126,6 @@ def reporting_get_lead_statuses(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("opportunity", short_help="Get opportunity status change report")
@@ -233,8 +230,6 @@ def reporting_get_opportunity_statuses(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

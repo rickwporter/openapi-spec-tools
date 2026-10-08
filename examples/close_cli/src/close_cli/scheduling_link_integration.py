@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "scheduling_link_integration", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create or update a Scheduling Link via OAuth")
@@ -74,8 +73,6 @@ def scheduling_links_create_integration(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a User Scheduling Link via OAuth integration")
 def scheduling_links_delete_integration(
@@ -110,8 +107,6 @@ def scheduling_links_delete_integration(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

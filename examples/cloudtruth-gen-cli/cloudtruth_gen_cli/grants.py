@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "grants", display_opt, depth, search)
-    return
 
 
 class RoleEnum(str, Enum):  # noqa: F811
@@ -92,8 +91,6 @@ def grants_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_destroy(
@@ -129,8 +126,6 @@ def grants_destroy(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class Role(str, Enum):  # noqa: F811
@@ -203,8 +198,6 @@ def grants_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class RoleEnum(str, Enum):  # noqa: F811
     OWNER = "OWNER"
@@ -261,8 +254,6 @@ def grants_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_retrieve(
@@ -298,8 +289,6 @@ def grants_retrieve(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class RoleEnum(str, Enum):  # noqa: F811
@@ -353,8 +342,6 @@ def grants_partial_update(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

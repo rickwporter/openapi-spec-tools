@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "organization", display_opt, depth, search)
-    return
 
 
 @app.command("set", short_help="Update an organization")
@@ -95,8 +94,6 @@ def organizations_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get an organization\'s details")
 def organizations_get(
@@ -132,8 +129,6 @@ def organizations_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

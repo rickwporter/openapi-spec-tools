@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_import_update", display_opt, depth, search)
-    return
 
 
 @app.command("delete", short_help="Delete an ImportUpdate activity")
@@ -68,8 +67,6 @@ def activities_import_updates_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all ImportUpdate activities")
@@ -162,8 +159,6 @@ def activities_import_updates_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single ImportUpdate activity")
 def activities_import_updates_get(
@@ -198,8 +193,6 @@ def activities_import_updates_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

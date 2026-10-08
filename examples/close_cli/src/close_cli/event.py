@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "event", display_opt, depth, search)
-    return
 
 
 @app.command("list", short_help="Retrieve a list of events")
@@ -168,8 +167,6 @@ def events_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve a single event by ID")
 def events_get(
@@ -201,8 +198,6 @@ def events_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

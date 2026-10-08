@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_call", display_opt, depth, search)
-    return
 
 
 class Direction(str, Enum):  # noqa: F811
@@ -160,8 +159,6 @@ def activities_calls_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a Call activity")
 def activities_calls_delete(
@@ -193,8 +190,6 @@ def activities_calls_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all Call activities")
@@ -285,8 +280,6 @@ def activities_calls_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class Status(str, Enum):  # noqa: F811
@@ -387,8 +380,6 @@ def activities_calls_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single Call activity")
 def activities_calls_get(
@@ -423,8 +414,6 @@ def activities_calls_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

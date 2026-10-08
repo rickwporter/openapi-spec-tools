@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "bulk_action_sequence_subscription", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Initiate a new bulk sequence subscription")
@@ -88,8 +87,6 @@ def bulk_actions_sequence_subscriptions_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List bulk sequence subscriptions")
 def bulk_actions_sequence_subscriptions_list(
@@ -138,8 +135,6 @@ def bulk_actions_sequence_subscriptions_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single bulk sequence subscription object")
 def bulk_actions_sequence_subscriptions_get(
@@ -174,8 +169,6 @@ def bulk_actions_sequence_subscriptions_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

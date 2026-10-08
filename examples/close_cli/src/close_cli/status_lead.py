@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "status_lead", display_opt, depth, search)
-    return
 
 
 class LeadStatusColor(str, Enum):  # noqa: F811
@@ -87,8 +86,6 @@ def lead_statuses_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a lead status")
 def lead_statuses_delete(
@@ -121,8 +118,6 @@ def lead_statuses_delete(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List lead statuses for your organization")
 def lead_statuses_list(
@@ -153,8 +148,6 @@ def lead_statuses_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class LeadStatusColor(str, Enum):  # noqa: F811
@@ -208,8 +201,6 @@ def lead_statuses_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a single lead status")
 def lead_statuses_get(
@@ -241,8 +232,6 @@ def lead_statuses_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "saved_search", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a Smart View")
@@ -74,8 +73,6 @@ def smart_views_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a Smart View")
 def smart_views_delete(
@@ -107,8 +104,6 @@ def smart_views_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Update a Smart View")
@@ -142,8 +137,6 @@ def smart_views_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single Smart View")
 def smart_views_get(
@@ -175,8 +168,6 @@ def smart_views_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

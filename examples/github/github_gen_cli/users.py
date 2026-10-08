@@ -37,7 +37,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "users", display_opt, depth, search)
-    return
 
 
 @app.command("attestations", short_help="List attestations")
@@ -103,8 +102,6 @@ def users_list_attestations(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("current", short_help="Get the authenticated user")
 def users_get_authenticated(
@@ -136,8 +133,6 @@ def users_get_authenticated(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List users")
@@ -187,8 +182,6 @@ def users_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show-by-id", short_help="Get a user using their ID")
 def users_get_by_id(
@@ -237,8 +230,6 @@ def users_get_by_id(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show-by-name", short_help="Get a user")
 def users_get_by_username(
@@ -285,8 +276,6 @@ def users_get_by_username(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

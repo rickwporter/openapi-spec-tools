@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "custom_field_custom_object_type", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a new Custom Object Custom Field")
@@ -72,8 +71,6 @@ def custom_fields_custom_object_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a Custom Object Custom Field")
 def custom_fields_custom_object_delete(
@@ -107,8 +104,6 @@ def custom_fields_custom_object_delete(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List Custom Object Custom Fields")
 def custom_fields_custom_object_list(
@@ -139,8 +134,6 @@ def custom_fields_custom_object_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Update a Custom Object Custom Field")
@@ -179,8 +172,6 @@ def custom_fields_custom_object_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch Custom Object Custom Field\'s details")
 def custom_fields_custom_object_get(
@@ -212,8 +203,6 @@ def custom_fields_custom_object_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

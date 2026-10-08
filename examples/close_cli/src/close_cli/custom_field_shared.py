@@ -37,7 +37,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "custom_field_shared", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a new Shared Custom Field")
@@ -69,8 +68,6 @@ def custom_fields_shared_create(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("delete", short_help="Delete a Shared Custom Field")
@@ -105,8 +102,6 @@ def custom_fields_shared_delete(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List Shared Custom Fields")
 def custom_fields_shared_list(
@@ -140,8 +135,6 @@ def custom_fields_shared_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("set", short_help="Update a Shared Custom Field")
@@ -178,8 +171,6 @@ def custom_fields_shared_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch Shared Custom Field\'s details")
 def custom_fields_shared_get(
@@ -214,8 +205,6 @@ def custom_fields_shared_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "task", display_opt, depth, search)
-    return
 
 
 class TaskPriority(str, Enum):  # noqa: F811
@@ -122,8 +121,6 @@ def tasks_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a task")
 def tasks_delete(
@@ -155,8 +152,6 @@ def tasks_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter tasks")
@@ -304,8 +299,6 @@ def tasks_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class TaskPriority(str, Enum):  # noqa: F811
     HIGH = "high"
@@ -392,8 +385,6 @@ def tasks_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Fetch a task\'s details")
 def tasks_get(
@@ -428,8 +419,6 @@ def tasks_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

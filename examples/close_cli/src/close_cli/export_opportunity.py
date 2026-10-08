@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "export_opportunity", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Export opportunities, based on opportunity filters")
@@ -85,8 +84,6 @@ def exports_create_opportunity(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List Opportunity Exports")
 def exports_list_opportunity(
@@ -135,8 +132,6 @@ def exports_list_opportunity(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single Opportunity Export")
 def exports_get_opportunity(
@@ -173,8 +168,6 @@ def exports_get_opportunity(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

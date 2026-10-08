@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "user", display_opt, depth, search)
-    return
 
 
 @app.command("availability", short_help="List user availability statuses")
@@ -72,8 +71,6 @@ def users_list_availabilities(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 class OrderBy(str, Enum):  # noqa: F811
@@ -128,8 +125,6 @@ def users_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 class OrderBy(str, Enum):  # noqa: F811
     LAST_NAME_FIRST_NAME = "last_name,first_name"
@@ -183,8 +178,6 @@ def users_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

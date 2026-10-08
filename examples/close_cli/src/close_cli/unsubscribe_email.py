@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "unsubscribe_email", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Unsubscribe an email address")
@@ -74,8 +73,6 @@ def unsubscribed_emails_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Resubscribe an email address")
 def unsubscribed_emails_delete(
@@ -108,8 +105,6 @@ def unsubscribed_emails_delete(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("list", short_help="List all unsubscribed emails")
 def unsubscribed_emails_list(
@@ -140,8 +135,6 @@ def unsubscribed_emails_list(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

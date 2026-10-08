@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "files_variables", display_opt, depth, search)
-    return
 
 
 class VariableCollectionCreate(str, Enum):  # noqa: F811
@@ -246,8 +245,6 @@ def post_variables(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("local", short_help="Get local variables")
 def get_local_variables(
@@ -289,8 +286,6 @@ def get_local_variables(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("published", short_help="Get published variables")
@@ -338,8 +333,6 @@ def get_published_variables(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

@@ -37,7 +37,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "blocked_phone_number", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Create a Blocked Phone Number")
@@ -83,8 +82,6 @@ def blocked_phone_numbers_create(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a Blocked Phone Number")
 def blocked_phone_numbers_delete(
@@ -118,8 +115,6 @@ def blocked_phone_numbers_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List Blocked Phone Numbers")
@@ -169,8 +164,6 @@ def blocked_phone_numbers_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("set", short_help="Update a Blocked Phone Number")
 def blocked_phone_numbers_update(
@@ -208,8 +201,6 @@ def blocked_phone_numbers_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve a single Blocked Phone Number")
 def blocked_phone_numbers_get(
@@ -244,8 +235,6 @@ def blocked_phone_numbers_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

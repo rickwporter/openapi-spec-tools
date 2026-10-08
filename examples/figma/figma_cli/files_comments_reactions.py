@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "files_comments_reactions", display_opt, depth, search)
-    return
 
 
 @app.command("create", short_help="Add a reaction to a comment")
@@ -75,8 +74,6 @@ def post_comment_reaction(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("delete", short_help="Delete a reaction")
 def delete_comment_reaction(
@@ -114,8 +111,6 @@ def delete_comment_reaction(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get reactions for a comment")
 def get_comment_reactions(
@@ -151,8 +146,6 @@ def get_comment_reactions(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

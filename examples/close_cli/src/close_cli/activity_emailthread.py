@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "activity_emailthread", display_opt, depth, search)
-    return
 
 
 @app.command("delete", short_help="Delete an EmailThread activity")
@@ -68,8 +67,6 @@ def activities_email_threads_delete(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 @app.command("list", short_help="List or filter all EmailThread activities")
@@ -161,8 +158,6 @@ def activities_email_threads_list(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Get a single EmailThread activity")
 def activities_email_threads_get(
@@ -197,8 +192,6 @@ def activities_email_threads_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":

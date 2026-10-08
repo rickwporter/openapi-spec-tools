@@ -151,8 +151,6 @@ def add_node_to_table(
 
             add_node_to_table(table, child, display, depth + 1, max_depth, needle)
 
-    return
-
 
 def create_tree_table(
     node: TreeNode,

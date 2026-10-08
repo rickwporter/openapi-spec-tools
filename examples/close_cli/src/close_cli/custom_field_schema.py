@@ -35,7 +35,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "custom_field_schema", display_opt, depth, search)
-    return
 
 
 @app.command("set", short_help="Update a custom field schema")
@@ -73,8 +72,6 @@ def custom_field_schemas_update(
     except Exception as ex:
         _e.handle_exceptions(ex)
 
-    return
-
 
 @app.command("show", short_help="Retrieve a custom field schema")
 def custom_field_schemas_get(
@@ -106,8 +103,6 @@ def custom_field_schemas_get(
         display(data, _out_fmt, _out_style)
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 
 
 if __name__ == "__main__":
