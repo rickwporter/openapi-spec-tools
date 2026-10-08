@@ -8,9 +8,9 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
 
-from pets_api import _environment as _e  # noqa: F401
-from pets_api import _logging as _l  # noqa: F401
-from pets_api import _requests as _r  # noqa: F401
+from pets_api import _environment as _e
+from pets_api import _logging as _l
+from pets_api import _requests as _r
 
 
 def create_pets(
