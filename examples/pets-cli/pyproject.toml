@@ -27,7 +27,7 @@ pets = "pets_cli.main:app"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.6,<0.16",
+    "ruff>=0.16.10",
     "pytest>=9.1.1",
     "black>=26.3.1,<27",
     "coverage>=7.16.2",

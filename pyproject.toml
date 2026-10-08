@@ -48,7 +48,7 @@ layout = "openapi_spec_tools.cli.layout:app"
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
-    "ruff>=0.15.6,<0.16",
+    "ruff>=0.16.10",
     "coverage>=7.16.2",
     "tomlkit>=0.13.3,<0.14",
 ]
