@@ -449,8 +449,6 @@ def {func_name}({args_str}) -> None:
         display(data, _out_fmt, _out_style{"" if not columns else ", columns=columns"})
     except Exception as ex:
         _e.handle_exceptions(ex)
-
-    return
 """
 
     def tree_data(self, node: LayoutNode) -> dict[str, Any]:
@@ -507,7 +505,6 @@ def show_commands(
     """
     path = Path(__file__).parent / "tree.yaml"
     _t.tree(path.as_posix(), "{node.identifier}", display_opt, depth, search)
-    return
 '''
 
     def generate_files(self, node: LayoutNode, directory: str) -> None:
