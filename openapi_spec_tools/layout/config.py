@@ -16,6 +16,7 @@ class LayoutConfig(BaseModel):
     to allow for determining which items are set vs just using default values.
     """
 
+    prefix: str | None = None
     max_help_length: int | None = None
     supported_content: list[ContentType] | None = None
     common_operations: dict[str, str] | None = None

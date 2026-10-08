@@ -18,7 +18,7 @@ layout suggest openapi.yaml layout.yaml --prefix /api/v1 --config layout-config.
 | --- | --- |
 | `OPENAPI` | OpenAPI specification to read. |
 | `FILENAME` | Layout file to write. |
-| `--prefix` | Path prefix removed before the remaining segments become commands. Path parameters such as `{id}` are dropped. |
+| `--prefix` | Path prefix removed before the remaining segments become commands. Path parameters such as `{id}` are dropped. Overrides `prefix` from `--config`. |
 | `--config` | YAML file of generator settings. Properties are listed below. |
 | `--update` | Merge the new suggestion into the existing output file. Commands already in that file keep their edits. Commands the suggestion no longer includes are removed, and new commands are added. |
 | `--indent` | Spaces used to indent each YAML level. Defaults to 4. |
@@ -31,6 +31,7 @@ Each remaining path segment is converted to kebab-case and becomes a command or 
 
 | Field | Description |
 | --- | --- |
+| `prefix` | Path prefix removed before the remaining segments become commands. Path parameters such as `{id}` are dropped. Defaults to an empty string, which leaves the path unchanged. |
 | `max_help_length` | Maximum length of a generated description before it is truncated. Defaults to 80. |
 | `supported_content` | Response content types inspected for pagination body properties. The first type on a successful response that appears in this list is used. Accepted values are `application/json`, `application/yaml`, `application/xml`, `application/pdf`, `application/zip`, and `application/octet-stream`. Defaults to `application/json` and `application/yaml`. |
 | `common_operations` | Map of `operationId` segments and HTTP methods to command names. Matching order and the default map are below. |
@@ -59,6 +60,7 @@ The default map is:
 | `put` | `set` |
 
 ```yaml
+prefix: /api/v1
 max_help_length: 80
 supported_content:
   - application/json

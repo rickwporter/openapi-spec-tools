@@ -30,6 +30,7 @@ NEXT_HEAD = "next_headers"
 
 def test_config():
     config = LayoutConfig(
+        prefix="/api/v1",
         max_help_length=40,
         supported_content=[ContentType.APP_JSON],
         common_operations={"add": "create"},
@@ -40,7 +41,8 @@ def test_config():
         next_properties="next",
         next_headers=["Link", "X-Next"],
     )
-    uut = LayoutGenerator({}, config=config, max_help_length=12, page_size_params="count")
+    uut = LayoutGenerator({}, config=config, prefix="/pets", max_help_length=12, page_size_params="count")
+    assert uut.prefix == "/pets"
     assert uut.max_help_length == 12
     assert uut.supported_response_content == [ContentType.APP_JSON]
     assert uut.common_ops == {"add": "create"}
@@ -51,7 +53,11 @@ def test_config():
     assert uut.next_properties == ["next"]
     assert uut.next_headers == ["Link", "X-Next"]
 
+    uut = LayoutGenerator({}, config=config)
+    assert uut.prefix == "/api/v1"
+
     uut = LayoutGenerator({})
+    assert uut.prefix == ""
     assert uut.max_help_length == DEFAULT_MAX_HELP_LENGTH
     assert uut.supported_response_content == DEFAULT_SUPPORTED_CONTENT
     assert uut.common_ops == DEFAULT_OPERATION_MAP
@@ -237,8 +243,8 @@ def test_condense(node: LayoutNode, expected: LayoutNode) -> None:
 def test_generate_pets():
     oas = open_oas(asset_filename("pet.yaml"))
 
-    uut = LayoutGenerator(oas)
-    node = uut.generate("/pets")
+    uut = LayoutGenerator(oas, prefix="/pets")
+    node = uut.generate()
     assert [] == node.subcommands()
     ops = node.operations()
     assert 3 == len(ops)
@@ -249,8 +255,8 @@ def test_generate_pets():
 def test_generate_cloudtruth():
     oas = open_oas(asset_filename("ct.yaml"))
 
-    uut = LayoutGenerator(oas)
-    node = uut.generate("/api/v1")
+    uut = LayoutGenerator(oas, prefix="/api/v1")
+    node = uut.generate()
 
     assert 'CloudTruth centralizes your configuration parameters' in node.description
 
@@ -278,7 +284,7 @@ def test_generate_misc():
     oas = open_oas(asset_filename("misc.yaml"))
 
     uut = LayoutGenerator(oas)
-    node = uut.generate("", description="this is it")
+    node = uut.generate(description="this is it")
 
     assert node.description == "this is it"
     assert [] == node.operations()
@@ -297,7 +303,7 @@ def test_generate_node_file():
     tempdir = TemporaryDirectory()
     file = Path(tempdir.name) / "layout.yaml"
     generator = LayoutGenerator(oas)
-    node = generator.generate("")
+    node = generator.generate()
 
     assert "CLI to manage your application" == node.description
 

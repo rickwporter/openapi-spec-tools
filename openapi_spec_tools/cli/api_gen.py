@@ -69,8 +69,8 @@ def generate_api(
     if layout_file:
         commands = layout_tree_with_error_handling(layout_file, start, logger)
     else:
-        layout_gen = LayoutGenerator(oas)
-        commands = layout_gen.generate(prefix)
+        layout_gen = LayoutGenerator(oas, prefix=prefix or None)
+        commands = layout_gen.generate()
 
     config = gen_config_from_file(config_file)
 

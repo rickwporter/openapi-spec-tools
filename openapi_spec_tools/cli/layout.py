@@ -235,8 +235,8 @@ def layout_suggest(
     logger = init_logging(log_level, LOG_CLASS)
     oas = open_oas_with_error_handling(openapi_file, logger)
     config = layout_config_from_file(config_file)
-    generator = LayoutGenerator(oas, config=config)
-    node = generator.generate(prefix)
+    generator = LayoutGenerator(oas, config=config, prefix=prefix or None)
+    node = generator.generate()
 
     if update:
         original = file_to_tree(output_file)
