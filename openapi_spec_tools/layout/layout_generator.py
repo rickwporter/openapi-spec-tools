@@ -55,6 +55,7 @@ class LayoutGenerator:
         self,
         oas: dict[str, Any],
         config: LayoutConfig | None = None,
+        prefix: str | None = None,
         max_help_length: int | None = None,
         supported_content: list[ContentType] | None = None,
         common_operations: dict[str, str] | None = None,
@@ -68,12 +69,14 @@ class LayoutGenerator:
         """Initialize the generator with internal values.
 
         Constructor arguments take precedence over ``config``, which takes precedence over the built-in defaults.
+        The path prefix defaults to an empty string when neither the argument nor the config sets it.
         Pagination names default to an empty list when neither the argument nor the config sets them.
         """
         config = config or LayoutConfig()
         self.paths = oas.get(OasField.PATHS, {})
         self.components = oas.get(OasField.COMPONENTS, {})
         self.description = oas.get(OasField.INFO, {}).get(OasField.DESCRIPTION)
+        self.prefix = _or(prefix, config.prefix, "")
         self.max_help_length = _or(max_help_length, config.max_help_length, DEFAULT_MAX_HELP_LENGTH)
         self.supported_response_content = _or(supported_content, config.supported_content, DEFAULT_SUPPORTED_CONTENT)
         self.common_ops = _or(common_operations, config.common_operations, DEFAULT_OPERATION_MAP)
@@ -313,13 +316,13 @@ class LayoutGenerator:
         node.children = condensed
         return node
 
-    def generate(self, prefix: str, description: str | None = None) -> LayoutNode:
+    def generate(self, description: str | None = None) -> LayoutNode:
         """Create a suggested layout for the provided OpenAPI spec."""
         help = self.short_help(description or self.description or DEFAULT_HELP)
         main = LayoutNode(command=DEFAULT_START, identifier=DEFAULT_START, description=help)
 
         for path_name, path_data in self.paths.items():
-            path_parts = path_to_parts(path_name, prefix)
+            path_parts = path_to_parts(path_name, self.prefix)
             commands = self.parts_to_commands(path_parts)
 
             for method, op_data in path_data.items():

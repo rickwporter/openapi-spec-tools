@@ -406,6 +406,36 @@ def test_layout_suggest_config():
     assert "nextHeader: x-next" in text
 
 
+def test_layout_suggest_prefix_from_config():
+    directory = TemporaryDirectory()
+    layout_file = Path(directory.name) / "layout.yaml"
+    config_file = Path(directory.name) / "layout_config.yaml"
+    config_file.write_text("prefix: /pets\n", encoding="utf-8")
+
+    layout_suggest(
+        asset_filename("pet.yaml"),
+        layout_file.as_posix(),
+        config_file=config_file.as_posix(),
+    )
+
+    text = layout_file.read_text(encoding="utf-8", errors="ignore")
+    assert "subcommandId: pets" not in text
+    assert "operationId: listPets" in text
+
+    # a command-line prefix overrides the configuration file
+    config_file.write_text("prefix: /ignored\n", encoding="utf-8")
+    layout_suggest(
+        asset_filename("pet.yaml"),
+        layout_file.as_posix(),
+        prefix="/pets",
+        config_file=config_file.as_posix(),
+    )
+
+    text = layout_file.read_text(encoding="utf-8", errors="ignore")
+    assert "subcommandId: pets" not in text
+    assert "operationId: listPets" in text
+
+
 def test_layout_suggest_missing_config():
     directory = TemporaryDirectory()
     layout_file = Path(directory.name) / "layout.yaml"

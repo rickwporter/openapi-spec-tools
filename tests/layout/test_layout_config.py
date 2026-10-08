@@ -10,6 +10,7 @@ from openapi_spec_tools.types import ContentType
 def test_from_config_defaults():
     uut = LayoutConfig()
 
+    assert uut.prefix is None
     assert uut.max_help_length is None
     assert uut.supported_content is None
     assert uut.common_operations is None
@@ -26,6 +27,7 @@ def test_from_config_overrides():
     operations = {"add": "create", "get": "show"}
 
     uut = LayoutConfig(
+        prefix="/api/v1",
         max_help_length=40,
         supported_content=supported,
         common_operations=operations,
@@ -37,6 +39,7 @@ def test_from_config_overrides():
         next_headers=["Link", "X-Next"],
     )
 
+    assert "/api/v1" == uut.prefix
     assert 40 == uut.max_help_length
     assert supported == uut.supported_content
     assert operations == uut.common_operations
@@ -59,6 +62,7 @@ def test_from_yaml_defaults():
 
 def test_from_yaml():
     text = """\
+prefix: /api/v1
 max_help_length: 40
 supported_content:
   - application/json
@@ -80,6 +84,7 @@ next_headers:
   - X-Next
 """
     expected = LayoutConfig(
+        prefix="/api/v1",
         max_help_length=40,
         supported_content=[ContentType.APP_JSON, ContentType.APP_YAML],
         common_operations={"add": "create", "get": "show"},

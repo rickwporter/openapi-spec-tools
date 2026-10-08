@@ -104,8 +104,8 @@ def generate_cli(
             typer.echo(render_missing(missing))
             raise typer.Exit(1)
     else:
-        layout_gen = LayoutGenerator(oas)
-        commands = layout_gen.generate(prefix)
+        layout_gen = LayoutGenerator(oas, prefix=prefix or None)
+        commands = layout_gen.generate()
         typer.echo("Generated layout -- equivalent can be saved using 'layout suggest'.")
 
     config = gen_config_from_file(config_file)
