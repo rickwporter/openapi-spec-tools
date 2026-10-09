@@ -70,7 +70,7 @@ def memberships_update_pinned_views(
     try:
         data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -102,7 +102,7 @@ def memberships_get_pinned_views(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 

@@ -196,7 +196,7 @@ def request(
         try:
             content = response.content.decode(encoding=encoding, errors="ignore")
             return yaml.safe_load(content)
-        except Exception as ex:
+        except Exception as ex:  # noqa: BLE001
             logger.error(f"Failed to decode {method} {pretty_url} response: {ex}")
             return None
 
