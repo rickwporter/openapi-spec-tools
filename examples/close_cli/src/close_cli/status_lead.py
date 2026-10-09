@@ -51,7 +51,7 @@ class LeadStatusColor(str, Enum):  # noqa: F811
 @app.command("create", short_help="Create a new status that can be applied to leads")
 def lead_statuses_create(
     color: Annotated[LeadStatusColor | None, typer.Option(show_default=False, case_sensitive=False)] = None,
-    label: Annotated[str, typer.Option(show_default=False)] = None,
+    label: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -165,7 +165,7 @@ class LeadStatusColor(str, Enum):  # noqa: F811
 def lead_statuses_update(
     id: Annotated[str, typer.Argument(show_default=False)],
     color: Annotated[LeadStatusColor | None, typer.Option(show_default=False, case_sensitive=False)] = None,
-    label: Annotated[str, typer.Option(show_default=False)] = None,
+    label: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

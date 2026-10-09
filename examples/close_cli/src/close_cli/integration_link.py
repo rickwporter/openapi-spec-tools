@@ -45,9 +45,9 @@ class IntegrationLinkType(str, Enum):  # noqa: F811
 
 @app.command("create", short_help="Create an integration link")
 def integration_links_create(
-    name: Annotated[str, typer.Option(show_default=False)] = None,
-    type_: Annotated[IntegrationLinkType, typer.Option("--type", show_default=False, case_sensitive=False)] = None,
-    url: Annotated[str, typer.Option(show_default=False)] = None,
+    name: Annotated[str | None, typer.Option(show_default=False)] = None,
+    type_: Annotated[IntegrationLinkType | None, typer.Option("--type", show_default=False, case_sensitive=False)] = None,
+    url: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

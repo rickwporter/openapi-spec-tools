@@ -43,7 +43,7 @@ def sms_templates_create(
     attachments_filename: Annotated[str | None, typer.Option(show_default=False)] = None,
     attachments_url: Annotated[str | None, typer.Option(show_default=False)] = None,
     is_shared: Annotated[bool | None, typer.Option("--is-shared/--no-is-shared", show_default=False)] = None,
-    name: Annotated[str, typer.Option(show_default=False)] = None,
+    name: Annotated[str | None, typer.Option(show_default=False)] = None,
     text: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,

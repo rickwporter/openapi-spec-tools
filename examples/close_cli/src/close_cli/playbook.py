@@ -73,7 +73,7 @@ def playbooks_archive(
 def playbooks_create(
     custom_field_ids: Annotated[list[str] | None, typer.Option(show_default=False, help="IDs of [Shared Custom Fields](/api/resources/custom-fields/custom-fields-shared) to associate with this Playbook.")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="Description of the playbook.")] = None,
-    name: Annotated[str, typer.Option(show_default=False)] = None,
+    name: Annotated[str | None, typer.Option(show_default=False)] = None,
     outcome_ids: Annotated[list[str] | None, typer.Option(show_default=False, help="IDs of [Outcomes](/api/resources/outcomes/) that should be associated with this Playbook.")] = None,
     summary_guidance: Annotated[str | None, typer.Option(show_default=False, help="Guidance for AI summaries of calls and meetings associated with this Playbook.")] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",

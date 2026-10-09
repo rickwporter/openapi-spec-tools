@@ -39,9 +39,9 @@ def show_commands(
 
 @app.command("create", short_help="Create new Webhook subscription")
 def webhooks_create(
-    events_action: Annotated[str, typer.Option(show_default=False)] = None,
-    events_object_type: Annotated[str, typer.Option(show_default=False)] = None,
-    url: Annotated[str, typer.Option(show_default=False, help="Destination URL for the webhook subscription")] = None,
+    events_action: Annotated[str | None, typer.Option(show_default=False)] = None,
+    events_object_type: Annotated[str | None, typer.Option(show_default=False)] = None,
+    url: Annotated[str | None, typer.Option(show_default=False, help="Destination URL for the webhook subscription")] = None,
     verify_ssl: Annotated[bool | None, typer.Option("--verify-ssl/--no-verify-ssl", help="Verify SSL certificate of destination webhook URL. Set to `false` to disable SSL certificate validation. We recommend using https to protect your data during delivery.")] = True,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,

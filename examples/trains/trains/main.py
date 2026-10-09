@@ -98,9 +98,9 @@ def get_stations(
 def get_trips(
     page: Annotated[int | None, typer.Option(min=1, help="The page number to return")] = 1,
     limit: Annotated[int | None, typer.Option(min=1, max=100, help="The number of items to return per page")] = 10,
-    origin: Annotated[str, typer.Option(show_default=False, help="The ID of the origin station")] = None,
-    destination: Annotated[str, typer.Option(show_default=False, help="The ID of the destination station")] = None,
-    date_: Annotated[datetime, typer.Option("--date", show_default=False, help="The date and time of the trip in ISO 8601 format in origin station\'s timezone.")] = None,
+    origin: Annotated[str | None, typer.Option(show_default=False, help="The ID of the origin station")] = None,
+    destination: Annotated[str | None, typer.Option(show_default=False, help="The ID of the destination station")] = None,
+    date_: Annotated[datetime | None, typer.Option("--date", show_default=False, help="The date and time of the trip in ISO 8601 format in origin station\'s timezone.")] = None,
     bicycles: Annotated[bool | None, typer.Option("--bicycles/--no-bicycles", help="Only return trips where bicycles are known to be allowed")] = False,
     dogs: Annotated[bool | None, typer.Option("--dogs/--no-dogs", help="Only return trips where dogs are known to be allowed")] = False,
     _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",

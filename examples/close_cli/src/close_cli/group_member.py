@@ -40,7 +40,7 @@ def show_commands(
 @app.command("create", short_help="Add a User to a Group")
 def groups_add_member(
     group_id: Annotated[str, typer.Argument(show_default=False)],
-    user_id: Annotated[str, typer.Option(show_default=False)] = None,
+    user_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

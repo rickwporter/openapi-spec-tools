@@ -124,7 +124,7 @@ def activities_sms_create(
     organization_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     remote_phone: Annotated[str | None, typer.Option(show_default=False, help="Phone number in E.164 format")] = None,
     source: Annotated[Source | None, typer.Option(show_default=False, case_sensitive=False)] = None,
-    status: Annotated[Status, typer.Option(show_default=False, case_sensitive=False)] = None,
+    status: Annotated[Status | None, typer.Option(show_default=False, case_sensitive=False)] = None,
     template_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     text: Annotated[str | None, typer.Option(show_default=False)] = None,
     user_id: Annotated[str | None, typer.Option(show_default=False)] = None,

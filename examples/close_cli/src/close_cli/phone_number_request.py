@@ -53,7 +53,7 @@ class PhoneNumberSharing(str, Enum):  # noqa: F811
 def phone_numbers_create(
     bundle_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     carrier_type: Annotated[CarrierType | None, typer.Option(show_default=False, case_sensitive=False)] = None,
-    country: Annotated[str, typer.Option(show_default=False, help="A two letter ISO country code (e.g. `US` for United States).")] = None,
+    country: Annotated[str | None, typer.Option(show_default=False, help="A two letter ISO country code (e.g. `US` for United States).")] = None,
     prefix: Annotated[str | None, typer.Option(help="A string with the phone number prefix or area code, not including the country code.")] = "",
     sharing: Annotated[PhoneNumberSharing | None, typer.Option(case_sensitive=False, hidden=True, help="Deprecated. `personal` for a number that belongs to an individual user, or `group` for a group number. The distinction between personal and group numbers is being removed, and this field will be removed in a future update. When omitted, defaults to `personal`.")] = "personal",
     with_mms: Annotated[bool | None, typer.Option("--with-mms/--no-with-mms", show_default=False, help="By default, MMS-capable numbers are rented if Close supports MMS for the given country. Renting an MMS-capable number can be forced by setting this flag to `true`. If set to `false`, certain prefixes that don\'t support MMS can be rented in countries where Close supports MMS. In most scenarios, this flag should not be passed. When you request an MMS number, you must set `with_sms` to `true` as well.")] = None,

@@ -15,7 +15,7 @@ from cloudtruth_api.flat import _requests as _r
 
 def environments_copy_create(
     id: str,  # A unique identifier for the environment. [required]
-    name: str = None,  # The environment name. [required]
+    name: str | None = None,  # The environment name. [required]
     description: str | None = None,  # A description of the environment...
     child_environment_names: str | None = None,  # When copying child Environments, this indicates what name to use for each Environment...
     recursive: bool | None = None,  # If true, copy child environments recursively.  If false, only copy the specified project.
@@ -49,7 +49,7 @@ def environments_copy_create(
 
 
 def environments_create(
-    name: str = None,  # The environment name. [required]
+    name: str | None = None,  # The environment name. [required]
     description: str | None = None,  # A description of the environment...
     parent: str | None = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
     _api_host: str | None = None,  # API host, read from API_HOST if not provided
@@ -179,7 +179,7 @@ def environments_pushes_list(
 
 def environments_update(
     id: str,  # A unique identifier for the environment. [required]
-    name: str = None,  # The environment name. [required]
+    name: str | None = None,  # The environment name. [required]
     description: str | None = None,  # A description of the environment...
     parent: str | None = None,  # Environments can inherit from a single parent environment which provides values for parameters when specific environment...
     access_controlled: bool | None = None,  # Indicates if access control is being enforced through grants.

@@ -46,7 +46,7 @@ class OpportunityStatusType(str, Enum):  # noqa: F811
 @app.command("create", short_help="Create an opportunity status")
 def opportunity_statuses_create(
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    label: Annotated[str, typer.Option(show_default=False)] = None,
+    label: Annotated[str | None, typer.Option(show_default=False)] = None,
     pipeline_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     type_: Annotated[OpportunityStatusType | None, typer.Option("--type", case_sensitive=False)] = "active",
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
@@ -159,7 +159,7 @@ def opportunity_statuses_list(
 def opportunity_statuses_update(
     id: Annotated[str, typer.Argument(show_default=False)],
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    label: Annotated[str, typer.Option(show_default=False)] = None,
+    label: Annotated[str | None, typer.Option(show_default=False)] = None,
     pipeline_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,

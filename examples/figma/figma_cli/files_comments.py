@@ -42,7 +42,7 @@ def show_commands(
 @app.command("create", short_help="Add a comment to a file")
 def post_comment(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to add comments in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    message: Annotated[str, typer.Option(show_default=False, help="The text contents of the comment to post.")] = None,
+    message: Annotated[str | None, typer.Option(show_default=False, help="The text contents of the comment to post.")] = None,
     comment_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the comment to reply to, if any. This must be a root comment. You cannot reply to other replies (a comment that has a parent_id).")] = None,
     client_meta_x: Annotated[float | None, typer.Option(show_default=False, help="X coordinate of the vector.")] = None,
     client_meta_y: Annotated[float | None, typer.Option(show_default=False, help="Y coordinate of the vector.")] = None,

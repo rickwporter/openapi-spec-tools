@@ -41,7 +41,7 @@ def show_commands(
 
 @app.command("create", short_help="")
 def environments_create(
-    name: Annotated[str, typer.Option(show_default=False, help="The environment name.")] = None,
+    name: Annotated[str | None, typer.Option(show_default=False, help="The environment name.")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the environment.  You may find it helpful to document how this environment is used to assist others when they need to maintain software that uses this content.")] = None,
     parent: Annotated[str | None, typer.Option(show_default=False, help="Environments can inherit from a single parent environment which provides values for parameters when specific environments do not have a value set.  Every organization has one default environment that cannot be removed.")] = None,
     _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
@@ -217,7 +217,7 @@ def environments_pushes_list(
 @app.command("set", short_help="")
 def environments_update(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the environment.")],
-    name: Annotated[str, typer.Option(show_default=False, help="The environment name.")] = None,
+    name: Annotated[str | None, typer.Option(show_default=False, help="The environment name.")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the environment.  You may find it helpful to document how this environment is used to assist others when they need to maintain software that uses this content.")] = None,
     parent: Annotated[str | None, typer.Option(show_default=False, help="Environments can inherit from a single parent environment which provides values for parameters when specific environments do not have a value set.  Every organization has one default environment that cannot be removed.")] = None,
     access_controlled: Annotated[bool | None, typer.Option("--access-controlled/--no-access-controlled", show_default=False, help="Indicates if access control is being enforced through grants.")] = None,

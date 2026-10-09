@@ -39,7 +39,7 @@ def show_commands(
 
 @app.command("set", short_help="Update Blocked Phone Number settings")
 def blocked_phone_numbers_update_settings(
-    reject_anonymous_inbound_calls: Annotated[bool, typer.Option("--reject-anonymous-inbound-calls/--no-reject-anonymous-inbound-calls", show_default=False)] = None,
+    reject_anonymous_inbound_calls: Annotated[bool | None, typer.Option("--reject-anonymous-inbound-calls/--no-reject-anonymous-inbound-calls", show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

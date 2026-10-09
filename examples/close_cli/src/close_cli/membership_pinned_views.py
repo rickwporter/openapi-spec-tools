@@ -40,7 +40,7 @@ def show_commands(
 @app.command("set", short_help="Update pinned views for a membership")
 def memberships_update_pinned_views(
     id: Annotated[str, typer.Argument(show_default=False)],
-    saved_view_ids: Annotated[list[str], typer.Option(show_default=False)] = None,
+    saved_view_ids: Annotated[list[str] | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

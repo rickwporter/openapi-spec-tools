@@ -174,7 +174,7 @@ class Format(str, Enum):  # noqa: F811
 @app.command("images", short_help="Render images of file nodes")
 def get_images(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to export images from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    ids: Annotated[str, typer.Option(show_default=False, help="A comma separated list of node IDs to render.")] = None,
+    ids: Annotated[str | None, typer.Option(show_default=False, help="A comma separated list of node IDs to render.")] = None,
     version: Annotated[str | None, typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
     scale: Annotated[float | None, typer.Option(min=0.01, max=4, show_default=False, help="A number between 0.01 and 4, the image scaling factor.")] = None,
     format_: Annotated[Format | None, typer.Option("--format", case_sensitive=False, help="A string enum for the image output format.")] = "png",
