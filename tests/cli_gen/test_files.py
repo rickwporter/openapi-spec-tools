@@ -98,7 +98,8 @@ def test_generate_node_multiple():
         text = file.read_text()
         assert "#!/usr/bin/env python3" in text
         assert f"Copyright {datetime.now().year}" in text
-        assert "from typing import Annotated" in text
+        assert "import typer" in text
+        assert f"from {pkg_name} import _arguments as _" in text
         assert 'app = typer.Typer(no_args_is_help=True, ' in text
         assert 'if __name__ == "__main__":' in text
 
@@ -144,7 +145,8 @@ def test_generate_node_skip_bugged():
         text = file.read_text()
         assert "#!/usr/bin/env python3" in text
         assert f"Copyright {datetime.now().year}" in text
-        assert "from typing import Annotated" in text
+        assert "import typer" in text
+        assert f"from {pkg_name} import _arguments as _" in text
         assert 'app = typer.Typer(no_args_is_help=True, ' in text
         assert 'if __name__ == "__main__":' in text
 

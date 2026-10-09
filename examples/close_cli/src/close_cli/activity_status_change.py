@@ -8,16 +8,11 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
-from typing import Annotated  # noqa: F401
 
 import typer
-from rich_objects import display  # noqa: F401
 
 from close_cli import _arguments as _a
 from close_cli import _display as _d  # noqa: F401
-from close_cli import _exceptions as _e  # noqa: F401
-from close_cli import _logging as _l  # noqa: F401
-from close_cli import _requests as _r  # noqa: F401
 from close_cli import _tree as _t
 from close_cli.activity_status_change_lead import app as activity_status_change_lead
 from close_cli.activity_status_change_opportunity import app as activity_status_change_opportunity

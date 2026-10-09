@@ -8,16 +8,16 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
-from typing import Annotated  # noqa: F401
+from typing import Annotated
 
 import typer
-from rich_objects import display  # noqa: F401
+from rich_objects import display
 
 from trains import _arguments as _a
 from trains import _display as _d  # noqa: F401
-from trains import _exceptions as _e  # noqa: F401
-from trains import _logging as _l  # noqa: F401
-from trains import _requests as _r  # noqa: F401
+from trains import _exceptions as _e
+from trains import _logging as _l
+from trains import _requests as _r
 from trains import _tree as _t
 from trains.bookings import app as bookings
 

@@ -8,16 +8,16 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
-from typing import Annotated  # noqa: F401
+from typing import Annotated
 
 import typer
-from rich_objects import display  # noqa: F401
+from rich_objects import display
 
 from close_cli import _arguments as _a
 from close_cli import _display as _d  # noqa: F401
-from close_cli import _exceptions as _e  # noqa: F401
-from close_cli import _logging as _l  # noqa: F401
-from close_cli import _requests as _r  # noqa: F401
+from close_cli import _exceptions as _e
+from close_cli import _logging as _l
+from close_cli import _requests as _r
 from close_cli import _tree as _t
 
 app = typer.Typer(no_args_is_help=True, help="Manage export opportunity")
