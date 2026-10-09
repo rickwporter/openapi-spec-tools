@@ -118,7 +118,7 @@ def activities_notes_create(
     try:
         data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -150,7 +150,7 @@ def activities_notes_delete(
     try:
         data = _r.request("DELETE", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -240,7 +240,7 @@ def activities_notes_list(
     try:
         data = _r.depaginate(page_info, url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -307,7 +307,7 @@ def activities_notes_update(
     try:
         data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -342,7 +342,7 @@ def activities_notes_get(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 

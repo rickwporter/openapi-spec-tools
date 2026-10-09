@@ -69,7 +69,7 @@ def open_oas_with_error_handling(filename: str, logger: logging.Logger) -> Any:
         return data
     except FileNotFoundError:
         message = f"failed to find {filename}"
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         message = f"unable to parse {filename}: {ex}"
 
     typer.echo(f"ERROR: {message}")
@@ -90,7 +90,7 @@ def open_layout_with_error_handling(filename: str, logger: logging.Logger) -> An
         return data
     except FileNotFoundError:
         message = f"failed to find {filename}"
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         message = f"unable to parse {filename}: {ex}"
 
     typer.echo(f"ERROR: {message}")
@@ -113,7 +113,7 @@ def layout_tree_with_error_handling(filename: str, start: str, logger: logging.L
         message = f"failed to find {filename}"
     except ValueError as ex:
         message = str(ex)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         message = f"unable to parse {filename}: {ex}"
 
     typer.echo(f"ERROR: {message}")
@@ -131,7 +131,7 @@ def _config_from_file(filename: str | None, config_type: type[ConfigT]) -> Confi
         message = f"failed to find {filename}"
     except ValueError as ex:
         message = str(ex)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         message = f"unable to parse {filename}: {ex}"
 
     typer.echo(f"ERROR: {message}")

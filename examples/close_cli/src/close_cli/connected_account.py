@@ -70,7 +70,7 @@ def connected_accounts_list(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -105,7 +105,7 @@ def connected_accounts_get(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 

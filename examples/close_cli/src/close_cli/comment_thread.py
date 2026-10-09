@@ -85,7 +85,7 @@ def comments_list_threads(
     try:
         data = _r.depaginate(page_info, url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -117,7 +117,7 @@ def comments_get_thread(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 

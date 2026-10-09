@@ -458,7 +458,7 @@ def {func_name}({args_str}) -> None:
     try:
         data = _r.{req_func}({', '.join(req_args)}){self.hidden(node)}{self.allowed(node)}{self.summary_display(node)}
         display(data, _out_fmt, _out_style{"" if not columns else ", columns=columns"})
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 """
 

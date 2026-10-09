@@ -71,7 +71,7 @@ def get_file_component_sets(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -103,7 +103,7 @@ def get_file_components(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -141,7 +141,7 @@ def get_image_fills(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -173,7 +173,7 @@ def get_file_meta(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -245,7 +245,7 @@ def get_file_nodes(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -301,7 +301,7 @@ def get_file(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -333,7 +333,7 @@ def get_file_styles(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -375,7 +375,7 @@ def get_file_versions(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 

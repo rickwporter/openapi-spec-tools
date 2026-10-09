@@ -96,7 +96,7 @@ def get_activity_logs(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -128,7 +128,7 @@ def get_component_set(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -160,7 +160,7 @@ def get_component(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -245,7 +245,7 @@ def get_images(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -276,7 +276,7 @@ def get_me(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -327,7 +327,7 @@ def get_payments(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
@@ -359,7 +359,7 @@ def get_style(
     try:
         data = _r.request("GET", url, headers=headers, params=params, timeout=_api_timeout)
         display(data, _out_fmt, _out_style)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         _e.handle_exceptions(ex)
 
 
