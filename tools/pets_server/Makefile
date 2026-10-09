@@ -31,7 +31,6 @@ openapi_gen_args := --input-spec $(gen_workdir)/$(oas)
 openapi_gen_args += --generator-name $(language)
 openapi_gen_args += --output $(gen_workdir)/$(gen_dir)
 
-
 #####################
 # Targets
 default: help
@@ -50,7 +49,7 @@ regen: rmgen gen ## Regenerate the server code
 rmgen: ## Removes the previously generated server code
 	rm -rf $(gen_dir)
 
-gen: ## Generate the client code
+gen: ## Generate the server code
 	$(DOCKER_CMD) run $(gen_container_args) $(openapi_gen_image) generate $(openapi_gen_args) > $(gen_log)
 
 openapi-image: ## Pulls the openapi generator container (when needed)
