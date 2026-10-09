@@ -161,7 +161,7 @@ from {self.package_name} import _requests as _r
         if allow_required and required and schema_default is None:
             arg_default = ""
         else:
-            if not required:
+            if not required or schema_default is None:
                 py_type = f"{py_type} | None"
             if schema_default is None:
                 arg_default = " = None"

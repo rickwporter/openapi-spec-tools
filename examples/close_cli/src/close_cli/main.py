@@ -130,10 +130,10 @@ class ObjectType(str, Enum):  # noqa: F811
 
 @app.command("enrich-field", short_help="Enrich a specific field on a lead or contact using AI")
 def field_enrichment_create(
-    field_id: Annotated[str, typer.Option(show_default=False)] = None,
-    object_id: Annotated[str, typer.Option(show_default=False)] = None,
-    object_type: Annotated[ObjectType, typer.Option(show_default=False, case_sensitive=False)] = None,
-    organization_id: Annotated[str, typer.Option(show_default=False)] = None,
+    field_id: Annotated[str | None, typer.Option(show_default=False)] = None,
+    object_id: Annotated[str | None, typer.Option(show_default=False)] = None,
+    object_type: Annotated[ObjectType | None, typer.Option(show_default=False, case_sensitive=False)] = None,
+    organization_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     overwrite_existing_value: Annotated[bool | None, typer.Option("--overwrite-existing-value/--no-overwrite-existing-value")] = False,
     set_new_value: Annotated[bool | None, typer.Option("--set-new-value/--no-set-new-value")] = True,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",

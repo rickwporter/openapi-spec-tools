@@ -135,7 +135,7 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'another_qparam: Annotated[str, typer.Option(show_default=False, help="Query parameter")] = None'
+        'another_qparam: Annotated[str | None, typer.Option(show_default=False, help="Query parameter")] = None'
         in text
     )
     assert 'more: Annotated[bool | None, typer.Option("--more/--no-more", hidden=True)] = False' in text
@@ -183,7 +183,7 @@ def test_op_query_arguments():
         in text
     )
     assert (
-        'addr_zip_code: Annotated[str, typer.Option(show_default=False)] = None'
+        'addr_zip_code: Annotated[str | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
@@ -225,7 +225,7 @@ def test_op_body_arguments():
 
     lines = uut.op_body_arguments(body_params)
     text = "\n".join(lines)
-    assert 'name: Annotated[str, typer.Option(show_default=False, help="Pet name")] = None' in text
+    assert 'name: Annotated[str | None, typer.Option(show_default=False, help="Pet name")] = None' in text
     assert 'tag: Annotated[str | None, typer.Option(show_default=False, help="Pet classification")] = None' in text
     assert (
         'another_value: Annotated[str | None, typer.Option(hidden=True, '
@@ -616,7 +616,7 @@ def test_function_header_params():
 
     # check function argument (aka CLI option)
     assert (
-        'has_param: Annotated[int, typer.Option(show_default=False, help="Parameter in header")] = None'
+        'has_param: Annotated[int | None, typer.Option(show_default=False, help="Parameter in header")] = None'
         in text
     )
     assert (

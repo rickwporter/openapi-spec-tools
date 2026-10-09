@@ -46,7 +46,7 @@ class GroupBy(str, Enum):  # noqa: F811
 def get_library_analytics_style_actions(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File key of the library to fetch analytics data for.")],
     cursor: Annotated[str | None, typer.Option(show_default=False, help="Cursor indicating what page of data to fetch. Obtained from prior API call.")] = None,
-    group_by: Annotated[GroupBy, typer.Option(show_default=False, case_sensitive=False, help="A dimension to group returned analytics data by.")] = None,
+    group_by: Annotated[GroupBy | None, typer.Option(show_default=False, case_sensitive=False, help="A dimension to group returned analytics data by.")] = None,
     start_date: Annotated[str | None, typer.Option(show_default=False, help="ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior.")] = None,
     end_date: Annotated[str | None, typer.Option(show_default=False, help="ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
@@ -96,7 +96,7 @@ class GroupBy(str, Enum):  # noqa: F811
 def get_library_analytics_style_usages(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File key of the library to fetch analytics data for.")],
     cursor: Annotated[str | None, typer.Option(show_default=False, help="Cursor indicating what page of data to fetch. Obtained from prior API call.")] = None,
-    group_by: Annotated[GroupBy, typer.Option(show_default=False, case_sensitive=False, help="A dimension to group returned analytics data by.")] = None,
+    group_by: Annotated[GroupBy | None, typer.Option(show_default=False, case_sensitive=False, help="A dimension to group returned analytics data by.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

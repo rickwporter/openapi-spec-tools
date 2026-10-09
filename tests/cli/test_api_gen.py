@@ -140,7 +140,7 @@ def test_api_generate_success_layout(layout, expected_files, temp_working_dir):
     [
         pytest.param(
             "flat", [
-                'def create_pets(\n    id: int = None,',
+                'def create_pets(\n    id: int | None = None,',
                 'body["id"] = id',
             ],
             id="flat",
@@ -153,7 +153,7 @@ def test_api_generate_success_layout(layout, expected_files, temp_working_dir):
         ),
         pytest.param(
             "property", [
-                'def create_pets(\n    id: int = None,',
+                'def create_pets(\n    id: int | None = None,',
             ],
             id="property",
         ),

@@ -41,8 +41,8 @@ def show_commands(
 
 @app.command("create", short_help="Create a membership")
 def memberships_create(
-    email: Annotated[str, typer.Option(show_default=False)] = None,
-    role_id: Annotated[str, typer.Option(show_default=False, help="One of `superuser`, `user`, or `restricteduser` for the corresponding predefined role, or the ID of a custom [Role](https://developer.close.com/api/resources/roles). The role must not grant the `manage_organization` permission.")] = None,
+    email: Annotated[str | None, typer.Option(show_default=False)] = None,
+    role_id: Annotated[str | None, typer.Option(show_default=False, help="One of `superuser`, `user`, or `restricteduser` for the corresponding predefined role, or the ID of a custom [Role](https://developer.close.com/api/resources/roles). The role must not grant the `manage_organization` permission.")] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

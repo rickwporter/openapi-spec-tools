@@ -40,9 +40,9 @@ def show_commands(
 @app.command("create", short_help="Attach a file to a lead")
 def leads_files_create(
     id: Annotated[str, typer.Argument(show_default=False)],
-    content_type: Annotated[str, typer.Option(show_default=False)] = None,
-    filename: Annotated[str, typer.Option(show_default=False)] = None,
-    url: Annotated[str, typer.Option(show_default=False)] = None,
+    content_type: Annotated[str | None, typer.Option(show_default=False)] = None,
+    filename: Annotated[str | None, typer.Option(show_default=False)] = None,
+    url: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

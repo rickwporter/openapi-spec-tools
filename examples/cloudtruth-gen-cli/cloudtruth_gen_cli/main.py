@@ -80,7 +80,7 @@ def backup_snapshot_create(
 
 @app.command("generate-password", short_help="Get a randomly generated password using AWS Secrets Manager, with fallback to /dev/urandom.")
 def utils_generate_password_create(
-    length: Annotated[int, typer.Option(show_default=False, help="The length of the password to generate.  Minimum of 8, maximum of 4095.")] = None,
+    length: Annotated[int | None, typer.Option(show_default=False, help="The length of the password to generate.  Minimum of 8, maximum of 4095.")] = None,
     require_hardware_generation: Annotated[bool | None, typer.Option("--require-hardware-generation/--no-require-hardware-generation", help="Default behavior is to fallback to /dev/urandom if we fail to get a random password from AWS Secrets Manager.  If set to \'True\', we will not fallback to local password generation using /dev/urandom.  Default: False")] = False,
     require_lowercase: Annotated[bool | None, typer.Option("--require-lowercase/--no-require-lowercase", help="The password must include lowercase letters [a-z]. Default: True.")] = True,
     require_numbers: Annotated[bool | None, typer.Option("--require-numbers/--no-require-numbers", help="The password must include numbers [0-9].  Default: True.")] = True,

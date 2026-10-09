@@ -108,7 +108,7 @@ def custom_objects_delete(
 
 @app.command("list", short_help="List Custom Object instances")
 def custom_objects_list(
-    lead_id: Annotated[str, typer.Option(show_default=False)] = None,
+    lead_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     custom_object_type_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,

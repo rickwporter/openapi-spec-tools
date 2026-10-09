@@ -39,7 +39,7 @@ def show_commands(
 
 @app.command("create", short_help="Unsubscribe an email address")
 def unsubscribed_emails_create(
-    email: Annotated[str, typer.Option(show_default=False)] = None,
+    email: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

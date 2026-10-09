@@ -39,8 +39,8 @@ def show_commands(
 
 @app.command("upload", short_help="Generate a signed S3 POST")
 def files_create(
-    content_type: Annotated[str, typer.Option(show_default=False)] = None,
-    filename: Annotated[str, typer.Option(show_default=False)] = None,
+    content_type: Annotated[str | None, typer.Option(show_default=False)] = None,
+    filename: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

@@ -41,8 +41,8 @@ def show_commands(
 
 @app.command("create", short_help="Create a Blocked Phone Number")
 def blocked_phone_numbers_create(
-    phone: Annotated[str, typer.Option(show_default=False, help="The phone number (in E.164 format) that you wish to block.")] = None,
-    reason: Annotated[str, typer.Option(show_default=False, help="The reason why you wish to block a given phone number.")] = None,
+    phone: Annotated[str | None, typer.Option(show_default=False, help="The phone number (in E.164 format) that you wish to block.")] = None,
+    reason: Annotated[str | None, typer.Option(show_default=False, help="The reason why you wish to block a given phone number.")] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -168,7 +168,7 @@ def blocked_phone_numbers_list(
 @app.command("set", short_help="Update a Blocked Phone Number")
 def blocked_phone_numbers_update(
     id: Annotated[str, typer.Argument(show_default=False)],
-    reason: Annotated[str, typer.Option(show_default=False, help="The updated reason for blocking the given phone number.")] = None,
+    reason: Annotated[str | None, typer.Option(show_default=False, help="The updated reason for blocking the given phone number.")] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

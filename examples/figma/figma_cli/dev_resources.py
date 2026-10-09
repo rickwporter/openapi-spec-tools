@@ -39,10 +39,10 @@ def show_commands(
 
 @app.command("create", short_help="Create dev resources")
 def post_dev_resources(
-    dev_resources_name: Annotated[str, typer.Option(show_default=False, help="The name of the dev resource.")] = None,
-    dev_resources_url: Annotated[str, typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
-    dev_resources_file_key: Annotated[str, typer.Option(show_default=False, help="The file key where the dev resource belongs.")] = None,
-    dev_resources_node_id: Annotated[str, typer.Option(show_default=False, help="The target node to attach the dev resource to.")] = None,
+    dev_resources_name: Annotated[str | None, typer.Option(show_default=False, help="The name of the dev resource.")] = None,
+    dev_resources_url: Annotated[str | None, typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
+    dev_resources_file_key: Annotated[str | None, typer.Option(show_default=False, help="The file key where the dev resource belongs.")] = None,
+    dev_resources_node_id: Annotated[str | None, typer.Option(show_default=False, help="The target node to attach the dev resource to.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -99,7 +99,7 @@ def post_dev_resources(
 
 @app.command("set", short_help="Update dev resources")
 def put_dev_resources(
-    dev_resources_id: Annotated[str, typer.Option(show_default=False, help="Unique identifier of the dev resource")] = None,
+    dev_resources_id: Annotated[str | None, typer.Option(show_default=False, help="Unique identifier of the dev resource")] = None,
     dev_resources_name: Annotated[str | None, typer.Option(show_default=False, help="The name of the dev resource.")] = None,
     dev_resources_url: Annotated[str | None, typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",

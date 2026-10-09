@@ -15,7 +15,7 @@ from cloudtruth_api.prop import _requests as _r
 
 def environments_tags_create(
     environment_pk: str,  # [required]
-    name: str = None,  # The tag name... [required]
+    name: str | None = None,  # The tag name... [required]
     description: str | None = None,  # A description of the tag...
     timestamp: datetime | None = None,  # The point in time this tag represents. If not specified then the current time will be used.
     immutable: bool | None = None,  # If True, this tag cannot be modified once it is created.
@@ -143,7 +143,7 @@ def environments_tags_list(
 def environments_tags_update(
     environment_pk: str,  # [required]
     id: str,  # A unique identifier for the tag. [required]
-    name: str = None,  # The tag name... [required]
+    name: str | None = None,  # The tag name... [required]
     description: str | None = None,  # A description of the tag...
     timestamp: datetime | None = None,  # The point in time this tag represents.  If explicitly set to `null` then the current time will be used.
     immutable: bool | None = None,  # If True, this tag cannot be modified once it is created.

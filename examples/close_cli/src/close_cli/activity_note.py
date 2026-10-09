@@ -46,7 +46,7 @@ def activities_notes_create(
     contact_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     created_by: Annotated[str | None, typer.Option(show_default=False)] = None,
     date_created: Annotated[datetime | None, typer.Option(show_default=False)] = None,
-    lead_id: Annotated[str, typer.Option(show_default=False)] = None,
+    lead_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     note: Annotated[str | None, typer.Option(show_default=False)] = None,
     note_html: Annotated[str | None, typer.Option(show_default=False)] = None,
     organization_id: Annotated[str | None, typer.Option(show_default=False)] = None,

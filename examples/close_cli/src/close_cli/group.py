@@ -42,7 +42,7 @@ def show_commands(
 @app.command("create", short_help="Create a Group")
 def groups_create(
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    name: Annotated[str, typer.Option(show_default=False)] = None,
+    name: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -150,7 +150,7 @@ def groups_list(
 def groups_update(
     id: Annotated[str, typer.Argument(show_default=False)],
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    name: Annotated[str, typer.Option(show_default=False)] = None,
+    name: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

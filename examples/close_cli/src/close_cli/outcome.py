@@ -45,7 +45,7 @@ class OutcomeType(str, Enum):  # noqa: F811
 @app.command("create", short_help="Create an outcome")
 def outcomes_create(
     description: Annotated[str | None, typer.Option(show_default=False, help="Explain what the outcome means and when it should be used.")] = None,
-    name: Annotated[str, typer.Option(show_default=False, help="Displayed to users wherever outcomes can be selected.")] = None,
+    name: Annotated[str | None, typer.Option(show_default=False, help="Displayed to users wherever outcomes can be selected.")] = None,
     type_: Annotated[OutcomeType | None, typer.Option("--type", case_sensitive=False, help="Set to `vm-dropped` if this outcome should be automatically set on calls whenever a team member performs a Voicemail Drop. Otherwise, leave empty or explicitly set to `custom` (default).")] = "custom",
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,

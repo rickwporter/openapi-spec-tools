@@ -180,7 +180,7 @@ def get_file_meta(
 @app.command("nodes", short_help="Get file JSON for specific nodes")
 def get_file_nodes(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to export JSON from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    ids: Annotated[str, typer.Option(show_default=False, help="A comma separated list of node IDs to retrieve and convert.")] = None,
+    ids: Annotated[str | None, typer.Option(show_default=False, help="A comma separated list of node IDs to retrieve and convert.")] = None,
     version: Annotated[str | None, typer.Option(show_default=False, help="A specific version ID to get. Omitting this will get the current version of the file.")] = None,
     depth: Annotated[float | None, typer.Option(show_default=False, help="Positive integer representing how deep into the node tree to traverse. For example, setting this to 1 will return only the children directly underneath the desired nodes. Not setting this parameter returns all nodes.")] = None,
     geometry: Annotated[str | None, typer.Option(show_default=False, help="Set to \"paths\" to export vector data.")] = None,

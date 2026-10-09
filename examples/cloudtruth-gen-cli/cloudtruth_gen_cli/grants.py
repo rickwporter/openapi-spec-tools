@@ -46,9 +46,9 @@ class RoleEnum(str, Enum):  # noqa: F811
 
 @app.command("create", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_create(
-    principal: Annotated[str, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
-    scope: Annotated[str, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
-    role: Annotated[RoleEnum, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
+    principal: Annotated[str | None, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
+    scope: Annotated[str | None, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
+    role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
     _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
@@ -209,9 +209,9 @@ class RoleEnum(str, Enum):  # noqa: F811
 @app.command("set", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_update(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the grant.")],
-    principal: Annotated[str, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
-    scope: Annotated[str, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
-    role: Annotated[RoleEnum, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
+    principal: Annotated[str | None, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
+    scope: Annotated[str | None, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
+    role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
     _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,

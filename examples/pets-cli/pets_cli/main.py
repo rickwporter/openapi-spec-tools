@@ -39,10 +39,10 @@ def show_commands(
 
 @app.command("add", short_help="Create a pet")
 def create_pets(
-    id: Annotated[int, typer.Option(show_default=False)] = None,
-    name: Annotated[str, typer.Option(show_default=False)] = None,
+    id: Annotated[int | None, typer.Option(show_default=False)] = None,
+    name: Annotated[str | None, typer.Option(show_default=False)] = None,
     tag: Annotated[str | None, typer.Option(show_default=False)] = None,
-    owner: Annotated[str, typer.Option(show_default=False)] = None,
+    owner: Annotated[str | None, typer.Option(show_default=False)] = None,
     _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,

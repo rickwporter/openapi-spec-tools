@@ -100,7 +100,7 @@ def test_function_header_params():
     assert 'class Color(str, Enum):' in text
 
     # check function argument (aka CLI option)
-    assert 'has_param: int = None,  # Parameter in header' in text
+    assert 'has_param: int | None = None,  # Parameter in header' in text
     assert 'color: Color | None = None,' in text
 
     # make sure we add to headers

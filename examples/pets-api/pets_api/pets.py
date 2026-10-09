@@ -14,10 +14,10 @@ from pets_api import _requests as _r
 
 
 def create_pets(
-    id: int = None,  # [required]
-    name: str = None,  # [required]
+    id: int | None = None,  # [required]
+    name: str | None = None,  # [required]
     tag: str | None = None,
-    owner: str = None,  # [required]
+    owner: str | None = None,  # [required]
     _api_host: str | None = None,  # API host, read from API_HOST if not provided, defaults to http://petstore.swagger.io/v1
     _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
     _api_timeout: int | None = None,  # timeout for operation, read from API_TIMEOUT if not provided, defaults to 5
