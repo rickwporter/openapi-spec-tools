@@ -26,7 +26,6 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "ruff>=0.16.10",
-    "black>=26.3.1,<27",
     "openapi-spec-tools",
 ]
 
