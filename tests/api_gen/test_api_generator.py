@@ -125,7 +125,7 @@ def test_op_query_arguments():
 
     assert 'situation: str = "anything goes",  # Query param at path level, likely unused' in text
     assert 'limit: int | None = None,  # How many items to return at one time (max 100)' in text
-    assert 'another_qparam: str = None,  # Query parameter' in text
+    assert 'another_qparam: str | None = None,  # Query parameter' in text
     assert 'more: bool | None = False,' in text
     assert 'day_value: DayValue | None = None,' in text
     assert 'page_size: int | None = 100,  # Maximum items per page' in text
@@ -137,7 +137,7 @@ def test_op_query_arguments():
     assert 'addr_street: str | None = None,  # Street address (e.g. 123 Main Street, POBox 507)' in text
     assert 'addr_city: str | None = None,' in text
     assert 'addr_state: str | None = None,' in text
-    assert 'addr_zip_code: str = None,' in text
+    assert 'addr_zip_code: str | None = None,' in text
     assert 'favorite_day: FavoriteDay | None = None,' in text
     assert 'crazy_enum: CrazyEnum | None = "1.0",' in text
     assert 'list_enum_def_list: list[ListEnumDefList] | None = ["1", "8"],' in text

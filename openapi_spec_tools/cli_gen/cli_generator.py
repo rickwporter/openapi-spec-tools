@@ -214,6 +214,9 @@ if __name__ == "__main__":
             if schema_default is None:
                 arg_default = " = None"
                 typer_args.append('show_default=False')
+                # RUF013 - cannot have typer.Option() defaulting to a type (None) outside the declared type
+                if required and "None" not in py_type:
+                    py_type += " | None"
             elif collection and not isinstance(schema_default, list):
                 arg_default = f" = [{maybe_quoted(schema_default)}]"
             else:

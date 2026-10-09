@@ -18,7 +18,7 @@ def test_op_body_arguments():
     args = uut.op_body_arguments(body_params)
     text = "\n".join(args)
 
-    assert 'name: str = None,  # Pet name' in text
+    assert 'name: str | None = None,  # Pet name' in text
     assert 'tag: str | None = None,  # Pet classification' in text
     assert 'another_value: str | None = "Anything goes",  # A string with a default' in text
     assert 'flavor: Species | None = None,  # Species type' in text
@@ -113,7 +113,7 @@ def test_function_header_params():
     assert 'class Color(str, Enum):' in text
 
     # check function argument (aka CLI option)
-    assert 'has_param: int = None,  # Parameter in header' in text
+    assert 'has_param: int | None = None,  # Parameter in header' in text
     assert 'color: Color | None = None,' in text
 
     # make sure we add to headers
