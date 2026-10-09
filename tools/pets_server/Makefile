@@ -58,3 +58,6 @@ ifneq ($(shell $(DOCKER_CMD) images -q $(openapi_gen_image)),)
 else
 	$(DOCKER_CMD) pull $(openapi_gen_image)
 endif
+
+run: ## Run generated server in container
+	cd $(gen_dir) && $(DOCKER_CMD) compose up --build

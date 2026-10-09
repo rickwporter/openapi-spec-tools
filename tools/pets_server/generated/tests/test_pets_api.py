@@ -35,20 +35,20 @@ def test_create_pets(client: TestClient):
 
     Create a pet
     """
-    pet = openapi_server.Pet()
+    pet = {"id": 1, "name": "Clifford", "tag": "big"}
 
     headers = {
     }
     # uncomment below to make a request
-    #response = client.request(
-    #    "POST",
-    #    "/pets",
-    #    headers=headers,
-    #    json=pet,
-    #)
+    response = client.request(
+       "POST",
+       "/pets",
+       headers=headers,
+       json=pet,
+    )
 
     # uncomment below to assert the status code of the HTTP response
-    #assert response.status_code == 200
+    assert response.status_code == 200
 
 
 def test_show_pet_by_id(client: TestClient):
