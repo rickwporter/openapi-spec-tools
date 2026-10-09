@@ -156,7 +156,7 @@ def _assert_exists(file: str) -> None:
         commit = repo.head.commit
         relative_path = Path(file).absolute().relative_to(commit.tree.abspath).as_posix()
         _ = commit.tree / relative_path
-    except Exception:
+    except Exception:  # noqa: BLE001
         error_out("Unable to find file")
 
 
