@@ -25,7 +25,7 @@ def test_get_logger() -> None:
     [
         pytest.param(LogLevel.CRITICAL, logging.CRITICAL, id="critical"),
         pytest.param(LogLevel.ERROR, logging.ERROR, id="error"),
-        pytest.param(LogLevel.WARN, logging.WARN, id="warn"),
+        pytest.param(LogLevel.WARN, logging.WARNING, id="warn"),
         pytest.param(LogLevel.INFO, logging.INFO, id="info"),
         pytest.param(LogLevel.DEBUG, logging.DEBUG, id="debug"),
     ]
