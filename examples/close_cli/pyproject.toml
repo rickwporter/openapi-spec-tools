@@ -48,11 +48,7 @@ max-statements = 75
 
 [tool.ruff.lint.per-file-ignores]
 "*.py" = [
-    "F811", # redefined: happens for enums
-    "BLE001", # blind exception: generic catch
-    "PLR1711", # useless-return: makes code more readable
     "RUF100", # non-enabled: allow unused noqa values
-    # "RUF013", # typer.Option[str] = None
 ]
 "connected_account.py" = [
     "B006", # mutable args: used for default lists

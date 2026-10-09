@@ -60,6 +60,5 @@ max-statements = 75
 
 [tool.ruff.lint.per-file-ignores]
 "*.py" = [
-    "F401", # unused-imports: for Enum and sub-commands without any operations
-    "F811", # redefined: happens for enums
+    "RUF100", # non-enabled: allow unused noqa values
 ]
