@@ -27,7 +27,7 @@ dev = [
     "coverage>=7.16.2",
     "openapi-spec-tools",
     "pytest>=9.1.1",
-    "ruff>=0.15.6,<0.16",
+    "ruff>=0.16.10",
 ]
 
 [tool.uv.sources]
@@ -48,11 +48,7 @@ max-statements = 75
 
 [tool.ruff.lint.per-file-ignores]
 "*.py" = [
-    "F811", # redefined: happens for enums
-    "BLE001", # blind exception: generic catch
-    "PLR1711", # useless-return: makes code more readable
     "RUF100", # non-enabled: allow unused noqa values
-    # "RUF013", # typer.Option[str] = None
 ]
 "connected_account.py" = [
     "B006", # mutable args: used for default lists

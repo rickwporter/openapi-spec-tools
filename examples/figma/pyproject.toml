@@ -33,7 +33,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "openapi-spec-tools",
-    "ruff>=0.15.6,<0.16",
+    "ruff>=0.16.10",
 ]
 
 [tool.uv]
@@ -60,6 +60,5 @@ max-statements = 75
 
 [tool.ruff.lint.per-file-ignores]
 "*.py" = [
-    "F401", # unused-imports: for Enum and sub-commands without any operations
-    "F811", # redefined: happens for enums
+    "RUF100", # non-enabled: allow unused noqa values
 ]

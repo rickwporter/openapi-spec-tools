@@ -14,7 +14,7 @@ The `close.json` is the OpenAPI specification copied from [here](https://api.clo
 
 The `Makefile` is an update of others in the `examples/` tailored for this project.
 
-Linting rules were manually added to `pyproject.toml`. Some of the execptions may not be caught with the current version of `ruff`, but were added when using a later version (before aligning with the rest of the project).
+Linting rules were manually added to `pyproject.toml`. Ignoring `RUF100` is the curent standard to avoid flagging unused ignores (e.g. `# noqa: F401`). However, the more targeted ignores are due to differences in the OpenAPI specification that hit "limitations" on the code generation.
 
 The `[project.scripts]` section of `pyproject.toml` was modified to align with using a `typer` application.
 
