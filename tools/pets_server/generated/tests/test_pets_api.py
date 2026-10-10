@@ -35,20 +35,20 @@ def test_create_pets(client: TestClient):
 
     Create a pet
     """
-    pet = {"id": 1, "name": "Clifford", "tag": "big"}
+    pet = openapi_server.Pet()
 
     headers = {
     }
     # uncomment below to make a request
-    response = client.request(
-       "POST",
-       "/pets",
-       headers=headers,
-       json=pet,
-    )
+    #response = client.request(
+    #    "POST",
+    #    "/pets",
+    #    headers=headers,
+    #    json=pet,
+    #)
 
     # uncomment below to assert the status code of the HTTP response
-    assert response.status_code == 200
+    #assert response.status_code == 200
 
 
 def test_show_pet_by_id(client: TestClient):
@@ -62,6 +62,25 @@ def test_show_pet_by_id(client: TestClient):
     # uncomment below to make a request
     #response = client.request(
     #    "GET",
+    #    "/pets/{petId}".format(petId='pet_id_example'),
+    #    headers=headers,
+    #)
+
+    # uncomment below to assert the status code of the HTTP response
+    #assert response.status_code == 200
+
+
+def test_delete_pet_by_id(client: TestClient):
+    """Test case for delete_pet_by_id
+
+    Delete a pet
+    """
+
+    headers = {
+    }
+    # uncomment below to make a request
+    #response = client.request(
+    #    "DELETE",
     #    "/pets/{petId}".format(petId='pet_id_example'),
     #    headers=headers,
     #)

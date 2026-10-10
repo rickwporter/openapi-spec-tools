@@ -65,3 +65,15 @@ class PetsImpl(BasePetsApi):
             raise HTTPException(status_code=404, detail=f"No pet with id={petId} found.")
 
         return pet
+
+    async def delete_pet_by_id(
+        self,
+        petId: Annotated[str, Field(description="The id of the pet to retrieve")],
+    ) -> None:
+        global pets_by_id
+        id = int(petId)
+
+        if id not in pets_by_id:
+            raise HTTPException(status_code=404, detail=f"No pet with id={petId} found.")
+
+        pets_by_id.pop(id)

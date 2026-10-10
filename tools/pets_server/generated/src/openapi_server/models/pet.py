@@ -34,7 +34,8 @@ class Pet(BaseModel):
     id: StrictInt
     name: StrictStr
     tag: Optional[StrictStr] = None
-    __properties: ClassVar[List[str]] = ["id", "name", "tag"]
+    owner: Optional[StrictStr]
+    __properties: ClassVar[List[str]] = ["id", "name", "tag", "owner"]
 
     model_config = {
         "populate_by_name": True,
@@ -73,6 +74,11 @@ class Pet(BaseModel):
             },
             exclude_none=True,
         )
+        # set to None if owner (nullable) is None
+        # and model_fields_set contains the field
+        if self.owner is None and "owner" in self.model_fields_set:
+            _dict['owner'] = None
+
         return _dict
 
     @classmethod
@@ -87,7 +93,8 @@ class Pet(BaseModel):
         _obj = cls.model_validate({
             "id": obj.get("id"),
             "name": obj.get("name"),
-            "tag": obj.get("tag")
+            "tag": obj.get("tag"),
+            "owner": obj.get("owner")
         })
         return _obj
 

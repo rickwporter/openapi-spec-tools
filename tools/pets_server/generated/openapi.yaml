@@ -65,6 +65,29 @@ paths:
       tags:
       - pets
   /pets/{petId}:
+    delete:
+      operationId: deletePetById
+      parameters:
+      - description: The id of the pet to retrieve
+        explode: false
+        in: path
+        name: petId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Expected empty response for successful delete
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: unexpected error
+      summary: Delete a pet
+      tags:
+      - pets
     get:
       operationId: showPetById
       parameters:
@@ -99,6 +122,7 @@ components:
         id: 0
         name: name
         tag: tag
+        owner: owner
       properties:
         id:
           format: int64
@@ -110,9 +134,14 @@ components:
         tag:
           title: tag
           type: string
+        owner:
+          nullable: true
+          title: owner
+          type: string
       required:
       - id
       - name
+      - owner
       title: Pet
       type: object
     Pets:

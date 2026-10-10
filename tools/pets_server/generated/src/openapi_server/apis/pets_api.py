@@ -87,3 +87,21 @@ async def show_pet_by_id(
     if not BasePetsApi.subclasses:
         raise HTTPException(status_code=500, detail="Not implemented")
     return await BasePetsApi.subclasses[0]().show_pet_by_id(petId)
+
+
+@router.delete(
+    "/pets/{petId}",
+    responses={
+        204: {"description": "Expected empty response for successful delete"},
+        "default": {"model": Error, "description": "unexpected error"},
+    },
+    tags=["pets"],
+    summary="Delete a pet",
+    response_model_by_alias=True,
+)
+async def delete_pet_by_id(
+    petId: Annotated[str, Field(description="The id of the pet to retrieve")] = Path(..., description="The id of the pet to retrieve"),
+) -> None:
+    if not BasePetsApi.subclasses:
+        raise HTTPException(status_code=500, detail="Not implemented")
+    return await BasePetsApi.subclasses[0]().delete_pet_by_id(petId)

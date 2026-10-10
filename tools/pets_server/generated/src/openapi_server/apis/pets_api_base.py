@@ -34,3 +34,10 @@ class BasePetsApi:
         petId: Annotated[str, Field(description="The id of the pet to retrieve")],
     ) -> Pet:
         ...
+
+
+    async def delete_pet_by_id(
+        self,
+        petId: Annotated[str, Field(description="The id of the pet to retrieve")],
+    ) -> None:
+        ...
