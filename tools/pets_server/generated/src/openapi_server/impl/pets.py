@@ -12,7 +12,25 @@ from openapi_server.models.pet import Pet
 from openapi_server.apis.pets_api_base import BasePetsApi
 
 
-pets_by_id: dict[int, Pet] = {}
+pets_by_id: dict[int, Pet] = {
+    1: Pet(id=1, name="Spot", owner="Firehouse"),
+    2: Pet(id=2, name="Clifford", owner="Emily", tag="big"),
+    3: Pet(id=3, name="Lassie", owner="Tommy"),
+    4: Pet(id=4, name="Scout", owner="Mirldula"),
+    5: Pet(id=5, name="Rocky",owner="Kathy"),
+    6: Pet(id=6, name="Brandy", owner="Rick"),
+    7: Pet(id=7, name="Chip", owner="Blaine"),
+    8: Pet(id=8, name="Bubbles", owner="Toph"),
+    9: Pet(id=9, name="Shadow", owner="Lora"),
+
+    
+    100: Pet(id=100, name="Gizmo", owner="Shirleen"),
+    101: Pet(id=101, name="Rusty", owner="George"),
+    102: Pet(id=102, name="Gizmo", owner="Lyle"),
+    103: Pet(id=103, name="Toulouse", owner="Rachel"),
+    104: Pet(id=104, name="O'Malley", owner="Phil"),
+    105: Pet(id=105, name="Duchess", owner="Eva"),
+}
 
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s %(message)s"
 LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
