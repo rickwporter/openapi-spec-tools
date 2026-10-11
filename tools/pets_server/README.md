@@ -6,19 +6,17 @@ The OpenAPI specification here ne
 
 ## Creation
 
-The implementation (in `generated/`) was initually built with `make gen`.
-Following that, here's what was done:
-1. Fixed the test
-    * Updated `test_create_pets()` to pass a dictionary instead of a class that could not be imported -- used a negative number for the `id` to avoid any conflict.
-    * Uncommented a couple tests to verify some ability to add/list.
-2. Added implementation in `generated/src/openapi_server/impl/ptest.py`
-    * Added rudimentary operations to manage an in memory dictionary
-    * Added some sample data
+`make gen` (and `make regen`) runs the OpenAPI generator into `generated/`.
+That directory is build output and is not committed.
+After generation, the Makefile:
+1. Copies `impl/pets.py` to `generated/src/openapi_server/impl/pets.py`.
+    * The implementation keeps an in-memory dictionary and some sample data.
+2. Applies `patches/test_pets_api.patch`.
+    * `test_create_pets()` passes a dictionary instead of `openapi_server.Pet()`, which cannot be imported. The `id` is negative so it does not collide with sample data.
+    * The list and create tests are uncommented.
 
 The implementation is NOT robust, but allows for simple testing.
-The FastAPI implemenation is multi-threaded, and the "database" operations are NOT threadsafe.
-
-> **WARNING:** using `make rm-gen` or `make regen` will delete the implementation file and the test fix.
+The FastAPI implementation is multi-threaded, and the "database" operations are NOT threadsafe.
 
 
 ## Running
