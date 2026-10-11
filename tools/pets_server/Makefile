@@ -2,6 +2,11 @@
 # Project stuff
 gen_dir ?= generated
 
+# Hand-written pieces reapplied after generation. generated/ is not committed.
+impl_src := impl/pets.py
+impl_dest := $(gen_dir)/src/openapi_server/impl/pets.py
+test_patch := patches/test_pets_api.patch
+
 gen_log ?= generator.log
 gen_workdir := /local
 gen_currdir ?= $(shell pwd)
@@ -51,6 +56,9 @@ rmgen: ## Removes the previously generated server code
 
 gen: ## Generate the server code
 	$(DOCKER_CMD) run $(gen_container_args) $(openapi_gen_image) generate $(openapi_gen_args) > $(gen_log)
+	mkdir -p $(dir $(impl_dest))
+	cp $(impl_src) $(impl_dest)
+	patch -d $(gen_dir) -p1 < $(test_patch)
 
 openapi-image: ## Pulls the openapi generator container (when needed)
 ifneq ($(shell $(DOCKER_CMD) images -q $(openapi_gen_image)),)
