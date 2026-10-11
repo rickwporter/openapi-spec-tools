@@ -1,0 +1,168 @@
+openapi: 3.0.0
+info:
+  license:
+    name: MIT
+  title: Swagger Petstore
+  version: 1.0.0
+servers:
+- url: http://petstore.swagger.io/v1
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      parameters:
+      - description: How many items to return at one time (max 100)
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          maximum: 100
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pets"
+          description: A paged array of pets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              explode: false
+              schema:
+                type: string
+              style: simple
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: unexpected error
+      summary: List all pets
+      tags:
+      - pets
+    post:
+      operationId: createPets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pet"
+        required: true
+      responses:
+        "201":
+          description: Null response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: unexpected error
+      summary: Create a pet
+      tags:
+      - pets
+  /pets/{petId}:
+    delete:
+      operationId: deletePetById
+      parameters:
+      - description: The id of the pet to retrieve
+        explode: false
+        in: path
+        name: petId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Expected empty response for successful delete
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: unexpected error
+      summary: Delete a pet
+      tags:
+      - pets
+    get:
+      operationId: showPetById
+      parameters:
+      - description: The id of the pet to retrieve
+        explode: false
+        in: path
+        name: petId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+          description: Expected response to a valid request
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: unexpected error
+      summary: Info for a specific pet
+      tags:
+      - pets
+components:
+  schemas:
+    Pet:
+      example:
+        id: 0
+        name: name
+        tag: tag
+        owner: owner
+      properties:
+        id:
+          format: int64
+          title: id
+          type: integer
+        name:
+          title: name
+          type: string
+        tag:
+          title: tag
+          type: string
+        owner:
+          nullable: true
+          title: owner
+          type: string
+      required:
+      - id
+      - name
+      - owner
+      title: Pet
+      type: object
+    Pets:
+      items:
+        $ref: "#/components/schemas/Pet"
+      maxItems: 100
+      type: array
+    Error:
+      example:
+        code: 6
+        message: message
+      properties:
+        code:
+          format: int32
+          title: code
+          type: integer
+        message:
+          title: message
+          type: string
+      required:
+      - code
+      - message
+      title: Error
+      type: object
