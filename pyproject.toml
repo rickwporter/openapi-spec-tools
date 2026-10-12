@@ -74,7 +74,7 @@ build-backend = "hatchling.build"
 line-length = 120
 target-version = "py312"
 exclude = [
-    "tools/pets_server/generated",  # no need to check OpenAPI generator
+    "tools/pets_server",  # no need to check OpenAPI generator
 ]
 
 [tool.ruff.lint]

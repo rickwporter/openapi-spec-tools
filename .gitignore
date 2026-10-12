@@ -169,3 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Pets test server output from the OpenAPI generator.
+# Rebuilt with `make gen` in tools/pets_server; do not commit.
+tools/pets_server/generated/
