@@ -78,6 +78,11 @@ environments:
             nextProperty: next
     -   name: pushes
         operationId: environments_pushes_list
+        pagination:
+            itemProperty: results
+            pageStart: page
+            pageSize: page_size
+            nextProperty: next
     -   name: set
         operationId: environments_update
     -   name: show
@@ -161,6 +166,11 @@ integrations:
         subcommandId: integrations_azure
     -   name: explore
         operationId: integrations_explore_list
+        pagination:
+            itemProperty: results
+            pageStart: page
+            pageSize: page_size
+            nextProperty: next
     -   name: github
         subcommandId: integrations_github
 integrations_aws:
@@ -589,6 +599,11 @@ projects_parameters:
         operationId: projects_parameters_destroy
     -   name: duality
         operationId: projects_parameters_duality_list
+        pagination:
+            itemProperty: results
+            pageStart: page
+            pageSize: page_size
+            nextProperty: next
     -   name: list
         operationId: projects_parameters_list
         pagination:
@@ -598,6 +613,11 @@ projects_parameters:
             nextProperty: next
     -   name: pushes
         operationId: projects_parameters_pushes_list
+        pagination:
+            itemProperty: results
+            pageStart: page
+            pageSize: page_size
+            nextProperty: next
     -   name: rules
         subcommandId: projects_parameters_rules
     -   name: set
@@ -606,8 +626,12 @@ projects_parameters:
         operationId: projects_parameters_retrieve
     -   name: timeline
         operationId: projects_parameters_timeline_retrieve
+        pagination:
+            itemProperty: results
     -   name: timelines
         operationId: projects_parameters_timelines_retrieve
+        pagination:
+            itemProperty: results
     -   name: update
         operationId: projects_parameters_partial_update
     -   name: values
@@ -672,8 +696,12 @@ projects_templates:
         operationId: projects_templates_retrieve
     -   name: timeline
         operationId: projects_templates_timeline_retrieve
+        pagination:
+            itemProperty: results
     -   name: timelines
         operationId: projects_templates_timelines_retrieve
+        pagination:
+            itemProperty: results
     -   name: update
         operationId: projects_templates_partial_update
 serviceaccounts:
