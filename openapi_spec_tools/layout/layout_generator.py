@@ -307,9 +307,9 @@ class LayoutGenerator:
         for child in node.children:
             ops = child.operations()
             if len(ops) == 1 and len(child.subcommands()) == 0:
-                # keep the "descriptive" command, and replace the identifier with the grandchild's (aka)
-                updated = LayoutNode(command=child.command, identifier=ops[0].identifier)
-                condensed.append(updated)
+                # use the child's command/name with the grandchild's properties (e.g. pagination, sub-commands)
+                ops[0].command = child.command
+                condensed.append(ops[0])
             else:
                 condensed.append(self.condense(child))
 
