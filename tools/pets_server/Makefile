@@ -45,8 +45,8 @@ help: ## This message
 
 prereq: openapi-image ## Prerequisites for building the OpenAPI server
 
-clean: ## Cleanup build artifacts
-	rm -f $(openapi_gen_log)
+clean: rmgen ## Cleanup build artifacts
+	rm -f $(gen_log)
 
 enchilada all: regen ## Convenience targets
 regen: rmgen gen ## Regenerate the server code
@@ -54,11 +54,11 @@ regen: rmgen gen ## Regenerate the server code
 rmgen: ## Removes the previously generated server code
 	rm -rf $(gen_dir)
 
+$(gen_dir): gen
 gen: ## Generate the server code
 	$(DOCKER_CMD) run $(gen_container_args) $(openapi_gen_image) generate $(openapi_gen_args) > $(gen_log)
-	mkdir -p $(dir $(impl_dest))
 	cp $(impl_src) $(impl_dest)
-	patch -d $(gen_dir) -p1 < $(test_patch)
+	patch -N -d $(gen_dir) -p1 < $(test_patch)
 
 openapi-image: ## Pulls the openapi generator container (when needed)
 ifneq ($(shell $(DOCKER_CMD) images -q $(openapi_gen_image)),)
@@ -67,5 +67,5 @@ else
 	$(DOCKER_CMD) pull $(openapi_gen_image)
 endif
 
-run: ## Run generated server in container
+run: $(gen_dir) ## Run generated server in container
 	cd $(gen_dir) && $(DOCKER_CMD) compose up --build
