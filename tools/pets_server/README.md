@@ -7,7 +7,7 @@ The OpenAPI specification here ne
 ## Creation
 
 `make gen` (and `make regen`) runs the OpenAPI generator into `generated/`.
-That directory is build output and is not committed.
+That directory is build output and is not committed due to security concerns.
 After generation, the Makefile:
 1. Copies `impl/pets.py` to `generated/src/openapi_server/impl/pets.py`.
     * The implementation keeps an in-memory dictionary and some sample data.
