@@ -45,6 +45,7 @@ def unroll(full_set: dict[str, set[str]], items: set[str]) -> set[str]:
     the initial set of names to look for.
 
     The return is the set of all items of the referenced from the inputs.
+    A name is visited once, so a reference cycle does not recurse forever.
 
     Example:
     =======
@@ -60,14 +61,18 @@ def unroll(full_set: dict[str, set[str]], items: set[str]) -> set[str]:
        result = {b, c, d, e}
 
     """
-    result = deepcopy(items)
 
-    for i in items:
-        sub = full_set.get(i)
-        if sub:
-            result.update(unroll(full_set, sub))
+    def _walk(names: set[str], seen: set[str]) -> set[str]:
+        """Collect these names and the references they reach."""
+        found = set(names)
+        for name in names - seen:
+            seen.add(name)
+            refs = full_set.get(name)
+            if refs:
+                found.update(_walk(refs, seen))
+        return found
 
-    return result
+    return _walk(set(items), set())
 
 
 def find_dict_prop(obj: dict[str, Any], prop_name: str) -> set[str]:
