@@ -232,12 +232,43 @@ def test_suggest_command(op_data, expected):
             ),
             id="nested",
         ),
+        pytest.param(
+            LayoutNode(
+                command="main",
+                identifier="main",
+                children=[
+                    LayoutNode(
+                        command="foo",
+                        identifier="foo_func",
+                        children=[
+                            LayoutNode(
+                                command="bar",
+                                identifier="bar_func",
+                                pagination=PaginationNames(page_size="page"),
+                            ),
+                        ],
+                    )
+                ],
+            ),
+            LayoutNode(
+                command="main",
+                identifier="main",
+                children=[
+                    LayoutNode(
+                        command="foo",
+                        identifier="bar_func",
+                        pagination=PaginationNames(page_size="page"),
+                    ),
+                ],
+            ),
+            id="extra-props",
+        ),
     ]
 )
 def test_condense(node: LayoutNode, expected: LayoutNode) -> None:
     uut = LayoutGenerator({})
     result = uut.condense(node)
-    assert expected == result
+    assert expected.as_dict() == result.as_dict()
 
 
 def test_generate_pets():
