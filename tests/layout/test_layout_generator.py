@@ -133,6 +133,40 @@ def test_get_model(reference, found):
 
 ANIMAL = {'type': 'object', 'properties': {'species': {'type': 'string'}}}
 PET = {'type': 'object', 'properties': {'id': {'type': 'integer'}, 'name': {'type': 'string'}}}
+COMPOSED = {
+    'type': 'object',
+    'description': 'A wrapper',
+    'properties': {
+        'data': {
+            'type': 'array',
+            'items': PET,
+        },
+        'links': {
+            'type': 'object',
+            'properties': {
+                'next': {'type': 'string'},
+            },
+        },
+        'extra': {'type': 'string'},
+    },
+}
+COMPOSED_PET = {
+    'type': 'object',
+    'properties': {
+        'id': {'type': 'integer'},
+        'name': {'type': 'string'},
+        'tag': {'type': 'string'},
+    },
+    'description': 'Custom pet',
+    'required': ['name', 'tag'],
+}
+COMPOSED_LOOP = {
+    'type': 'object',
+    'properties': {
+        'fromB': {'type': 'integer'},
+        'fromA': {'type': 'string'},
+    },
+}
 
 @pytest.mark.parametrize(
     ["op_id", "expected"],
@@ -144,6 +178,10 @@ PET = {'type': 'object', 'properties': {'id': {'type': 'integer'}, 'name': {'typ
         pytest.param("deleteSomethingElse", PET, id="json"),
         pytest.param("getSomethingElse", ANIMAL, id="no-ref"),
         pytest.param("updateSomethingElse", None, id="no-schema"),
+        pytest.param("getComposed", COMPOSED, id="allOf"),
+        pytest.param("getComposedModel", COMPOSED_PET, id="ref-allOf"),
+        pytest.param("getComposedLoop", COMPOSED_LOOP, id="allOf-cycle"),
+        pytest.param("getMissingRef", {}, id="missing-ref"),
     ]
 )
 def test_get_response_body(op_id, expected):
@@ -421,3 +459,11 @@ def test_get_pagination(gen_args, expected):
 
     uut = LayoutGenerator(oas, **gen_args)
     assert expected == uut.get_pagination(op_data)
+
+
+def test_get_pagination_allof_body():
+    oas = open_oas(asset_filename("misc2.yaml"))
+    op = map_operations(oas.get(OasField.PATHS, {})).get("getComposed")
+    uut = LayoutGenerator(oas, page_size_params="limit", page_start_params="page", items_properties="data")
+    expected = PaginationNames(page_size="limit", page_start="page", items_property="data")
+    assert expected == uut.get_pagination(op)
