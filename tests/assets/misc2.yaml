@@ -63,6 +63,63 @@ paths:
             application/json:
               examples:
                 note: This response has no schema
+  /composed:
+    get:
+      operationId: getComposed
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Wrapper'
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Pet'
+                      extra:
+                        type: string
+                      links:
+                        allOf:
+                          - $ref: '#/components/schemas/LinksPage'
+  /composed/model:
+    get:
+      operationId: getComposedModel
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComposedPet'
+                description: Custom pet
+  /composed/loop:
+    get:
+      operationId: getComposedLoop
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoopA'
+  /composed/missing:
+    get:
+      operationId: getMissingRef
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoesNotExist'
 
 
 components:
@@ -83,3 +140,45 @@ components:
           nullable: true
       required:
       - name
+    Wrapper:
+      type: object
+      description: A wrapper
+      properties:
+        data:
+          description: Collection
+          type: array
+          items:
+            type: object
+        links:
+          type: object
+    LinksPage:
+      type: object
+      properties:
+        next:
+          type: string
+    ComposedPet:
+      description: Pet plus extra
+      allOf:
+        - $ref: '#/components/schemas/Pet'
+        - type: object
+          required:
+            - name
+          properties:
+            tag:
+              type: string
+      required:
+        - tag
+    LoopA:
+      allOf:
+        - $ref: '#/components/schemas/LoopB'
+        - type: object
+          properties:
+            fromA:
+              type: string
+    LoopB:
+      allOf:
+        - $ref: '#/components/schemas/LoopA'
+        - type: object
+          properties:
+            fromB:
+              type: integer
