@@ -12,11 +12,11 @@ Install uv and create the project.
 
 ### Creating the layout
 
-To get started, I generated a layout file using the command captured in `make layout-suggest`. This creates the `suggested.yaml` which was copied to `layout.yaml` before being modified.
+To get started, the layout file was generated without a configuration using the command captured in `make layout-suggest`. This creates the `suggested.yaml` which was copied to `layout.yaml` before being modified.
 
-The suggested layout was not quite as streamlined as I wanted. It had a couple top-level commands (e.g. `stations`, and `trips`) with only a `show` option. So, I moved those operations up into `main`. Analogously, the original `bookings_payment` only had a `create`, so it was moved directly into the `bookings` command.
+The suggested layout was not quite as streamlined as desired. It had a couple top-level commands (e.g. `stations`, and `trips`) with only a `show` option. So, those operations were moved up into `main`. Analogously, the original `bookings_payment` only had a `create`, so it was moved directly into the `bookings` command.
 
-Additionally, I added `pagination` parameters to the three items that take list query parameters and provide data back in a list.
+Initially, `pagination` parameters were manually added to the three items that take list query parameters and provide data back in a list. More recently, a `layout_config.yaml` was added to allow the `layout suggest` step finds the pagination parameters.
 
 ### Generate code
 

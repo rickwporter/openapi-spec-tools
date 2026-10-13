@@ -1,0 +1,3 @@
+page_size_params: limit
+page_start_params: page
+items_properties: data

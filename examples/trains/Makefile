@@ -8,6 +8,7 @@ help: ## This message
 LAYOUT_FILE := layout.yaml
 SUGGESTED_FILE := suggested.yaml
 OPENAPI_SPEC := openapi.yaml
+LAYOUT_CONFIG := layout_config.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := trains
 
@@ -34,7 +35,7 @@ layout-lint:  ## Check the layout file format
 	$(uv_run) layout check $(LAYOUT_FILE)
 
 layout-suggest: ## Create suggested layout file
-	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE)
+	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --config $(LAYOUT_CONFIG)
 
 cli-gen: layout-lint ## Generate CLI code
 	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --no-tests --project-dir $(PROJECT_DIRECTORY)
