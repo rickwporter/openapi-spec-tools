@@ -33,6 +33,7 @@ from tests.helpers import asset_filename
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
 PET3_YAML = asset_filename("pet3.yaml")
+MISC2_YAML = asset_filename("misc2.yaml")
 
 
 #################################################
@@ -669,44 +670,72 @@ def test_models_list(filename: str, search: str | None, expected: str) -> None:
         output = mock_stdout.getvalue()
         assert output == expected
 
-PET_MODEL_PETS_SHOW = """\
-Pets:
-    items:
-        $ref: '#/components/schemas/Pet'
-    maxItems: 100
-    type: array
-
+MISC_MODEL_COMPOSED_PET_SHOW = """\
+ComposedPet:
+    allOf:
+    -   $ref: '#/components/schemas/Pet'
+    -   properties:
+            tag:
+                type: string
+        required:
+        - name
+        type: object
+    description: Pet plus extra
+    required:
+    - tag
 """
-
-PET_MODEL_PETS_REF_SHOW = f"""\
-Pet:
+MISC_MODEL_COMPOSED_PET_EXPAND = """\
+ComposedPet:
+    description: Pet plus extra
     properties:
         id:
-            format: int64
             type: integer
         name:
             type: string
         tag:
             type: string
     required:
-    - id
     - name
+    - tag
     type: object
-{PET_MODEL_PETS_SHOW}\
+    x-reference: Pet
 """
+MISC_MODEL_PET_SHOW = """\
+Pet:
+    properties:
+        id:
+            type: integer
+        name:
+            type: string
+    type: object
+"""
+MISC_MODEL_COMPOSED_PET_REF = f"""\
+{MISC_MODEL_COMPOSED_PET_SHOW}\
+{MISC_MODEL_PET_SHOW}
+"""
+
+MISC_MODEL_COMPOSED_PET_REF_EXPAND = f"""\
+{MISC_MODEL_COMPOSED_PET_EXPAND}\
+{MISC_MODEL_PET_SHOW}
+"""
+
 @pytest.mark.parametrize(
-    ["filename", "model", "references", "expected"],
+    ["filename", "model", "references", "expand", "expected"],
     [
-        pytest.param(PET_YAML, "Pets", False, PET_MODEL_PETS_SHOW, id="found"),
-        pytest.param(PET_YAML, "Pets", True, PET_MODEL_PETS_REF_SHOW, id="references"),
+        pytest.param(MISC2_YAML, "Pet", False, False, MISC_MODEL_PET_SHOW, id="basic"),
+        pytest.param(MISC2_YAML, "Pet", True, True, MISC_MODEL_PET_SHOW, id="no-refs"),
+        pytest.param(MISC2_YAML, "ComposedPet", False, False, MISC_MODEL_COMPOSED_PET_SHOW, id="complex"),
+        pytest.param(MISC2_YAML, "ComposedPet", True, False, MISC_MODEL_COMPOSED_PET_REF, id="ref"),
+        pytest.param(MISC2_YAML, "ComposedPet", False, True, MISC_MODEL_COMPOSED_PET_EXPAND, id="expand"),
+        pytest.param(MISC2_YAML, "ComposedPet", True, True, MISC_MODEL_COMPOSED_PET_REF_EXPAND, id="ref-expand"),
     ]
 )
-def test_models_show_success(filename, model, references, expected) -> None:
+def test_models_show_success(filename, model, references, expand, expected) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
-        models_show(filename, model, references)
+        models_show(filename, model, include_referenced=references, expand=expand)
 
         output = mock_stdout.getvalue()
-        assert output == expected
+        assert output.rstrip() == expected.rstrip()
 
 
 def test_models_show_failure() -> None:
