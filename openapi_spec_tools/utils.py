@@ -388,6 +388,80 @@ def find_paths(paths: dict[str, Any], search: str | None = None, sub_paths: bool
     return result
 
 
+def merge_schema(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
+    """Merge ``overlay`` onto ``base``, combining properties and required lists.
+
+    A property in ``overlay`` replaces a property of the same name in ``base``.
+    """
+    merged = deepcopy(base)
+    for key, value in overlay.items():
+        if key == OasField.PROPS and isinstance(value, dict):
+            properties = dict(merged.get(key, {}))
+            properties.update(deepcopy(value))
+            merged[key] = properties
+        elif key == OasField.REQUIRED and isinstance(value, list):
+            merged[key] = list(dict.fromkeys([*merged.get(key, []), *value]))
+        else:
+            merged[key] = deepcopy(value)
+    return merged
+
+
+def expand_schema(schema: dict[str, Any] | None, components: dict[str, Any]) -> dict[str, Any]:
+    """Resolve ``$ref`` values and merge ``allOf`` items into one schema.
+
+    Expansion walks the schema, including nested property schemas. Later ``allOf`` items
+    replace properties that share a name. A reference already being expanded is skipped.
+    A resolved reference records its short name in ``x-reference``.
+    ``components`` is the OpenAPI components object used to resolve references.
+    """
+
+    def _model(reference: str) -> dict[str, Any] | None:
+        """Return the component schema named by ``reference``."""
+        value: Any = components
+        for key in short_ref(reference).split('/'):
+            if not key or not isinstance(value, dict):
+                return None
+            value = value.get(key)
+            if not value:
+                return None
+        return value
+
+    def _expand_value(value: Any, seen: set[str]) -> Any:
+        """Expand schemas contained in a dict or list."""
+        if isinstance(value, dict):
+            return _expand(value, seen)
+        if isinstance(value, list):
+            return [_expand_value(item, seen) for item in value]
+        return value
+
+    def _expand(model: dict[str, Any] | None, seen: set[str]) -> dict[str, Any]:
+        """Expand one schema, skipping references already on the stack."""
+        if not model:
+            return {}
+
+        pending = deepcopy(model)
+        resolved: dict[str, Any] = {}
+
+        reference = pending.pop(OasField.REFS, None)
+        if reference and reference not in seen:
+            seen.add(reference)
+            target = _model(reference)
+            resolved = _expand(target, seen)
+            seen.remove(reference)
+            if target:
+                resolved[OasField.X_REF.value] = reference.rsplit('/', maxsplit=1)[-1]
+
+        for item in pending.pop(OasField.ALL_OF, None) or []:
+            resolved = merge_schema(resolved, _expand(item, seen))
+
+        if pending:
+            resolved = merge_schema(resolved, pending)
+
+        return {key: _expand_value(value, seen) for key, value in resolved.items()}
+
+    return _expand(schema, set())
+
+
 def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
     """Remove all 'tags' from the output schema.
 

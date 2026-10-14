@@ -132,10 +132,15 @@ def test_get_model(reference, found):
 
 
 ANIMAL = {'type': 'object', 'properties': {'species': {'type': 'string'}}}
-PET = {'type': 'object', 'properties': {'id': {'type': 'integer'}, 'name': {'type': 'string'}}}
+PET = {
+    'type': 'object',
+    'properties': {'id': {'type': 'integer'}, 'name': {'type': 'string'}},
+    'x-reference': 'Pet',
+}
 COMPOSED = {
     'type': 'object',
     'description': 'A wrapper',
+    'x-reference': 'Wrapper',
     'properties': {
         'data': {
             'type': 'array',
@@ -146,6 +151,7 @@ COMPOSED = {
             'properties': {
                 'next': {'type': 'string'},
             },
+            'x-reference': 'LinksPage',
         },
         'extra': {'type': 'string'},
     },
@@ -159,6 +165,7 @@ COMPOSED_PET = {
     },
     'description': 'Custom pet',
     'required': ['name', 'tag'],
+    'x-reference': 'ComposedPet',
 }
 COMPOSED_LOOP = {
     'type': 'object',
@@ -166,6 +173,7 @@ COMPOSED_LOOP = {
         'fromB': {'type': 'integer'},
         'fromA': {'type': 'string'},
     },
+    'x-reference': 'LoopA',
 }
 
 @pytest.mark.parametrize(

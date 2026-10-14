@@ -12,6 +12,7 @@ from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import _or
+from openapi_spec_tools.utils import expand_schema
 
 CREATE = "create"
 DELETE = "delete"
@@ -46,24 +47,6 @@ def _to_list(data: str | list[str] | None) -> list[str]:
     if not data:
         return []
     return [data] if isinstance(data, str) else data
-
-
-def _merge_schema(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
-    """Merge ``overlay`` onto ``base``, combining properties and required lists.
-
-    A property in ``overlay`` replaces a property of the same name in ``base``.
-    """
-    merged = deepcopy(base)
-    for key, value in overlay.items():
-        if key == OasField.PROPS and isinstance(value, dict):
-            properties = dict(merged.get(key, {}))
-            properties.update(deepcopy(value))
-            merged[key] = properties
-        elif key == OasField.REQUIRED and isinstance(value, list):
-            merged[key] = list(dict.fromkeys([*merged.get(key, []), *value]))
-        else:
-            merged[key] = deepcopy(value)
-    return merged
 
 
 class LayoutGenerator:
@@ -169,45 +152,6 @@ class LayoutGenerator:
 
         return None
 
-    def expand_schema(self, schema: dict[str, Any] | None) -> dict[str, Any]:
-        """Resolve ``$ref`` values and merge ``allOf`` items into one schema.
-
-        Expansion walks the schema, including nested property schemas. Later ``allOf`` items
-        replace properties that share a name. A reference already being expanded is skipped.
-        """
-
-        def _expand_value(value: Any, seen: set[str]) -> Any:
-            """Expand schemas contained in a dict or list."""
-            if isinstance(value, dict):
-                return _expand(value, seen)
-            if isinstance(value, list):
-                return [_expand_value(item, seen) for item in value]
-            return value
-
-        def _expand(model: dict[str, Any] | None, seen: set[str]) -> dict[str, Any]:
-            """Expand one schema, skipping references already on the stack."""
-            if not model:
-                return {}
-
-            pending = deepcopy(model)
-            resolved: dict[str, Any] = {}
-
-            reference = pending.pop(OasField.REFS, None)
-            if reference and reference not in seen:
-                seen.add(reference)
-                resolved = _expand(self.get_model(reference), seen)
-                seen.remove(reference)
-
-            for item in pending.pop(OasField.ALL_OF, None) or []:
-                resolved = _merge_schema(resolved, _expand(item, seen))
-
-            if pending:
-                resolved = _merge_schema(resolved, pending)
-
-            return {key: _expand_value(value, seen) for key, value in resolved.items()}
-
-        return _expand(schema, set())
-
     def get_response_body(self, op_data: dict[str, Any]) -> dict[str, Any] | None:
         """Get the response body schema with ``$ref`` and ``allOf`` expanded."""
         responses = op_data.get(OasField.RESPONSES, {})
@@ -225,7 +169,7 @@ class LayoutGenerator:
                 if not schema:
                     continue
 
-                return self.expand_schema(schema)
+                return expand_schema(schema, self.components)
 
         return None
 
