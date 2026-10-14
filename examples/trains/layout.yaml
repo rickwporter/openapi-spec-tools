@@ -6,15 +6,15 @@ main:
     - name: stations
       operationId: get-stations
       pagination:
-        pageSize: limit
-        pageStart: page
         itemProperty: data
+        pageStart: page
+        pageSize: limit
     - name: trips
       operationId: get-trips
       pagination:
-        pageSize: limit
-        pageStart: page
         itemProperty: data
+        pageStart: page
+        pageSize: limit
 
 bookings:
     description: Manage bookings
@@ -26,9 +26,9 @@ bookings:
     - name: list
       operationId: get-bookings
       pagination:
-        pageSize: limit
-        pageStart: page
         itemProperty: data
+        pageStart: page
+        pageSize: limit
     - name: payment
       operationId: create-booking-payment
     - name: show

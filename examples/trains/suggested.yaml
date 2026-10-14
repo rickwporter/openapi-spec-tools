@@ -5,8 +5,16 @@ main:
         subcommandId: bookings
     -   name: stations
         operationId: get-stations
+        pagination:
+            itemProperty: data
+            pageStart: page
+            pageSize: limit
     -   name: trips
         operationId: get-trips
+        pagination:
+            itemProperty: data
+            pageStart: page
+            pageSize: limit
 bookings:
     description: Manage bookings
     operations:
@@ -18,5 +26,9 @@ bookings:
         operationId: create-booking-payment
     -   name: show
         operationId: get-bookings
+        pagination:
+            itemProperty: data
+            pageStart: page
+            pageSize: limit
     -   name: show
         operationId: get-booking
