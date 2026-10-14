@@ -41,6 +41,12 @@ Repository = "https://github.com/rickwporter/openapi-spec-tools"
 
 [project.scripts]
 oas = "openapi_spec_tools.cli.oas:app"
+analyze = "openapi_spec_tools.cli.oas:analyze_typer"
+models = "openapi_spec_tools.cli.oas:models_typer"
+operations = "openapi_spec_tools.cli.oas:op_typer"
+tags = "openapi_spec_tools.cli.oas:tag_typer"
+paths = "openapi_spec_tools.cli.oas:path_typer"
+content = "openapi_spec_tools.cli.oas:content_typer"
 cli-gen = "openapi_spec_tools.cli.cli_gen:app"
 api-gen = "openapi_spec_tools.cli.api_gen:app"
 layout = "openapi_spec_tools.cli.layout:app"
