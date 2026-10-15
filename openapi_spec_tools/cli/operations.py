@@ -6,6 +6,7 @@ import typer
 import yaml
 from rich_objects import console_factory
 
+from openapi_spec_tools.cli.arguments import ExpandOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.utils import error_out
@@ -24,6 +25,12 @@ INDENT = "    "
 LOG_CLASS = "ops"
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to operations")
+
+OperationNameArgument = Annotated[str, typer.Argument(metavar="NAME", help="Name of the operation")]
+ContentTypeOption = Annotated[
+    str | None,
+    typer.Option(show_default=False, help="Specific content type to match (otherwise uses first standard type)"),
+]
 
 
 @app.command(name="list", short_help="List operations in OpenAPI spec")
@@ -59,7 +66,7 @@ def operation_list(
 @app.command(name="show", short_help="Show the opertions schema")
 def operation_show(
     filename: OpenApiFilenameArgument,
-    operation_name: Annotated[str, typer.Argument(help="Name of the operation to show")],
+    operation_name: OperationNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -86,7 +93,7 @@ def operation_show(
 @app.command(name="models", short_help="List the models referenced by the specified operaton")
 def operation_models(
     filename: OpenApiFilenameArgument,
-    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
+    operation_name: OperationNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -116,8 +123,8 @@ def operation_models(
 @app.command("parameters", short_help="Display the parameters for the specified operation")
 def operations_parameters(
     filename: OpenApiFilenameArgument,
-    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
-    expand: Annotated[bool, typer.Option(help="Expand the references and allOf fields")] = False,
+    operation_name: OperationNameArgument,
+    expand: ExpandOption = False,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -152,12 +159,9 @@ def operations_parameters(
 @app.command("request", short_help="Display the request body for the specified operation")
 def operation_request_body(
     filename: OpenApiFilenameArgument,
-    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
-    expand: Annotated[bool, typer.Option(help="Expand the references and allOf fields")] = False,
-    content_type: Annotated[
-        str | None,
-        typer.Option(show_default=False, help="Specific content type to match (otherwise uses first standard type)"),
-    ] = None,
+    operation_name: OperationNameArgument,
+    expand: ExpandOption = False,
+    content_type: ContentTypeOption = None,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -204,12 +208,9 @@ def operation_request_body(
 @app.command("response", short_help="Display the response body for the specified operation")
 def operation_response_body(
     filename: OpenApiFilenameArgument,
-    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
-    expand: Annotated[bool, typer.Option(help="Expand the references and allOf fields")] = False,
-    content_type: Annotated[
-        str | None,
-        typer.Option(show_default=False, help="Specific content type to match (otherwise uses first standard type)"),
-    ] = None,
+    operation_name: OperationNameArgument,
+    expand: ExpandOption = False,
+    content_type: ContentTypeOption = None,
     response_code: Annotated[
         str | None,
         typer.Option(

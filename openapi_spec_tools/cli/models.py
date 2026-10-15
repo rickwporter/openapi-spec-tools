@@ -6,6 +6,7 @@ import typer
 import yaml
 from rich_objects import console_factory
 
+from openapi_spec_tools.cli.arguments import ExpandOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.utils import error_out
@@ -27,6 +28,8 @@ INDENT = "    "
 LOG_CLASS = "models"
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to models")
+
+ModelNameArgument = Annotated[str, typer.Argument(metavar="NAME", help="Name of the model")]
 
 
 @app.command(name="list", short_help="List models in OpenAPI spec")
@@ -63,9 +66,9 @@ def models_list(
 @app.command(name="show", short_help="Show the model schema")
 def models_show(
     filename: OpenApiFilenameArgument,
-    model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
+    model_name: ModelNameArgument,
     include_referenced: Annotated[bool, typer.Option("--references", help="Include referenced models")] = False,
-    expand: Annotated[bool, typer.Option()] = False,
+    expand: ExpandOption = False,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -95,7 +98,7 @@ def models_show(
 @app.command(name="uses", short_help="List sub-models used by the specified model")
 def models_uses(
     filename: OpenApiFilenameArgument,
-    model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
+    model_name: ModelNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -124,7 +127,7 @@ def models_uses(
 @app.command(name="used-by", short_help="List models which reference the specified model")
 def models_used_by(
     filename: OpenApiFilenameArgument,
-    model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
+    model_name: ModelNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -151,7 +154,7 @@ def models_used_by(
 @app.command(name="ops", short_help="List operations which reference the specified model")
 def models_operations(
     filename: OpenApiFilenameArgument,
-    model_name: Annotated[str, typer.Argument(help="Name of the model to search for")],
+    model_name: ModelNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
