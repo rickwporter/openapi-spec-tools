@@ -3,6 +3,7 @@ import logging
 import os
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Any
 from typing import TypeVar
 
@@ -160,6 +161,33 @@ def write_layout_tree(filename: str, node: LayoutNode, logger: logging.Logger, i
     write_layout(filename, node, indent)
     delta = datetime.now() - start
     logger.info(f"Writing {filename} took {delta.total_seconds()} seconds")
+
+
+def short_filename(long: str) -> str:
+    """Shorten the filename to just the name portion."""
+    return Path(long).name
+
+
+def remove_list_prefix(items: list[str]) -> list[str]:
+    """Remove a common model prefix. This typically happens when everything is in schemas/."""
+    prefix = items[0].split('/')[0] + '/'
+    if not all(_.startswith(prefix) for _ in items):
+        return items
+
+    return [_.replace(prefix, "") for _ in items]
+
+
+def remove_dict_prefix(map: dict[str, Any]) -> dict[str, Any]:
+    """Remove common prefix segements (delineated by /'s) from dictionary keys.
+
+    If all the keys of the provided map start with the same prefix (before /), it removes the prefix from the keys.
+    """
+    keys = list(map.keys())
+    prefix = keys[0].split('/')[0] + '/'
+    if not all(_.startswith(prefix) for _ in keys):
+        return map
+
+    return {k.replace(prefix, ""): v for k, v in map.items()}
 
 
 def console_factory() -> Console:
