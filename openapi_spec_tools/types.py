@@ -61,3 +61,12 @@ class ContentType(str, Enum):
     APP_XML = "application/xml"
     APP_YAML = "application/yaml"
     APP_ZIP = "application/zip"
+
+    @classmethod
+    def is_value(cls, proposed: str) -> bool:
+        """Check if the proposed value is one of the enum values."""
+        try:
+            cls(proposed)
+            return True
+        except ValueError:
+            return False

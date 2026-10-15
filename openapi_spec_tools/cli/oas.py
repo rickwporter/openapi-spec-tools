@@ -371,7 +371,7 @@ def operation_request_body(
 
     found = None
     for name, data in content.items():
-        if name not in ContentType or (content_type and name != content_type):
+        if not ContentType.is_value(name) or (content_type and name != content_type):
             continue
         schema = data.get(OasField.SCHEMA)
         if not schema:
@@ -445,7 +445,7 @@ def operation_response_body(
 
         content = resp_data.get(OasField.CONTENT, {})
         for cont_name, cont_data in content.items():
-            if cont_name not in ContentType or (content_type and cont_name != content_type):
+            if not ContentType.is_value(cont_name) or (content_type and cont_name != content_type):
                 continue
             schema = cont_data.get(OasField.SCHEMA)
             if not schema:
