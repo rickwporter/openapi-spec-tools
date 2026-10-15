@@ -510,46 +510,55 @@ WITH_PARAMS_EXPANDED = """\
 
 
 @pytest.mark.parametrize(
-    ["filename", "operation", "kwargs", "title", "schema"],
+    ["filename", "operation", "kwargs", "expected"],
     [
+        pytest.param(
+            PET2_YAML,
+            "createPets",
+            {},
+            "createPets has no parameters\n",
+            id="none",
+        ),
+        pytest.param(
+            BODY_YAML,
+            "noParams",
+            {},
+            "noParams has no parameters\n",
+            id="empty",
+        ),
         pytest.param(
             PET2_YAML,
             "listPets",
             {},
-            "Found listPets parameters:",
-            LIST_PETS_PARAMS,
+            printed_schema("Found listPets parameters:", LIST_PETS_PARAMS),
             id="operation",
         ),
         pytest.param(
             PET2_YAML,
             "showPetById",
             {},
-            "Found showPetById parameters:",
-            SHOW_PET_PARAMS,
+            printed_schema("Found showPetById parameters:", SHOW_PET_PARAMS),
             id="path",
         ),
         pytest.param(
             BODY_YAML,
             "pathParamsOnly",
             {},
-            "Found pathParamsOnly parameters:",
-            PATH_PARAMS,
+            printed_schema("Found pathParamsOnly parameters:", PATH_PARAMS),
             id="path-only",
         ),
         pytest.param(
             BODY_YAML,
             "withParams",
             {},
-            "Found withParams parameters:",
-            WITH_PARAMS,
+            printed_schema("Found withParams parameters:", WITH_PARAMS),
             id="unexpanded",
         ),
         pytest.param(
             BODY_YAML,
             "withParams",
             {"expand": True},
-            "Found withParams parameters:",
-            WITH_PARAMS_EXPANDED,
+            printed_schema("Found withParams parameters:", WITH_PARAMS_EXPANDED),
             id="expanded",
         ),
     ],
@@ -558,25 +567,10 @@ def test_operations_parameters_success(
     filename: str,
     operation: str,
     kwargs: dict[str, Any],
-    title: str,
-    schema: str,
+    expected: str,
 ) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
         operations_parameters(filename, operation, **kwargs)
-
-        assert mock_stdout.getvalue() == printed_schema(title, schema)
-
-
-@pytest.mark.parametrize(
-    ["filename", "operation", "expected"],
-    [
-        pytest.param(PET2_YAML, "createPets", "createPets has no parameters\n", id="none"),
-        pytest.param(BODY_YAML, "noParams", "noParams has no parameters\n", id="empty"),
-    ],
-)
-def test_operations_parameters_none(filename: str, operation: str, expected: str) -> None:
-    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
-        operations_parameters(filename, operation)
 
         assert mock_stdout.getvalue() == expected
 
