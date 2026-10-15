@@ -14,6 +14,8 @@ from openapi_spec_tools.cli.utils import layout_config_from_file
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.utils import remove_dict_prefix
+from openapi_spec_tools.cli.utils import remove_list_prefix
 from openapi_spec_tools.layout import LayoutConfig
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
@@ -189,3 +191,27 @@ def test_console_factory() -> None:
     with mock.patch.dict(os.environ, {}, clear=True):
         console = console_factory()
         assert console.width != 3000
+
+
+@pytest.mark.parametrize(
+    ["items", "expected"],
+    [
+        pytest.param(["a/b"], ["b"], id="single"),
+        pytest.param(["a/b", "a/c"], ["b", "c"], id="common"),
+        pytest.param(["a/b", "b/c"], ["a/b", "b/c"], id="no-common"),
+    ]
+)
+def test_remove_list_prefix(items, expected) -> None:
+    assert expected == remove_list_prefix(items)
+
+
+@pytest.mark.parametrize(
+    ["map", "expected"],
+    [
+        pytest.param({"a/b": {"foo": "bar"}}, {"b": {"foo": "bar"}}, id="single"),
+        pytest.param({"a/b": None, "a/c": "sna"}, {"b": None, "c": "sna"}, id="common"),
+        pytest.param({"a/b": "x", "b/c": "y"}, {"a/b": "x", "b/c": "y"}, id="no-common"),
+    ]
+)
+def test_remove_dict_prefix(map, expected) -> None:
+    assert expected == remove_dict_prefix(map)
