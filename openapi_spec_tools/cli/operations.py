@@ -113,6 +113,42 @@ def operation_models(
     return
 
 
+@app.command("parameters", short_help="Display the parameters for the specified operation")
+def operations_parameters(
+    filename: OpenApiFilenameArgument,
+    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
+    expand: Annotated[bool, typer.Option(help="Expand the references and allOf fields")] = False,
+    log_level: LogLevelOption = "info",
+) -> None:
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
+
+    operations = map_operations(spec.get(OasField.PATHS, {}))
+    operation = operations.get(operation_name)
+    if not operation:
+        error_out(f"failed to find {operation_name}")
+
+    # Path-item parameters apply to every operation on the path.
+    params = [
+        *(operation.get(OasField.X_PATH_PARAMS) or []),
+        *(operation.get(OasField.PARAMS) or []),
+    ]
+    console = console_factory()
+    if not params:
+        console.print(f"{operation_name} has no parameters")
+        return
+
+    if expand:
+        components = spec.get(OasField.COMPONENTS, {})
+        params = [expand_schema(item, components) for item in params]
+
+    title = f"Found {operation_name} parameters:"
+    text = INDENT + yaml.dump(params, indent=len(INDENT)).replace("\n", "\n" + INDENT)
+    console.print(title)
+    console.print(text)
+    return
+
+
 @app.command("request", short_help="Display the request body for the specified operation")
 def operation_request_body(
     filename: OpenApiFilenameArgument,

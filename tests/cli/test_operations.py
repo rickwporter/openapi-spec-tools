@@ -9,6 +9,7 @@ from openapi_spec_tools.cli.operations import operation_models
 from openapi_spec_tools.cli.operations import operation_request_body
 from openapi_spec_tools.cli.operations import operation_response_body
 from openapi_spec_tools.cli.operations import operation_show
+from openapi_spec_tools.cli.operations import operations_parameters
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
@@ -408,3 +409,183 @@ def test_operation_response_body_failure(
         operation_response_body(BODY_YAML, operation, **kwargs)
     assert err.value.exit_code == 1
     assert mock_stdout.getvalue() == expected
+
+
+LIST_PETS_PARAMS = """\
+-   description: How many items to return at one time (max 100)
+    in: query
+    name: limit
+    required: false
+    schema:
+        format: int32
+        maximum: 100
+        type: integer
+"""
+
+SHOW_PET_PARAMS = """\
+-   description: The id of the pet to retrieve
+    in: path
+    name: petId
+    required: true
+    schema:
+        type: string
+"""
+
+PATH_PARAMS = """\
+-   in: path
+    name: petId
+    required: true
+    schema:
+        type: string
+-   in: query
+    name: limit
+    schema:
+        type: integer
+"""
+
+WITH_PARAMS = """\
+-   in: path
+    name: petId
+    required: true
+    schema:
+        type: string
+-   in: query
+    name: limit
+    schema:
+        type: integer
+-   $ref: '#/components/parameters/PageSize'
+-   allOf:
+    -   $ref: '#/components/parameters/PageSize'
+    -   description: Items in a page
+-   in: query
+    name: filter
+    schema:
+        allOf:
+        -   $ref: '#/components/schemas/Widget'
+        -   properties:
+                extra:
+                    type: boolean
+            type: object
+"""
+
+WITH_PARAMS_EXPANDED = """\
+-   in: path
+    name: petId
+    required: true
+    schema:
+        type: string
+-   in: query
+    name: limit
+    schema:
+        type: integer
+-   description: Maximum items per page
+    in: query
+    name: page-size
+    schema:
+        default: 100
+        type: integer
+    x-reference: PageSize
+-   description: Items in a page
+    in: query
+    name: page-size
+    schema:
+        default: 100
+        type: integer
+    x-reference: PageSize
+-   in: query
+    name: filter
+    schema:
+        properties:
+            extra:
+                type: boolean
+            name:
+                type: string
+            tag:
+                type: string
+        required:
+        - name
+        type: object
+        x-reference: Widget
+"""
+
+
+@pytest.mark.parametrize(
+    ["filename", "operation", "kwargs", "title", "schema"],
+    [
+        pytest.param(
+            PET2_YAML,
+            "listPets",
+            {},
+            "Found listPets parameters:",
+            LIST_PETS_PARAMS,
+            id="operation",
+        ),
+        pytest.param(
+            PET2_YAML,
+            "showPetById",
+            {},
+            "Found showPetById parameters:",
+            SHOW_PET_PARAMS,
+            id="path",
+        ),
+        pytest.param(
+            BODY_YAML,
+            "pathParamsOnly",
+            {},
+            "Found pathParamsOnly parameters:",
+            PATH_PARAMS,
+            id="path-only",
+        ),
+        pytest.param(
+            BODY_YAML,
+            "withParams",
+            {},
+            "Found withParams parameters:",
+            WITH_PARAMS,
+            id="unexpanded",
+        ),
+        pytest.param(
+            BODY_YAML,
+            "withParams",
+            {"expand": True},
+            "Found withParams parameters:",
+            WITH_PARAMS_EXPANDED,
+            id="expanded",
+        ),
+    ],
+)
+def test_operations_parameters_success(
+    filename: str,
+    operation: str,
+    kwargs: dict[str, Any],
+    title: str,
+    schema: str,
+) -> None:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        operations_parameters(filename, operation, **kwargs)
+
+        assert mock_stdout.getvalue() == printed_schema(title, schema)
+
+
+@pytest.mark.parametrize(
+    ["filename", "operation", "expected"],
+    [
+        pytest.param(PET2_YAML, "createPets", "createPets has no parameters\n", id="none"),
+        pytest.param(BODY_YAML, "noParams", "noParams has no parameters\n", id="empty"),
+    ],
+)
+def test_operations_parameters_none(filename: str, operation: str, expected: str) -> None:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        operations_parameters(filename, operation)
+
+        assert mock_stdout.getvalue() == expected
+
+
+def test_operations_parameters_failure() -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        operations_parameters(PET2_YAML, "missingOp")
+    assert err.value.exit_code == 1
+    assert mock_stdout.getvalue() == "ERROR: failed to find missingOp\n"
