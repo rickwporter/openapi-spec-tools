@@ -392,6 +392,87 @@ def find_paths(paths: dict[str, Any], search: str | None = None, sub_paths: bool
     return result
 
 
+def flatten_schema(schema: dict[str, Any] | None) -> dict[str, Any]:
+    """Consolidate nested object properties into dotted property names.
+
+    A property that has its own properties is replaced by those properties. Each consolidated
+    name is ``<parent_name>.<property_name>``. ``x-parents`` concatenates the parent names in
+    the chain, from the outermost parent to the immediate parent. A nested property remains
+    required only when that property and every ancestor are required. Schemas nested in other
+    fields are flattened the same way. The input schema is not modified.
+    """
+
+    def _with_parent(prop: Any, parent: str) -> Any:
+        """Prepend ``parent`` to the property's ``x-parents`` chain."""
+        if not isinstance(prop, dict):
+            return prop
+
+        existing = prop.get(OasField.X_PARENTS)
+        if isinstance(existing, list):
+            chain = existing
+        elif existing is None:
+            chain = []
+        else:
+            chain = [existing]
+        prop[OasField.X_PARENTS.value] = [parent, *chain]
+        return prop
+
+    def _prefixed_required(name: str, prop: dict[str, Any]) -> list[str]:
+        """Prefix a cascaded property's required names with ``name``."""
+        required = prop.get(OasField.REQUIRED)
+        if not isinstance(required, list):
+            return []
+        return [f"{name}.{item}" for item in required]
+
+    def _flatten_value(value: Any) -> Any:
+        """Flatten schemas contained in a dict or list."""
+        if isinstance(value, dict):
+            return _flatten(value)
+        if isinstance(value, list):
+            return [_flatten_value(item) for item in value]
+        return value
+
+    def _consolidate(properties: dict[str, Any]) -> tuple[dict[str, Any], dict[str, list[str]]]:
+        """Return flattened properties and the required-name replacements."""
+        flat: dict[str, Any] = {}
+        replacements: dict[str, list[str]] = {}
+        for name, raw_prop in properties.items():
+            prop = _flatten_value(raw_prop)
+            nested = prop.get(OasField.PROPS) if isinstance(prop, dict) else None
+            if isinstance(nested, dict) and nested:
+                replacements[name] = _prefixed_required(name, prop)
+                for sub_name, sub_prop in nested.items():
+                    flat[f"{name}.{sub_name}"] = _with_parent(sub_prop, name)
+            else:
+                flat[name] = prop
+                replacements[name] = [name]
+        return flat, replacements
+
+    def _flatten(model: dict[str, Any]) -> dict[str, Any]:
+        """Flatten one schema, hoisting cascaded properties into the parent map."""
+        for key, value in list(model.items()):
+            if key == OasField.PROPS:
+                continue
+            model[key] = _flatten_value(value)
+
+        properties = model.get(OasField.PROPS)
+        if isinstance(properties, dict):
+            flat, replacements = _consolidate(properties)
+            model[OasField.PROPS.value] = flat
+            required = model.get(OasField.REQUIRED)
+            if isinstance(required, list):
+                model[OasField.REQUIRED.value] = [
+                    renamed
+                    for name in required
+                    for renamed in replacements.get(name, [name])
+                ]
+        return model
+
+    if not schema:
+        return {}
+    return _flatten(deepcopy(schema))
+
+
 def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
     """Remove all 'tags' from the output schema.
 

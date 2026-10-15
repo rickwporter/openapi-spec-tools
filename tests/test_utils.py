@@ -9,6 +9,7 @@ from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
 from openapi_spec_tools.utils import find_references
+from openapi_spec_tools.utils import flatten_schema
 from openapi_spec_tools.utils import map_content_types
 from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
@@ -378,6 +379,261 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
     oas = open_test_oas(filename)
     actual = find_paths(oas.get(OasField.PATHS), search, subpaths)
     assert set(expected) == set(actual.keys())
+
+
+
+@pytest.mark.parametrize(
+    ["schema", "expected"],
+    [
+        pytest.param(None, {}, id="none"),
+        pytest.param({}, {}, id="empty"),
+        pytest.param(
+            {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]},
+            {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]},
+            id="plain",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "description": "root",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "owner": {
+                        "type": "object",
+                        "description": "the owner",
+                        "properties": {"name": {"type": "string", "description": "owner name"}},
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "description": "root",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "owner.name": {
+                        "type": "string",
+                        "description": "owner name",
+                        "x-parents": ["owner"],
+                    },
+                },
+            },
+            id="one-level",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "required": ["id", "owner", "missing"],
+                "properties": {
+                    "id": {"type": "integer"},
+                    "owner": {
+                        "type": "object",
+                        "required": ["name", "home"],
+                        "properties": {
+                            "name": {"type": "string"},
+                            "nickname": {"type": "string"},
+                            "home": {
+                                "type": "object",
+                                "required": ["street"],
+                                "properties": {
+                                    "street": {"type": "string"},
+                                    "city": {"type": "string"},
+                                },
+                            },
+                        },
+                    },
+                    "tag": {"type": "string"},
+                },
+            },
+            {
+                "type": "object",
+                "required": ["id", "owner.name", "owner.home.street", "missing"],
+                "properties": {
+                    "id": {"type": "integer"},
+                    "owner.name": {"type": "string", "x-parents": ["owner"]},
+                    "owner.nickname": {"type": "string", "x-parents": ["owner"]},
+                    "owner.home.street": {"type": "string", "x-parents": ["owner", "home"]},
+                    "owner.home.city": {"type": "string", "x-parents": ["owner", "home"]},
+                    "tag": {"type": "string"},
+                },
+            },
+            id="nested-required",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                    "id": {"type": "integer"},
+                    "owner": {
+                        "type": "object",
+                        "required": ["name"],
+                        "properties": {"name": {"type": "string"}},
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                    "id": {"type": "integer"},
+                    "owner.name": {"type": "string", "x-parents": ["owner"]},
+                },
+            },
+            id="optional-parent",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "required": ["owner"],
+                "properties": {
+                    "owner": {
+                        "type": "object",
+                        "properties": {"name": {"type": "string"}},
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "required": [],
+                "properties": {"owner.name": {"type": "string", "x-parents": ["owner"]}},
+            },
+            id="required-parent-without-required-children",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["meta"],
+                            "properties": {
+                                "meta": {
+                                    "type": "object",
+                                    "required": ["color"],
+                                    "properties": {"color": {"type": "string"}},
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["meta.color"],
+                            "properties": {
+                                "meta.color": {"type": "string", "x-parents": ["meta"]},
+                            },
+                        },
+                    }
+                },
+            },
+            id="items",
+        ),
+        pytest.param(
+            {
+                "allOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "home": {"type": "object", "properties": {"city": {"type": "string"}}}
+                        },
+                    }
+                ]
+            },
+            {
+                "allOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "home.city": {"type": "string", "x-parents": ["home"]},
+                        },
+                    }
+                ]
+            },
+            id="allOf",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "extra": {"type": "object", "additionalProperties": {"type": "string"}},
+                    "empty": {"type": "object", "properties": {}},
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "extra": {"type": "object", "additionalProperties": {"type": "string"}},
+                    "empty": {"type": "object", "properties": {}},
+                },
+            },
+            id="no-cascaded-properties",
+        ),
+        pytest.param(
+            {
+                "properties": {
+                    "owner": {
+                        "properties": {
+                            "home.city": {"type": "string", "x-parents": ["home"]},
+                            "name": "bad",
+                        }
+                    }
+                }
+            },
+            {
+                "properties": {
+                    "owner.home.city": {"type": "string", "x-parents": ["owner", "home"]},
+                    "owner.name": "bad",
+                }
+            },
+            id="existing-parents",
+        ),
+        pytest.param(
+            {"properties": {"owner": {"properties": {"city": {"type": "string", "x-parents": "home"}}}}},
+            {"properties": {"owner.city": {"type": "string", "x-parents": ["owner", "home"]}}},
+            id="scalar-parents",
+        ),
+    ],
+)
+def test_flatten_schema(schema: dict[str, Any] | None, expected: dict[str, Any]) -> None:
+    assert expected == flatten_schema(schema)
+
+
+def test_flatten_schema_copies() -> None:
+    schema = {
+        "type": "object",
+        "required": ["owner"],
+        "properties": {
+            "owner": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {"name": {"type": "string"}},
+            }
+        },
+    }
+    original = {
+        "type": "object",
+        "required": ["owner"],
+        "properties": {
+            "owner": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {"name": {"type": "string"}},
+            }
+        },
+    }
+    flattened = flatten_schema(schema)
+
+    flattened["properties"]["owner.name"]["type"] = "integer"
+    flattened["required"].append("extra")
+    assert schema == original
 
 
 def path_tag_count(schema: dict[str, Any]) -> int:
