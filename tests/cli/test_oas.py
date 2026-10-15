@@ -17,6 +17,8 @@ from openapi_spec_tools.cli.oas import models_used_by
 from openapi_spec_tools.cli.oas import models_uses
 from openapi_spec_tools.cli.oas import operation_list
 from openapi_spec_tools.cli.oas import operation_models
+from openapi_spec_tools.cli.oas import operation_request_body
+from openapi_spec_tools.cli.oas import operation_response_body
 from openapi_spec_tools.cli.oas import operation_show
 from openapi_spec_tools.cli.oas import paths_list
 from openapi_spec_tools.cli.oas import paths_operations
@@ -34,6 +36,7 @@ PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
 PET3_YAML = asset_filename("pet3.yaml")
 MISC2_YAML = asset_filename("misc2.yaml")
+BODY_YAML = asset_filename("bodies.yaml")
 
 
 #################################################
@@ -404,6 +407,256 @@ def test_operation_models_failure() -> None:
         assert err.value.exit_code == 1
         output = mock_stdout.getvalue()
         assert output == f"ERROR: failed to find {search}\n"
+
+
+def printed_schema(title: str, schema: str) -> str:
+    """Match body output, including the indent the command adds after the final newline."""
+    if not schema.endswith("\n"):
+        schema += "\n"
+    body = "    " + schema.replace("\n", "\n    ")
+    return f"{title}\n{body}\n"
+
+
+WIDGET_EXPANDED = """\
+properties:
+    name:
+        type: string
+    tag:
+        type: string
+required:
+- name
+type: object
+x-reference: Widget
+"""
+
+REF_RESPONSE_SCHEMA = """\
+content:
+    application/json:
+        schema:
+            type: string
+description: ok
+x-reference: Ok
+"""
+
+
+@pytest.mark.parametrize(
+    ["operation", "kwargs", "title", "schema"],
+    [
+        pytest.param(
+            "expandRequest",
+            {},
+            "Found expandRequest required request-body (application/json):",
+            "$ref: '#/components/schemas/Widget'\n",
+            id="unexpanded",
+        ),
+        pytest.param(
+            "expandRequest",
+            {"expand": True},
+            "Found expandRequest required request-body (application/json):",
+            WIDGET_EXPANDED,
+            id="expanded",
+        ),
+        pytest.param(
+            "firstStandard",
+            {},
+            "Found firstStandard required request-body (application/xml):",
+            "type: boolean\n",
+            id="first-standard",
+        ),
+        pytest.param(
+            "firstStandard",
+            {"content_type": "application/json"},
+            "Found firstStandard required request-body (application/json):",
+            "type: integer\n",
+            id="later-type",
+        ),
+        pytest.param(
+            "firstStandard",
+            {"content_type": "application/xml"},
+            "Found firstStandard required request-body (application/xml):",
+            "type: boolean\n",
+            id="explicit-xml",
+        ),
+        pytest.param(
+            "skipSchema",
+            {},
+            "Found skipSchema request-body (application/yaml):",
+            "type: string\n",
+            id="skip-missing-schema",
+        ),
+    ],
+)
+def test_operation_request_body_success(
+    operation: str,
+    kwargs: dict[str, Any],
+    title: str,
+    schema: str,
+) -> None:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        operation_request_body(BODY_YAML, operation, **kwargs)
+
+        assert mock_stdout.getvalue() == printed_schema(title, schema)
+
+
+@pytest.mark.parametrize(
+    ["operation", "kwargs", "expected"],
+    [
+        pytest.param("missingOp", {}, "ERROR: failed to find missingOp\n", id="no-op"),
+        pytest.param("noBody", {}, "ERROR: no requestBody for noBody\n", id="no-body"),
+        pytest.param(
+            "expandRequest",
+            {"content_type": "application/yaml"},
+            "ERROR: no application/yaml content found for expandRequest\n",
+            id="content-type",
+        ),
+        pytest.param("noSchema", {}, "ERROR: no standard content found for noSchema\n", id="no-schema"),
+        pytest.param("plainOnly", {}, "ERROR: no standard content found for plainOnly\n", id="nonstandard"),
+        pytest.param("emptyContent", {}, "ERROR: no requestBody for emptyContent\n", id="empty-content"),
+        pytest.param(
+            "firstStandard",
+            {"content_type": "multipart/form-data"},
+            "ERROR: no multipart/form-data content found for firstStandard\n",
+            id="nonstandard-type",
+        ),
+    ],
+)
+def test_operation_request_body_failure(
+    operation: str,
+    kwargs: dict[str, Any],
+    expected: str,
+) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        operation_request_body(BODY_YAML, operation, **kwargs)
+    assert err.value.exit_code == 1
+    assert mock_stdout.getvalue() == expected
+
+
+@pytest.mark.parametrize(
+    ["operation", "kwargs", "title", "schema"],
+    [
+        pytest.param(
+            "multiType",
+            {},
+            "Found multiType 200 response (application/xml):",
+            "type: boolean\n",
+            id="skip-error-and-html",
+        ),
+        pytest.param(
+            "multiType",
+            {"content_type": "application/json"},
+            "Found multiType 200 response (application/json):",
+            "type: number\n",
+            id="content-type",
+        ),
+        pytest.param(
+            "multiType",
+            {"response_code": "400"},
+            "Found multiType 400 response (application/json):",
+            "type: string\n",
+            id="response-code",
+        ),
+        pytest.param(
+            "emptyThenBody",
+            {},
+            "Found emptyThenBody 201 response (application/json):",
+            "type: string\n",
+            id="skip-empty",
+        ),
+        pytest.param(
+            "schemaLater",
+            {},
+            "Found schemaLater 200 response (application/yaml):",
+            "type: string\n",
+            id="skip-missing-schema",
+        ),
+        pytest.param(
+            "refResponse",
+            {},
+            "Found refResponse 200 response:",
+            "$ref: '#/components/responses/Ok'\n",
+            id="ref-only",
+        ),
+        pytest.param(
+            "refResponse",
+            {"expand": True},
+            "Found refResponse 200 response:",
+            REF_RESPONSE_SCHEMA,
+            id="ref-expand",
+        ),
+        pytest.param(
+            "expandRequest",
+            {"expand": True, "response_code": "default"},
+            "Found expandRequest default response (application/json):",
+            WIDGET_EXPANDED,
+            id="expand-error",
+        ),
+    ],
+)
+def test_operation_response_body_success(
+    operation: str,
+    kwargs: dict[str, Any],
+    title: str,
+    schema: str,
+) -> None:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        operation_response_body(BODY_YAML, operation, **kwargs)
+
+        assert mock_stdout.getvalue() == printed_schema(title, schema)
+
+
+@pytest.mark.parametrize(
+    ["operation", "kwargs", "expected"],
+    [
+        pytest.param("missingOp", {}, "ERROR: failed to find missingOp\n", id="no-op"),
+        pytest.param(
+            "expandRequest",
+            {},
+            "ERROR: no successful standard response found for expandRequest\n",
+            id="no-resp-content",
+        ),
+        pytest.param(
+            "expandRequest",
+            {"response_code": "201"},
+            "ERROR: no 201 standard response found for expandRequest\n",
+            id="code",
+        ),
+        pytest.param(
+            "expandRequest",
+            {"content_type": "application/yaml"},
+            "ERROR: no successful application/yaml response found for expandRequest\n",
+            id="content",
+        ),
+        pytest.param(
+            "expandRequest",
+            {"response_code": "201", "content_type": "application/foo"},
+            "ERROR: no 201 application/foo response found for expandRequest\n",
+            id="code-content",
+        ),
+        pytest.param(
+            "expandRequest",
+            {"response_code": "404"},
+            "ERROR: no 404 standard response found for expandRequest\n",
+            id="unknown-code",
+        ),
+        pytest.param("missingResponses", {}, "ERROR: no responses for missingResponses\n", id="no-resp"),
+        pytest.param("noResponses", {}, "ERROR: no responses for noResponses\n", id="empty-resp"),
+    ],
+)
+def test_operation_response_body_failure(
+    operation: str,
+    kwargs: dict[str, Any],
+    expected: str,
+) -> None:
+    with (
+        mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        operation_response_body(BODY_YAML, operation, **kwargs)
+    assert err.value.exit_code == 1
+    assert mock_stdout.getvalue() == expected
 
 
 ##########################################

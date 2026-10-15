@@ -1,0 +1,182 @@
+openapi: "3.0.0"
+info:
+  title: bodies
+  version: "1.0.0"
+paths:
+  /types:
+    post:
+      operationId: firstStandard
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+          application/xml:
+            schema:
+              type: boolean
+          application/json:
+            schema:
+              type: integer
+      responses:
+        "200":
+          description: ok
+  /skip-schema:
+    post:
+      operationId: skipSchema
+      requestBody:
+        content:
+          application/json:
+            example: {}
+          application/yaml:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: ok
+  /no-schema:
+    post:
+      operationId: noSchema
+      requestBody:
+        content:
+          application/json:
+            example: hi
+      responses:
+        "200":
+          description: ok
+  /plain:
+    post:
+      operationId: plainOnly
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: ok
+  /empty-content:
+    post:
+      operationId: emptyContent
+      requestBody:
+        content: {}
+      responses:
+        "200":
+          description: ok
+  /multi-response:
+    get:
+      operationId: multiType
+      responses:
+        "400":
+          description: bad
+          content:
+            application/json:
+              schema:
+                type: string
+        "200":
+          description: ok
+          content:
+            text/html:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: boolean
+            application/json:
+              schema:
+                type: number
+        "201":
+          description: created
+          content:
+            application/json:
+              schema:
+                type: integer
+  /empty-then:
+    get:
+      operationId: emptyThenBody
+      responses:
+        "200":
+          description: no content
+        "201":
+          content:
+            application/json:
+              schema:
+                type: string
+  /schema-later:
+    get:
+      operationId: schemaLater
+      responses:
+        "200":
+          content:
+            application/json:
+              example: {}
+            application/yaml:
+              schema:
+                type: string
+  /ref:
+    get:
+      operationId: refResponse
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+  /ref-extra:
+    get:
+      operationId: refWithExtra
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+          description: not a pure ref
+  /no-responses:
+    get:
+      operationId: noResponses
+      responses: {}
+  /missing-responses:
+    get:
+      operationId: missingResponses
+      summary: operation without a responses field
+  /nobody:
+    get:
+      operationId: noBody
+      responses:
+        "200":
+          description: operation with no request body
+          content:
+            application/json:
+              schema:
+                type: string
+  /expand:
+    post:
+      operationId: expandRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Widget"
+      responses:
+        "201":
+          description: no response body
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Widget"
+components:
+  schemas:
+    Widget:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        tag:
+          type: string
+  responses:
+    Ok:
+      description: ok
+      content:
+        application/json:
+          schema:
+            type: string

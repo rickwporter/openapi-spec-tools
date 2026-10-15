@@ -17,6 +17,7 @@ from openapi_spec_tools.cli.history import app as history_app
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import expand_schema
@@ -341,6 +342,136 @@ def operation_models(
         for n in sorted(matches):
             console.print(f"{INDENT}{n}")
 
+    return
+
+
+@op_typer.command("request", short_help="Display the request body for the specified operation")
+def operation_request_body(
+    filename: OpenApiFilenameArgument,
+    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
+    expand: Annotated[bool, typer.Option(help="Expand the references and allOf fields")] = False,
+    content_type: Annotated[
+        str | None,
+        typer.Option(show_default=False, help="Specific content type to match (otherwise uses first standard type)"),
+    ] = None,
+    log_level: LogLevelOption = "info",
+) -> None:
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
+
+    operations = map_operations(spec.get(OasField.PATHS, {}))
+    operation = operations.get(operation_name)
+    if not operation:
+        error_out(f"failed to find {operation_name}")
+
+    body = operation.get(OasField.REQ_BODY, {})
+    content = body.get(OasField.CONTENT)
+    if not content:
+        error_out(f"no {OasField.REQ_BODY.value} for {operation_name}")
+
+    found = None
+    for name, data in content.items():
+        if name not in ContentType or (content_type and name != content_type):
+            continue
+        schema = data.get(OasField.SCHEMA)
+        if not schema:
+            continue
+        content_type = name
+        found = schema
+        break
+
+    if not found:
+        content_msg = "standard" if not content_type else content_type
+        error_out(f"no {content_msg} content found for {operation_name}")
+
+    if expand:
+        components = spec.get(OasField.COMPONENTS, {})
+        found = expand_schema(schema=found, components=components)
+
+    required = "required " if body.get(OasField.REQUIRED, False) else ""
+    title = f"Found {operation_name} {required}request-body ({content_type}):"
+    text = INDENT + yaml.dump(found, indent=len(INDENT)).replace("\n", "\n" + INDENT)
+    console = console_factory()
+    console.print(title)
+    console.print(text)
+    return
+
+
+@op_typer.command("response", short_help="Display the response body for the specified operation")
+def operation_response_body(
+    filename: OpenApiFilenameArgument,
+    operation_name: Annotated[str, typer.Argument(help="Name of the operation")],
+    expand: Annotated[bool, typer.Option(help="Expand the references and allOf fields")] = False,
+    content_type: Annotated[
+        str | None,
+        typer.Option(show_default=False, help="Specific content type to match (otherwise uses first standard type)"),
+    ] = None,
+    response_code: Annotated[
+        str | None,
+        typer.Option(
+            "--response",
+            show_default=False,
+            help="Specific response code. Unspecified looks for first 2xx response",
+        ),
+    ] = None,
+    log_level: LogLevelOption = "info",
+) -> None:
+    logger = init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename, logger)
+
+    operations = map_operations(spec.get(OasField.PATHS, {}))
+    operation = operations.get(operation_name)
+    if not operation:
+        error_out(f"failed to find {operation_name}")
+
+    responses = operation.get(OasField.RESPONSES)
+    if not responses:
+        error_out(f"no responses for {operation_name}")
+
+    found_schema = None
+    found_code = None
+    found_type = None
+    for code, resp_data in responses.items():
+        unmatched = response_code is not None and response_code != code
+        unsuccessful = response_code is None and not code.startswith("2")
+        if unmatched or unsuccessful:
+            continue
+
+        if resp_data.keys() == {OasField.REFS.value}:
+            found_schema = resp_data
+            found_code = code
+            found_type = ""
+            break
+
+        content = resp_data.get(OasField.CONTENT, {})
+        for cont_name, cont_data in content.items():
+            if cont_name not in ContentType or (content_type and cont_name != content_type):
+                continue
+            schema = cont_data.get(OasField.SCHEMA)
+            if not schema:
+                continue
+            found_code = code
+            found_schema = schema
+            found_type = f" ({cont_name})"
+            break
+
+        if found_code:
+            break
+
+    if not found_schema:
+        ctype = "standard" if not content_type else content_type
+        rtype = "successful" if not response_code else response_code
+        error_out(f"no {rtype} {ctype} response found for {operation_name}")
+
+    if expand:
+        components = spec.get(OasField.COMPONENTS, {})
+        found_schema = expand_schema(schema=found_schema, components=components)
+
+    title = f"Found {operation_name} {found_code} response{found_type}:"
+    text = INDENT + yaml.dump(found_schema, indent=len(INDENT)).replace("\n", "\n" + INDENT)
+    console = console_factory()
+    console.print(title)
+    console.print(text)
     return
 
 
