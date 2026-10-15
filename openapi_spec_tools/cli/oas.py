@@ -19,6 +19,7 @@ from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
+from openapi_spec_tools.utils import expand_schema
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
 from openapi_spec_tools.utils import find_references
@@ -485,12 +486,14 @@ def models_show(
     filename: OpenApiFilenameArgument,
     model_name: Annotated[str, typer.Argument(help="Name of the model to show")],
     include_referenced: Annotated[bool, typer.Option("--references", help="Include referenced models")] = False,
+    expand: Annotated[bool, typer.Option()] = False,
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
     spec = open_oas_with_error_handling(filename, logger)
 
-    models = map_models(spec.get(OasField.COMPONENTS, {}))
+    components = spec.get(OasField.COMPONENTS, {})
+    models = map_models(components)
     full_name = model_full_name(models, model_name)
     model = models.get(full_name)
     if not model:
@@ -500,8 +503,11 @@ def models_show(
         models = {full_name: model}
     else:
         models = model_filter(models, {full_name})
-    models = remove_dict_prefix(models)
 
+    if expand:
+        models = {name: expand_schema(schema, components) for name, schema in models.items()}
+
+    models = remove_dict_prefix(models)
     console = console_factory()
     console.print(yaml.dump(models, indent=len(INDENT)))
     return
