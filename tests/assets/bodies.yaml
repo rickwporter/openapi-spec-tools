@@ -144,6 +144,47 @@ paths:
             application/json:
               schema:
                 type: string
+  /params/{petId}:
+    parameters:
+      - name: petId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+    get:
+      operationId: withParams
+      parameters:
+        - $ref: "#/components/parameters/PageSize"
+        - allOf:
+            - $ref: "#/components/parameters/PageSize"
+            - description: Items in a page
+        - name: filter
+          in: query
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/Widget"
+              - type: object
+                properties:
+                  extra:
+                    type: boolean
+      responses:
+        "200":
+          description: ok
+    delete:
+      operationId: pathParamsOnly
+      responses:
+        "204":
+          description: path parameters only
+  /no-params:
+    get:
+      operationId: noParams
+      responses:
+        "200":
+          description: operation with no parameters
   /expand:
     post:
       operationId: expandRequest
@@ -163,6 +204,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Widget"
 components:
+  parameters:
+    PageSize:
+      name: page-size
+      description: Maximum items per page
+      in: query
+      schema:
+        type: integer
+        default: 100
   schemas:
     Widget:
       type: object

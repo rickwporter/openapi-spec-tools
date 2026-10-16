@@ -27,6 +27,7 @@ ConfigFileOption = Annotated[
     str | None,
     typer.Option("--config", metavar=FILENAME, show_default=False, help="Generator configuration file")
 ]
+ExpandOption = Annotated[bool, typer.Option("--expand", help="Expand the references and allOf fields")]
 IndentOption = Annotated[
     int,
     typer.Option(
