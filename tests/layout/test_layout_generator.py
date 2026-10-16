@@ -134,7 +134,10 @@ def test_get_model(reference, found):
 ANIMAL = {'type': 'object', 'properties': {'species': {'type': 'string'}}}
 PET = {
     'type': 'object',
-    'properties': {'id': {'type': 'integer'}, 'name': {'type': 'string'}},
+    'properties': {
+        'id': {'type': 'integer', 'x-reference': 'Pet'},
+        'name': {'type': 'string', 'x-reference': 'Pet'},
+    },
     'x-reference': 'Pet',
 }
 COMPOSED = {
@@ -149,7 +152,7 @@ COMPOSED = {
         'links': {
             'type': 'object',
             'properties': {
-                'next': {'type': 'string'},
+                'next': {'type': 'string', 'x-reference': 'LinksPage'},
             },
             'x-reference': 'LinksPage',
         },
@@ -159,9 +162,9 @@ COMPOSED = {
 COMPOSED_PET = {
     'type': 'object',
     'properties': {
-        'id': {'type': 'integer'},
-        'name': {'type': 'string'},
-        'tag': {'type': 'string'},
+        'id': {'type': 'integer', 'x-reference': 'Pet'},
+        'name': {'type': 'string', 'x-reference': 'Pet'},
+        'tag': {'type': 'string', 'x-reference': 'ComposedPet'},
     },
     'description': 'Custom pet',
     'required': ['name', 'tag'],
@@ -170,8 +173,8 @@ COMPOSED_PET = {
 COMPOSED_LOOP = {
     'type': 'object',
     'properties': {
-        'fromB': {'type': 'integer'},
-        'fromA': {'type': 'string'},
+        'fromB': {'type': 'integer', 'x-reference': 'LoopB'},
+        'fromA': {'type': 'string', 'x-reference': 'LoopA'},
     },
     'x-reference': 'LoopA',
 }

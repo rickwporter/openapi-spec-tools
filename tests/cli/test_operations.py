@@ -173,8 +173,10 @@ WIDGET_EXPANDED = """\
 properties:
     name:
         type: string
+        x-reference: Widget
     tag:
         type: string
+        x-reference: Widget
 required:
 - name
 type: object
@@ -500,8 +502,10 @@ WITH_PARAMS_EXPANDED = """\
                 type: boolean
             name:
                 type: string
+                x-reference: Widget
             tag:
                 type: string
+                x-reference: Widget
         required:
         - name
         type: object

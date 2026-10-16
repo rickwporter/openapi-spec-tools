@@ -411,12 +411,17 @@ def merge_schema(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any
     return merged
 
 
-def expand_schema(schema: dict[str, Any] | None, components: dict[str, Any]) -> dict[str, Any]:
+def expand_schema(
+    schema: dict[str, Any] | None,
+    components: dict[str, Any],
+    reference: str | None = None,
+) -> dict[str, Any]:
     """Resolve ``$ref`` values and merge ``allOf`` items into one schema.
 
     Expansion walks the schema, including nested property schemas. Later ``allOf`` items
     replace properties that share a name. A reference already being expanded is skipped.
-    A resolved reference records its short name in ``x-reference``.
+    A resolved reference records its short name in ``x-reference``. Properties brought in
+    by that reference record the same name, unless they already have an ``x-reference``.
     ``components`` is the OpenAPI components object used to resolve references.
     """
 
@@ -430,6 +435,15 @@ def expand_schema(schema: dict[str, Any] | None, components: dict[str, Any]) -> 
             if not value:
                 return None
         return value
+
+    def _mark_reference_properties(schema: dict[str, Any], class_name: str) -> None:
+        """Record ``class_name`` on properties brought in by a resolved reference."""
+        properties = schema.get(OasField.PROPS)
+        if not isinstance(properties, dict):
+            return
+        for prop in properties.values():
+            if isinstance(prop, dict):
+                prop.setdefault(OasField.X_REF.value, class_name)
 
     def _expand_value(value: Any, seen: set[str]) -> Any:
         """Expand schemas contained in a dict or list."""
@@ -454,7 +468,9 @@ def expand_schema(schema: dict[str, Any] | None, components: dict[str, Any]) -> 
             resolved = _expand(target, seen)
             seen.remove(reference)
             if target:
-                resolved[OasField.X_REF.value] = reference_classname(reference)
+                class_name = reference_classname(reference)
+                resolved[OasField.X_REF.value] = class_name
+                _mark_reference_properties(resolved, class_name)
 
         for item in pending.pop(OasField.ALL_OF, None) or []:
             resolved = merge_schema(resolved, _expand(item, seen))
@@ -464,7 +480,11 @@ def expand_schema(schema: dict[str, Any] | None, components: dict[str, Any]) -> 
 
         return {key: _expand_value(value, seen) for key, value in resolved.items()}
 
-    return _expand(schema, set())
+    result = _expand(schema, set())
+    if reference:
+        _mark_reference_properties(result, reference_classname(reference))
+
+    return result
 
 
 def remove_schema_tags(schema: dict[str, Any]) -> dict[str, Any]:
