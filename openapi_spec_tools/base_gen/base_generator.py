@@ -37,6 +37,7 @@ from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import NULL_TYPES
 from openapi_spec_tools.utils import _or
 from openapi_spec_tools.utils import map_operations
+from openapi_spec_tools.utils import reference_classname
 
 LOG_CLASS = "base-gen"
 
@@ -184,10 +185,6 @@ class BaseGenerator:
         value = to_snake_case(replace_special(s))
         return "--" + value.rstrip("_").replace("_", "-")
 
-    def short_reference_name(self, full_name: str) -> str:
-        """Transform the '#/components/schemas/Xxx' to 'Xxx'."""
-        return full_name.rsplit('/', maxsplit=1)[-1]
-
     def shebang(self) -> str:
         """Get the shebang line that goes at the top of each file."""
         return "#!/usr/bin/env python3\n"
@@ -259,7 +256,7 @@ class BaseGenerator:
             reference = item.get(OasField.REFS)
 
         if reference:
-            prop[OasField.X_REF.value] = self.short_reference_name(reference)
+            prop[OasField.X_REF.value] = reference_classname(reference)
 
             # resolve references, if they're enums
             sub_model = self.get_model(reference)
@@ -390,7 +387,7 @@ class BaseGenerator:
 
         full_ref = model.get(OasField.REFS)
         if full_ref:
-            updated[OasField.X_REF.value] = self.short_reference_name(full_ref)
+            updated[OasField.X_REF.value] = reference_classname(full_ref)
             submodel = self.get_model(full_ref)
             if not submodel:
                 self.logger.warning(f"Unable to find model for {full_ref}")
@@ -426,7 +423,7 @@ class BaseGenerator:
         for index, parent in enumerate(model.get(OasField.ALL_OF, [])):
             required_sub = parent.get(OasField.REQUIRED, [])
             reference = parent.get(OasField.REFS, "")
-            short_refname = self.short_reference_name(reference)
+            short_refname = reference_classname(reference)
             sub_properties = self.expanded_settable_properties(f"{name}.anyOf[{index}]", parent)
             for sub_name, sub_data in sub_properties.items():
                 if short_refname:
@@ -446,7 +443,7 @@ class BaseGenerator:
         self.update_one_of(name, model)
 
         reference = model.get(OasField.REFS, "")
-        short_refname = self.short_reference_name(reference)
+        short_refname = reference_classname(reference)
         required_props = model.get(OasField.REQUIRED, [])
         ref_model = self.get_model(reference)
         if ref_model:
@@ -504,7 +501,7 @@ class BaseGenerator:
                 full_name = f"{prop_name}.{sub_name}"
                 sub_data[OasField.REQUIRED.value] = prop_name in required_props and sub_name in required_sub
                 if reference:
-                    set_missing(sub_data, OasField.X_REF.value, self.short_reference_name(reference))
+                    set_missing(sub_data, OasField.X_REF.value, reference_classname(reference))
                 set_missing(sub_data, OasField.X_FIELD.value, sub_name)
                 prepend(sub_data, OasField.X_PARENTS.value, prop_name)
                 if forced_single:
@@ -530,7 +527,7 @@ class BaseGenerator:
         name = "body"
         ref = schema.get(OasField.REFS)
         if ref:
-            name = self.short_reference_name(ref)
+            name = reference_classname(ref)
             schema = self.get_model(ref)
 
         return (name, schema)
@@ -659,7 +656,7 @@ class BaseGenerator:
             model = self.get_model(ref)
             if model:
                 item = deepcopy(model)
-                item[OasField.X_REF] = self.short_reference_name(ref)
+                item[OasField.X_REF] = reference_classname(ref)
             if item.get(OasField.IN) != location:
                 continue
 

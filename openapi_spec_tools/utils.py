@@ -231,6 +231,11 @@ def short_ref(full_name: str) -> str:
     return '/'.join(values)
 
 
+def reference_classname(full_name: str) -> str:
+    """Get the class name from a reference (``#/components/schemas/Xxx`` becomes ``Xxx``)."""
+    return full_name.rsplit('/', maxsplit=1)[-1]
+
+
 def find_references(obj: dict[str, Any]) -> set[str]:
     """Walk the 'obj' dictionary to find all the reference values (e.g. "$ref")."""
     refs = find_dict_prop(obj, OasField.REFS)
@@ -449,7 +454,7 @@ def expand_schema(schema: dict[str, Any] | None, components: dict[str, Any]) -> 
             resolved = _expand(target, seen)
             seen.remove(reference)
             if target:
-                resolved[OasField.X_REF.value] = reference.rsplit('/', maxsplit=1)[-1]
+                resolved[OasField.X_REF.value] = reference_classname(reference)
 
         for item in pending.pop(OasField.ALL_OF, None) or []:
             resolved = merge_schema(resolved, _expand(item, seen))

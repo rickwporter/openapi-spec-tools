@@ -19,6 +19,7 @@ from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import open_oas
+from openapi_spec_tools.utils import reference_classname
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
@@ -74,6 +75,20 @@ def test_open_oas() -> None:
 )
 def test_short_ref(full_name, expected) -> None:
     assert expected == short_ref(full_name)
+
+
+@pytest.mark.parametrize(
+    ["full_name", "expected"],
+    [
+        pytest.param("", "", id="empty"),
+        pytest.param("#/components/schemas/Xxx", "Xxx", id="schema"),
+        pytest.param("#/components/parameters/PetId", "PetId", id="parameter"),
+        pytest.param("schemas/Error", "Error", id="short"),
+        pytest.param("AlreadyClass", "AlreadyClass", id="bare"),
+    ],
+)
+def test_reference_classname(full_name, expected) -> None:
+    assert expected == reference_classname(full_name)
 
 
 @pytest.mark.parametrize(
