@@ -87,7 +87,7 @@ def models_show(
         models = model_filter(models, {full_name})
 
     if expand:
-        models = {name: expand_schema(schema, components) for name, schema in models.items()}
+        models = {name: expand_schema(schema, components, name) for name, schema in models.items()}
 
     models = remove_dict_prefix(models)
     console = console_factory()

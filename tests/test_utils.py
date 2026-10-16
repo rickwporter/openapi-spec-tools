@@ -490,41 +490,47 @@ LOOP_COMPONENTS = {
 EXPANDED_PET = {
     "type": "object",
     "description": "A pet",
-    "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+    "properties": {
+        "id": {"type": "integer", "x-reference": "Pet"},
+        "name": {"type": "string", "x-reference": "Pet"},
+    },
     "required": ["name"],
     "x-reference": "Pet",
 }
 
 
 @pytest.mark.parametrize(
-    ["schema", "components", "expected"],
+    ["schema", "components", "name", "expected"],
     [
-        pytest.param(None, {}, {}, id="none"),
-        pytest.param({}, {}, {}, id="empty"),
+        pytest.param(None, {}, None, {}, id="none"),
+        pytest.param({}, {}, None, {}, id="empty"),
         pytest.param(
             {"type": "object", "properties": {"name": {"type": "string"}}},
             {},
+            None,
             {"type": "object", "properties": {"name": {"type": "string"}}},
             id="plain",
         ),
-        pytest.param({"$ref": "#/components/schemas/Pet"}, PET_COMPONENTS, EXPANDED_PET, id="ref"),
-        pytest.param({"$ref": "#/components/schemas/Missing"}, PET_COMPONENTS, {}, id="missing-ref"),
+        pytest.param({"$ref": "#/components/schemas/Pet"}, PET_COMPONENTS, None, EXPANDED_PET, id="ref"),
+        pytest.param({"$ref": "#/components/schemas/Missing"}, PET_COMPONENTS, None, {}, id="missing-ref"),
         pytest.param(
             {"$ref": "#/components/schemas/Pet", "description": "Custom pet"},
             PET_COMPONENTS,
+            None,
             {**EXPANDED_PET, "description": "Custom pet"},
             id="ref-sibling",
         ),
         pytest.param(
             {"$ref": "#/components/schemas/ComposedPet"},
             PET_COMPONENTS,
+            None,
             {
                 "type": "object",
                 "description": "Pet plus extra",
                 "properties": {
-                    "id": {"type": "integer"},
-                    "name": {"type": "string"},
-                    "tag": {"type": "string"},
+                    "id": {"type": "integer", "x-reference": "Pet"},
+                    "name": {"type": "string", "x-reference": "Pet"},
+                    "tag": {"type": "string", "x-reference": "ComposedPet"},
                 },
                 "required": ["name", "tag"],
                 "x-reference": "ComposedPet",
@@ -532,14 +538,58 @@ EXPANDED_PET = {
             id="allOf",
         ),
         pytest.param(
+            PET_COMPONENTS["schemas"]["ComposedPet"],
+            PET_COMPONENTS,
+            None,
+            {
+                "type": "object",
+                "description": "Pet plus extra",
+                "properties": {
+                    "id": {"type": "integer", "x-reference": "Pet"},
+                    "name": {"type": "string", "x-reference": "Pet"},
+                    "tag": {"type": "string"},
+                },
+                "required": ["name", "tag"],
+                "x-reference": "Pet",
+            },
+            id="allOf-inline",
+        ),
+        pytest.param(
+            {"$ref": "#/components/schemas/Owned"},
+            {
+                "schemas": {
+                    **PET_COMPONENTS["schemas"],
+                    "Owned": {
+                        "type": "object",
+                        "properties": {
+                            "pet": {"$ref": "#/components/schemas/Pet"},
+                            "note": {"type": "string"},
+                        },
+                    },
+                },
+            },
+            None,
+            {
+                "type": "object",
+                "properties": {
+                    "pet": EXPANDED_PET,
+                    "note": {"type": "string", "x-reference": "Owned"},
+                },
+                "x-reference": "Owned",
+            },
+            id="property-ref",
+        ),
+        pytest.param(
             {"type": "array", "items": {"$ref": "#/components/schemas/Pet"}},
             PET_COMPONENTS,
+            None,
             {"type": "array", "items": EXPANDED_PET},
             id="nested-ref",
         ),
         pytest.param(
             {"oneOf": [{"$ref": "#/components/schemas/Pet"}, {"type": "string"}]},
             PET_COMPONENTS,
+            None,
             {"oneOf": [EXPANDED_PET, {"type": "string"}]},
             id="list",
         ),
@@ -551,6 +601,7 @@ EXPANDED_PET = {
                 ]
             },
             {},
+            None,
             {
                 "properties": {
                     "name": {"description": "overridden"},
@@ -563,9 +614,13 @@ EXPANDED_PET = {
         pytest.param(
             {"$ref": "#/components/schemas/LoopA"},
             LOOP_COMPONENTS,
+            None,
             {
                 "type": "object",
-                "properties": {"fromB": {"type": "integer"}, "fromA": {"type": "string"}},
+                "properties": {
+                    "fromB": {"type": "integer", "x-reference": "LoopB"},
+                    "fromA": {"type": "string", "x-reference": "LoopA"},
+                },
                 "x-reference": "LoopA",
             },
             id="cycle",
@@ -573,25 +628,59 @@ EXPANDED_PET = {
         pytest.param(
             {"$ref": "#/components/schema/LoopC"},
             LOOP_COMPONENTS,
+            None,
             {},
             id="bad-ref",
         ),
         pytest.param(
             {"$ref": "#/components/schema/LoopC"},
             LOOP_COMPONENTS,
+            None,
             {},
             id="missing-ref",
         ),
         pytest.param(
             {"$ref": "#/components/schema/LoopA"},
             [],
+            None,
             {},
             id="bad-component",
         ),
+        pytest.param(
+            {"properties": []},
+            {},
+            "foo",
+            {"properties": []},
+            id="prop-list",
+        ),
+        pytest.param(
+            {"properties": {"name": []}},
+            {},
+            "foo",
+            {"properties": {"name": []}},
+            id="prop-value",
+        ),
+        pytest.param(
+            {"properties": {"a": {"type": "string"}, "b":{"typer": "integer"}}},
+            {},
+            "/foo/Bar",
+            {
+                "properties":{
+                    "a": {"type": "string", "x-reference": "Bar"},
+                    "b":{"typer": "integer", "x-reference": "Bar"},
+                },
+            },
+            id="name",
+        ),
     ],
 )
-def test_expand_schema(schema: dict[str, Any] | None, components: dict[str, Any], expected: dict[str, Any]) -> None:
-    assert expected == expand_schema(schema, components)
+def test_expand_schema(
+    schema: dict[str, Any] | None,
+    components: dict[str, Any],
+    name: str | None,
+    expected: dict[str, Any],
+) -> None:
+    assert expected == expand_schema(schema, components, name)
 
 
 def test_expand_schema_copies() -> None:

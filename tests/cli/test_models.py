@@ -50,10 +50,13 @@ ComposedPet:
     properties:
         id:
             type: integer
+            x-reference: Pet
         name:
             type: string
+            x-reference: Pet
         tag:
             type: string
+            x-reference: ComposedPet
     required:
     - name
     - tag
@@ -69,6 +72,17 @@ Pet:
             type: string
     type: object
 """
+MISC_MODEL_PET_EXPAND = """\
+Pet:
+    properties:
+        id:
+            type: integer
+            x-reference: Pet
+        name:
+            type: string
+            x-reference: Pet
+    type: object
+"""
 MISC_MODEL_COMPOSED_PET_REF = f"""\
 {MISC_MODEL_COMPOSED_PET_SHOW}\
 {MISC_MODEL_PET_SHOW}
@@ -76,14 +90,14 @@ MISC_MODEL_COMPOSED_PET_REF = f"""\
 
 MISC_MODEL_COMPOSED_PET_REF_EXPAND = f"""\
 {MISC_MODEL_COMPOSED_PET_EXPAND}\
-{MISC_MODEL_PET_SHOW}
+{MISC_MODEL_PET_EXPAND}
 """
 
 @pytest.mark.parametrize(
     ["filename", "model", "references", "expand", "expected"],
     [
         pytest.param(MISC2_YAML, "Pet", False, False, MISC_MODEL_PET_SHOW, id="basic"),
-        pytest.param(MISC2_YAML, "Pet", True, True, MISC_MODEL_PET_SHOW, id="no-refs"),
+        pytest.param(MISC2_YAML, "Pet", True, True, MISC_MODEL_PET_EXPAND, id="no-refs"),
         pytest.param(MISC2_YAML, "ComposedPet", False, False, MISC_MODEL_COMPOSED_PET_SHOW, id="complex"),
         pytest.param(MISC2_YAML, "ComposedPet", True, False, MISC_MODEL_COMPOSED_PET_REF, id="ref"),
         pytest.param(MISC2_YAML, "ComposedPet", False, True, MISC_MODEL_COMPOSED_PET_EXPAND, id="expand"),
