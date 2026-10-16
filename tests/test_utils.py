@@ -4,6 +4,8 @@ from typing import Any
 import pytest
 
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import _flatten_collection
+from openapi_spec_tools.utils import _flatten_collection_type
 from openapi_spec_tools.utils import _or
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
@@ -389,7 +391,11 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
         pytest.param({}, {}, id="empty"),
         pytest.param(
             {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]},
-            {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]},
+            {
+                "type": "object",
+                "properties": {"name": {"type": "string", "x-field": "name", "required": True}},
+                "required": ["name"],
+            },
             id="plain",
         ),
         pytest.param(
@@ -409,11 +415,13 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
                 "type": "object",
                 "description": "root",
                 "properties": {
-                    "id": {"type": "integer"},
+                    "id": {"type": "integer", "x-field": "id", "required": False},
                     "owner.name": {
                         "type": "string",
                         "description": "owner name",
                         "x-parents": ["owner"],
+                        "x-field": "name",
+                        "required": False,
                     },
                 },
             },
@@ -448,12 +456,27 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
                 "type": "object",
                 "required": ["id", "owner.name", "owner.home.street", "missing"],
                 "properties": {
-                    "id": {"type": "integer"},
-                    "owner.name": {"type": "string", "x-parents": ["owner"]},
-                    "owner.nickname": {"type": "string", "x-parents": ["owner"]},
-                    "owner.home.street": {"type": "string", "x-parents": ["owner", "home"]},
-                    "owner.home.city": {"type": "string", "x-parents": ["owner", "home"]},
-                    "tag": {"type": "string"},
+                    "id": {"type": "integer", "x-field": "id", "required": True},
+                    "owner.name": {"type": "string", "x-parents": ["owner"], "x-field": "name", "required": True},
+                    "owner.nickname": {
+                        "type": "string",
+                        "x-parents": ["owner"],
+                        "x-field": "nickname",
+                        "required": False,
+                    },
+                    "owner.home.street": {
+                        "type": "string",
+                        "x-parents": ["owner", "home"],
+                        "x-field": "street",
+                        "required": True,
+                    },
+                    "owner.home.city": {
+                        "type": "string",
+                        "x-parents": ["owner", "home"],
+                        "x-field": "city",
+                        "required": False,
+                    },
+                    "tag": {"type": "string", "x-field": "tag", "required": False},
                 },
             },
             id="nested-required",
@@ -475,8 +498,8 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
                 "type": "object",
                 "required": ["id"],
                 "properties": {
-                    "id": {"type": "integer"},
-                    "owner.name": {"type": "string", "x-parents": ["owner"]},
+                    "id": {"type": "integer", "x-field": "id", "required": True},
+                    "owner.name": {"type": "string", "x-parents": ["owner"], "x-field": "name", "required": False},
                 },
             },
             id="optional-parent",
@@ -495,7 +518,9 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
             {
                 "type": "object",
                 "required": [],
-                "properties": {"owner.name": {"type": "string", "x-parents": ["owner"]}},
+                "properties": {
+                    "owner.name": {"type": "string", "x-parents": ["owner"], "x-field": "name", "required": False},
+                },
             },
             id="required-parent-without-required-children",
         ),
@@ -522,20 +547,245 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
             {
                 "type": "object",
                 "properties": {
-                    "tags": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "required": ["meta.color"],
-                            "properties": {
-                                "meta.color": {"type": "string", "x-parents": ["meta"]},
-                            },
-                        },
+                    "tags.meta.color": {
+                        "type": "string",
+                        "x-parents": ["tags", "meta"],
+                        "x-field": "color",
+                        "x-forced-single": True,
+                        "required": False,
                     }
                 },
             },
             id="items",
         ),
+        pytest.param(
+            {
+                "type": "object",
+                "required": ["tags"],
+                "properties": {
+                    "id": {"type": "integer"},
+                    "tags": {
+                        "type": ["array", "null"],
+                        "items": {
+                            "type": "object",
+                            "required": ["name"],
+                            "properties": {
+                                "name": {"type": "string"},
+                                "color": {"type": "string"},
+                                "home": {
+                                    "type": "object",
+                                    "required": ["city"],
+                                    "properties": {
+                                        "city": {"type": "string"},
+                                        "street": {"type": "string"},
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    "labels": {"type": "array", "items": {"type": "string"}},
+                },
+            },
+            {
+                "type": "object",
+                "required": ["tags.name"],
+                "properties": {
+                    "id": {"type": "integer", "x-field": "id", "required": False},
+                    "tags.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": True,
+                    },
+                    "tags.color": {
+                        "type": "string",
+                        "x-field": "color",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "tags.home.city": {
+                        "type": "string",
+                        "x-field": "city",
+                        "x-parents": ["tags", "home"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "tags.home.street": {
+                        "type": "string",
+                        "x-field": "street",
+                        "x-parents": ["tags", "home"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "labels": {
+                        "type": "string",
+                        "x-collection": "array",
+                        "x-field": "labels",
+                        "required": False,
+                    },
+                },
+            },
+            id="complex-collection",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "labels": {"type": "array", "description": "Names", "items": {"type": "string"}},
+                    "flags": {"type": "array", "items": {"type": "boolean"}},
+                    "scores": {"type": "array", "items": {"type": "number", "format": "double"}},
+                    "ids": {"type": ["array", "null"], "items": {"type": "integer", "format": "int64"}},
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "labels": {
+                        "type": "string",
+                        "description": "Names",
+                        "x-collection": "array",
+                        "x-field": "labels",
+                        "required": False,
+                    },
+                    "flags": {
+                        "type": "boolean",
+                        "x-collection": "array",
+                        "x-field": "flags",
+                        "required": False,
+                    },
+                    "scores": {
+                        "type": "number",
+                        "format": "double",
+                        "x-collection": "array",
+                        "x-field": "scores",
+                        "required": False,
+                    },
+                    "ids": {
+                        "type": "integer",
+                        "format": "int64",
+                        "x-collection": "array",
+                        "x-field": "ids",
+                        "required": False,
+                    },
+                },
+            },
+            id="simple-array",
+        ),
+        pytest.param(
+            {
+                "description": "A pet",
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "required": ["name"],
+                        "properties": {
+                            "name": {"type": "string"},
+                            "home": {"type": "object", "properties": {"city": {"type": "string"}}},
+                        },
+                    },
+                    {"type": "string"},
+                ],
+            },
+            {
+                "description": "A pet",
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                    "name": {"type": "string", "x-field": "name", "required": True},
+                    "home.city": {
+                        "type": "string",
+                        "x-field": "city",
+                        "x-parents": ["home"],
+                        "required": False,
+                    },
+                },
+            },
+            id="oneOf",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "description": "Current status",
+                        "nullable": True,
+                        "oneOf": [
+                            {"type": "string", "enum": ["open", "closed"]},
+                            {"type": "integer"},
+                        ],
+                    },
+                    "label": {
+                        "description": "outer",
+                        "oneOf": [{"type": "string", "description": "inner"}],
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "description": "Current status",
+                        "nullable": True,
+                        "type": "string",
+                        "enum": ["open", "closed"],
+                        "x-field": "status",
+                        "required": False,
+                    },
+                    "label": {
+                        "description": "inner",
+                        "type": "string",
+                        "x-field": "label",
+                        "required": False,
+                    },
+                },
+            },
+            id="oneOf-property",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "pet": {
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "color": {"type": "string"},
+                                    },
+                                },
+                            },
+                            {"type": "string"},
+                        ]
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "pet.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["pet"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "pet.color": {
+                        "type": "string",
+                        "x-field": "color",
+                        "x-parents": ["pet"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                },
+            },
+            id="oneOf-collection",
+        ),
+        pytest.param({"oneOf": []}, {"oneOf": []}, id="empty-oneOf"),
         pytest.param(
             {
                 "allOf": [
@@ -552,7 +802,12 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
                     {
                         "type": "object",
                         "properties": {
-                            "home.city": {"type": "string", "x-parents": ["home"]},
+                            "home.city": {
+                                "type": "string",
+                                "x-parents": ["home"],
+                                "x-field": "city",
+                                "required": False,
+                            },
                         },
                     }
                 ]
@@ -570,8 +825,13 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
             {
                 "type": "object",
                 "properties": {
-                    "extra": {"type": "object", "additionalProperties": {"type": "string"}},
-                    "empty": {"type": "object", "properties": {}},
+                    "extra": {
+                        "type": "object",
+                        "additionalProperties": {"type": "string"},
+                        "x-field": "extra",
+                        "required": False,
+                    },
+                    "empty": {"type": "object", "properties": {}, "x-field": "empty", "required": False},
                 },
             },
             id="no-cascaded-properties",
@@ -589,7 +849,12 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
             },
             {
                 "properties": {
-                    "owner.home.city": {"type": "string", "x-parents": ["owner", "home"]},
+                    "owner.home.city": {
+                        "type": "string",
+                        "x-parents": ["owner", "home"],
+                        "x-field": "city",
+                        "required": False,
+                    },
                     "owner.name": "bad",
                 }
             },
@@ -597,8 +862,80 @@ def test_find_paths(filename, search, subpaths, expected) -> None:
         ),
         pytest.param(
             {"properties": {"owner": {"properties": {"city": {"type": "string", "x-parents": "home"}}}}},
-            {"properties": {"owner.city": {"type": "string", "x-parents": ["owner", "home"]}}},
+            {
+                "properties": {
+                    "owner.city": {
+                        "type": "string",
+                        "x-parents": ["owner", "home"],
+                        "x-field": "city",
+                        "required": False,
+                    },
+                },
+            },
             id="scalar-parents",
+        ),
+        pytest.param(
+            {
+                "$ref": "#/components/schemas/Owner",
+                "x-reference": "Owner",
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "home": {
+                        "$ref": "#/components/schemas/Address",
+                        "type": "object",
+                        "properties": {
+                            "street": {"type": "string"},
+                            "zip_code": {"$ref": "#/components/schemas/ZipCode", "type": "string"},
+                        },
+                    },
+                },
+            },
+            {
+                "$ref": "#/components/schemas/Owner",
+                "x-reference": "Owner",
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "x-field": "name", "x-reference": "Owner", "required": False},
+                    "home.street": {
+                        "type": "string",
+                        "x-field": "street",
+                        "x-parents": ["home"],
+                        "x-reference": "Address",
+                        "required": False,
+                    },
+                    "home.zip_code": {
+                        "$ref": "#/components/schemas/ZipCode",
+                        "type": "string",
+                        "x-field": "zip_code",
+                        "x-parents": ["home"],
+                        "x-reference": "ZipCode",
+                        "required": False,
+                    },
+                },
+            },
+            id="lowest-ref",
+        ),
+        pytest.param(
+            {
+                "x-reference": "Owner",
+                "properties": {
+                    "home": {"type": "object", "properties": {"city": {"type": "string"}}},
+                },
+            },
+            {
+                "x-reference": "Owner",
+                "properties": {
+                    "home.city": {
+                        "type": "string",
+                        "x-field": "city",
+                        "x-parents": ["home"],
+                        "x-reference": "Owner",
+                        "required": False,
+                    },
+                },
+            },
+            id="inherited-ref",
         ),
     ],
 )
@@ -634,6 +971,45 @@ def test_flatten_schema_copies() -> None:
     flattened["properties"]["owner.name"]["type"] = "integer"
     flattened["required"].append("extra")
     assert schema == original
+
+
+@pytest.mark.parametrize(
+    ["model", "expected"],
+    [
+        pytest.param({"type": "array"}, "array", id="simple"),
+        pytest.param({"type": "number"}, None, id="type-str"),
+        pytest.param({"type": {"array"}}, None, id="type-set"),
+        pytest.param({"type": ["null", "array"]}, "array", id="list-null"),
+        pytest.param({"type": ["foo", "array"]}, None, id="list-unknown"),
+    ]
+)
+def test__flatten_collection_type(model: dict[str, Any], expected: str | None) -> None:
+    assert expected == _flatten_collection_type(model)
+
+
+@pytest.mark.parametrize(
+    ["model", "updated", "expected"],
+    [
+        pytest.param({}, {}, False, id="empty"),
+        pytest.param({"type": "string"}, {"type": "string"}, False, id="no-update"),
+        pytest.param({"type": "array"}, {"type": "array"}, False, id="no-item"),
+        pytest.param(
+            {"type": "array", "items": ["string"]},
+            {"type": "array", "items": ["string"]},
+            False,
+            id="non-dict-items",
+        ),
+        pytest.param(
+            {"type": "array", "items": {"type": "string"}, "description": "simple"},
+            {"type": "string", "x-collection": "array", "description": "simple"},
+            True,
+            id="simple",
+        ),
+    ]
+)
+def test__flatten_collection(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
+    assert expected == _flatten_collection(model)
+    assert model == updated
 
 
 def path_tag_count(schema: dict[str, Any]) -> int:
