@@ -4,9 +4,11 @@ from copy import deepcopy
 from typing import Any
 
 from openapi_spec_tools.constants import NULL_TYPES
-from openapi_spec_tools.constants import SIMPLE_TYPES
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import reference_classname
+
+# NOTE: the 'integer' and 'float' values are not standard anymore, but were used a long time ago
+SIMPLE_TYPES = {'string', 'boolean', 'number', 'integer', 'float'}
 
 
 def _flatten_reference_name(model: dict[str, Any]) -> str | None:
