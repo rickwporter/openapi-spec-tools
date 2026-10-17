@@ -211,7 +211,7 @@ from openapi_spec_tools.flatten import flatten_schema
             },
             {
                 "type": "object",
-                "required": ["tags.name"],
+                "required": [],
                 "properties": {
                     "id": {"type": "integer", "x-field": "id", "required": False},
                     "tags.name": {
@@ -219,7 +219,7 @@ from openapi_spec_tools.flatten import flatten_schema
                         "x-field": "name",
                         "x-parents": ["tags"],
                         "x-forced-single": True,
-                        "required": True,
+                        "required": False,
                     },
                     "tags.color": {
                         "type": "string",
@@ -563,7 +563,8 @@ from openapi_spec_tools.flatten import flatten_schema
     ],
 )
 def test_flatten_schema(schema: dict[str, Any] | None, expected: dict[str, Any]) -> None:
-    assert expected == flatten_schema(schema)
+    flattened = flatten_schema(schema)
+    assert expected == flattened
 
 
 def test_flatten_schema_copies() -> None:
@@ -628,10 +629,14 @@ def test__flatten_collection_type(model: dict[str, Any], expected: str | None) -
             True,
             id="simple",
         ),
+        pytest.param(
+            {"type": "array", "items": {"oneOf": [{"type": "string"}, {"type": "number"}]}, "x-some": "value"},
+            {"type": "string", "x-collection": "array", "x-some": "value"},
+            True,
+            id="one-of",
+        ),
     ]
 )
 def test__flatten_collection(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
     assert expected == _flatten_collection(model)
     assert model == updated
-
-

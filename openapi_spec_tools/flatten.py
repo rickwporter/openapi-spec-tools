@@ -106,9 +106,14 @@ def _flatten_collection(model: dict[str, Any]) -> bool:
     items = model.get(OasField.ITEMS)
     if not isinstance(items, dict) or items is model:
         return False
-    # while _flatten_apply_one_of(items):
-    #     pass
+    while _flatten_apply_one_of(items):
+        pass
     simple = _flatten_items_are_simple(items)
+
+    # if the collection is not requred, the items in the collections cannot be
+    required = model.get(OasField.REQUIRED, False)
+    if not required and OasField.REQUIRED.value in items:
+        items[OasField.REQUIRED.value] = False
 
     model.pop(OasField.ITEMS.value, None)
     model.pop(OasField.TYPE.value, None)
@@ -182,8 +187,11 @@ def _flatten_apply_one_of(model: dict[str, Any]) -> bool:
 
 def _flatten_model(model: dict[str, Any], ancestor_required: bool = True) -> dict[str, Any]:
     """Flatten one schema, hoisting cascaded properties into the parent map."""
-    _flatten_apply_one_of(model)
-    _flatten_collection(model)
+    if _flatten_apply_one_of(model):
+        return _flatten_model(model)
+
+    if _flatten_collection(model):
+        return _flatten_model(model)
 
     for key, value in list(model.items()):
         if key == OasField.PROPS:
