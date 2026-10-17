@@ -4,6 +4,7 @@ from typing import Any
 
 from openapi_spec_tools.base_gen import simple_escape
 from openapi_spec_tools.base_gen import to_snake_case
+from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.layout.config import LayoutConfig
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
@@ -12,7 +13,6 @@ from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import _or
-from openapi_spec_tools.utils import expand_schema
 
 CREATE = "create"
 DELETE = "delete"

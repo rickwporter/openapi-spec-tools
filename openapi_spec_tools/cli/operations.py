@@ -13,9 +13,9 @@ from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import remove_dict_prefix
+from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import expand_schema
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
