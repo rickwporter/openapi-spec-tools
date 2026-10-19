@@ -23,6 +23,7 @@ The FastAPI implementation is multi-threaded, and the "database" operations are 
 
 The primary means of running the server is through the use of a Docker container.
 This simplifies dependencies between `openapi-spec-tools` and the server.
+The `make gen` creates the server code and must be run once before running the server. 
 The `make run` target will start the server in the foreground, so you can run the `pets-cli` example.
 
 Here are some instructions for using the server with the `pets-cli`.

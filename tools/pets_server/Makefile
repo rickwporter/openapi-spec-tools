@@ -54,7 +54,6 @@ regen: rmgen gen ## Regenerate the server code
 rmgen: ## Removes the previously generated server code
 	rm -rf $(gen_dir)
 
-$(gen_dir): gen
 gen: ## Generate the server code
 	$(DOCKER_CMD) run $(gen_container_args) $(openapi_gen_image) generate $(openapi_gen_args) > $(gen_log)
 	cp $(impl_src) $(impl_dest)
@@ -67,5 +66,5 @@ else
 	$(DOCKER_CMD) pull $(openapi_gen_image)
 endif
 
-run: $(gen_dir) ## Run generated server in container
+run: ## Run generated server in container
 	cd $(gen_dir) && $(DOCKER_CMD) compose up --build
