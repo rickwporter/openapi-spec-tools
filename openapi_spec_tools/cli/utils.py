@@ -12,6 +12,9 @@ from rich import print
 from rich.console import Console
 
 from openapi_spec_tools.base_gen import GeneratorConfig
+from openapi_spec_tools.cli.arguments import ExpansionType
+from openapi_spec_tools.expand import expand_schema
+from openapi_spec_tools.flatten import flatten_schema
 from openapi_spec_tools.layout import LayoutConfig
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.layout import file_to_tree
@@ -203,3 +206,24 @@ def console_factory() -> Console:
     elif pytest_version is not None:
         width = 3000
     return Console(width=width)
+
+
+def perform_expansion(
+    expansion: ExpansionType,
+    schema: dict[str, Any],
+    components: dict[str, Any],
+    name: str | None,
+) -> dict[str, Any]:
+    """Perform the specified ExpansionType on the schema.
+
+    This utility avoids repeated code in several CLI functions.
+    """
+    if expansion == ExpansionType.NONE:
+        return schema
+
+    expanded = expand_schema(schema, components=components, reference=name)
+    if expansion == ExpansionType.EXPAND:
+        return expanded
+
+    # this is for ExpansionType.FLATTEN
+    return flatten_schema(expanded)

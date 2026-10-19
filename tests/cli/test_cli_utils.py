@@ -8,12 +8,14 @@ import pytest
 import typer
 
 from openapi_spec_tools.base_gen import GeneratorConfig
+from openapi_spec_tools.cli.arguments import ExpansionType
 from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import gen_config_from_file
 from openapi_spec_tools.cli.utils import layout_config_from_file
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.utils import perform_expansion
 from openapi_spec_tools.cli.utils import remove_dict_prefix
 from openapi_spec_tools.cli.utils import remove_list_prefix
 from openapi_spec_tools.layout import LayoutConfig
@@ -215,3 +217,35 @@ def test_remove_list_prefix(items, expected) -> None:
 )
 def test_remove_dict_prefix(map, expected) -> None:
     assert expected == remove_dict_prefix(map)
+
+
+def test_perform_expansion() -> None:
+    components = {
+        "schemas": {
+            "Owner": {
+                "type": "object",
+                "properties": {"name": {"type": "string"}},
+                "required": ["name"],
+            }
+        }
+    }
+    schema = {"type": "object", "properties": {"owner": {"$ref": "#/components/schemas/Owner"}}}
+
+    assert perform_expansion(ExpansionType.NONE, schema, components, "schemas/Pet") is schema
+
+    expanded = perform_expansion(ExpansionType.EXPAND, schema, components, "schemas/Pet")
+    owner = expanded["properties"]["owner"]
+    assert owner["x-reference"] == "Owner"
+    assert owner["properties"]["name"]["type"] == "string"
+    assert "$ref" not in owner
+
+    flat = perform_expansion(ExpansionType.FLATTEN, schema, components, "schemas/Pet")
+    assert "owner" not in flat["properties"]
+    assert flat["properties"]["owner.name"] == {
+        "type": "string",
+        "x-reference": "Owner",
+        "required": False,
+        "x-parents": ["owner"],
+        "x-field": "name",
+    }
+    assert schema["properties"]["owner"] == {"$ref": "#/components/schemas/Owner"}

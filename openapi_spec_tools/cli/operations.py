@@ -6,14 +6,14 @@ import typer
 import yaml
 from rich_objects import console_factory
 
-from openapi_spec_tools.cli.arguments import ExpandOption
+from openapi_spec_tools.cli.arguments import ExpansionOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.utils import perform_expansion
 from openapi_spec_tools.cli.utils import remove_dict_prefix
-from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import find_references
@@ -124,7 +124,7 @@ def operation_models(
 def operations_parameters(
     filename: OpenApiFilenameArgument,
     operation_name: OperationNameArgument,
-    expand: ExpandOption = False,
+    expansion: ExpansionOption = "none",
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -145,9 +145,8 @@ def operations_parameters(
         console.print(f"{operation_name} has no parameters")
         return
 
-    if expand:
-        components = spec.get(OasField.COMPONENTS, {})
-        params = [expand_schema(item, components) for item in params]
+    components = spec.get(OasField.COMPONENTS, {})
+    params = [perform_expansion(expansion, item, components, None) for item in params]
 
     title = f"Found {operation_name} parameters:"
     text = INDENT + yaml.dump(params, indent=len(INDENT)).replace("\n", "\n" + INDENT)
@@ -160,7 +159,7 @@ def operations_parameters(
 def operation_request_body(
     filename: OpenApiFilenameArgument,
     operation_name: OperationNameArgument,
-    expand: ExpandOption = False,
+    expansion: ExpansionOption = "none",
     content_type: ContentTypeOption = None,
     log_level: LogLevelOption = "info",
 ) -> None:
@@ -192,9 +191,8 @@ def operation_request_body(
         content_msg = "standard" if not content_type else content_type
         error_out(f"no {content_msg} content found for {operation_name}")
 
-    if expand:
-        components = spec.get(OasField.COMPONENTS, {})
-        found = expand_schema(schema=found, components=components)
+    components = spec.get(OasField.COMPONENTS, {})
+    found = perform_expansion(expansion, found, components, None)
 
     required = "required " if body.get(OasField.REQUIRED, False) else ""
     title = f"Found {operation_name} {required}request-body ({content_type}):"
@@ -209,7 +207,7 @@ def operation_request_body(
 def operation_response_body(
     filename: OpenApiFilenameArgument,
     operation_name: OperationNameArgument,
-    expand: ExpandOption = False,
+    expansion: ExpansionOption = "none",
     content_type: ContentTypeOption = None,
     response_code: Annotated[
         str | None,
@@ -268,9 +266,8 @@ def operation_response_body(
         rtype = "successful" if not response_code else response_code
         error_out(f"no {rtype} {ctype} response found for {operation_name}")
 
-    if expand:
-        components = spec.get(OasField.COMPONENTS, {})
-        found_schema = expand_schema(schema=found_schema, components=components)
+    components = spec.get(OasField.COMPONENTS, {})
+    found_schema = perform_expansion(expansion, found_schema, components, None)
 
     title = f"Found {operation_name} {found_code} response{found_type}:"
     text = INDENT + yaml.dump(found_schema, indent=len(INDENT)).replace("\n", "\n" + INDENT)
