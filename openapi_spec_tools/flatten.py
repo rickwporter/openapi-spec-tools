@@ -74,6 +74,29 @@ def _flatten_mark_required(prop: Any, required: bool) -> Any:
     return prop
 
 
+# Nested schemas that represent child properties, and so inherit ``readOnly``.
+_READ_ONLY_SCHEMA_FIELDS = frozenset(
+    {
+        OasField.ADDITIONAL_PROPS,
+        OasField.ALL_OF,
+        OasField.ANY_OF,
+        OasField.ITEMS,
+        OasField.ONE_OF,
+    }
+)
+
+
+def _flatten_is_read_only(model: Any) -> bool:
+    """Return whether ``model`` sets ``readOnly`` to true."""
+    return isinstance(model, dict) and model.get(OasField.READ_ONLY) is True
+
+
+def _flatten_merge_read_only(model: dict[str, Any], parent_read_only: bool, child: Any) -> None:
+    """Keep ``readOnly`` true when either merged schema is read-only."""
+    if parent_read_only or _flatten_is_read_only(child):
+        model[OasField.READ_ONLY.value] = True
+
+
 def _flatten_collection_type(model: dict[str, Any]) -> str | None:
     """Return ``array`` when the schema is an array, including a nullable array."""
     schema_type = model.get(OasField.TYPE)
@@ -99,6 +122,7 @@ def _flatten_collection(model: dict[str, Any]) -> bool:
     """Treat an array of complex items as one item.
 
     The item schema replaces the array. ``x-forced-single`` is set and ``x-collection`` is omitted.
+    ``readOnly`` true on the array or the items schema is kept.
     """
     collection_type = _flatten_collection_type(model)
     if collection_type is None:
@@ -115,9 +139,11 @@ def _flatten_collection(model: dict[str, Any]) -> bool:
     if not required and OasField.REQUIRED.value in items:
         items[OasField.REQUIRED.value] = False
 
+    parent_read_only = _flatten_is_read_only(model)
     model.pop(OasField.ITEMS.value, None)
     model.pop(OasField.TYPE.value, None)
     model.update(items)
+    _flatten_merge_read_only(model, parent_read_only, items)
     if simple:
         model.pop(OasField.X_SINGLE.value, None)
         model[OasField.X_COLLECT.value] = collection_type
@@ -134,12 +160,12 @@ def _flatten_mark_single(prop: Any, forced_single: bool) -> Any:
     return prop
 
 
-def _flatten_value(value: Any) -> Any:
+def _flatten_value(value: Any, ancestor_read_only: bool = False) -> Any:
     """Flatten schemas contained in a dict or list."""
     if isinstance(value, dict):
-        return _flatten_model(value)
+        return _flatten_model(value, ancestor_read_only=ancestor_read_only)
     if isinstance(value, list):
-        return [_flatten_value(item) for item in value]
+        return [_flatten_value(item, ancestor_read_only) for item in value]
     return value
 
 
@@ -149,13 +175,21 @@ def _flatten_properties(
     required_names: set[str],
     ancestor_required: bool,
     forced_single: bool,
+    ancestor_read_only: bool,
 ) -> tuple[dict[str, Any], dict[str, list[str]]]:
-    """Return flattened properties and the required-name replacements."""
+    """Return flattened properties and the required-name replacements.
+
+    ``ancestor_read_only`` true is copied onto every property.
+    """
     flat: dict[str, Any] = {}
     replacements: dict[str, list[str]] = {}
     for name, raw_prop in properties.items():
         level_required = ancestor_required and name in required_names
-        prop = _flatten_model(raw_prop, level_required) if isinstance(raw_prop, dict) else raw_prop
+        prop = (
+            _flatten_model(raw_prop, level_required, ancestor_read_only)
+            if isinstance(raw_prop, dict)
+            else raw_prop
+        )
         nested = prop.get(OasField.PROPS) if isinstance(prop, dict) else None
         if isinstance(nested, dict) and nested:
             replacements[name] = _flatten_prefixed_required(name, prop)
@@ -174,29 +208,40 @@ def _flatten_apply_one_of(model: dict[str, Any]) -> bool:
     """Merge the first ``oneOf`` schema onto ``model``.
 
     Keys already on ``model`` stay when the chosen item does not set them.
+    ``readOnly`` true on either schema is kept.
     """
     one_of = model.get(OasField.ONE_OF)
     if not isinstance(one_of, list) or not one_of or not isinstance(one_of[0], dict):
         return False
 
     chosen = one_of[0]
+    parent_read_only = _flatten_is_read_only(model)
     model.pop(OasField.ONE_OF.value, None)
     model.update(chosen)
+    _flatten_merge_read_only(model, parent_read_only, chosen)
     return True
 
 
-def _flatten_model(model: dict[str, Any], ancestor_required: bool = True) -> dict[str, Any]:
+def _flatten_model(
+    model: dict[str, Any],
+    ancestor_required: bool = True,
+    ancestor_read_only: bool = False,
+) -> dict[str, Any]:
     """Flatten one schema, hoisting cascaded properties into the parent map."""
+    if ancestor_read_only:
+        model[OasField.READ_ONLY.value] = True
+
     if _flatten_apply_one_of(model):
         return _flatten_model(model)
 
     if _flatten_collection(model):
         return _flatten_model(model)
 
+    read_only = _flatten_is_read_only(model)
     for key, value in list(model.items()):
         if key == OasField.PROPS:
             continue
-        model[key] = _flatten_value(value)
+        model[key] = _flatten_value(value, read_only and key in _READ_ONLY_SCHEMA_FIELDS)
 
     properties = model.get(OasField.PROPS)
     required = model.get(OasField.REQUIRED)
@@ -208,6 +253,7 @@ def _flatten_model(model: dict[str, Any], ancestor_required: bool = True) -> dic
             required_names,
             ancestor_required,
             bool(model.get(OasField.X_SINGLE)),
+            read_only,
         )
         model[OasField.PROPS.value] = flat
         if isinstance(required, list):
@@ -228,8 +274,11 @@ def flatten_schema(schema: dict[str, Any] | None) -> dict[str, Any]:
     property name, so ``home.address.zip_code`` records ``zip_code``. ``x-reference`` is the
     ``reference_classname()`` name of the lowest-level ``$ref`` class that contains the property.
     A property's ``required`` value is true only when that property and every ancestor are required.
-    A schema with ``oneOf`` uses the first item in that list. Keys already on the schema remain
-    when that item does not set them, so a description carries through. An array of complex items
+    ``readOnly`` true on a schema or property is copied onto every nested property. ``readOnly`` false
+    is not copied downward. A property that sets ``readOnly`` true stays read-only when its parent is
+    false or omits ``readOnly``. A schema with ``oneOf`` uses the first item in that list. Keys already
+    on the schema remain when that item does not set them, so a description carries through. An array
+    of complex items
     is replaced by one item schema, marked ``x-forced-single``, and does not record ``x-collection``.
     An array of a simple type, such as string, boolean, number, or integer, takes that items type,
     drops ``items``, and records ``x-collection`` as ``array``. Schemas nested in other fields are

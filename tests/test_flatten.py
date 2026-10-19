@@ -560,6 +560,349 @@ from openapi_spec_tools.flatten import flatten_schema
             },
             id="inherited-ref",
         ),
+        pytest.param(
+            {
+                "type": "object",
+                "readOnly": True,
+                "example": {"name": "ada"},
+                "additionalProperties": {"type": "string"},
+                "properties": {
+                    "id": {"type": "integer", "readOnly": False},
+                    "owner": {
+                        "type": "object",
+                        "readOnly": False,
+                        "properties": {
+                            "name": {"type": "string"},
+                            "home": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string", "readOnly": False}},
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "readOnly": True,
+                "example": {"name": "ada"},
+                "additionalProperties": {"type": "string", "readOnly": True},
+                "properties": {
+                    "id": {"type": "integer", "readOnly": True, "x-field": "id", "required": False},
+                    "owner.name": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-parents": ["owner"],
+                        "x-field": "name",
+                        "required": False,
+                    },
+                    "owner.home.city": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-parents": ["owner", "home"],
+                        "x-field": "city",
+                        "required": False,
+                    },
+                },
+            },
+            id="read-only-propagates",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "home": {
+                                "type": "object",
+                                "readOnly": True,
+                                "properties": {
+                                    "city": {"type": "string"},
+                                    "zip": {"type": "string", "readOnly": False},
+                                },
+                            },
+                        },
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "owner.name": {
+                        "type": "string",
+                        "x-parents": ["owner"],
+                        "x-field": "name",
+                        "required": False,
+                    },
+                    "owner.home.city": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-parents": ["owner", "home"],
+                        "x-field": "city",
+                        "required": False,
+                    },
+                    "owner.home.zip": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-parents": ["owner", "home"],
+                        "x-field": "zip",
+                        "required": False,
+                    },
+                },
+            },
+            id="read-only-nested",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "readOnly": False,
+                "properties": {
+                    "id": {"type": "integer", "readOnly": True},
+                    "name": {"type": "string"},
+                    "title": {"type": "string", "readOnly": False},
+                    "owner": {
+                        "type": "object",
+                        "readOnly": False,
+                        "properties": {
+                            "nickname": {"type": "string", "readOnly": True},
+                            "alias": {"type": "string"},
+                        },
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "readOnly": False,
+                "properties": {
+                    "id": {"type": "integer", "readOnly": True, "x-field": "id", "required": False},
+                    "name": {"type": "string", "x-field": "name", "required": False},
+                    "title": {"type": "string", "readOnly": False, "x-field": "title", "required": False},
+                    "owner.nickname": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-parents": ["owner"],
+                        "x-field": "nickname",
+                        "required": False,
+                    },
+                    "owner.alias": {
+                        "type": "string",
+                        "x-parents": ["owner"],
+                        "x-field": "alias",
+                        "required": False,
+                    },
+                },
+            },
+            id="read-only-child-overrides",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "tags": {
+                        "type": "array",
+                        "readOnly": True,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string", "readOnly": False},
+                                "color": {"type": "string"},
+                            },
+                        },
+                    },
+                    "notes": {
+                        "type": "array",
+                        "readOnly": False,
+                        "items": {
+                            "type": "object",
+                            "readOnly": True,
+                            "properties": {"text": {"type": "string"}},
+                        },
+                    },
+                    "labels": {
+                        "type": "array",
+                        "readOnly": False,
+                        "items": {"type": "string", "readOnly": True},
+                    },
+                    "flags": {
+                        "type": "array",
+                        "readOnly": True,
+                        "items": {"type": "boolean", "readOnly": False},
+                    },
+                    "scores": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "value": {"type": "number"},
+                                "secret": {"type": "string", "readOnly": True},
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "tags.name": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-field": "name",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "tags.color": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-field": "color",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "notes.text": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-field": "text",
+                        "x-parents": ["notes"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "labels": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-collection": "array",
+                        "x-field": "labels",
+                        "required": False,
+                    },
+                    "flags": {
+                        "type": "boolean",
+                        "readOnly": True,
+                        "x-collection": "array",
+                        "x-field": "flags",
+                        "required": False,
+                    },
+                    "scores.value": {
+                        "type": "number",
+                        "x-field": "value",
+                        "x-parents": ["scores"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "scores.secret": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-field": "secret",
+                        "x-parents": ["scores"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                },
+            },
+            id="read-only-collection",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "description": "Current status",
+                        "readOnly": True,
+                        "oneOf": [
+                            {"type": "string", "readOnly": False, "enum": ["open", "closed"]},
+                            {"type": "integer"},
+                        ],
+                    },
+                    "label": {
+                        "readOnly": False,
+                        "oneOf": [{"type": "string", "readOnly": True}],
+                    },
+                    "pet": {
+                        "oneOf": [
+                            {
+                                "type": "object",
+                                "readOnly": True,
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "color": {"type": "string", "readOnly": False},
+                                },
+                            }
+                        ]
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "description": "Current status",
+                        "readOnly": True,
+                        "type": "string",
+                        "enum": ["open", "closed"],
+                        "x-field": "status",
+                        "required": False,
+                    },
+                    "label": {"type": "string", "readOnly": True, "x-field": "label", "required": False},
+                    "pet.name": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-field": "name",
+                        "x-parents": ["pet"],
+                        "required": False,
+                    },
+                    "pet.color": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-field": "color",
+                        "x-parents": ["pet"],
+                        "required": False,
+                    },
+                },
+            },
+            id="read-only-one-of",
+        ),
+        pytest.param(
+            {
+                "readOnly": True,
+                "allOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "home": {
+                                "type": "object",
+                                "properties": {"city": {"type": "string", "readOnly": False}},
+                            },
+                        },
+                    }
+                ],
+            },
+            {
+                "readOnly": True,
+                "allOf": [
+                    {
+                        "type": "object",
+                        "readOnly": True,
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "readOnly": True,
+                                "x-field": "name",
+                                "required": False,
+                            },
+                            "home.city": {
+                                "type": "string",
+                                "readOnly": True,
+                                "x-parents": ["home"],
+                                "x-field": "city",
+                                "required": False,
+                            },
+                        },
+                    }
+                ],
+            },
+            id="read-only-all-of",
+        ),
     ],
 )
 def test_flatten_schema(schema: dict[str, Any] | None, expected: dict[str, Any]) -> None:
