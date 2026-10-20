@@ -19,6 +19,14 @@ class LogLevel(str, Enum):
     DEBUG = "debug"
 
 
+class ExpansionType(str, Enum):
+    """Type of expansion to perform."""
+
+    NONE = "none"
+    EXPAND = "expand"
+    FLATTEN = "flatten"
+
+
 CodeDirectoryOption = Annotated[
     str | None,
     typer.Option("--code-dir", metavar=DIRECTORY, show_default=False, help="Directory for code -- overrides default")
@@ -27,7 +35,17 @@ ConfigFileOption = Annotated[
     str | None,
     typer.Option("--config", metavar=FILENAME, show_default=False, help="Generator configuration file")
 ]
-ExpandOption = Annotated[bool, typer.Option("--expand", help="Expand the references and allOf fields")]
+ExpansionOption = Annotated[
+    ExpansionType,
+    typer.Option(
+        "--expansion",
+        case_sensitive=False,
+        help=(
+            "Level of expansion to display: 'expand' resolve '$ref' and 'allOf' properties;"
+            " 'flatten' unnests sub-object properties."
+        ),
+    ),
+]
 IndentOption = Annotated[
     int,
     typer.Option(

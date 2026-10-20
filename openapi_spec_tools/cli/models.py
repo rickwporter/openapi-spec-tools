@@ -6,15 +6,15 @@ import typer
 import yaml
 from rich_objects import console_factory
 
-from openapi_spec_tools.cli.arguments import ExpandOption
+from openapi_spec_tools.cli.arguments import ExpansionOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.cli.utils import perform_expansion
 from openapi_spec_tools.cli.utils import remove_dict_prefix
 from openapi_spec_tools.cli.utils import remove_list_prefix
-from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_models
@@ -68,7 +68,7 @@ def models_show(
     filename: OpenApiFilenameArgument,
     model_name: ModelNameArgument,
     include_referenced: Annotated[bool, typer.Option("--references", help="Include referenced models")] = False,
-    expand: ExpandOption = False,
+    expansion: ExpansionOption = "none",
     log_level: LogLevelOption = "info",
 ) -> None:
     logger = init_logging(log_level, LOG_CLASS)
@@ -86,8 +86,7 @@ def models_show(
     else:
         models = model_filter(models, {full_name})
 
-    if expand:
-        models = {name: expand_schema(schema, components, name) for name, schema in models.items()}
+    models = {name: perform_expansion(expansion, schema, components, name) for name, schema in models.items()}
 
     models = remove_dict_prefix(models)
     console = console_factory()

@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 import typer
 
+from openapi_spec_tools.cli.arguments import ExpansionType
 from openapi_spec_tools.cli.operations import operation_list
 from openapi_spec_tools.cli.operations import operation_models
 from openapi_spec_tools.cli.operations import operation_request_body
@@ -205,7 +206,7 @@ x-reference: Ok
         ),
         pytest.param(
             "expandRequest",
-            {"expand": True},
+            {"expansion": ExpansionType.EXPAND},
             "Found expandRequest required request-body (application/json):",
             WIDGET_EXPANDED,
             id="expanded",
@@ -335,14 +336,14 @@ def test_operation_request_body_failure(
         ),
         pytest.param(
             "refResponse",
-            {"expand": True},
+            {"expansion": ExpansionType.EXPAND},
             "Found refResponse 200 response:",
             REF_RESPONSE_SCHEMA,
             id="ref-expand",
         ),
         pytest.param(
             "expandRequest",
-            {"expand": True, "response_code": "default"},
+            {"expansion": ExpansionType.EXPAND, "response_code": "default"},
             "Found expandRequest default response (application/json):",
             WIDGET_EXPANDED,
             id="expand-error",
@@ -561,7 +562,7 @@ WITH_PARAMS_EXPANDED = """\
         pytest.param(
             BODY_YAML,
             "withParams",
-            {"expand": True},
+            {"expansion": ExpansionType.EXPAND},
             printed_schema("Found withParams parameters:", WITH_PARAMS_EXPANDED),
             id="expanded",
         ),

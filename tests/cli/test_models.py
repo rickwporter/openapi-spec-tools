@@ -3,6 +3,7 @@ from unittest import mock
 import pytest
 import typer
 
+from openapi_spec_tools.cli.arguments import ExpansionType
 from openapi_spec_tools.cli.models import models_list
 from openapi_spec_tools.cli.models import models_operations
 from openapi_spec_tools.cli.models import models_show
@@ -94,19 +95,23 @@ MISC_MODEL_COMPOSED_PET_REF_EXPAND = f"""\
 """
 
 @pytest.mark.parametrize(
-    ["filename", "model", "references", "expand", "expected"],
+    ["filename", "model", "references", "expansion", "expected"],
     [
-        pytest.param(MISC2_YAML, "Pet", False, False, MISC_MODEL_PET_SHOW, id="basic"),
-        pytest.param(MISC2_YAML, "Pet", True, True, MISC_MODEL_PET_EXPAND, id="no-refs"),
-        pytest.param(MISC2_YAML, "ComposedPet", False, False, MISC_MODEL_COMPOSED_PET_SHOW, id="complex"),
-        pytest.param(MISC2_YAML, "ComposedPet", True, False, MISC_MODEL_COMPOSED_PET_REF, id="ref"),
-        pytest.param(MISC2_YAML, "ComposedPet", False, True, MISC_MODEL_COMPOSED_PET_EXPAND, id="expand"),
-        pytest.param(MISC2_YAML, "ComposedPet", True, True, MISC_MODEL_COMPOSED_PET_REF_EXPAND, id="ref-expand"),
+        pytest.param(MISC2_YAML, "Pet", False, ExpansionType.NONE, MISC_MODEL_PET_SHOW, id="basic"),
+        pytest.param(MISC2_YAML, "Pet", True, ExpansionType.EXPAND, MISC_MODEL_PET_EXPAND, id="no-refs"),
+        pytest.param(MISC2_YAML, "ComposedPet", False, ExpansionType.NONE, MISC_MODEL_COMPOSED_PET_SHOW, id="complex"),
+        pytest.param(MISC2_YAML, "ComposedPet", True, ExpansionType.NONE, MISC_MODEL_COMPOSED_PET_REF, id="ref"),
+        pytest.param(
+            MISC2_YAML, "ComposedPet", False, ExpansionType.EXPAND, MISC_MODEL_COMPOSED_PET_EXPAND, id="expand",
+        ),
+        pytest.param(
+            MISC2_YAML, "ComposedPet", True, ExpansionType.EXPAND, MISC_MODEL_COMPOSED_PET_REF_EXPAND, id="ref-expand",
+        ),
     ]
 )
-def test_models_show_success(filename, model, references, expand, expected) -> None:
+def test_models_show_success(filename, model, references, expansion, expected) -> None:
     with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
-        models_show(filename, model, include_referenced=references, expand=expand)
+        models_show(filename, model, include_referenced=references, expansion=expansion)
 
         output = mock_stdout.getvalue()
         assert output.rstrip() == expected.rstrip()
