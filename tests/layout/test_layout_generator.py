@@ -192,7 +192,7 @@ COMPOSED_LOOP = {
         pytest.param("getComposed", COMPOSED, id="allOf"),
         pytest.param("getComposedModel", COMPOSED_PET, id="ref-allOf"),
         pytest.param("getComposedLoop", COMPOSED_LOOP, id="allOf-cycle"),
-        pytest.param("getMissingRef", {}, id="missing-ref"),
+        pytest.param("getMissingRef", {"$ref": "#/components/schemas/DoesNotExist"}, id="missing-ref"),
     ]
 )
 def test_get_response_body(op_id, expected):
