@@ -86,7 +86,7 @@ def expand_schema(
                 resolved[OasField.X_REF.value] = class_name
                 _mark_reference_properties(resolved, class_name)
             else:
-                pending[OasField.REFS] = reference
+                pending[OasField.REFS.value] = reference
             seen.remove(reference)
 
         for item in pending.pop(OasField.ALL_OF, None) or []:
