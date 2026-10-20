@@ -34,9 +34,10 @@ def expand_schema(
 
     Expansion walks the schema, including nested property schemas. Later ``allOf`` items
     replace properties that share a name. A reference already being expanded is skipped.
-    A resolved reference records its short name in ``x-reference``. Properties brought in
-    by that reference record the same name, unless they already have an ``x-reference``.
-    ``components`` is the OpenAPI components object used to resolve references.
+    A reference that cannot be resolved is left in place. A resolved reference records its
+    short name in ``x-reference``. Properties brought in by that reference record the same
+    name, unless they already have an ``x-reference``. ``components`` is the OpenAPI
+    components object used to resolve references.
     """
 
     def _model(reference: str) -> dict[str, Any] | None:
@@ -79,12 +80,14 @@ def expand_schema(
         if reference and reference not in seen:
             seen.add(reference)
             target = _model(reference)
-            resolved = _expand(target, seen)
-            seen.remove(reference)
             if target:
+                resolved = _expand(target, seen)
                 class_name = reference_classname(reference)
                 resolved[OasField.X_REF.value] = class_name
                 _mark_reference_properties(resolved, class_name)
+            else:
+                pending[OasField.REFS] = reference
+            seen.remove(reference)
 
         for item in pending.pop(OasField.ALL_OF, None) or []:
             resolved = merge_schema(resolved, _expand(item, seen))
