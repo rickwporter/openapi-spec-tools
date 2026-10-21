@@ -9,5 +9,6 @@ main:
       operationId: listPets
       pagination:
         pageSize: limit
+        nextHeader: x-next
     - name: show
       operationId: showPetById
