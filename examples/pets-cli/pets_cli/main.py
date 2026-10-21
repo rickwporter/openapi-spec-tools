@@ -138,6 +138,7 @@ def list_pets(
         max_count=_max_count,
         page_size_name="limit",
         page_size_value=limit,
+        next_header_name="x-next",
     )
     missing = []
     if _api_key is None:
