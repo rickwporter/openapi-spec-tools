@@ -2,8 +2,8 @@ from typing import Any
 
 import pytest
 
+from openapi_spec_tools.flatten import _collection_type
 from openapi_spec_tools.flatten import _flatten_collection
-from openapi_spec_tools.flatten import _flatten_collection_type
 from openapi_spec_tools.flatten import flatten_schema
 
 
@@ -1190,8 +1190,8 @@ def test_flatten_schema_copies() -> None:
         pytest.param({"type": ["foo", "array"]}, None, id="list-unknown"),
     ]
 )
-def test__flatten_collection_type(model: dict[str, Any], expected: str | None) -> None:
-    assert expected == _flatten_collection_type(model)
+def test__collection_type(model: dict[str, Any], expected: str | None) -> None:
+    assert expected == _collection_type(model)
 
 
 @pytest.mark.parametrize(
