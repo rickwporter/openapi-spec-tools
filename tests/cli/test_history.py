@@ -7,6 +7,7 @@ from unittest import mock
 
 import pytest
 import typer
+from rich_objects import to_ascii
 
 from openapi_spec_tools.cli.history import _commithash
 from openapi_spec_tools.cli.history import _find_commits
@@ -15,7 +16,6 @@ from openapi_spec_tools.cli.history import commit_changes
 from openapi_spec_tools.cli.history import commit_diff
 from openapi_spec_tools.cli.history import commit_history
 from openapi_spec_tools.cli.history import commit_show
-from tests.cli_gen.helpers import to_ascii
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 

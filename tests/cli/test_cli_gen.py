@@ -94,7 +94,6 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
         filenames = {i.name for i in path.iterdir()}
         expected = {
             "__init__.py",
-            "helpers.py",
             "test_display.py",
             "test_exceptions.py",
             "test_logging.py",
@@ -150,7 +149,6 @@ def test_cli_generate_success_copyright(temp_working_dir):
         assert copyright_text in text
 
     filenames = {
-        "helpers.py",
         "test_display.py",
         "test_exceptions.py",
         "test_logging.py",
@@ -203,7 +201,6 @@ def test_cli_generate_success_no_layout():
 
     test_files = {
         '__init__.py',
-        'helpers.py',
         'test_display.py',
         'test_exceptions.py',
         'test_logging.py',

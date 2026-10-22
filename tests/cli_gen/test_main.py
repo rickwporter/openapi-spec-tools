@@ -1,8 +1,8 @@
 import typer
+from rich_objects import to_ascii
 from typer.testing import CliRunner
 
 from tests.assets.arg_test import app as program
-from tests.cli_gen.helpers import to_ascii
 
 runner = CliRunner(charset="ascii")
 

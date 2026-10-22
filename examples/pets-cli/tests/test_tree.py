@@ -8,11 +8,11 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 import pytest
+from rich_objects import to_ascii
 
 from pets_cli._tree import TreeDisplay
 from pets_cli._tree import TreeNode
 from pets_cli._tree import tree
-from tests.helpers import to_ascii
 
 
 def test_tree_node_get():
