@@ -378,7 +378,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rich", specifier = ">=15.0.0" },
-    { name = "rich-objects", specifier = ">=0.3.0" },
+    { name = "rich-objects", specifier = ">=0.3.1" },
     { name = "typer", specifier = ">=0.27.2" },
 ]
 
@@ -462,7 +462,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rich", specifier = ">=15.0.0" },
-    { name = "rich-objects", specifier = ">=0.3.0" },
+    { name = "rich-objects", specifier = ">=0.3.1" },
     { name = "typer", specifier = ">=0.27.2" },
 ]
 
@@ -744,15 +744,15 @@ wheels = [
 
 [[package]]
 name = "rich-objects"
-version = "0.3.0"
+version = "0.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyyaml" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4e/ab/1bf2c2de651c65f08844189d4b5a64de6cfa9b37c3b63e41e994d8227499/rich_objects-0.3.0.tar.gz", hash = "sha256:558ac2f55ed8aeb4577271d69efa79b206d2666bde6150fc8921d000b3b0dad3", size = 44419, upload-time = "2026-09-22T10:35:21.712Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/e7/c7f0c7654a522e7e36017b77733cb011301cfde2cdc78b744704eceaa09e/rich_objects-0.3.1.tar.gz", hash = "sha256:f9d9a1ac0b98ac85eb1a1651a65c6aca79b04a12497571f8fd4c03d1b290d943", size = 44503, upload-time = "2026-10-22T10:15:55.973Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/8d/460c74b222611d83499b2840216a0676bf51d6000cc28c4b9524be02edc7/rich_objects-0.3.0-py3-none-any.whl", hash = "sha256:d784ffec1652a7b8bc0b80493a76be428c89e56979965fffc705d2d2301a9109", size = 9763, upload-time = "2026-09-22T10:35:20.382Z" },
+    { url = "https://files.pythonhosted.org/packages/00/bd/90e0b758168fee69a37c79354ea4455c9bbe1d5c4270c436185306774d6b/rich_objects-0.3.1-py3-none-any.whl", hash = "sha256:e04d5b841cb754c15ab2167778759c40b602881110d5c34afd9a4505bebb6dfc", size = 10305, upload-time = "2026-10-22T10:15:54.635Z" },
 ]
 
 [[package]]
