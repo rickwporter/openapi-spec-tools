@@ -118,11 +118,24 @@ def _flatten_items_are_simple(items: dict[str, Any]) -> bool:
     return items.get(OasField.TYPE) in SIMPLE_TYPES
 
 
-def _flatten_collection(model: dict[str, Any]) -> bool:
+def _flatten_collection_requires_items(model: dict[str, Any], ancestor_required: bool) -> bool:
+    """Return whether fields taken from a collection item stay required.
+
+    Item fields are required only when the collection itself is required and ``minItems`` is greater
+    than zero. A missing ``minItems`` means the collection may be empty, so its fields are optional.
+    """
+    if not ancestor_required:
+        return False
+    min_items = model.get(OasField.MIN_ITEMS, 0)
+    return isinstance(min_items, int) and min_items > 0
+
+
+def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -> bool:
     """Treat an array of complex items as one item.
 
     The item schema replaces the array. ``x-forced-single`` is set and ``x-collection`` is omitted.
-    ``readOnly`` true on the array or the items schema is kept.
+    ``readOnly`` true on the array or the items schema is kept. Required fields on the item stay
+    required only when the collection is required and ``minItems`` is greater than zero.
     """
     collection_type = _flatten_collection_type(model)
     if collection_type is None:
@@ -134,9 +147,7 @@ def _flatten_collection(model: dict[str, Any]) -> bool:
         pass
     simple = _flatten_items_are_simple(items)
 
-    # if the collection is not requred, the items in the collections cannot be
-    required = model.get(OasField.REQUIRED, False)
-    if not required and OasField.REQUIRED.value in items:
+    if not _flatten_collection_requires_items(model, ancestor_required) and OasField.REQUIRED.value in items:
         items[OasField.REQUIRED.value] = False
 
     parent_read_only = _flatten_is_read_only(model)
@@ -232,10 +243,10 @@ def _flatten_model(
         model[OasField.READ_ONLY.value] = True
 
     if _flatten_apply_one_of(model):
-        return _flatten_model(model)
+        return _flatten_model(model, ancestor_required, ancestor_read_only)
 
-    if _flatten_collection(model):
-        return _flatten_model(model)
+    if _flatten_collection(model, ancestor_required):
+        return _flatten_model(model, ancestor_required, ancestor_read_only)
 
     read_only = _flatten_is_read_only(model)
     for key, value in list(model.items()):
@@ -274,6 +285,8 @@ def flatten_schema(schema: dict[str, Any] | None) -> dict[str, Any]:
     property name, so ``home.address.zip_code`` records ``zip_code``. ``x-reference`` is the
     ``reference_classname()`` name of the lowest-level ``$ref`` class that contains the property.
     A property's ``required`` value is true only when that property and every ancestor are required.
+    Fields taken from an array item are required only when that array is required and ``minItems`` is
+    greater than zero.
     ``readOnly`` true on a schema or property is copied onto every nested property. ``readOnly`` false
     is not copied downward. A property that sets ``readOnly`` true stays read-only when its parent is
     false or omits ``readOnly``. A schema with ``oneOf`` uses the first item in that list. Keys already

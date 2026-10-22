@@ -255,6 +255,246 @@ from openapi_spec_tools.flatten import flatten_schema
         pytest.param(
             {
                 "type": "object",
+                "required": ["id", "tags"],
+                "properties": {
+                    "id": {"type": "integer"},
+                    "tags": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "type": "object",
+                            "required": ["name", "home"],
+                            "properties": {
+                                "name": {"type": "string"},
+                                "color": {"type": "string"},
+                                "home": {
+                                    "type": "object",
+                                    "required": ["city"],
+                                    "properties": {
+                                        "city": {"type": "string"},
+                                        "street": {"type": "string"},
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "required": ["id", "tags.name", "tags.home.city"],
+                "properties": {
+                    "id": {"type": "integer", "x-field": "id", "required": True},
+                    "tags.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": True,
+                    },
+                    "tags.color": {
+                        "type": "string",
+                        "x-field": "color",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "tags.home.city": {
+                        "type": "string",
+                        "x-field": "city",
+                        "x-parents": ["tags", "home"],
+                        "x-forced-single": True,
+                        "required": True,
+                    },
+                    "tags.home.street": {
+                        "type": "string",
+                        "x-field": "street",
+                        "x-parents": ["tags", "home"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                },
+            },
+            id="required-collection-min-items",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "required": ["tags"],
+                "properties": {
+                    "tags": {
+                        "type": "array",
+                        "minItems": 0,
+                        "items": {
+                            "type": "object",
+                            "required": ["name"],
+                            "properties": {"name": {"type": "string"}},
+                        },
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "tags.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": False,
+                    }
+                },
+            },
+            id="required-collection-min-items-zero",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "tags": {
+                        "type": ["array", "null"],
+                        "minItems": 2,
+                        "items": {
+                            "type": "object",
+                            "required": ["name"],
+                            "properties": {"name": {"type": "string"}},
+                        },
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "tags.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["tags"],
+                        "x-forced-single": True,
+                        "required": False,
+                    }
+                },
+            },
+            id="optional-collection-min-items",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "object",
+                        "required": ["tags"],
+                        "properties": {
+                            "tags": {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {
+                                    "type": "object",
+                                    "required": ["name"],
+                                    "properties": {"name": {"type": "string"}},
+                                },
+                            }
+                        },
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "owner.tags.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["owner", "tags"],
+                        "x-forced-single": True,
+                        "required": False,
+                    }
+                },
+            },
+            id="optional-parent-required-collection",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "required": ["pet"],
+                "properties": {
+                    "pet": {
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {
+                                    "type": "object",
+                                    "required": ["name"],
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "color": {"type": "string"},
+                                    },
+                                },
+                            },
+                            {"type": "string"},
+                        ]
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "required": ["pet.name"],
+                "properties": {
+                    "pet.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["pet"],
+                        "x-forced-single": True,
+                        "required": True,
+                    },
+                    "pet.color": {
+                        "type": "string",
+                        "x-field": "color",
+                        "x-parents": ["pet"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                },
+            },
+            id="required-oneOf-collection-min-items",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "pet": {
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {
+                                    "type": "object",
+                                    "required": ["name"],
+                                    "properties": {"name": {"type": "string"}},
+                                },
+                            },
+                            {"type": "string"},
+                        ]
+                    }
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "pet.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["pet"],
+                        "x-forced-single": True,
+                        "required": False,
+                    }
+                },
+            },
+            id="optional-oneOf-collection-min-items",
+        ),
+        pytest.param(
+            {
+                "type": "object",
                 "properties": {
                     "labels": {"type": "array", "description": "Names", "items": {"type": "string"}},
                     "flags": {"type": "array", "items": {"type": "boolean"}},
