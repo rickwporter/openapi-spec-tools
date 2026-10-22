@@ -22,20 +22,45 @@ def open_test_oas(filename: str) -> Any:
     return open_oas(asset_filename(filename))
 
 
-def deltas(lhs: dict[str, Any], rhs: dict[str, Any]) -> list[str]:
-    """Find top-level properties with differences in values.
+def deltas(lhs: Any, rhs: Any) -> dict[str, Any] | str:
+    """Recursively describe differences between ``lhs`` and ``rhs``.
 
-    Due to ordering diffs, it is often difficult to see the deltas. This tells top-level keys for values that
-    have differences.
+    Dictionaries and lists are walked so nested values can be compared. A key or list item present only in
+    ``lhs`` is ``missing``. A key or list item present only in ``rhs`` is ``added``. Other differing values are
+    reported as ``repr(lhs) != repr(rhs)``. Equal values produce an empty dictionary. List items are compared
+    by position and recorded under ``item[{index}]``.
     """
-    lkeys = set(lhs.keys())
-    rkeys = set(rhs.keys())
-    result = lkeys.difference(rkeys) | rkeys.difference(lkeys)
-    common = lkeys.intersection(rkeys)
-    for key in common:
-        if lhs.get(key) == rhs.get(key):
-            continue
+    if isinstance(lhs, dict) and isinstance(rhs, dict):
+        return _dict_deltas(lhs, rhs)
+    if isinstance(lhs, list) and isinstance(rhs, list):
+        return _list_deltas(lhs, rhs)
+    if lhs != rhs:
+        return f"{lhs!r} != {rhs!r}"
+    return {}
 
-        result.add(key)
 
-    return list(result)
+def _dict_deltas(lhs: dict[str, Any], rhs: dict[str, Any]) -> dict[str, Any]:
+    """Return nested differences for two dictionaries."""
+    result: dict[str, Any] = {}
+    for key in sorted(set(lhs) | set(rhs)):
+        if key not in rhs:
+            result[key] = "missing"
+        elif key not in lhs:
+            result[key] = "added"
+        elif lhs[key] != rhs[key]:
+            result[key] = deltas(lhs[key], rhs[key])
+    return result
+
+
+def _list_deltas(lhs: list[Any], rhs: list[Any]) -> dict[str, Any]:
+    """Return positional differences for two lists."""
+    result: dict[str, Any] = {}
+    shared = min(len(lhs), len(rhs))
+    for index in range(shared):
+        if lhs[index] != rhs[index]:
+            result[f"item[{index}]"] = deltas(lhs[index], rhs[index])
+    for index in range(shared, len(lhs)):
+        result[f"item[{index}]"] = "missing"
+    for index in range(shared, len(rhs)):
+        result[f"item[{index}]"] = "added"
+    return result
