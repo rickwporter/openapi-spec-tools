@@ -62,7 +62,6 @@ class CliGenerator(BaseGenerator):
             base_test / "test_logging.py": "test_logging.py",
             base_test / "test_requests.py": "test_requests.py",
             cli_test / "__init__.py": "__init__.py",
-            cli_test / "helpers.py": "helpers.py",
             cli_test / "test_display.py": "test_display.py",
             cli_test / "test_exceptions.py": "test_exceptions.py",
             cli_test / "test_main.py": "test_main.py",

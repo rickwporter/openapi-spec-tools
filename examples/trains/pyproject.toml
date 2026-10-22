@@ -19,7 +19,7 @@ dependencies = [
     "rich>=15.0.0",
     "requests>=2.34.2",
     "pyyaml>=6.0.3",
-    "rich-objects>=0.3.0",
+    "rich-objects>=0.3.1",
 ]
 
 [project.scripts]

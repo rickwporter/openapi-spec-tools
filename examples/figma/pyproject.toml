@@ -17,7 +17,7 @@ classifiers = [
 dependencies = [
     "typer>=0.27.2",
     "rich>=15.0.0",
-    "rich-objects>=0.3.0",
+    "rich-objects>=0.3.1",
     "requests>=2.34.2",
     "pyyaml>=6.0.3",
 ]

@@ -6,6 +6,7 @@ from unittest import mock
 import pytest
 import typer
 import yaml
+from rich_objects import to_ascii
 
 from openapi_spec_tools.cli.layout import TreeFormat
 from openapi_spec_tools.cli.layout import layout_check_format
@@ -13,7 +14,6 @@ from openapi_spec_tools.cli.layout import layout_merge
 from openapi_spec_tools.cli.layout import layout_operations
 from openapi_spec_tools.cli.layout import layout_suggest
 from openapi_spec_tools.cli.layout import layout_tree
-from tests.cli_gen.helpers import to_ascii
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 
