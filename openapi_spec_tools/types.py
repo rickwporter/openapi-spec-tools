@@ -21,6 +21,7 @@ class OasField(str, Enum):
     ITEMS = "items"
     MAX = "maximum"
     MIN = "minimum"
+    MIN_ITEMS = "minItems"
     NAME = "name"
     NULLABLE = "nullable"
     ONE_OF = "oneOf"
