@@ -9,7 +9,7 @@ from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import reference_classname
 
 
-def _flatten_reference_name(model: dict[str, Any]) -> str | None:
+def _reference_name(model: dict[str, Any]) -> str | None:
     """Return the short class name for a schema's ``$ref`` or ``x-reference``."""
     reference = model.get(OasField.REFS)
     if not isinstance(reference, str) or not reference:
@@ -19,7 +19,7 @@ def _flatten_reference_name(model: dict[str, Any]) -> str | None:
     return None
 
 
-def _flatten_apply_reference(prop: Any, inherited: str | None) -> Any:
+def _apply_reference(prop: Any, inherited: str | None) -> Any:
     """Record the lowest-level reference class on ``prop``."""
     if not isinstance(prop, dict):
         return prop
@@ -33,14 +33,14 @@ def _flatten_apply_reference(prop: Any, inherited: str | None) -> Any:
     return prop
 
 
-def _flatten_with_field(prop: Any, name: str) -> Any:
+def _add_x_field(prop: Any, name: str) -> Any:
     """Record the lowest-level property name in ``x-field``."""
     if isinstance(prop, dict):
         prop[OasField.X_FIELD.value] = name.rsplit(".", maxsplit=1)[-1]
     return prop
 
 
-def _flatten_with_parent(prop: Any, parent: str) -> Any:
+def _add_parent(prop: Any, parent: str) -> Any:
     """Prepend ``parent`` to the property's ``x-parents`` chain."""
     if not isinstance(prop, dict):
         return prop
@@ -56,7 +56,7 @@ def _flatten_with_parent(prop: Any, parent: str) -> Any:
     return prop
 
 
-def _flatten_prefixed_required(name: str, prop: dict[str, Any]) -> list[str]:
+def _prefixed_required(name: str, prop: dict[str, Any]) -> list[str]:
     """Prefix a cascaded property's required names with ``name``."""
     required = prop.get(OasField.REQUIRED)
     if not isinstance(required, list):
@@ -64,7 +64,7 @@ def _flatten_prefixed_required(name: str, prop: dict[str, Any]) -> list[str]:
     return [f"{name}.{item}" for item in required]
 
 
-def _flatten_mark_required(prop: Any, required: bool) -> Any:
+def _mark_required(prop: Any, required: bool) -> Any:
     """Set ``required`` when this value is a property schema."""
     if not isinstance(prop, dict) or isinstance(prop.get(OasField.REQUIRED), list):
         return prop
@@ -86,18 +86,18 @@ _READ_ONLY_SCHEMA_FIELDS = frozenset(
 )
 
 
-def _flatten_is_read_only(model: Any) -> bool:
+def _is_read_only(model: Any) -> bool:
     """Return whether ``model`` sets ``readOnly`` to true."""
     return isinstance(model, dict) and model.get(OasField.READ_ONLY) is True
 
 
-def _flatten_merge_read_only(model: dict[str, Any], parent_read_only: bool, child: Any) -> None:
+def _merge_read_only(model: dict[str, Any], parent_read_only: bool, child: Any) -> None:
     """Keep ``readOnly`` true when either merged schema is read-only."""
-    if parent_read_only or _flatten_is_read_only(child):
+    if parent_read_only or _is_read_only(child):
         model[OasField.READ_ONLY.value] = True
 
 
-def _flatten_collection_type(model: dict[str, Any]) -> str | None:
+def _collection_type(model: dict[str, Any]) -> str | None:
     """Return ``array`` when the schema is an array, including a nullable array."""
     schema_type = model.get(OasField.TYPE)
     if schema_type == "array":
@@ -110,7 +110,7 @@ def _flatten_collection_type(model: dict[str, Any]) -> str | None:
     return None
 
 
-def _flatten_items_are_simple(items: dict[str, Any]) -> bool:
+def _items_are_simple(items: dict[str, Any]) -> bool:
     """Return whether array items are a scalar type."""
     properties = items.get(OasField.PROPS)
     if isinstance(properties, dict) and properties:
@@ -118,7 +118,7 @@ def _flatten_items_are_simple(items: dict[str, Any]) -> bool:
     return items.get(OasField.TYPE) in SIMPLE_TYPES
 
 
-def _flatten_collection_requires_items(model: dict[str, Any], ancestor_required: bool) -> bool:
+def _collection_requires_items(model: dict[str, Any], ancestor_required: bool) -> bool:
     """Return whether fields taken from a collection item stay required.
 
     Item fields are required only when the collection itself is required and ``minItems`` is greater
@@ -137,24 +137,24 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
     ``readOnly`` true on the array or the items schema is kept. Required fields on the item stay
     required only when the collection is required and ``minItems`` is greater than zero.
     """
-    collection_type = _flatten_collection_type(model)
+    collection_type = _collection_type(model)
     if collection_type is None:
         return False
     items = model.get(OasField.ITEMS)
     if not isinstance(items, dict) or items is model:
         return False
-    while _flatten_apply_one_of(items):
+    while _apply_one_of(items):
         pass
-    simple = _flatten_items_are_simple(items)
+    simple = _items_are_simple(items)
 
-    if not _flatten_collection_requires_items(model, ancestor_required) and OasField.REQUIRED.value in items:
+    if not _collection_requires_items(model, ancestor_required) and OasField.REQUIRED.value in items:
         items[OasField.REQUIRED.value] = False
 
-    parent_read_only = _flatten_is_read_only(model)
+    parent_read_only = _is_read_only(model)
     model.pop(OasField.ITEMS.value, None)
     model.pop(OasField.TYPE.value, None)
     model.update(items)
-    _flatten_merge_read_only(model, parent_read_only, items)
+    _merge_read_only(model, parent_read_only, items)
     if simple:
         model.pop(OasField.X_SINGLE.value, None)
         model[OasField.X_COLLECT.value] = collection_type
@@ -164,7 +164,7 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
     return True
 
 
-def _flatten_mark_single(prop: Any, forced_single: bool) -> Any:
+def _mark_single(prop: Any, forced_single: bool) -> Any:
     """Mark a property that came from a multi-property collection."""
     if forced_single and isinstance(prop, dict):
         prop[OasField.X_SINGLE.value] = True
@@ -203,19 +203,19 @@ def _flatten_properties(
         )
         nested = prop.get(OasField.PROPS) if isinstance(prop, dict) else None
         if isinstance(nested, dict) and nested:
-            replacements[name] = _flatten_prefixed_required(name, prop)
+            replacements[name] = _prefixed_required(name, prop)
             for sub_name, sub_prop in nested.items():
                 full_name = f"{name}.{sub_name}"
-                updated = _flatten_apply_reference(_flatten_with_parent(sub_prop, name), reference)
-                flat[full_name] = _flatten_with_field(_flatten_mark_single(updated, forced_single), full_name)
+                updated = _apply_reference(_add_parent(sub_prop, name), reference)
+                flat[full_name] = _add_x_field(_mark_single(updated, forced_single), full_name)
         else:
-            marked = _flatten_mark_single(_flatten_mark_required(prop, level_required), forced_single)
-            flat[name] = _flatten_with_field(_flatten_apply_reference(marked, reference), name)
+            marked = _mark_single(_mark_required(prop, level_required), forced_single)
+            flat[name] = _add_x_field(_apply_reference(marked, reference), name)
             replacements[name] = [name]
     return flat, replacements
 
 
-def _flatten_apply_one_of(model: dict[str, Any]) -> bool:
+def _apply_one_of(model: dict[str, Any]) -> bool:
     """Merge the first ``oneOf`` schema onto ``model``.
 
     Keys already on ``model`` stay when the chosen item does not set them.
@@ -226,10 +226,10 @@ def _flatten_apply_one_of(model: dict[str, Any]) -> bool:
         return False
 
     chosen = one_of[0]
-    parent_read_only = _flatten_is_read_only(model)
+    parent_read_only = _is_read_only(model)
     model.pop(OasField.ONE_OF.value, None)
     model.update(chosen)
-    _flatten_merge_read_only(model, parent_read_only, chosen)
+    _merge_read_only(model, parent_read_only, chosen)
     return True
 
 
@@ -242,13 +242,13 @@ def _flatten_model(
     if ancestor_read_only:
         model[OasField.READ_ONLY.value] = True
 
-    if _flatten_apply_one_of(model):
+    if _apply_one_of(model):
         return _flatten_model(model, ancestor_required, ancestor_read_only)
 
     if _flatten_collection(model, ancestor_required):
         return _flatten_model(model, ancestor_required, ancestor_read_only)
 
-    read_only = _flatten_is_read_only(model)
+    read_only = _is_read_only(model)
     for key, value in list(model.items()):
         if key == OasField.PROPS:
             continue
@@ -260,7 +260,7 @@ def _flatten_model(
         required_names = set(required) if isinstance(required, list) else set()
         flat, replacements = _flatten_properties(
             properties,
-            _flatten_reference_name(model),
+            _reference_name(model),
             required_names,
             ancestor_required,
             bool(model.get(OasField.X_SINGLE)),
