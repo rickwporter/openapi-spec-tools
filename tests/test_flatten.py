@@ -2,8 +2,10 @@ from typing import Any
 
 import pytest
 
+from openapi_spec_tools.flatten import _apply_any_of
 from openapi_spec_tools.flatten import _collection_type
 from openapi_spec_tools.flatten import _flatten_collection
+from openapi_spec_tools.flatten import _is_complex
 from openapi_spec_tools.flatten import flatten_schema
 
 
@@ -651,6 +653,169 @@ from openapi_spec_tools.flatten import flatten_schema
         pytest.param({"oneOf": []}, {"oneOf": []}, id="empty-oneOf"),
         pytest.param(
             {
+                "description": "A pet",
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "required": ["name"],
+                        "properties": {
+                            "name": {"type": "string"},
+                            "home": {"type": "object", "properties": {"city": {"type": "string"}}},
+                        },
+                    },
+                    {"type": "string"},
+                ],
+            },
+            {
+                "description": "A pet",
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                    "name": {"type": "string", "x-field": "name", "required": True},
+                    "home.city": {
+                        "type": "string",
+                        "x-field": "city",
+                        "x-parents": ["home"],
+                        "required": False,
+                    },
+                },
+            },
+            id="anyOf-complex",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "description": "Current status",
+                        "anyOf": [
+                            {"type": "string", "enum": ["open", "closed"]},
+                            {"type": "integer"},
+                        ],
+                    },
+                    "label": {
+                        "description": "outer",
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {"text": {"type": "string", "description": "inner"}},
+                            },
+                            {"type": "string"},
+                        ],
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "description": "Current status",
+                        "anyOf": [
+                            {"type": "string", "enum": ["open", "closed"]},
+                            {"type": "integer"},
+                        ],
+                        "x-field": "status",
+                        "required": False,
+                    },
+                    "label.text": {
+                        "type": "string",
+                        "description": "inner",
+                        "x-field": "text",
+                        "x-parents": ["label"],
+                        "required": False,
+                    },
+                },
+            },
+            id="anyOf-property",
+        ),
+        pytest.param(
+            {
+                "type": "object",
+                "properties": {
+                    "pet": {
+                        "anyOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "color": {"type": "string"},
+                                    },
+                                },
+                            },
+                            {"type": "string"},
+                        ]
+                    },
+                    "labels": {
+                        "anyOf": [
+                            {"type": "array", "items": {"type": "string"}},
+                            {"type": "null"},
+                        ]
+                    },
+                },
+            },
+            {
+                "type": "object",
+                "properties": {
+                    "pet.name": {
+                        "type": "string",
+                        "x-field": "name",
+                        "x-parents": ["pet"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "pet.color": {
+                        "type": "string",
+                        "x-field": "color",
+                        "x-parents": ["pet"],
+                        "x-forced-single": True,
+                        "required": False,
+                    },
+                    "labels": {
+                        "anyOf": [
+                            {"type": "string", "x-collection": "array"},
+                            {"type": "null"},
+                        ],
+                        "x-field": "labels",
+                        "required": False,
+                    },
+                },
+            },
+            id="anyOf-collection",
+        ),
+        pytest.param({"anyOf": []}, {"anyOf": []}, id="empty-anyOf"),
+        pytest.param(
+            {
+                "readOnly": True,
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "color": {"type": "string", "readOnly": False},
+                        },
+                    },
+                    {"type": "string"},
+                ],
+            },
+            {
+                "readOnly": True,
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "readOnly": True, "x-field": "name", "required": False},
+                    "color": {
+                        "type": "string",
+                        "readOnly": True,
+                        "x-field": "color",
+                        "required": False,
+                    },
+                },
+            },
+            id="read-only-anyOf",
+        ),
+        pytest.param(
+            {
                 "allOf": [
                     {
                         "type": "object",
@@ -1222,4 +1387,68 @@ def test__collection_type(model: dict[str, Any], expected: str | None) -> None:
 )
 def test__flatten_collection(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
     assert expected == _flatten_collection(model)
+    assert model == updated
+
+
+@pytest.mark.parametrize(
+    ["model", "expected"],
+    [
+        pytest.param({}, False, id="empty"),
+        pytest.param({"properties": {}}, False, id="dict-empty"),
+        pytest.param({"properties": ["a"]}, False, id="prop-list"),
+        pytest.param({"properties": {"a": {"type": "string"}}}, True, id="properties"),
+        pytest.param({"items": {"type": "string"}}, False, id="items-simple"),
+        pytest.param({"items": {"properties": {"a": {"type": "string"}}}}, True, id="items-complex"),
+        pytest.param({"allOf": [{"type": "number"}]}, False, id="all-of-simple"),
+        pytest.param({"allOf": [{"properties": {"a": {"type": "string"}}}]}, True, id="all-of-complex"),
+    ],
+)
+def test__is_complex(model: dict[str, Any], expected: bool) -> None:
+    assert _is_complex(model) is expected
+
+
+@pytest.mark.parametrize(
+    ["model", "updated", "expected"],
+    [
+        pytest.param({}, {}, False, id="empty"),
+        pytest.param(
+            {"anyOf": True},
+            {"anyOf": True},
+            False,
+            id="bool",
+        ),
+        pytest.param(
+            {"anyOf": []},
+            {"anyOf": []},
+            False,
+            id="empty-list",
+        ),
+        pytest.param(
+            {"anyOf": [1, True]},
+            {"anyOf": [1, True]},
+            False,
+            id="non-dict",
+        ),
+        pytest.param(
+            {"anyOf": [{"type": "string"}, {"type": "number", "format": "int32"}]},
+            {"anyOf": [{"type": "string"}, {"type": "number", "format": "int32"}]},
+            False,
+            id="non-complex",
+        ),
+        pytest.param(
+            {
+                "anyOf": [
+                    {"type": "object", "properties": {"a": {"type": "string", "format": "datetime"}}},
+                    {"properties": {"b": {"type": "number", "format": "uint32"}}},
+                ],
+            },
+            {"type": "object", "properties": {"a": {"type": "string", "format": "datetime"}}},
+            True,
+            id="nested-complex",
+        ),
+
+    ],
+)
+def test__apply_any_of(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
+    assert expected == _apply_any_of(model)
     assert model == updated
