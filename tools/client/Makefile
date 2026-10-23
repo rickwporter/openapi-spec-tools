@@ -1,6 +1,6 @@
 #####################
 # Project stuff
-project_name ?= foo
+project_name ?= my_project
 package_name ?= $(project_name)
 package_version ?= 0.1.0
 
@@ -13,7 +13,7 @@ gen_currdir ?= $(shell pwd)
 
 #####################
 # Container stuff
-openapi_gen_version ?= v7.11.0
+openapi_gen_version ?= v7.26.0
 openapi_gen_image ?= openapitools/openapi-generator-cli:$(openapi_gen_version)
 
 # this allows for ovrriding with podman
@@ -49,13 +49,20 @@ default: help
 
 help: ## This message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@echo
+	@echo "****** Settable variables and defaults ******"
+	@echo "openapi_gen_version   = $(openapi_gen_version)"
+	@echo "client_spec           = $(client_spec)"
+	@echo "project_name          = $(project_name)"
+	@echo "client_dir            = $(client_dir)"
+	@echo
 
 prereq: openapi-image ## Prerequisites for building the OpenAPI client
 
 clean: ## Cleanup build artifacts
 	rm -f $(openapi_gen_log)
 
-enchilada all: client-regen ## Convenience targets
+all: client-regen ## Client regeneration
 client-regen: client-rmgen client-gen ## Regenerate the client code
 
 client-rmgen: ## Removes the previously generated client code
