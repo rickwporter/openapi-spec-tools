@@ -118,6 +118,27 @@ def _items_are_simple(items: dict[str, Any]) -> bool:
     return items.get(OasField.TYPE) in SIMPLE_TYPES
 
 
+def _is_complex(schema: dict[str, Any]) -> bool:
+    """Return whether ``schema`` has nested properties.
+
+    A schema is complex when it has properties, or when an array ``items`` schema or the first
+    ``allOf``, ``anyOf``, or ``oneOf`` entry is complex. Scalar types are not complex.
+    """
+    properties = schema.get(OasField.PROPS)
+    if isinstance(properties, dict) and properties:
+        return True
+
+    items = schema.get(OasField.ITEMS)
+    if isinstance(items, dict) and _is_complex(items):
+        return True
+
+    for field in (OasField.ALL_OF, OasField.ANY_OF, OasField.ONE_OF):
+        nested = schema.get(field)
+        if isinstance(nested, list) and nested and isinstance(nested[0], dict) and _is_complex(nested[0]):
+            return True
+    return False
+
+
 def _collection_requires_items(model: dict[str, Any], ancestor_required: bool) -> bool:
     """Return whether fields taken from a collection item stay required.
 
@@ -143,7 +164,7 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
     items = model.get(OasField.ITEMS)
     if not isinstance(items, dict) or items is model:
         return False
-    while _apply_one_of(items):
+    while _apply_any_of(items) or _apply_one_of(items):
         pass
     simple = _items_are_simple(items)
 
@@ -215,6 +236,26 @@ def _flatten_properties(
     return flat, replacements
 
 
+def _apply_any_of(model: dict[str, Any]) -> bool:
+    """Merge the first ``anyOf`` schema onto ``model`` when that item is complex.
+
+    Simple scalar alternatives stay as ``anyOf``. Keys already on ``model`` stay when the chosen
+    item does not set them. ``readOnly`` true on either schema is kept.
+    """
+    any_of = model.get(OasField.ANY_OF)
+    if not isinstance(any_of, list) or not any_of or not isinstance(any_of[0], dict):
+        return False
+    chosen = any_of[0]
+    if not _is_complex(chosen):
+        return False
+
+    parent_read_only = _is_read_only(model)
+    model.pop(OasField.ANY_OF.value, None)
+    model.update(chosen)
+    _merge_read_only(model, parent_read_only, chosen)
+    return True
+
+
 def _apply_one_of(model: dict[str, Any]) -> bool:
     """Merge the first ``oneOf`` schema onto ``model``.
 
@@ -243,6 +284,9 @@ def _flatten_model(
         model[OasField.READ_ONLY.value] = True
 
     if _apply_one_of(model):
+        return _flatten_model(model, ancestor_required, ancestor_read_only)
+
+    if _apply_any_of(model):
         return _flatten_model(model, ancestor_required, ancestor_read_only)
 
     if _flatten_collection(model, ancestor_required):
@@ -289,7 +333,10 @@ def flatten_schema(schema: dict[str, Any] | None) -> dict[str, Any]:
     greater than zero.
     ``readOnly`` true on a schema or property is copied onto every nested property. ``readOnly`` false
     is not copied downward. A property that sets ``readOnly`` true stays read-only when its parent is
-    false or omits ``readOnly``. A schema with ``oneOf`` uses the first item in that list. Keys already
+    false or omits ``readOnly``. A schema with ``anyOf`` uses the first item when that item is complex.
+    An item is complex when it has properties, or when a nested array, ``allOf``, ``anyOf``, or ``oneOf``
+    leads to properties. Simple scalar alternatives stay in ``anyOf``. Keys already on the schema remain
+    when that item does not set them. A schema with ``oneOf`` uses the first item in that list. Keys already
     on the schema remain when that item does not set them, so a description carries through. An array
     of complex items
     is replaced by one item schema, marked ``x-forced-single``, and does not record ``x-collection``.
