@@ -5,8 +5,8 @@ import pytest
 from openapi_spec_tools.flatten import _apply_any_of
 from openapi_spec_tools.flatten import _collection_type
 from openapi_spec_tools.flatten import _flatten_collection
-from openapi_spec_tools.flatten import _is_complex
 from openapi_spec_tools.flatten import flatten_schema
+from openapi_spec_tools.flatten import is_complex
 
 
 @pytest.mark.parametrize(
@@ -1404,8 +1404,8 @@ def test__flatten_collection(model: dict[str, Any], updated: dict[str, Any], exp
         pytest.param({"type": ["string", "number", "foo"]}, True, id="type-list-complex"),
     ],
 )
-def test__is_complex(model: dict[str, Any], expected: bool) -> None:
-    assert _is_complex(model) is expected
+def test_is_complex(model: dict[str, Any], expected: bool) -> None:
+    assert is_complex(model) is expected
 
 
 @pytest.mark.parametrize(

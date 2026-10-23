@@ -110,7 +110,7 @@ def _collection_type(model: dict[str, Any]) -> str | None:
     return None
 
 
-def _is_complex(schema: dict[str, Any]) -> bool:
+def is_complex(schema: dict[str, Any]) -> bool:
     """Return whether ``schema`` has nested properties.
 
     A schema is complex when it has properties, or when an array ``items`` schema or the first
@@ -121,7 +121,7 @@ def _is_complex(schema: dict[str, Any]) -> bool:
         return True
 
     items = schema.get(OasField.ITEMS)
-    if isinstance(items, dict) and _is_complex(items):
+    if isinstance(items, dict) and is_complex(items):
         return True
 
     types = schema.get(OasField.TYPE)
@@ -131,7 +131,7 @@ def _is_complex(schema: dict[str, Any]) -> bool:
 
     for field in (OasField.ALL_OF, OasField.ANY_OF, OasField.ONE_OF):
         nested = schema.get(field)
-        if isinstance(nested, list) and nested and isinstance(nested[0], dict) and _is_complex(nested[0]):
+        if isinstance(nested, list) and nested and isinstance(nested[0], dict) and is_complex(nested[0]):
             return True
     return False
 
@@ -163,7 +163,7 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
         return False
     while _apply_any_of(items) or _apply_one_of(items):
         pass
-    complex = _is_complex(items)
+    complex = is_complex(items)
 
     if not _collection_requires_items(model, ancestor_required) and OasField.REQUIRED.value in items:
         items[OasField.REQUIRED.value] = False
@@ -244,7 +244,7 @@ def _apply_any_of(model: dict[str, Any]) -> bool:
     if not isinstance(any_of, list) or not any_of or not isinstance(any_of[0], dict):
         return False
     chosen = any_of[0]
-    if not _is_complex(chosen):
+    if not is_complex(chosen):
         return False
 
     parent_read_only = _is_read_only(model)
