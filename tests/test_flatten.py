@@ -773,10 +773,8 @@ from openapi_spec_tools.flatten import flatten_schema
                         "required": False,
                     },
                     "labels": {
-                        "anyOf": [
-                            {"type": "string", "x-collection": "array"},
-                            {"type": "null"},
-                        ],
+                        "type": "string",
+                        "x-collection": "array",
                         "x-field": "labels",
                         "required": False,
                     },
@@ -1401,6 +1399,9 @@ def test__flatten_collection(model: dict[str, Any], updated: dict[str, Any], exp
         pytest.param({"items": {"properties": {"a": {"type": "string"}}}}, True, id="items-complex"),
         pytest.param({"allOf": [{"type": "number"}]}, False, id="all-of-simple"),
         pytest.param({"allOf": [{"properties": {"a": {"type": "string"}}}]}, True, id="all-of-complex"),
+        pytest.param({"type": "number"}, False, id="type-string"),
+        pytest.param({"type": ["string", "number"]}, False, id="type-list-simple"),
+        pytest.param({"type": ["string", "number", "foo"]}, True, id="type-list-complex"),
     ],
 )
 def test__is_complex(model: dict[str, Any], expected: bool) -> None:

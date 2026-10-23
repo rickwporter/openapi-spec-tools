@@ -110,14 +110,6 @@ def _collection_type(model: dict[str, Any]) -> str | None:
     return None
 
 
-def _items_are_simple(items: dict[str, Any]) -> bool:
-    """Return whether array items are a scalar type."""
-    properties = items.get(OasField.PROPS)
-    if isinstance(properties, dict) and properties:
-        return False
-    return items.get(OasField.TYPE) in SIMPLE_TYPES
-
-
 def _is_complex(schema: dict[str, Any]) -> bool:
     """Return whether ``schema`` has nested properties.
 
@@ -131,6 +123,11 @@ def _is_complex(schema: dict[str, Any]) -> bool:
     items = schema.get(OasField.ITEMS)
     if isinstance(items, dict) and _is_complex(items):
         return True
+
+    types = schema.get(OasField.TYPE)
+    if types and isinstance(types, (list, str)):
+        types = set(types if isinstance(types, list) else [types])
+        return not types.issubset(SIMPLE_TYPES)
 
     for field in (OasField.ALL_OF, OasField.ANY_OF, OasField.ONE_OF):
         nested = schema.get(field)
@@ -166,7 +163,7 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
         return False
     while _apply_any_of(items) or _apply_one_of(items):
         pass
-    simple = _items_are_simple(items)
+    complex = _is_complex(items)
 
     if not _collection_requires_items(model, ancestor_required) and OasField.REQUIRED.value in items:
         items[OasField.REQUIRED.value] = False
@@ -176,12 +173,13 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
     model.pop(OasField.TYPE.value, None)
     model.update(items)
     _merge_read_only(model, parent_read_only, items)
-    if simple:
-        model.pop(OasField.X_SINGLE.value, None)
-        model[OasField.X_COLLECT.value] = collection_type
-    else:
+    if complex:
         model[OasField.X_SINGLE.value] = True
         model.pop(OasField.X_COLLECT.value, None)
+    else:
+        model.pop(OasField.X_SINGLE.value, None)
+        model[OasField.X_COLLECT.value] = collection_type
+
     return True
 
 
