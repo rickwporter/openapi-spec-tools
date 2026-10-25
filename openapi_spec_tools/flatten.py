@@ -110,12 +110,15 @@ def _collection_type(model: dict[str, Any]) -> str | None:
     return None
 
 
-def _items_are_simple(items: dict[str, Any]) -> bool:
-    """Return whether array items are a scalar type."""
-    properties = items.get(OasField.PROPS)
-    if isinstance(properties, dict) and properties:
+def is_simple_type(schema: dict[str, Any]) -> bool:
+    """Return whether schema is a simple type."""
+    types = schema.get(OasField.TYPE)
+    if not types or not isinstance(types, (list, str)):
         return False
-    return items.get(OasField.TYPE) in SIMPLE_TYPES
+
+    # make sure there's at least one simple type
+    types = set(types if isinstance(types, list) else [types])
+    return not types.isdisjoint(SIMPLE_TYPES)
 
 
 def _is_complex(schema: dict[str, Any]) -> bool:
@@ -166,7 +169,7 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
         return False
     while _apply_any_of(items) or _apply_one_of(items):
         pass
-    simple = _items_are_simple(items)
+    simple = is_simple_type(items)
 
     if not _collection_requires_items(model, ancestor_required) and OasField.REQUIRED.value in items:
         items[OasField.REQUIRED.value] = False

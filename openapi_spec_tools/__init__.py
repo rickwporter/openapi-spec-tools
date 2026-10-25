@@ -2,6 +2,7 @@
 from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.expand import merge_schema
 from openapi_spec_tools.flatten import flatten_schema
+from openapi_spec_tools.flatten import is_simple_type
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
