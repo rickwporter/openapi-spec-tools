@@ -7,6 +7,7 @@ from openapi_spec_tools.flatten import _collection_type
 from openapi_spec_tools.flatten import _flatten_collection
 from openapi_spec_tools.flatten import _is_complex
 from openapi_spec_tools.flatten import flatten_schema
+from openapi_spec_tools.flatten import is_simple_type
 
 
 @pytest.mark.parametrize(
@@ -1388,6 +1389,21 @@ def test__collection_type(model: dict[str, Any], expected: str | None) -> None:
 def test__flatten_collection(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
     assert expected == _flatten_collection(model)
     assert model == updated
+
+
+@pytest.mark.parametrize(
+    ["schema", "expected"],
+    [
+        pytest.param({}, False, id="empty"),
+        pytest.param({"type": {"foo": "bar"}}, False, id="dict"),
+        pytest.param({"type": "object"}, False, id="single-complex"),
+        pytest.param({"type": "number"}, True, id="single-simple"),
+        pytest.param({"type": ["object", "boolean", "foo"]}, True, id="list-simple"),
+        pytest.param({"type": ["object", "foo"]}, False, id="list-complex"),
+    ]
+)
+def test_is_simple_type(schema: dict[str, Any], expected: bool) -> None:
+    assert is_simple_type(schema) is expected
 
 
 @pytest.mark.parametrize(
