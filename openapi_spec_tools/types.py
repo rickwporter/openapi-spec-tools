@@ -51,6 +51,7 @@ class OasField(str, Enum):
     X_PATH_PARAMS = "x-path-params"
     X_REF = "x-reference"
     X_SINGLE = "x-forced-single"
+    X_ENUM = "x-enum"
 
 
 class ContentType(str, Enum):

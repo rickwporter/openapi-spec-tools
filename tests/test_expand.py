@@ -122,6 +122,44 @@ EXPANDED_PET = {
     "x-reference": "Pet",
 }
 
+ENUM_COMPONENTS = {
+    "schemas": {
+        "Status": {
+            "type": "string",
+            "enum": ["open", "closed"],
+        },
+        "EmptyStatus": {
+            "type": "string",
+            "enum": [],
+        },
+        "BadStatus": {
+            "type": "string",
+            "enum": "open",
+        },
+        "LabeledStatus": {
+            "description": "A labeled status",
+            "allOf": [
+                {"$ref": "#/components/schemas/Status"},
+                {"description": "labeled"},
+            ],
+        },
+        "Pet": {
+            "type": "object",
+            "properties": {
+                "status": {"$ref": "#/components/schemas/Status"},
+                "name": {"type": "string"},
+            },
+        },
+    }
+}
+
+EXPANDED_STATUS = {
+    "type": "string",
+    "enum": ["open", "closed"],
+    "x-reference": "Status",
+    "x-enum": "Status",
+}
+
 
 @pytest.mark.parametrize(
     ["schema", "components", "name", "expected"],
@@ -315,6 +353,88 @@ EXPANDED_PET = {
                 },
             },
             id="name",
+        ),
+        pytest.param(
+            {"type": "string", "enum": ["open", "closed"]},
+            {},
+            None,
+            {"type": "string", "enum": ["open", "closed"]},
+            id="inline-enum",
+        ),
+        pytest.param(
+            {"$ref": "#/components/schemas/Status"},
+            ENUM_COMPONENTS,
+            None,
+            EXPANDED_STATUS,
+            id="enum-ref",
+        ),
+        pytest.param(
+            {"$ref": "#/components/schemas/Status", "description": "Custom status"},
+            ENUM_COMPONENTS,
+            None,
+            {**EXPANDED_STATUS, "description": "Custom status"},
+            id="enum-ref-sibling",
+        ),
+        pytest.param(
+            {"$ref": "#/components/schemas/EmptyStatus"},
+            ENUM_COMPONENTS,
+            None,
+            {"type": "string", "enum": [], "x-reference": "EmptyStatus"},
+            id="empty-enum",
+        ),
+        pytest.param(
+            {"$ref": "#/components/schemas/BadStatus"},
+            ENUM_COMPONENTS,
+            None,
+            {"type": "string", "enum": "open", "x-reference": "BadStatus"},
+            id="non-list-enum",
+        ),
+        pytest.param(
+            {"$ref": "#/components/schemas/Pet"},
+            ENUM_COMPONENTS,
+            None,
+            {
+                "type": "object",
+                "properties": {
+                    "status": EXPANDED_STATUS,
+                    "name": {"type": "string", "x-reference": "Pet"},
+                },
+                "x-reference": "Pet",
+            },
+            id="property-enum",
+        ),
+        pytest.param(
+            {"type": "array", "items": {"$ref": "#/components/schemas/Status"}},
+            ENUM_COMPONENTS,
+            None,
+            {"type": "array", "items": EXPANDED_STATUS},
+            id="nested-enum",
+        ),
+        pytest.param(
+            ENUM_COMPONENTS["schemas"]["LabeledStatus"],
+            ENUM_COMPONENTS,
+            None,
+            {
+                "type": "string",
+                "enum": ["open", "closed"],
+                "description": "A labeled status",
+                "x-reference": "Status",
+                "x-enum": "Status",
+            },
+            id="allOf-enum",
+        ),
+        pytest.param(
+            {"$ref": "#/components/schemas/LabeledStatus"},
+            ENUM_COMPONENTS,
+            None,
+            {
+                "type": "string",
+                "enum": ["open", "closed"],
+                "description": "A labeled status",
+                "x-reference": "LabeledStatus",
+                "x-enum": "LabeledStatus",
+            },
+            id="allOf-enum-ref",
         ),
     ],
 )
