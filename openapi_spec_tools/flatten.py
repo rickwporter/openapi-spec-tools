@@ -239,6 +239,37 @@ def _flatten_properties(
     return flat, replacements
 
 
+# this is an ordered list of type/item-type for selecting types
+_TYPE_PREFERENCES = [
+    ("array", "string"),
+    ("array", "number"),
+    ("array", "float"),
+    ("array", "integer"),
+    ("array", "boolean"),
+    ("string", None),
+    ("number", None),
+    ("float", None),
+    ("integer", None),
+    ("boolean", None),
+]
+
+
+def _choose_type(types: list[dict[str, Any]]) -> dict[str, Any]:
+    """Chooses the most flexible "simple" type from the provided list.
+
+    If all the sub-types are complex, it chooses the first one.
+    """
+    for pref_main, pref_items in _TYPE_PREFERENCES:
+        for data in types:
+            main_type = data.get(OasField.TYPE)
+            item_type = data.get(OasField.ITEMS, {}).get(OasField.TYPE)
+            if main_type == pref_main and item_type == pref_items:
+                return data
+
+    # if no match found, just return the first item
+    return types[0]
+
+
 def _apply_any_of(model: dict[str, Any]) -> bool:
     """Merge the first ``anyOf`` schema onto ``model`` when that item is complex.
 
@@ -267,7 +298,7 @@ def _apply_one_of(model: dict[str, Any]) -> bool:
     if not isinstance(one_of, list) or not one_of or not isinstance(one_of[0], dict):
         return False
 
-    chosen = one_of[0]
+    chosen = _choose_type(one_of)
     parent_read_only = _is_read_only(model)
     model.pop(OasField.ONE_OF.value, None)
     model.update(chosen)

@@ -434,7 +434,13 @@ from openapi_spec_tools.flatten import is_simple_type
                                     },
                                 },
                             },
-                            {"type": "string"},
+                            {
+                                "type": "object",
+                                "required": "id",
+                                "properties": {
+                                    "id": {"type": "string"},
+                                }
+                            },
                         ]
                     }
                 },
@@ -476,7 +482,13 @@ from openapi_spec_tools.flatten import is_simple_type
                                     "properties": {"name": {"type": "string"}},
                                 },
                             },
-                            {"type": "string"},
+                            {
+                                "type": "object",
+                                "required": "id",
+                                "properties": {
+                                    "id": {"type": "string"},
+                                }
+                            },
                         ]
                     }
                 },
@@ -551,7 +563,13 @@ from openapi_spec_tools.flatten import is_simple_type
                             "home": {"type": "object", "properties": {"city": {"type": "string"}}},
                         },
                     },
-                    {"type": "string"},
+                    {
+                        "type": "object",
+                        "required": "id",
+                        "properties": {
+                            "id": {"type": "string"},
+                        }
+                    },
                 ],
             },
             {
@@ -625,7 +643,13 @@ from openapi_spec_tools.flatten import is_simple_type
                                     },
                                 },
                             },
-                            {"type": "string"},
+                            {
+                                "type": "object",
+                                "required": "id",
+                                "properties": {
+                                    "id": {"type": "string"},
+                                }
+                            },
                         ]
                     }
                 },
