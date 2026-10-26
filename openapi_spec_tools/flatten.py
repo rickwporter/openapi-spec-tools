@@ -154,12 +154,15 @@ def _collection_requires_items(model: dict[str, Any], ancestor_required: bool) -
     return isinstance(min_items, int) and min_items > 0
 
 
-def flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -> bool:
+def flatten_collection(model: dict[str, Any], ancestor_required: bool = True, force_single: bool = True) -> bool:
     """Treat an array of complex items as one item.
 
     The item schema replaces the array. ``x-forced-single`` is set and ``x-collection`` is omitted.
     ``readOnly`` true on the array or the items schema is kept. Required fields on the item stay
     required only when the collection is required and ``minItems`` is greater than zero.
+
+    The ``force_single`` parameter controls whether the X_SINGLE or X_COLLECT property is set when the
+    items are a complex type.
     """
     collection_type = _collection_type(model)
     if collection_type is None:
@@ -179,7 +182,7 @@ def flatten_collection(model: dict[str, Any], ancestor_required: bool = True) ->
     model.pop(OasField.TYPE.value, None)
     model.update(items)
     _merge_read_only(model, parent_read_only, items)
-    if simple:
+    if simple or not force_single:
         model.pop(OasField.X_SINGLE.value, None)
         model[OasField.X_COLLECT.value] = collection_type
     else:
