@@ -1,6 +1,9 @@
 """Implementation for several utilities for analyzing and modifying OpenAPI specifications."""
 from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.expand import merge_schema
+from openapi_spec_tools.flatten import apply_any_of
+from openapi_spec_tools.flatten import apply_one_of
+from openapi_spec_tools.flatten import flatten_collection
 from openapi_spec_tools.flatten import flatten_schema
 from openapi_spec_tools.flatten import is_simple_type
 from openapi_spec_tools.utils import count_values

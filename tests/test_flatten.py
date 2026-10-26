@@ -2,10 +2,11 @@ from typing import Any
 
 import pytest
 
-from openapi_spec_tools.flatten import _apply_any_of
 from openapi_spec_tools.flatten import _collection_type
-from openapi_spec_tools.flatten import _flatten_collection
 from openapi_spec_tools.flatten import _is_complex
+from openapi_spec_tools.flatten import apply_any_of
+from openapi_spec_tools.flatten import apply_one_of
+from openapi_spec_tools.flatten import flatten_collection
 from openapi_spec_tools.flatten import flatten_schema
 from openapi_spec_tools.flatten import is_simple_type
 
@@ -1406,8 +1407,8 @@ def test__collection_type(model: dict[str, Any], expected: str | None) -> None:
         ),
     ]
 )
-def test__flatten_collection(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
-    assert expected == _flatten_collection(model)
+def test_flatten_collection(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
+    assert expected == flatten_collection(model)
     assert model == updated
 
 
@@ -1466,8 +1467,8 @@ def test__is_complex(model: dict[str, Any], expected: bool) -> None:
             id="non-dict",
         ),
         pytest.param(
-            {"anyOf": [{"type": "string"}, {"type": "number", "format": "int32"}]},
-            {"type": "string"},
+            {"anyOf": [{"type": "number", "format": "int32"}, {"type": "string"}]},
+            {"type": "number", "format": "int32"},
             True,
             id="non-complex",
         ),
@@ -1485,6 +1486,52 @@ def test__is_complex(model: dict[str, Any], expected: bool) -> None:
 
     ],
 )
-def test__apply_any_of(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
-    assert expected == _apply_any_of(model)
+def test_apply_any_of(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
+    assert expected == apply_any_of(model)
+    assert model == updated
+
+
+@pytest.mark.parametrize(
+    ["model", "updated", "expected"],
+    [
+        pytest.param({}, {}, False, id="empty"),
+        pytest.param(
+            {"oneOf": True},
+            {"oneOf": True},
+            False,
+            id="bool",
+        ),
+        pytest.param(
+            {"oneOf": []},
+            {"oneOf": []},
+            False,
+            id="empty-list",
+        ),
+        pytest.param(
+            {"oneOf": [1, True]},
+            {"oneOf": [1, True]},
+            False,
+            id="non-dict",
+        ),
+        pytest.param(
+            {"oneOf": [{"type": "number", "format": "int32"}, {"type": "string"}]},
+            {"type": "string"},
+            True,
+            id="non-complex",
+        ),
+        pytest.param(
+            {
+                "oneOf": [
+                    {"type": "object", "properties": {"a": {"type": "string", "format": "datetime"}}},
+                    {"properties": {"b": {"type": "number", "format": "uint32"}}},
+                ],
+            },
+            {"type": "object", "properties": {"a": {"type": "string", "format": "datetime"}}},
+            True,
+            id="nested-complex",
+        ),
+    ],
+)
+def test_apply_one_of(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
+    assert expected == apply_one_of(model)
     assert model == updated
