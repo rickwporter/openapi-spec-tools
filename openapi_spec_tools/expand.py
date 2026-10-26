@@ -84,6 +84,9 @@ def expand_schema(
                 resolved = _expand(target, seen)
                 class_name = reference_classname(reference)
                 resolved[OasField.X_REF.value] = class_name
+                enum = resolved.get(OasField.ENUM)
+                if enum and isinstance(enum, list):
+                    resolved[OasField.X_ENUM.value] = class_name
                 _mark_reference_properties(resolved, class_name)
             else:
                 pending[OasField.REFS.value] = reference
