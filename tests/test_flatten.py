@@ -711,10 +711,8 @@ from openapi_spec_tools.flatten import is_simple_type
                 "properties": {
                     "status": {
                         "description": "Current status",
-                        "anyOf": [
-                            {"type": "string", "enum": ["open", "closed"]},
-                            {"type": "integer"},
-                        ],
+                        "type": "string",
+                        "enum": ["open", "closed"],
                         "x-field": "status",
                         "required": False,
                     },
@@ -774,10 +772,8 @@ from openapi_spec_tools.flatten import is_simple_type
                         "required": False,
                     },
                     "labels": {
-                        "anyOf": [
-                            {"type": "string", "x-collection": "array"},
-                            {"type": "null"},
-                        ],
+                        "type": "string",
+                        "x-collection": "array",
                         "x-field": "labels",
                         "required": False,
                     },
@@ -1447,8 +1443,8 @@ def test__is_complex(model: dict[str, Any], expected: bool) -> None:
         ),
         pytest.param(
             {"anyOf": [{"type": "string"}, {"type": "number", "format": "int32"}]},
-            {"anyOf": [{"type": "string"}, {"type": "number", "format": "int32"}]},
-            False,
+            {"type": "string"},
+            True,
             id="non-complex",
         ),
         pytest.param(

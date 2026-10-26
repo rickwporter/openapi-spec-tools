@@ -248,10 +248,8 @@ def _apply_any_of(model: dict[str, Any]) -> bool:
     any_of = model.get(OasField.ANY_OF)
     if not isinstance(any_of, list) or not any_of or not isinstance(any_of[0], dict):
         return False
-    chosen = any_of[0]
-    if not _is_complex(chosen):
-        return False
 
+    chosen = any_of[0]
     parent_read_only = _is_read_only(model)
     model.pop(OasField.ANY_OF.value, None)
     model.update(chosen)
