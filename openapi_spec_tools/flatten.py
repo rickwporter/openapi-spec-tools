@@ -154,7 +154,7 @@ def _collection_requires_items(model: dict[str, Any], ancestor_required: bool) -
     return isinstance(min_items, int) and min_items > 0
 
 
-def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -> bool:
+def flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -> bool:
     """Treat an array of complex items as one item.
 
     The item schema replaces the array. ``x-forced-single`` is set and ``x-collection`` is omitted.
@@ -167,7 +167,7 @@ def _flatten_collection(model: dict[str, Any], ancestor_required: bool = True) -
     items = model.get(OasField.ITEMS)
     if not isinstance(items, dict) or items is model:
         return False
-    while _apply_any_of(items) or _apply_one_of(items):
+    while apply_any_of(items) or apply_one_of(items):
         pass
     simple = is_simple_type(items)
 
@@ -270,7 +270,7 @@ def _choose_type(types: list[dict[str, Any]]) -> dict[str, Any]:
     return types[0]
 
 
-def _apply_any_of(model: dict[str, Any]) -> bool:
+def apply_any_of(model: dict[str, Any]) -> bool:
     """Merge the first ``anyOf`` schema onto ``model`` when that item is complex.
 
     Simple scalar alternatives stay as ``anyOf``. Keys already on ``model`` stay when the chosen
@@ -288,7 +288,7 @@ def _apply_any_of(model: dict[str, Any]) -> bool:
     return True
 
 
-def _apply_one_of(model: dict[str, Any]) -> bool:
+def apply_one_of(model: dict[str, Any]) -> bool:
     """Merge the first ``oneOf`` schema onto ``model``.
 
     Keys already on ``model`` stay when the chosen item does not set them.
@@ -315,13 +315,13 @@ def _flatten_model(
     if ancestor_read_only:
         model[OasField.READ_ONLY.value] = True
 
-    if _apply_one_of(model):
+    if apply_one_of(model):
         return _flatten_model(model, ancestor_required, ancestor_read_only)
 
-    if _apply_any_of(model):
+    if apply_any_of(model):
         return _flatten_model(model, ancestor_required, ancestor_read_only)
 
-    if _flatten_collection(model, ancestor_required):
+    if flatten_collection(model, ancestor_required):
         return _flatten_model(model, ancestor_required, ancestor_read_only)
 
     read_only = _is_read_only(model)
