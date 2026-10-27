@@ -27,8 +27,8 @@ class PropertyApiGenerator(ApiGenerator):
     def model_properties(self, name: str, schema: dict[str, Any]) -> dict[str, Any]:  # noqa: PLR0912
         """Get a list of settable model properties."""
         expanded = expand_schema(schema, self.components, name)
-        apply_one_of(expanded)
-        apply_any_of(expanded)
+        while apply_one_of(expanded) or apply_any_of(expanded):
+            pass
         flatten_collection(expanded, force_single=False)
         settable = {
             name: data
@@ -39,8 +39,8 @@ class PropertyApiGenerator(ApiGenerator):
         # update settable fields for easier digestion
         required = expanded.get(OasField.REQUIRED) or []
         for prop_name, prop_data in settable.items():
-            apply_one_of(prop_data)
-            apply_any_of(prop_data)
+            while apply_one_of(prop_data) or apply_any_of(prop_data):
+                pass
             flatten_collection(prop_data, force_single=False)
             self.update_enum(prop_data)
             prop_data[OasField.REQUIRED.value] = bool(prop_name in required)
