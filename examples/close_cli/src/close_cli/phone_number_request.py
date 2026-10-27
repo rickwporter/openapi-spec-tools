@@ -51,6 +51,7 @@ class PhoneNumberSharing(str, Enum):  # noqa: F811
 
 @app.command("internal", short_help="Request an internal phone number")
 def phone_numbers_create(
+    assign_to: Annotated[list[str] | None, typer.Option(show_default=False, help="IDs of the users the new phone number is assigned to. When omitted, the number is assigned to the user making the request. Assigning it to anyone else requires the \"Manage Team Phone Numbers\" permission, and every user must be an active member of the organization who is allowed to make calls.")] = None,
     bundle_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     carrier_type: Annotated[CarrierType | None, typer.Option(show_default=False, case_sensitive=False)] = None,
     country: Annotated[str | None, typer.Option(show_default=False, help="A two letter ISO country code (e.g. `US` for United States).")] = None,
@@ -94,6 +95,8 @@ def phone_numbers_create(
 
     params = {}
     body = {}
+    if assign_to is not None:
+        body["assign_to"] = assign_to
     if bundle_id is not None:
         body["bundle_id"] = bundle_id
     if carrier_type is not None:

@@ -24,8 +24,8 @@ def test_op_body_arguments():
     assert 'flavor: Species | None = None,  # Species type' in text
     assert 'bin_string: BinString | None = "4",' in text
     assert 'optional_list: list[str] | None = None,' in text
-    assert 'first_choice: int | None = None,' in text
-    assert 'list_various: list[bool] | None = None,' in text
+    assert 'first_choice: list[str] | None = None,' in text
+    assert 'list_various: list[int] | None = None,' in text
     assert 'format_: str | None = "text",' in text
     assert 'gone: str | None = None,  # To be removed' in text
     assert 'best_day: DayOfWeek | None = None,  # enum buried in all-of' in text

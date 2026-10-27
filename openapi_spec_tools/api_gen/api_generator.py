@@ -62,17 +62,17 @@ class ApiGenerator(BaseGenerator, ABC):
     def property_help(self, prop: dict[str, Any]) -> str:
         """Get the short help string for the specified property."""
         help = prop.get(OasField.SUMMARY) or prop.get(OasField.DESCRIPTION) or ""
-        short_ref = prop.get(OasField.X_REF)
+        short_ref = prop.get(OasField.X_ENUM) or prop.get(OasField.X_REF)
         choices = prop.get(OasField.ENUM)
         required = prop.get(OasField.REQUIRED)
 
         if help:
             if len(help) > self.max_help_length:
                 help = help.split(". ")[0].strip()[:self.max_help_length] + '...'
-        elif short_ref:
-            help = f"see {short_ref} for info"
         elif choices:
             help = f"choices: {', '.join([str(_) for _ in choices])}"
+        elif short_ref:
+            help = f"see {short_ref} for info"
 
         if required and "require" not in help.lower():
             if not help.endswith(" "):

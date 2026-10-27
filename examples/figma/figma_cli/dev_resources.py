@@ -68,24 +68,20 @@ def post_dev_resources(
     missing = []
     if _api_key is None:
         missing.append("--api-key")
-    if dev_resources_name is None:
-        missing.append("--dev-resources-name")
-    if dev_resources_url is None:
-        missing.append("--dev-resources-url")
-    if dev_resources_file_key is None:
-        missing.append("--dev-resources-file-key")
-    if dev_resources_node_id is None:
-        missing.append("--dev-resources-node-id")
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 
     params = {}
     body = {}
     dev_resources = {}
-    dev_resources["name"] = dev_resources_name
-    dev_resources["url"] = dev_resources_url
-    dev_resources["file_key"] = dev_resources_file_key
-    dev_resources["node_id"] = dev_resources_node_id
+    if dev_resources_name is not None:
+        dev_resources["name"] = dev_resources_name
+    if dev_resources_url is not None:
+        dev_resources["url"] = dev_resources_url
+    if dev_resources_file_key is not None:
+        dev_resources["file_key"] = dev_resources_file_key
+    if dev_resources_node_id is not None:
+        dev_resources["node_id"] = dev_resources_node_id
     # stitch together the sub-objects
     if dev_resources:
         body["dev_resources"] = [dev_resources]  # convert to list
@@ -124,15 +120,14 @@ def put_dev_resources(
     missing = []
     if _api_key is None:
         missing.append("--api-key")
-    if dev_resources_id is None:
-        missing.append("--dev-resources-id")
     if missing:
         _e.handle_exceptions(_e.MissingRequiredError(missing))
 
     params = {}
     body = {}
     dev_resources = {}
-    dev_resources["id"] = dev_resources_id
+    if dev_resources_id is not None:
+        dev_resources["id"] = dev_resources_id
     if dev_resources_name is not None:
         dev_resources["name"] = dev_resources_name
     if dev_resources_url is not None:

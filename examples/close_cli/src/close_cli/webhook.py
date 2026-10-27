@@ -60,10 +60,6 @@ def webhooks_create(
     missing = []
     if _api_key is None:
         missing.append("--api-key")
-    if events_action is None:
-        missing.append("--events-action")
-    if events_object_type is None:
-        missing.append("--events-object-type")
     if url is None:
         missing.append("--url")
     if missing:
@@ -72,8 +68,10 @@ def webhooks_create(
     params = {}
     body = {}
     events = {}
-    events["action"] = events_action
-    events["object_type"] = events_object_type
+    if events_action is not None:
+        events["action"] = events_action
+    if events_object_type is not None:
+        events["object_type"] = events_object_type
     body["url"] = url
     if verify_ssl is not None:
         body["verify_ssl"] = verify_ssl
@@ -159,6 +157,8 @@ class WebhookStatus(str, Enum):  # noqa: F811
 @app.command("set", short_help="Update existing Webhook subscription")
 def webhooks_update(
     id: Annotated[str, typer.Argument(show_default=False)],
+    events_action: Annotated[str | None, typer.Option(show_default=False)] = None,
+    events_object_type: Annotated[str | None, typer.Option(show_default=False)] = None,
     status: Annotated[WebhookStatus | None, typer.Option(show_default=False, case_sensitive=False)] = None,
     url: Annotated[str | None, typer.Option(show_default=False, help="Destination URL for the webhook subscription")] = None,
     verify_ssl: Annotated[bool | None, typer.Option("--verify-ssl/--no-verify-ssl", show_default=False, help="Verify SSL certificate of destination webhook URL. Set to `false` to disable SSL certificate validation. We recommend using https to protect your data during delivery.")] = None,
@@ -184,12 +184,20 @@ def webhooks_update(
 
     params = {}
     body = {}
+    events = {}
+    if events_action is not None:
+        events["action"] = events_action
+    if events_object_type is not None:
+        events["object_type"] = events_object_type
     if status is not None:
         body["status"] = status
     if url is not None:
         body["url"] = url
     if verify_ssl is not None:
         body["verify_ssl"] = verify_ssl
+    # stitch together the sub-objects
+    if events:
+        body["events"] = [events]  # convert to list
 
     try:
         data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)

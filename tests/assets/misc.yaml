@@ -315,7 +315,6 @@ components:
               oneOf:
               - type: boolean
               - type: integer
-              - type: string
           format:
             type: string
             default: text

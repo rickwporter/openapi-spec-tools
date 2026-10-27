@@ -37,15 +37,15 @@ def show_commands(
     _t.tree(path.as_posix(), "files_variables", display_opt, depth, search)
 
 
-class VariableCollectionCreate(str, Enum):  # noqa: F811
+class VariableCollectionsAction(str, Enum):  # noqa: F811
     CREATE = "CREATE"
 
 
-class VariableModeCreate(str, Enum):  # noqa: F811
+class VariableModesAction(str, Enum):  # noqa: F811
     CREATE = "CREATE"
 
 
-class VariableCreate(str, Enum):  # noqa: F811
+class VariablesAction(str, Enum):  # noqa: F811
     CREATE = "CREATE"
 
 
@@ -85,31 +85,30 @@ class VariableScope(str, Enum):  # noqa: F811
 @app.command("create", short_help="Create/modify/delete variables")
 def post_variables(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to modify variables in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    variable_collections_action: Annotated[VariableCollectionCreate | None, typer.Option(show_default=False, case_sensitive=False, help="The action to perform for the variable collection.")] = None,
+    variable_collections_action: Annotated[VariableCollectionsAction | None, typer.Option(show_default=False, case_sensitive=False, help="The action to perform for the variable collection.")] = None,
     variable_collections_id: Annotated[str | None, typer.Option(show_default=False, help="A temporary id for this variable collection.")] = None,
     variable_collections_name: Annotated[str | None, typer.Option(show_default=False, help="The name of this variable collection.")] = None,
     variable_collections_initial_mode_id: Annotated[str | None, typer.Option(show_default=False, help="The initial mode refers to the mode that is created by default. You can set a temporary id here, in order to reference this mode later in this request.")] = None,
     variable_collections_hidden_from_publishing: Annotated[bool | None, typer.Option("--variable-collections-hidden-from-publishing/--no-variable-collections-hidden-from-publishing", help="Whether this variable collection is hidden when publishing the current file as a library.")] = False,
     variable_collections_parent_variable_collection_id: Annotated[str | None, typer.Option(show_default=False, help="The id of the parent variable collection that this variable collection is extending from.")] = None,
-    variable_collections_initial_mode_id_to_parent_mode_id_mapping: Annotated[str | None, typer.Option(show_default=False, help="Maps inherited modes from the parent variable collection to the initial mode ids on the extended variable collection.")] = None,
-    variable_modes_action: Annotated[VariableModeCreate | None, typer.Option(show_default=False, case_sensitive=False, help="The action to perform for the variable mode.")] = None,
+    variable_modes_action: Annotated[VariableModesAction | None, typer.Option(show_default=False, case_sensitive=False, help="The action to perform for the variable mode.")] = None,
     variable_modes_id: Annotated[str | None, typer.Option(show_default=False, help="A temporary id for this variable mode.")] = None,
     variable_modes_name: Annotated[str | None, typer.Option(show_default=False, help="The name of this variable mode.")] = None,
     variable_modes_variable_collection_id: Annotated[str | None, typer.Option(show_default=False, help="The variable collection that will contain the mode. You can use the temporary id of a variable collection. New modes cannot be created on extended collections.")] = None,
-    variables_action: Annotated[VariableCreate | None, typer.Option(show_default=False, case_sensitive=False, help="The action to perform for the variable.")] = None,
+    variables_action: Annotated[VariablesAction | None, typer.Option(show_default=False, case_sensitive=False, help="The action to perform for the variable.")] = None,
     variables_id: Annotated[str | None, typer.Option(show_default=False, help="A temporary id for this variable.")] = None,
     variables_name: Annotated[str | None, typer.Option(show_default=False, help="The name of this variable.")] = None,
     variables_variable_collection_id: Annotated[str | None, typer.Option(show_default=False, help="The variable collection that will contain the variable. You can use the temporary id of a variable collection.")] = None,
     variables_resolved_type: Annotated[VariableResolvedDataType | None, typer.Option(show_default=False, case_sensitive=False, help="The resolved type of the variable.")] = None,
     variables_description: Annotated[str | None, typer.Option(show_default=False, help="The description of this variable.")] = None,
     variables_hidden_from_publishing: Annotated[bool | None, typer.Option("--variables-hidden-from-publishing/--no-variables-hidden-from-publishing", help="Whether this variable is hidden when publishing the current file as a library.")] = False,
-    variables_scopes: Annotated[list[VariableScope] | None, typer.Option(show_default=False, case_sensitive=False, help="An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields.")] = None,
+    variables_scopes: Annotated[list[VariableScope] | None, typer.Option(show_default=False, case_sensitive=False, help="Scopes allow a variable to be shown or hidden in the variable picker for various fields. This declutters the Figma UI if you have a large number of variables. Variable scopes are currently supported on `FLOAT`, `STRING`, and `COLOR` variables.")] = None,
     variables_code_syntax_web: Annotated[str | None, typer.Option(show_default=False)] = None,
     variables_code_syntax_android: Annotated[str | None, typer.Option(show_default=False)] = None,
     variables_code_syntax_i_os: Annotated[str | None, typer.Option(show_default=False)] = None,
     variable_mode_values_variable_id: Annotated[str | None, typer.Option(show_default=False, help="The target variable. You can use the temporary id of a variable.")] = None,
     variable_mode_values_mode_id: Annotated[str | None, typer.Option(show_default=False, help="Must correspond to a mode in the variable collection that contains the target variable.")] = None,
-    variable_mode_values_value: Annotated[bool | None, typer.Option("--variable-mode-values-value/--no-variable-mode-values-value", show_default=False, help="The value for the variable. The value must match the variable\'s type. If setting to a variable alias, the alias must resolve to this type. If overriding a value, the value type must match the variable\'s type. If removing an overridden value, the value must be `null`.")] = None,
+    variable_mode_values_value: Annotated[str | None, typer.Option(show_default=False, help="The value for the variable. The value must match the variable\'s type. If setting to a variable alias, the alias must resolve to this type. If overriding a value, the value type must match the variable\'s type. If removing an overridden value, the value must be `null`.")] = None,
     _api_host: _a.ApiHostOption = "https://api.figma.com",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -189,8 +188,6 @@ def post_variables(
         variable_collections["hiddenFromPublishing"] = variable_collections_hidden_from_publishing
     if variable_collections_parent_variable_collection_id is not None:
         variable_collections["parentVariableCollectionId"] = variable_collections_parent_variable_collection_id
-    if variable_collections_initial_mode_id_to_parent_mode_id_mapping is not None:
-        variable_collections["initialModeIdToParentModeIdMapping"] = variable_collections_initial_mode_id_to_parent_mode_id_mapping
     if variable_modes_action is not None:
         variable_modes["action"] = variable_modes_action
     if variable_modes_id is not None:
@@ -229,13 +226,13 @@ def post_variables(
         variable_mode_values["value"] = variable_mode_values_value
     # stitch together the sub-objects
     if code_syntax:
-        variables["codeSyntax"] = code_syntax
+        variables["codeSyntax"] = [code_syntax]  # convert to list
     if variable_collections:
-        body["variableCollections"] = variable_collections
+        body["variableCollections"] = [variable_collections]  # convert to list
     if variable_modes:
-        body["variableModes"] = variable_modes
+        body["variableModes"] = [variable_modes]  # convert to list
     if variables:
-        body["variables"] = variables
+        body["variables"] = [variables]  # convert to list
     if variable_mode_values:
         body["variableModeValues"] = [variable_mode_values]  # convert to list
 

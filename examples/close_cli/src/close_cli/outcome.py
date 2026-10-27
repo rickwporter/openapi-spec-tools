@@ -37,6 +37,11 @@ def show_commands(
     _t.tree(path.as_posix(), "outcome", display_opt, depth, search)
 
 
+class OutcomeAppliesTo(str, Enum):  # noqa: F811
+    CALLS = "calls"
+    MEETINGS = "meetings"
+
+
 class OutcomeType(str, Enum):  # noqa: F811
     VM_DROPPED = "vm-dropped"
     CUSTOM = "custom"
@@ -44,6 +49,7 @@ class OutcomeType(str, Enum):  # noqa: F811
 
 @app.command("create", short_help="Create an outcome")
 def outcomes_create(
+    applies_to: Annotated[list[OutcomeAppliesTo] | None, typer.Option(show_default=False, case_sensitive=False, hidden=True, help="Deprecated. This field will be derived from `type` in a future update: `custom` applies to calls and meetings, `vm-dropped` applies to calls only.")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="Explain what the outcome means and when it should be used.")] = None,
     name: Annotated[str | None, typer.Option(show_default=False, help="Displayed to users wherever outcomes can be selected.")] = None,
     type_: Annotated[OutcomeType | None, typer.Option("--type", case_sensitive=False, help="Set to `vm-dropped` if this outcome should be automatically set on calls whenever a team member performs a Voicemail Drop. Otherwise, leave empty or explicitly set to `custom` (default).")] = "custom",
@@ -71,6 +77,9 @@ def outcomes_create(
 
     params = {}
     body = {}
+    if applies_to is not None:
+        _l.logger().warning("--applies-to is deprecated and should not be used")
+        body["applies_to"] = applies_to
     if description is not None:
         body["description"] = description
     body["name"] = name
@@ -167,6 +176,11 @@ def outcomes_list(
         _e.handle_exceptions(ex)
 
 
+class OutcomeAppliesTo(str, Enum):  # noqa: F811
+    CALLS = "calls"
+    MEETINGS = "meetings"
+
+
 class OutcomeType(str, Enum):  # noqa: F811
     VM_DROPPED = "vm-dropped"
     CUSTOM = "custom"
@@ -175,6 +189,7 @@ class OutcomeType(str, Enum):  # noqa: F811
 @app.command("set", short_help="Update an outcome")
 def outcomes_update(
     id: Annotated[str, typer.Argument(show_default=False)],
+    applies_to: Annotated[list[OutcomeAppliesTo] | None, typer.Option(show_default=False, case_sensitive=False, hidden=True, help="Deprecated. This field will be derived from `type` in a future update: `custom` applies to calls and meetings, `vm-dropped` applies to calls only.")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="Explain what the outcome means and when it should be used.")] = None,
     name: Annotated[str | None, typer.Option(show_default=False, help="Displayed to users wherever outcomes can be selected.")] = None,
     type_: Annotated[OutcomeType | None, typer.Option("--type", show_default=False, case_sensitive=False, help="Set to `vm-dropped` if this outcome should be automatically set on calls whenever a team member performs a Voicemail Drop. Otherwise, leave empty or explicitly set to `custom` (default).")] = None,
@@ -200,6 +215,9 @@ def outcomes_update(
 
     params = {}
     body = {}
+    if applies_to is not None:
+        _l.logger().warning("--applies-to is deprecated and should not be used")
+        body["applies_to"] = applies_to
     if description is not None:
         body["description"] = description
     if name is not None:

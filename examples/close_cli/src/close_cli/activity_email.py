@@ -195,7 +195,7 @@ def activities_emails_create(
     if attachments:
         body["attachments"] = [attachments]  # convert to list
     if opens:
-        body["opens"] = opens
+        body["opens"] = [opens]  # convert to list
 
     try:
         data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
@@ -444,7 +444,7 @@ def activities_emails_update(
     if attachments:
         body["attachments"] = [attachments]  # convert to list
     if opens:
-        body["opens"] = opens
+        body["opens"] = [opens]  # convert to list
 
     try:
         data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)

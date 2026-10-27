@@ -45,6 +45,9 @@ class OpportunityValuePeriod(str, Enum):  # noqa: F811
 
 @app.command("create", short_help="Create an opportunity")
 def opportunities_create(
+    attachments_content_type: Annotated[str | None, typer.Option()] = "",
+    attachments_filename: Annotated[str | None, typer.Option(show_default=False)] = None,
+    attachments_url: Annotated[str | None, typer.Option(show_default=False)] = None,
     confidence: Annotated[int | None, typer.Option(show_default=False)] = None,
     contact_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     created_by: Annotated[str | None, typer.Option(show_default=False)] = None,
@@ -96,6 +99,13 @@ def opportunities_create(
 
     params = {}
     body = {}
+    attachments = {}
+    if attachments_content_type is not None:
+        attachments["content_type"] = attachments_content_type
+    if attachments_filename is not None:
+        attachments["filename"] = attachments_filename
+    if attachments_url is not None:
+        attachments["url"] = attachments_url
     if confidence is not None:
         body["confidence"] = confidence
     if contact_id is not None:
@@ -122,6 +132,9 @@ def opportunities_create(
         body["value"] = value
     if value_period is not None:
         body["value_period"] = value_period
+    # stitch together the sub-objects
+    if attachments:
+        body["attachments"] = [attachments]  # convert to list
 
     try:
         data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)

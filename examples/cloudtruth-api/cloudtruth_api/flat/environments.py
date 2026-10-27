@@ -17,7 +17,6 @@ def environments_copy_create(
     id: str,  # A unique identifier for the environment. [required]
     name: str | None = None,  # The environment name. [required]
     description: str | None = None,  # A description of the environment...
-    child_environment_names: str | None = None,  # When copying child Environments, this indicates what name to use for each Environment...
     recursive: bool | None = None,  # If true, copy child environments recursively.  If false, only copy the specified project.
     _api_host: str | None = None,  # API host, read from API_HOST if not provided
     _api_key: str | None = None,  # API key for bearer auth, read from API_KEY if not provided
@@ -39,8 +38,6 @@ def environments_copy_create(
     body["name"] = name
     if description is not None:
         body["description"] = description
-    if child_environment_names is not None:
-        body["child_environment_names"] = child_environment_names
     if recursive is not None:
         body["recursive"] = recursive
 

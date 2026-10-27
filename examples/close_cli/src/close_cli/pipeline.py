@@ -37,9 +37,17 @@ def show_commands(
     _t.tree(path.as_posix(), "pipeline", display_opt, depth, search)
 
 
+class OpportunityStatusType(str, Enum):  # noqa: F811
+    WON = "won"
+    LOST = "lost"
+    ACTIVE = "active"
+
+
 @app.command("create", short_help="Create a Pipeline")
 def pipelines_create(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
+    statuses_label: Annotated[str | None, typer.Option(show_default=False)] = None,
+    statuses_type: Annotated[OpportunityStatusType | None, typer.Option(case_sensitive=False)] = "active",
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -64,7 +72,15 @@ def pipelines_create(
 
     params = {}
     body = {}
+    statuses = {}
     body["name"] = name
+    if statuses_label is not None:
+        statuses["label"] = statuses_label
+    if statuses_type is not None:
+        statuses["type"] = statuses_type
+    # stitch together the sub-objects
+    if statuses:
+        body["statuses"] = [statuses]  # convert to list
 
     try:
         data = _r.request("POST", url, headers=headers, params=params, body=body, timeout=_api_timeout)
@@ -141,6 +157,7 @@ def pipelines_list(
 def pipelines_update(
     id: Annotated[str, typer.Argument(show_default=False)],
     name: Annotated[str | None, typer.Option()] = "",
+    statuses_id: Annotated[str | None, typer.Option(show_default=False, help="ID of an existing Opportunity Status. May belong to a different Pipeline, in which case the status is moved into this one.")] = None,
     _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
@@ -168,8 +185,14 @@ def pipelines_update(
 
     params = {}
     body = {}
+    statuses = {}
     if name is not None:
         body["name"] = name
+    if statuses_id is not None:
+        statuses["id"] = statuses_id
+    # stitch together the sub-objects
+    if statuses:
+        body["statuses"] = [statuses]  # convert to list
 
     try:
         data = _r.request("PUT", url, headers=headers, params=params, body=body, timeout=_api_timeout)

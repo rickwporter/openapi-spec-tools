@@ -246,11 +246,11 @@ def test_op_body_arguments():
         in text
     )
     assert(
-        'first_choice: Annotated[int | None, typer.Option(show_default=False)] = None'
+        'first_choice: Annotated[list[str] | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (
-        'list_various: Annotated[list[bool] | None, typer.Option(show_default=False)] = None'
+        'list_various: Annotated[list[int] | None, typer.Option(show_default=False)] = None'
         in text
     )
     assert (

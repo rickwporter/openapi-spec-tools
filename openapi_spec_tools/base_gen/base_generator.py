@@ -24,17 +24,18 @@ from openapi_spec_tools.base_gen.constants import SEP1
 from openapi_spec_tools.base_gen.constants import SEP2
 from openapi_spec_tools.base_gen.files import copy_and_update
 from openapi_spec_tools.base_gen.utils import maybe_quoted
-from openapi_spec_tools.base_gen.utils import prepend
 from openapi_spec_tools.base_gen.utils import quoted
 from openapi_spec_tools.base_gen.utils import replace_special
-from openapi_spec_tools.base_gen.utils import set_missing
 from openapi_spec_tools.base_gen.utils import shallow
 from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_camel_case
 from openapi_spec_tools.base_gen.utils import to_snake_case
+from openapi_spec_tools.constants import NULL_TYPES
+from openapi_spec_tools.expand import expand_schema
+from openapi_spec_tools.flatten import flatten_schema
+from openapi_spec_tools.flatten import is_simple_type
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import NULL_TYPES
 from openapi_spec_tools.utils import _or
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import reference_classname
@@ -376,146 +377,19 @@ class BaseGenerator:
 
         return None
 
-    def expand_references(self, model: dict[str, Any]) -> dict[str, Any]:
-        """Expand all the references.
-
-        This is a brute force method to recursively look for any `$ref` keys, and update
-        those dictionaries in place.
-        """
-        # start at this level
-        updated = deepcopy(model)
-
-        full_ref = model.get(OasField.REFS)
-        if full_ref:
-            updated[OasField.X_REF.value] = reference_classname(full_ref)
-            submodel = self.get_model(full_ref)
-            if not submodel:
-                self.logger.warning(f"Unable to find model for {full_ref}")
-                return {}
-
-            updated.update(submodel)
-
-        # then, loop thru all the sub-items
-        result = {}
-        for key, value in updated.items():
-            if isinstance(value, dict):
-                # recursively update
-                resolved = self.expand_references(value)
-                if resolved:
-                    result[key] = resolved
-            elif isinstance(value, list):
-                items = [
-                    self.expand_references(v) if isinstance(v, dict) else v
-                    for v in value
-                ]
-                if items:
-                    result[key] = items
-            else:
-                result[key] = value
-
-        return result
-
-    def expanded_settable_properties(self, name: str, model: dict[str, Any]) -> dict[str, Any]:
-        """Turn an expanded model (all references expanded) into a dictionary of properties."""
-        properties = {}
-
-        # start with the base-classes in allOf
-        for index, parent in enumerate(model.get(OasField.ALL_OF, [])):
-            required_sub = parent.get(OasField.REQUIRED, [])
-            reference = parent.get(OasField.REFS, "")
-            short_refname = reference_classname(reference)
-            sub_properties = self.expanded_settable_properties(f"{name}.anyOf[{index}]", parent)
-            for sub_name, sub_data in sub_properties.items():
-                if short_refname:
-                    set_missing(sub_data, OasField.X_REF.value, short_refname)
-                set_missing(sub_data, OasField.X_FIELD.value, sub_name)
-                sub_data[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED.value) and sub_name in required_sub
-                properties[sub_name] = sub_data
-
-        any_of = model.get(OasField.ANY_OF)
-        if any_of:
-            if len(any_of) != 1:
-                self.logger.info(f"Grabbing anyOf[0] item from {name}")
-                self.logger.debug(f"{name} anyOf selected: {shallow(any_of[0])}")
-            # just grab the first one... not sure this is the best choice, but need to do something
-            model.update(any_of[0])
-
-        self.update_one_of(name, model)
-
-        reference = model.get(OasField.REFS, "")
-        short_refname = reference_classname(reference)
-        required_props = model.get(OasField.REQUIRED, [])
-        ref_model = self.get_model(reference)
-        if ref_model:
-            # update the non-existing fields in the model
-            set_missing(model, OasField.X_REF.value, short_refname)
-            for k, v in ref_model.items():
-                set_missing(model, k, v)
-
-        # copy the individual properties
-        for prop_name, prop_data in model.get(OasField.PROPS, {}).items():
-            if prop_data.get(OasField.READ_ONLY, False):
-                continue
-
-            collection_type = self.model_collection_type(prop_data)
-            if collection_type:
-                collect_name = f"{short_refname}." if short_refname else "" + prop_name
-                item_model = prop_data.get(OasField.ITEMS, {})
-                if not item_model:
-                    self.logger.error(f"Could not find {collect_name} item model")
-                    continue
-                if self.model_is_complex(item_model):
-                    self.logger.warning(f"Treating complex collection of {collect_name} as a single item")
-                    prop_data.pop(OasField.ITEMS.value, None)
-                    prop_data.update(item_model)
-                    prop_data[OasField.X_SINGLE.value] = True
-                else:
-                    prop_data.pop(OasField.ITEMS.value, None)
-                    prop_data[OasField.X_COLLECT.value] = collection_type
-                    prop_data.update(item_model)
-
-            required_sub = prop_data.get(OasField.REQUIRED, [])
-            sub_properties = self.expanded_settable_properties(f"{name}.{prop_name}", prop_data)
-            if not sub_properties:
-                # kind of a corner case where an enum has no properties
-                for key in (OasField.ALL_OF, OasField.ANY_OF, OasField.ONE_OF):
-                    items = prop_data.pop(key, None)
-                    if not items:
-                        continue
-                    prop_data.update(items[0])
-
-                pytype = self.get_property_pytype(prop_name, prop_data)
-                if not pytype:
-                    self.logger.warning(f"Unable to determine pytype for {name}.{prop_name}")
-                    continue
-
-                if short_refname:
-                    set_missing(prop_data, OasField.X_REF.value, short_refname)
-                prop_data[OasField.REQUIRED.value] = prop_name in required_props
-                properties[prop_name] = prop_data
-                continue
-
-            forced_single = prop_data.get(OasField.X_SINGLE, False)
-            for sub_name, sub_data in sub_properties.items():
-                # these properties are "name mangled" to include the parent property name
-                full_name = f"{prop_name}.{sub_name}"
-                sub_data[OasField.REQUIRED.value] = prop_name in required_props and sub_name in required_sub
-                if reference:
-                    set_missing(sub_data, OasField.X_REF.value, reference_classname(reference))
-                set_missing(sub_data, OasField.X_FIELD.value, sub_name)
-                prepend(sub_data, OasField.X_PARENTS.value, prop_name)
-                if forced_single:
-                    # propagate to sub-fields, since there's nothing for the parent
-                    sub_data[OasField.X_SINGLE.value] = True
-                properties[full_name] = sub_data
-
-        return properties
-
     def model_settable_properties(self, name: str, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties."""
-        expanded = self.expand_references(model)
+        expanded = expand_schema(model, self.components, name)
+        flattened = flatten_schema(expanded)
 
-        return self.expanded_settable_properties(name, expanded)
+        # filter out read-only properties, and complex properties that CLI cannot deal with
+        settable = {
+            name: data
+            for name, data in flattened.get(OasField.PROPS).items()
+            if not data.get(OasField.READ_ONLY, False) and is_simple_type(data)
+        }
+
+        return settable
 
     def op_body_schema(self, operation: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Get the name and schema dictionary."""
@@ -603,7 +477,7 @@ class BaseGenerator:
         """
         values = param_data.get(OasField.ENUM)
         if values:
-            name = param_data.get(OasField.X_REF) or param_data.get(OasField.NAME)
+            name = param_data.get(OasField.X_ENUM) or param_data.get(OasField.NAME)
             return self.class_name(name)
 
         py_type = self.schema_to_pytype(param_data)
@@ -989,7 +863,7 @@ class BaseGenerator:
             if not values:
                 continue
 
-            e_name = param_data.get(OasField.X_REF) or param_data.get(OasField.NAME)
+            e_name = param_data.get(OasField.X_ENUM) or param_data.get(OasField.NAME)
             e_type = self.schema_to_pytype(param_data) or 'str'
             enums[self.class_name(e_name)] = (e_type, values)
 
@@ -997,7 +871,7 @@ class BaseGenerator:
             values = prop.get(OasField.ENUM)
             if not values:
                 continue
-            e_name = prop.get(OasField.X_REF) or name
+            e_name = prop.get(OasField.X_ENUM) or name
             e_type = self.schema_to_pytype(prop) or 'str'
             enums[self.class_name(e_name)] = (e_type, values)
 
