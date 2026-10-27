@@ -1,12 +1,14 @@
 """Declares the PropertyApiGenerator class."""
-from copy import deepcopy
 from typing import Any
 
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.base_gen import NL
 from openapi_spec_tools.base_gen import SEP1
 from openapi_spec_tools.base_gen import quoted
-from openapi_spec_tools.base_gen import shallow
+from openapi_spec_tools.expand import expand_schema
+from openapi_spec_tools.flatten import apply_any_of
+from openapi_spec_tools.flatten import apply_one_of
+from openapi_spec_tools.flatten import flatten_collection
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
 
@@ -24,57 +26,26 @@ class PropertyApiGenerator(ApiGenerator):
 
     def model_properties(self, name: str, schema: dict[str, Any]) -> dict[str, Any]:  # noqa: PLR0912
         """Get a list of settable model properties."""
-        model = deepcopy(schema)
-        body_props = {}
+        expanded = expand_schema(schema, self.components, name)
+        while apply_one_of(expanded) or apply_any_of(expanded):
+            pass
+        flatten_collection(expanded, force_single=False)
+        settable = {
+            name: data
+            for name, data in expanded.get(OasField.PROPS).items()
+            if not data.get(OasField.READ_ONLY, False)
+        }
 
-        # start with the base-classes in allOf
-        for parent in model.get(OasField.ALL_OF, []):
-            reference = parent.get(OasField.REFS, "")
-            if reference:
-                sub_model = self.get_model(reference)
-            else:
-                sub_model = deepcopy(parent)
-            required_sub = sub_model.get(OasField.REQUIRED, [])
-            for sub_name, _sub_data in sub_model.get(OasField.PROPS, {}).items():
-                if _sub_data.get(OasField.READ_ONLY):
-                    continue
+        # update settable fields for easier digestion
+        required = expanded.get(OasField.REQUIRED) or []
+        for prop_name, prop_data in settable.items():
+            while apply_one_of(prop_data) or apply_any_of(prop_data):
+                pass
+            flatten_collection(prop_data, force_single=False)
+            self.update_enum(prop_data)
+            prop_data[OasField.REQUIRED.value] = bool(prop_name in required)
 
-                sub_data = self.update_one_of(sub_name, deepcopy(_sub_data))
-                sub_data = self.update_collection(sub_data)
-                sub_data = self.update_reference(sub_data)
-                sub_data[OasField.REQUIRED.value] = sub_data.get(OasField.REQUIRED) or sub_name in required_sub
-                body_props[sub_name] = self.update_enum(sub_data)
-
-        any_of = model.pop(OasField.ANY_OF, None)
-        if any_of:
-            if len(any_of) != 1:
-                self.logger.info(f"Grabbing anyOf[0] item from {name}")
-                self.logger.debug(f"{name} anyOf selected: {shallow(any_of[0])}")
-            # just grab the first one... not sure this is the best choice, but need to do something
-            updated = self.update_one_of(name, deepcopy(any_of[0]))
-            updated = self.update_collection(updated)
-            updated = self.update_reference(updated)
-            model.update(self.update_enum(updated))
-
-        model = self.update_one_of(name, model)
-        model = self.update_collection(model)
-        model = self.update_reference(model)
-        required_props = model.get(OasField.REQUIRED, [])
-
-        # copy the individual properties
-        for prop_name, _prop_data in model.get(OasField.PROPS, {}).items():
-            if _prop_data.get(OasField.READ_ONLY, False):
-                continue
-
-            prop_data = deepcopy(_prop_data)
-            prop_data[OasField.REQUIRED.value] = prop_name in required_props
-            prop_data = self.update_one_of(prop_name, prop_data)
-            prop_data = self.update_collection(prop_data)
-            prop_data = self.update_reference(prop_data)
-
-            body_props[prop_name] = self.update_enum(prop_data)
-
-        return body_props
+        return settable
 
     def op_body_formation(self, properties: dict[str, Any]) -> str:
         """Create body parameter and poulates it when there are body paramters."""
