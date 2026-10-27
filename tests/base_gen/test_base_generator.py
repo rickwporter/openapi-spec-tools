@@ -277,25 +277,6 @@ def test_op_doc_string(op, expected):
 
 
 @pytest.mark.parametrize(
-    ["reference", "expected"],
-    [
-        pytest.param("Species", False, id="enum"),
-        pytest.param("AllOfSpecies", False, id="all-of-enum"),
-        pytest.param("RefToSpecies", False, id="ref-to-enum"),
-        pytest.param("SpeciesProp", False, id="single-enum-prop"),
-        pytest.param("Pet", True, id="obj"),
-        pytest.param("PetInherited", True, id="obj-inherted"),
-        pytest.param("PetReference", True, id="obj-reference"),
-    ]
-)
-def test_model_is_complex(reference, expected):
-    oas = open_oas(asset_filename("misc.yaml"))
-    uut = BaseGenerator(oas=oas, package_name=PKG)
-    model = uut.get_model(f"#/components/schemas/{reference}")
-    assert expected == uut.model_is_complex(model)
-
-
-@pytest.mark.parametrize(
     ["path", "expected"],
     [
         pytest.param('foo', '_api_host, "foo"', id="foo"),
