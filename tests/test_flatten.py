@@ -1382,33 +1382,66 @@ def test__collection_type(model: dict[str, Any], expected: str | None) -> None:
 
 
 @pytest.mark.parametrize(
-    ["model", "updated", "expected"],
+    ["model", "force", "updated", "expected"],
     [
-        pytest.param({}, {}, False, id="empty"),
-        pytest.param({"type": "string"}, {"type": "string"}, False, id="no-update"),
-        pytest.param({"type": "array"}, {"type": "array"}, False, id="no-item"),
+        pytest.param({}, True, {}, False, id="empty"),
+        pytest.param({"type": "string"}, True, {"type": "string"}, False, id="no-update"),
+        pytest.param({"type": "array"}, True, {"type": "array"}, False, id="no-item"),
         pytest.param(
             {"type": "array", "items": ["string"]},
+            True,
             {"type": "array", "items": ["string"]},
             False,
             id="non-dict-items",
         ),
         pytest.param(
             {"type": "array", "items": {"type": "string"}, "description": "simple"},
+            True,
             {"type": "string", "x-collection": "array", "description": "simple"},
             True,
             id="simple",
         ),
         pytest.param(
             {"type": "array", "items": {"oneOf": [{"type": "string"}, {"type": "number"}]}, "x-some": "value"},
+            True,
             {"type": "string", "x-collection": "array", "x-some": "value"},
             True,
             id="one-of",
         ),
+        pytest.param(
+            {
+                "type": "array",
+                "items": {"properties": {"A": {"type": "string"}, "B": {"type": "number"}}},
+                "x-some": "value",
+            },
+            True,
+            {
+                "x-some": "value",
+                "x-forced-single": True,
+                "properties": {"A": {"type": "string"}, "B": {"type": "number"}},
+            },
+            True,
+            id="complex-single",
+        ),
+        pytest.param(
+            {
+                "type": "array",
+                "items": {"properties": {"A": {"type": "string"}, "B": {"type": "number"}}},
+                "x-some": "value",
+            },
+            False,
+            {
+                "x-some": "value",
+                "x-collection": "array",
+                "properties": {"A": {"type": "string"}, "B": {"type": "number"}},
+            },
+            True,
+            id="complex-list",
+        ),
     ]
 )
-def test_flatten_collection(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
-    assert expected == flatten_collection(model)
+def test_flatten_collection(model: dict[str, Any], force: bool, updated: dict[str, Any], expected: bool) -> None:
+    assert expected == flatten_collection(model, force_single=force)
     assert model == updated
 
 
