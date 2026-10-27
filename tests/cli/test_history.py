@@ -452,6 +452,27 @@ def test_commit_show_failure() -> None:
     assert FILE_ERROR == mock_stdout.getvalue()
 
 
+MISC_DIFF_LATEST = """\
+┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Commits          ┃ Changes                                          ┃
+┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ dac5b6d..0f834e7 │ components:                                      │
+│                  │   schemas:                                       │
+│                  │     PetExt:                                      │
+│                  │       allOf[1]:                                  │
+│                  │         properties:                              │
+│                  │           listVarious:                           │
+│                  │             items:                               │
+│                  │               oneOf: 'different lengths: 3 != 2' │
+│                  │     Pets:                                        │
+│                  │       items: removed                             │
+│                  │       maxItems: removed                          │
+│                  │       properties: added                          │
+│                  │       type: array != object                      │
+│                  │     ShapeShifter: added                          │
+│                  │     SingleAnyOf: added                           │
+└──────────────────┴──────────────────────────────────────────────────┘
+"""
 HASH_DELTA1 = "dac5b6d..6fb491e"
 MISC_DIFF1_TABLE = """\
 ┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -529,7 +550,7 @@ Unable to determine differences.
         ),
         pytest.param({
             "oas_file": asset_filename("misc.yaml"), "commit_id": "dac5b6d"},
-            MISC_DIFF1_TABLE,
+            MISC_DIFF_LATEST,
             id="no-end",
         ),
         pytest.param({
