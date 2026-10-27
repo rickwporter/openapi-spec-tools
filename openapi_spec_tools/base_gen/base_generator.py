@@ -579,43 +579,19 @@ class BaseGenerator:
         Resolves parameter data to make it easier to digest (e.g. choosing any oneOf,
         collection information, required).
         """
-        prop = deepcopy(param)
-        name = prop.get(OasField.NAME)
-        prop = self.update_one_of(name, prop)
+        expanded = expand_schema(param, self.components)
+        flattened = flatten_schema(expanded)
+        self.update_enum(flattened)
 
-        any_of = prop.pop(OasField.ANY_OF, [])
-        if any_of:
-            # just grab the first one...
-            self.logger.warning(f"Grabbing anyOf[0] item from {shallow(any_of[0])}")
-            prop.update(any_of[0])
+        # flatten the type, too
+        types = flattened.get(OasField.TYPE)
+        if types and isinstance(types, list) and not NULL_TYPES.isdisjoint(types):
+            # if the item is nullable, then remove the null type(s) and set required=False
+            types = [t for t in types if t not in NULL_TYPES]
+            flattened[OasField.TYPE.value] = types[0] if len(types) == 1 else types
+            flattened[OasField.REQUIRED.value] = False
 
-        nullable = False
-        schema_type = prop.get(OasField.TYPE)
-        if isinstance(schema_type, list):
-            nullable = any(nt in schema_type for nt in NULL_TYPES)
-            schema_list = [v for v in schema_type if v not in NULL_TYPES]
-            nullable = schema_type != schema_list
-            if len(schema_list) == 1:
-                schema_type = schema_list[0]
-            else:
-                schema_type = schema_list
-            prop[OasField.TYPE.value] = schema_type
-
-        if isinstance(schema_type, str) and schema_type in COLLECTIONS.keys():
-            items = prop.pop(OasField.ITEMS, {})
-            prop.update(items)
-            prop[OasField.X_COLLECT.value] = schema_type
-            schema_type = items.get(OasField.TYPE)
-
-        self.update_enum(prop)
-
-        schema = self.simplify_type(prop)
-        if schema:
-            prop.update(schema)
-        if nullable:
-            prop[OasField.REQUIRED.value] = False
-
-        return prop
+        return flattened
 
     def params_to_settable_properties(self, parameters: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Get a dictionary of settable parameter properties.

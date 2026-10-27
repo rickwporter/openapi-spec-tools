@@ -24,6 +24,7 @@ ANY_OF = "anyOf"
 ONE_OF = "oneOf"
 ITEMS = "items"
 DEF = "default"
+SINGLE = "x-forced-single"
 
 S1 = '\n    '
 S2 = f"{S1}    "
@@ -729,7 +730,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
         pytest.param(SIMPLE_PARAM, SIMPLE_PROP, id="simple"),
         pytest.param(
             {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]},
-            {TYPE: "foo", COLLECT: "array"},
+            {TYPE: "foo"},
             id="oneOf-collect-match"
         ),
         pytest.param(
@@ -744,7 +745,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
         ),
         pytest.param(
             {ANY_OF: [{TYPE: "array", ITEMS: {TYPE: "sna"}}, {TYPE: "foo"}]},
-            {TYPE: "sna", COLLECT: "array"},
+            {TYPE: "sna", SINGLE: True},
             id="anyOf"
         ),
         pytest.param(
