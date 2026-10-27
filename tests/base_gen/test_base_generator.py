@@ -825,6 +825,8 @@ def test_param_to_property(parameter, expected):
                     'type': 'string',
                     'description': 'Favorite ice cream flavor',
                     'required': False,
+                    'x-reference': 'Owner',
+                    'x-field': 'iceCream',
                 }
             },
             id="Owner",
@@ -832,15 +834,7 @@ def test_param_to_property(parameter, expected):
         pytest.param(
             "ObservationStationCollectionGeoJson",
             {
-                'features.id': {
-                    'format': 'uri',
-                    'required': False,
-                    'type': 'string',
-                    'x-field': 'id',
-                    'x-forced-single': True,
-                    'x-parents': ['features'],
-                    'x-reference': 'GeoJsonFeature',
-                },
+                # NOTE: features.id and features.type that come from GeoJsonFeatureCollection get overwritten.
                 'features.properties.@id': {
                     'format': 'uri',
                     'required': False,
@@ -890,7 +884,6 @@ def test_param_to_property(parameter, expected):
                     'x-reference': 'ObservationStation',
                 },
                 'features.properties.geometry': {
-                    '$ref': '#/components/schemas/GeometryString',
                     'description': 'A geometry represented in Well-Known Text (WKT) format.',
                     'format': 'wkt',
                     'nullable': True,
@@ -925,15 +918,6 @@ def test_param_to_property(parameter, expected):
                     'x-forced-single': True,
                     'x-parents': ['features', 'properties'],
                     'x-reference': 'ObservationStation',
-                },
-                'features.type': {
-                    'enum': ['Feature'],
-                    'required': False,
-                    'type': 'string',
-                    'x-field': 'type',
-                    'x-forced-single': True,
-                    'x-parents': ['features'],
-                    'x-reference': 'GeoJsonFeature',
                 },
                 'type': {
                     'enum': ['FeatureCollection'],
@@ -957,7 +941,8 @@ def test_param_to_property(parameter, expected):
                     'format': 'uri',
                     'required': False,
                     'x-collection': 'array',
-                    'x-field': 'observationStations'
+                    'x-field': 'observationStations',
+                    'x-reference': 'ObservationStationCollectionGeoJson',
                 },
             },
             id="allOf-multi"
@@ -971,18 +956,21 @@ def test_param_to_property(parameter, expected):
                     'description': 'A string with a default',
                     'required': False,
                     'type': 'string',
+                    'x-field': 'anotherValue',
                     'x-reference': 'Pet',
                 },
                 'name': {
                     'description': 'Pet name',
                     'required': True,
                     'type': 'string',
+                    'x-field': 'name',
                     'x-reference': 'Pet',
                 },
                 'tag': {
                     'description': 'Pet classification',
                     'required': False,
                     'type': 'string',
+                    'x-field': 'tag',
                     'x-reference': 'Pet',
                 },
             },
@@ -995,6 +983,8 @@ def test_param_to_property(parameter, expected):
                     'enum': ['FeatureCollection'],
                     'type': 'string',
                     'required': True,
+                    'x-field': 'type',
+                    'x-reference': 'GeoJsonFeatureCollection',
                 },
                 'features.id': {
                     'format': 'uri',
@@ -1007,7 +997,7 @@ def test_param_to_property(parameter, expected):
                 },
                 'features.type': {
                     'enum': ['Feature'],
-                    'required': True,
+                    'required': False,
                     'type': 'string',
                     'x-field': 'type',
                     'x-forced-single': True,
@@ -1020,15 +1010,7 @@ def test_param_to_property(parameter, expected):
         pytest.param(
             "DeeperNesting",
             {
-                'features.id': {
-                    'format': 'uri',
-                    'required': False,
-                    'type': 'string',
-                    'x-field': 'id',
-                    'x-forced-single': True,
-                    'x-parents': ['features'],
-                    'x-reference': 'GeoJsonFeature',
-                },
+                # NOTE: features.id and features.type that come from GeoJsonFeatureCollection get overwritten.
                 'features.properties.@id': {
                     'format': 'uri',
                     'required': False,
@@ -1078,7 +1060,6 @@ def test_param_to_property(parameter, expected):
                     'x-reference': 'ObservationStation',
                 },
                 'features.properties.geometry': {
-                    '$ref': '#/components/schemas/GeometryString',
                     'description': 'A geometry represented in Well-Known Text (WKT) format.',
                     'format': 'wkt',
                     'nullable': True,
@@ -1113,15 +1094,6 @@ def test_param_to_property(parameter, expected):
                     'x-forced-single': True,
                     'x-parents': ['features', 'properties'],
                     'x-reference': 'ObservationStation',
-                },
-                'features.type': {
-                    'enum': ['Feature'],
-                    'required': False,
-                    'type': 'string',
-                    'x-field': 'type',
-                    'x-forced-single': True,
-                    'x-parents': ['features'],
-                    'x-reference': 'GeoJsonFeature',
                 },
                 'observationStations': {
                     'type': 'string',
@@ -1187,7 +1159,7 @@ def test_param_to_property(parameter, expected):
                 },
                 'type': {
                     'enum': ['FeatureCollection'],
-                    'required': False,
+                    'required': True,
                     'type': 'string',
                     'x-field': 'type',
                     'x-reference': 'GeoJsonFeatureCollection',
@@ -1198,30 +1170,81 @@ def test_param_to_property(parameter, expected):
         pytest.param(
             "Attachment",
             {
-                'bytes': {'nullable': True, 'required': False, 'type': 'string'},
-                'date': {'format': 'date', 'required': False, 'type': 'string'},
+                'bytes': {
+                    'nullable': True,
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Attachment',
+                    'x-field': 'bytes',
+                },
+                'date': {
+                    'format': 'date',
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Attachment',
+                    'x-field': 'date',
+                },
                 'edgeColor': {
                     'enum': ['yellow', 'purple', 'blue'],
                     'nullable': True,
                     'required': False,
                     'type': 'string',
-                    '$ref': '#/components/schemas/Color',
                     'x-reference': 'Color',
+                    'x-field': 'edgeColor',
+                    'x-enum': 'Color',
                 },
                 'id': {
                     'pattern': '^[0-9a-fA-F]{24}$',
                     'type': 'string',
                     'required': False,
-                    '$ref': '#/components/schemas/TrelloID',
                     'x-reference': 'TrelloID',
+                    'x-field': 'id',
                 },
-                'idMember': {'required': False, 'type': 'string'},
-                'isUpload': {'required': False, 'type': 'boolean'},
-                'mimeType': {'required': False, 'type': 'string'},
-                'name': {'required': False, 'type': 'string'},
-                'pos': {'format': 'float', 'required': False, 'type': 'number'},
-                'previews': {'type': 'string', 'required': False, 'x-collection': 'array'},
-                'url': {'format': 'url', 'required': False, 'type': 'string'}
+                'idMember': {
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Attachment',
+                    'x-field': 'idMember',
+                },
+                'isUpload': {
+                    'required': False,
+                    'type': 'boolean',
+                    'x-reference': 'Attachment',
+                    'x-field': 'isUpload',
+                },
+                'mimeType': {
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Attachment',
+                    'x-field': 'mimeType',
+                },
+                'name': {
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Attachment',
+                    'x-field': 'name',
+                },
+                'pos': {
+                    'format': 'float',
+                    'required': False,
+                    'type': 'number',
+                    'x-reference': 'Attachment',
+                    'x-field': 'pos',
+                },
+                'previews': {
+                    'type': 'string',
+                    'required': False,
+                    'x-collection': 'array',
+                    'x-reference': 'Attachment',
+                    'x-field': 'previews',
+                },
+                'url': {
+                    'format': 'url',
+                    'required': False,
+                    'type': 'string',
+                    'x-reference': 'Attachment',
+                    'x-field': 'url',
+                }
             },
             id="item"
         ),
@@ -1235,7 +1258,7 @@ def test_param_to_property(parameter, expected):
                     'nullable': True,
                     'x-field': 'color',
                     'x-reference': 'Color',
-                    '$ref': '#/components/schemas/Color',
+                    'x-enum': 'Color',
                 },
                 'files.bytes': {
                     'nullable': True,
@@ -1256,7 +1279,6 @@ def test_param_to_property(parameter, expected):
                     'x-reference': 'Attachment',
                 },
                 'files.edgeColor': {
-                    '$ref': '#/components/schemas/Color',
                     'enum': ['yellow', 'purple', 'blue'],
                     'nullable': True,
                     'required': False,
@@ -1265,9 +1287,9 @@ def test_param_to_property(parameter, expected):
                     'x-forced-single': True,
                     'x-parents': ['files'],
                     'x-reference': 'Color',
+                    'x-enum': 'Color',
                 },
                 'files.id': {
-                    '$ref': '#/components/schemas/TrelloID',
                     'pattern': '^[0-9a-fA-F]{24}$',
                     'required': False,
                     'type': 'string',
@@ -1340,37 +1362,125 @@ def test_param_to_property(parameter, expected):
         ),
         pytest.param(
             "MultiAttachmentList",
-            {},
+            {
+                'bytes': {
+                    'nullable': True,
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'bytes',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'date': {
+                    'format': 'date',
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'date',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'edgeColor': {
+                    'enum': ['yellow', 'purple', 'blue'],
+                    'nullable': True,
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'edgeColor',
+                    'x-forced-single': True,
+                    'x-reference': 'Color',
+                    'x-enum': 'Color',
+                },
+                'id': {
+                    'pattern': '^[0-9a-fA-F]{24}$',
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'id',
+                    'x-forced-single': True,
+                    'x-reference': 'TrelloID',
+                },
+                'idMember': {
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'idMember',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'isUpload': {
+                    'required': False,
+                    'type': 'boolean',
+                    'x-field': 'isUpload',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'mimeType': {
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'mimeType',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'name': {
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'name',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'pos': {
+                    'format': 'float',
+                    'required': False,
+                    'type': 'number',
+                    'x-field': 'pos',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'previews': {
+                    'required': False,
+                    'type': 'string',
+                    'x-collection': 'array',
+                    'x-field': 'previews',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+                'url': {
+                    'format': 'url',
+                    'required': False,
+                    'type': 'string',
+                    'x-field': 'url',
+                    'x-forced-single': True,
+                    'x-reference': 'Attachment',
+                },
+            },
             id="list-ref",
         ),
         pytest.param(
             "EnumListProperty",
             {
                 'rainbow': {
-                    '$ref': '#/components/schemas/Color',
                     'type': 'string',
                     'enum': ['yellow', 'purple', 'blue'],
                     'required': True,
                     'nullable': True,
                     'x-reference': 'Color',
                     'x-collection': 'array',
+                    'x-field': 'rainbow',
+                    'x-enum': 'Color',
                 }
             },
             id="list-enum",
         ),
         pytest.param(
             "MissingInheritedSubmodel",
-            {'sna': {'type': 'string', 'required': True}},
+            {'sna': {'type': 'string', 'required': True, 'x-field': 'sna', 'x-reference': 'MissingInheritedSubmodel'}},
             id="missing-submodel",
         ),
         pytest.param(
             "MissingSubmodelProperty",
-            {'bar': {'type': 'string', 'required': False}},
+            {'bar': {'type': 'string', 'required': False, 'x-field': 'bar', 'x-reference': 'MissingSubmodelProperty'}},
             id="missing-submodel",
         ),
         pytest.param(
             "MissingItemsModel",
-            {'foo': {'type': 'integer', 'required': False}},
+            {'foo': {'type': 'integer', 'required': False, 'x-field': 'foo', 'x-reference': 'MissingItemsModel'}},
             id="missing-items",
         ),
         pytest.param(
@@ -1381,14 +1491,17 @@ def test_param_to_property(parameter, expected):
                     'required': True,
                     'type': 'string',
                     'x-reference': 'RoleEnum',
-                    '$ref': '#/components/schemas/RoleEnum',
                     'description': 'The role that the user has in the organization.',
+                    'x-field': 'role',
+                    'x-enum': 'RoleEnum',
                 },
                 'user': {
                     'description': 'The user of the membership.',
                     'format': 'uri',
                     'required': True,
                     'type': 'string',
+                    'x-field': 'user',
+                    'x-reference': 'MembershipCreate',
                 },
             },
             id="enum-all-of"
@@ -1397,12 +1510,13 @@ def test_param_to_property(parameter, expected):
             "MembershipCreateAnyOf",
             {
                 'role': {
+                    'description': 'The role that the user has in the organization.',
                     'enum': ['OWNER', 'ADMIN', 'CONTRIB', 'VIEWER'],
                     'required': False,
                     'type': 'string',
+                    'x-field': 'role',
                     'x-reference': 'RoleEnum',
-                    '$ref': '#/components/schemas/RoleEnum',
-                    'description': 'The role that the user has in the organization.',
+                    'x-enum': 'RoleEnum',
                 },
             },
             id="enum-any-of"
@@ -1415,9 +1529,9 @@ def test_param_to_property(parameter, expected):
                     'required': False,
                     'type': 'string',
                     'x-reference': 'RoleEnum',
-                    '$ref': '#/components/schemas/RoleEnum',
+                    'x-field': 'role',
+                    'x-enum': 'RoleEnum',
                     'description': 'The role that the user has in the organization.',
-                    'default': None,
                 },
             },
             id="enum-one-of"
