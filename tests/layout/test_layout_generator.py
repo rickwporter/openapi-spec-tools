@@ -15,11 +15,11 @@ from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
+from tests.constants import NAME
+from tests.constants import OP_ID
+from tests.constants import X_METHOD
 from tests.helpers import asset_filename
 
-NAME = "name"
-OP_ID = "operationId"
-X_METH = "x-method"
 PAGE_SIZE = "page_size_params"
 PAGE_START = "page_start_params"
 ITEM_START = "item_start_params"
@@ -208,12 +208,12 @@ def test_get_response_body(op_id, expected):
 @pytest.mark.parametrize(
     ["op_data", "expected"],
     [
-        pytest.param({X_METH: "PUT", OP_ID: "foo_list"}, "set", id="put"),
-        pytest.param({X_METH: "PaTCh", OP_ID: "foo_list"}, "update", id="update"),
-        pytest.param({X_METH: "delete", OP_ID: "add_item"}, "create", id="begin"),
-        pytest.param({X_METH: "delete", OP_ID: "itemRetrieve"}, "show", id="end"),
-        pytest.param({X_METH: "delete", OP_ID: "item"}, "delete", id="method"),
-        pytest.param({X_METH: "delete", OP_ID: "itemListGetAll"}, "list", id="segment"),
+        pytest.param({X_METHOD: "PUT", OP_ID: "foo_list"}, "set", id="put"),
+        pytest.param({X_METHOD: "PaTCh", OP_ID: "foo_list"}, "update", id="update"),
+        pytest.param({X_METHOD: "delete", OP_ID: "add_item"}, "create", id="begin"),
+        pytest.param({X_METHOD: "delete", OP_ID: "itemRetrieve"}, "show", id="end"),
+        pytest.param({X_METHOD: "delete", OP_ID: "item"}, "delete", id="method"),
+        pytest.param({X_METHOD: "delete", OP_ID: "itemListGetAll"}, "list", id="segment"),
     ]
 )
 def test_suggest_command(op_data, expected):

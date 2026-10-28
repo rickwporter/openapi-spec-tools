@@ -10,21 +10,24 @@ from openapi_spec_tools.base_gen.config import GeneratorConfig
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
+from tests.constants import ADDITIONAL_PROPS
+from tests.constants import ANY_OF
+from tests.constants import COLLECT
+from tests.constants import DEF
+from tests.constants import DESC
+from tests.constants import ENUM
+from tests.constants import FORMAT
+from tests.constants import ITEMS
+from tests.constants import NAME
+from tests.constants import ONE_OF
+from tests.constants import PROPS
+from tests.constants import REFS
+from tests.constants import REQUIRED
+from tests.constants import SINGLE
+from tests.constants import SUM
+from tests.constants import TYPE
+from tests.constants import X_REF
 from tests.helpers import asset_filename
-
-SUM = "summary"
-DESC = "description"
-TYPE = "type"
-FORMAT = "format"
-REQUIRED = "required"
-COLLECT = "x-collection"
-ENUM = "enum"
-SCHEMA = "schema"
-ANY_OF = "anyOf"
-ONE_OF = "oneOf"
-ITEMS = "items"
-DEF = "default"
-SINGLE = "x-forced-single"
 
 S1 = '\n    '
 S2 = f"{S1}    "
@@ -388,13 +391,13 @@ def test_simplify_type(schema, expected):
         pytest.param({TYPE: "string"}, "str", id="str"),
         pytest.param({TYPE: "integer"}, "int", id="int"),
         pytest.param({TYPE: "numeric"}, "float", id="float"),
-        pytest.param({TYPE: "string", ENUM: ["a", "b"], "name": "sna_foo"}, "SnaFoo", id="unref-enum"),
+        pytest.param({TYPE: "string", ENUM: ["a", "b"], NAME: "sna_foo"}, "SnaFoo", id="unref-enum"),
         pytest.param(
-            {TYPE: "string", ENUM: ["a", "b"], "$ref": "#/comp/Schema/FooBar", "name": "sna_foo"},
+            {TYPE: "string", ENUM: ["a", "b"], REFS: "#/comp/Schema/FooBar", NAME: "sna_foo"},
             "SnaFoo",
             id="ref-enum",
         ),
-        pytest.param({TYPE: "object", "properties": {TYPE: "string"}}, "dict[str, Any]", id="object"),
+        pytest.param({TYPE: "object", PROPS: {TYPE: "string"}}, "dict[str, Any]", id="object"),
     ],
 )
 def test_get_parameter_pytype(param_data, expected):
@@ -424,7 +427,7 @@ def test_get_parameter_pytype(param_data, expected):
         pytest.param("foo", {TYPE: "foo"}, None, id="unknown"),
         pytest.param(
             "foo",
-            {TYPE: "string", REQUIRED: True, ENUM: ["a", "b"], "x-reference": "east_west"},
+            {TYPE: "string", REQUIRED: True, ENUM: ["a", "b"], X_REF: "east_west"},
             "EastWest",
             id="named-enum",
         ),
@@ -437,31 +440,31 @@ def test_get_parameter_pytype(param_data, expected):
         pytest.param("foo", {TYPE: "object"}, None, id="object"),
         pytest.param(
             "foo",
-            {TYPE: "object", "additionalProperties": {TYPE: "string"}},
+            {TYPE: "object", ADDITIONAL_PROPS: {TYPE: "string"}},
             "str | None",
             id="add-props",
         ),
         pytest.param(
             "foo",
-            {TYPE: "object", "additionalProperties": {TYPE: "string"}, REQUIRED: True},
+            {TYPE: "object", ADDITIONAL_PROPS: {TYPE: "string"}, REQUIRED: True},
             "str",
             id="add-props-req",
         ),
         pytest.param(
             "foo",
-            {TYPE: "object", "additionalProperties": None},
+            {TYPE: "object", ADDITIONAL_PROPS: None},
             None,
             id="add-props-none"
         ),
         pytest.param(
             "foo",
-            {TYPE: "object", "additionalProperties": True},
+            {TYPE: "object", ADDITIONAL_PROPS: True},
             None,
             id="add-props-bool"
         ),
         pytest.param(
             "foo",
-            {TYPE: "object", "additionalProperties": {}},
+            {TYPE: "object", ADDITIONAL_PROPS: {}},
             None,
             id="add-props-no-type"
         ),
@@ -611,13 +614,13 @@ class Special(str, Enum):  # noqa: F811
 
 SIMPLE_PARAM = {
     TYPE: "string",
-    ENUM: ["aOrB", "b_or_C", "-minus"], "$ref": "#/components/schemas/Simple",
-    "name": "simple",
+    ENUM: ["aOrB", "b_or_C", "-minus"], REFS: "#/components/schemas/Simple",
+    NAME: "simple",
 }
 
-NUMBER_PARAM = {TYPE: "integer", ENUM: [12, 37, 11], "name": "simple-number"}
-MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], "name": "mixed-values"}
-INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], "name": "int-strings"}
+NUMBER_PARAM = {TYPE: "integer", ENUM: [12, 37, 11], NAME: "simple-number"}
+MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], NAME: "mixed-values"}
+INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], NAME: "int-strings"}
 SIMPLE_PROP = deepcopy(SIMPLE_PARAM)
 SIMPLE_PROP[DEF] = None
 
@@ -664,14 +667,14 @@ def test_enum_declaration(name, enum_type, values, expected):
         pytest.param(
             [],
             [],
-            {"simple": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
+            {"simple": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], X_REF: "Simple"}},
             f"\n{SIMPLE_ENUM}",
             id="ref-body",
         ),
         pytest.param(
             [SIMPLE_PARAM],
             [SIMPLE_PARAM],
-            {"simple": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], "x-reference": "Simple"}},
+            {"simple": {TYPE: "string", ENUM: ["aOrB", "b_or_C", "-minus"], X_REF: "Simple"}},
             f"\n{SIMPLE_ENUM}",
             id="de-dup",
         ),
@@ -690,9 +693,9 @@ def test_enum_declaration(name, enum_type, values, expected):
             id="int-str"
         ),
         pytest.param(
-            [{"name": "path_param"}],
-            [{"name": "qyery_param"}],
-            {"body_param": {"default": None}},
+            [{NAME: "path_param"}],
+            [{NAME: "qyery_param"}],
+            {"body_param": {DEF: None}},
             "",
             id="no-values",
         )
