@@ -21,12 +21,11 @@ from openapi_spec_tools.cli.utils import gen_config_from_file
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 
 SEP = "\n    "
-
-LOG_CLASS = "api-gen"
 
 class BodyType(str, Enum):
     """Different body types for API generated code."""

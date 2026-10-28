@@ -23,7 +23,6 @@ from openapi_spec_tools.layout import write_layout
 from openapi_spec_tools.utils import open_oas
 
 # Common argument definition
-LOG_CLASS = "cli"
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s %(message)s"
 LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 

@@ -15,6 +15,7 @@ from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import perform_expansion
 from openapi_spec_tools.cli.utils import remove_dict_prefix
 from openapi_spec_tools.cli.utils import remove_list_prefix
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_models
@@ -25,7 +26,6 @@ from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import unroll
 
 INDENT = "    "
-LOG_CLASS = "models"
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to models")
 
