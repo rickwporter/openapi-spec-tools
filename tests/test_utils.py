@@ -284,7 +284,7 @@ def test_models_referenced_by(
 
 
 def test_map_models() -> None:
-    oas = open_test_oas("misc.yaml")
+    oas = open_test_oas("misc3.yaml")
     models = map_models(oas.get(OasField.COMPONENTS))
     keys = models.keys()
     expected = {

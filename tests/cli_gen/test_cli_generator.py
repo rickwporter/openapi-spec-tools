@@ -64,7 +64,7 @@ def test_app_definition():
 
 
 def test_op_path_arguments():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = CliGenerator(package_name="cli_package", oas=oas)
@@ -102,7 +102,7 @@ def test_op_path_arguments():
 
 
 def test_op_query_arguments():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = CliGenerator(package_name="cli_package", oas=oas)
@@ -204,7 +204,7 @@ def test_op_query_arguments():
 
 
 def test_op_body_arguments():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = CliGenerator(package_name="cli_package", oas=oas)
@@ -350,7 +350,7 @@ def test_hardcoded(hardcoded: dict[str, Any], expected: str) -> None:
     ],
 )
 def test_op_infra_arguments(command, has_details):
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     uut = CliGenerator(package_name="cli_package", oas=oas)
 
     lines = uut.command_infra_arguments(command)
@@ -374,7 +374,7 @@ def test_op_infra_arguments(command, has_details):
 
 
 def test_op_check_missing():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = CliGenerator(package_name="cli_package", oas=oas)
@@ -471,7 +471,7 @@ def test_function_definition_item():
 
 
 def test_function_definition_forced_single():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     item = LayoutNode(command="create", identifier="snaFooCreate")
     uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
@@ -559,7 +559,7 @@ def test_function_definition_paged():
 
 
 def test_function_deprecated():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     item = LayoutNode(command='sna', identifier='snafooCheck')
     uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
@@ -576,7 +576,7 @@ def test_function_deprecated():
 
 
 def test_function_x_deprecated():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     item = LayoutNode(command='sna', identifier='snafooDelete')
     uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)
@@ -593,7 +593,7 @@ def test_function_x_deprecated():
 
 
 def test_function_header_params():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     item = LayoutNode(command='sna', identifier='testPathParams')
     uut = CliGenerator(package_name="cli_package", oas=oas)
     text = uut.function_definition(item)

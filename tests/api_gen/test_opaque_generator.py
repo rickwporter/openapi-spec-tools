@@ -56,7 +56,7 @@ def test_function_definition():
 
 
 def test_function_deprecated():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     item = LayoutNode(command='sna', identifier='snafooCheck')
     uut = OpaqueApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
@@ -74,7 +74,7 @@ def test_function_deprecated():
 
 
 def test_function_x_deprecated():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     item = LayoutNode(command='sna', identifier='snafooDelete')
     uut = OpaqueApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
@@ -92,7 +92,7 @@ def test_function_x_deprecated():
 
 
 def test_function_header_params():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     item = LayoutNode(command='sna', identifier='testPathParams')
     uut = OpaqueApiGenerator(package_name="api_package", oas=oas)
     text = uut.function_definition(item)
