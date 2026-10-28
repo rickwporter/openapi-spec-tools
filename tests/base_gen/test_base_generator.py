@@ -599,7 +599,8 @@ def test_op_body_formation_depth() -> None:
         pytest.param('numeric', [-1, 0, 1, 2, 3.14159], True, id="float-match"),
         pytest.param('numeric', [-1, 0.1, 1, 2, 3, '*'], False, id="float-diff"),
         pytest.param('boolean', [True, False, True, True], True, id='bool-match'),
-        pytest.param('boolean', [False, 0, True], False, id="bool-diff")
+        pytest.param('boolean', [False, 0, True], False, id="bool-diff"),
+        pytest.param('foo', [1], False, id="unsupported"),
     ]
 )
 def test_enum_values_match_type(enum_type, values, expected):
