@@ -295,7 +295,7 @@ class BaseGenerator:
         # filter out read-only properties, and complex properties that CLI cannot deal with
         settable = {
             name: data
-            for name, data in flattened.get(OasField.PROPS).items()
+            for name, data in flattened.get(OasField.PROPS, {}).items()
             if not data.get(OasField.READ_ONLY, False) and is_simple_type(data)
         }
 

@@ -765,6 +765,11 @@ def test_param_to_property(parameter, expected):
     ["model_name", "expected"],
     [
         pytest.param(
+            "NoSuchModel",
+            {},
+            id="missing-model",
+        ),
+        pytest.param(
             "Owner",
             {
                 'name': {
