@@ -1,6 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any
 
 import pytest
 
@@ -666,6 +667,31 @@ MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], NAME: "mixed-values"}
 INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], NAME: "int-strings"}
 SIMPLE_PROP = deepcopy(SIMPLE_PARAM)
 SIMPLE_PROP[DEF] = None
+
+@pytest.mark.parametrize(
+    ["prop", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param(SIMPLE_PARAM, SIMPLE_PROP, id="strings"),
+        pytest.param(NUMBER_PARAM, NUMBER_PARAM, id="numbers"),
+        pytest.param(
+            MIXED_PARAM,
+            {TYPE: "string", ENUM: ["a", "1", "True", "b"], NAME: "mixed-values", DEF: None},
+            id="mixed",
+        ),
+        pytest.param(
+            # tests special handling for non-list enum value
+            {TYPE: "string", ENUM: "bogus"},
+            {TYPE: "string", ENUM: "bogus", DEF: None},
+            id="bad-enum",
+        )
+    ],
+)
+def test_update_enum(prop: dict[str, Any], expected: dict[str, Any]) -> None:
+    uut = BaseGenerator(oas={}, package_name=PKG)
+    result = uut.update_enum(deepcopy(prop))
+    assert expected == result
+
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
