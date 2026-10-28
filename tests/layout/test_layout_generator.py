@@ -367,7 +367,7 @@ def test_generate_cloudtruth():
 
 
 def test_generate_misc():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
 
     uut = LayoutGenerator(oas)
     node = uut.generate(description="this is it")
@@ -470,7 +470,7 @@ pets:
     ]
 )
 def test_get_pagination(gen_args, expected):
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     path = "/pets/{numFeet}/{species}/{neutered}/{birthday}"
     op_data = oas.get(OasField.PATHS).get(path).get("get")
 

@@ -301,7 +301,7 @@ def test_op_url_params(path, expected):
 
 
 def test_op_param_formation():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = BaseGenerator(oas=oas, package_name=PKG)
@@ -368,7 +368,7 @@ def test_op_param_formation():
     ]
 )
 def test_schema_to_type(schema, fmt, expected):
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     uut = BaseGenerator(oas=oas, package_name=PKG)
 
     assert expected == uut.schema_to_type(schema, fmt)
@@ -488,7 +488,7 @@ def test_get_property_pytype(prop_name, prop_data, expected):
     ],
 )
 def test_op_content_type(op_id, expected):
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get(op_id)
     uut = BaseGenerator(oas=oas, package_name=PKG)
@@ -497,7 +497,7 @@ def test_op_content_type(op_id, expected):
 
 
 def test_op_body_formation():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = BaseGenerator(oas=oas, package_name=PKG)
@@ -1536,7 +1536,7 @@ def test_param_to_property(parameter, expected):
     ]
 )
 def test_model_settable_properties(model_name, expected):
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     uut = BaseGenerator(oas=oas, package_name=PKG)
     model = uut.get_model(f"#/components/schemas/{model_name}")
     properties = uut.model_settable_properties(model_name, model)

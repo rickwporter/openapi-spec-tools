@@ -90,7 +90,7 @@ def test_command_infra_arguments(
 
 
 def test_op_path_arguments():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = TestApiGenerator(package_name="api_package", oas=oas)
@@ -113,7 +113,7 @@ def test_op_path_arguments():
 
 
 def test_op_query_arguments():
-    oas = open_oas(asset_filename("misc.yaml"))
+    oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
     uut = TestApiGenerator(package_name="api_package", oas=oas)
