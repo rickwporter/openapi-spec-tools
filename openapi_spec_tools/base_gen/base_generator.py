@@ -563,13 +563,10 @@ class BaseGenerator:
                 dep_msg = f"{option} is deprecated and should not be used"
 
             obj_name = "body"
-            field = prop_name
+            field = prop_data.get(OasField.X_FIELD) or prop_name
             parents = prop_data.get(OasField.X_PARENTS)
             if parents:
                 obj_name = self.variable_name(parents[-1])
-            x_field = prop_data.get(OasField.X_FIELD)
-            if x_field:
-                field = x_field
             if prop_data.get(OasField.REQUIRED):
                 lines.append(f'{obj_name}["{field}"] = {var_name}')
             else:

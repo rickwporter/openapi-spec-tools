@@ -225,6 +225,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /owners/:
+    get:
+      description: List people who may be pet owners
+      operationId: listOwners
+      responses:
+        '200':
+          description: List of owners
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: '#/components/schemas/Owner'
+    post:
+      description: Create a person who may become a pet owner
+      operationId: createOwner
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Owner'
   /sna/foo:
     get:
       operationId: snafooCheck

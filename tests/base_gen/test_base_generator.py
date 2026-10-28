@@ -568,6 +568,28 @@ def test_op_body_formation_props() -> None:
     assert 'body["deaths"] = deaths' in text
 
 
+def test_op_body_formation_depth() -> None:
+    oas = open_oas(asset_filename("misc3.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("createOwner")
+    uut = BaseGenerator(oas=oas, package_name=PKG)
+    body_params = uut.op_body_settable_properties(op)
+    text = uut.op_body_formation(body_params)
+    assert 'body = {}' in text
+    assert 'home = {}' in text
+    assert 'body["name"] = name' in text
+    assert 'if ice_cream is not None:' in text
+    assert 'body["iceCream"] = ice_cream' in text
+    # test a couple of the home sub-object fields (no need to test all)
+    assert 'if home_street is not None:' in text
+    assert 'home["street"] = home_street' in text
+    assert 'if home_city is not None:' in text
+    assert 'home["city"] = home_city' in text
+    # and, make sure the home sub-object is added to the main
+    assert 'if home:' in text
+    assert 'body["home"] = home' in text
+
+
 @pytest.mark.parametrize(
     ["enum_type", "values", "expected"],
     [
