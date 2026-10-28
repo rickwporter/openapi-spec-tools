@@ -4,9 +4,10 @@ from openapi_spec_tools.api_gen.opaque_generator import OpaqueApiGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.utils import open_oas
-from tests.api_gen.constants import DESC
-from tests.api_gen.constants import REQUIRED
-from tests.api_gen.constants import TYPE
+from tests.constants import DESC
+from tests.constants import REQUIRED
+from tests.constants import TYPE
+from tests.constants import X_REF
 from tests.helpers import asset_filename
 
 
@@ -15,7 +16,7 @@ from tests.helpers import asset_filename
     [
         pytest.param({}, [], id="empty"),
         pytest.param({DESC: "my party"}, ["body: Any = None,  # my party"], id="desc"),
-        pytest.param({"x-reference": "SomeBodyType"}, ["body: Any = None,  # see SomeBodyType for info"], id="ref"),
+        pytest.param({X_REF: "SomeBodyType"}, ["body: Any = None,  # see SomeBodyType for info"], id="ref"),
         pytest.param({REQUIRED: ["a", "b", "z"]}, ["body: Any = None,  # required fields: a, b, z"], id="req"),
         pytest.param({TYPE: "object"}, ["body: Any = None,  # no info available"], id="none")
     ]

@@ -4,7 +4,6 @@ from openapi_spec_tools.layout.utils import file_to_tree
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
-from tests.api_gen.constants import *  # noqa: F403
 from tests.helpers import asset_filename
 
 

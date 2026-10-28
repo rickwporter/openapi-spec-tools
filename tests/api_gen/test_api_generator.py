@@ -4,12 +4,12 @@ from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
-from tests.api_gen.constants import DESC
-from tests.api_gen.constants import ENUM
-from tests.api_gen.constants import REQUIRED
-from tests.api_gen.constants import SUM
-from tests.api_gen.constants import X_REF
 from tests.api_gen.helpers import TestApiGenerator
+from tests.constants import DESC
+from tests.constants import ENUM
+from tests.constants import REQUIRED
+from tests.constants import SUM
+from tests.constants import X_REF
 from tests.helpers import asset_filename
 
 
