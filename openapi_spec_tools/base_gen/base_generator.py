@@ -26,7 +26,6 @@ from openapi_spec_tools.base_gen.files import copy_and_update
 from openapi_spec_tools.base_gen.utils import maybe_quoted
 from openapi_spec_tools.base_gen.utils import quoted
 from openapi_spec_tools.base_gen.utils import replace_special
-from openapi_spec_tools.base_gen.utils import shallow
 from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_camel_case
 from openapi_spec_tools.base_gen.utils import to_snake_case
@@ -246,76 +245,6 @@ class BaseGenerator:
 
         return value
 
-    def update_reference(self, prop: dict[str, Any]) -> dict[str, Any]:
-        """Update a property's reference."""
-        reference = prop.get(OasField.REFS, "")
-
-        # this helps with CloudTruth where the role's are based on an enum reference inside an 'allOf'
-        all_of = prop.get(OasField.ALL_OF, [])
-        if not reference and len(all_of) == 1:
-            item = all_of[0]
-            reference = item.get(OasField.REFS)
-
-        if reference:
-            prop[OasField.X_REF.value] = reference_classname(reference)
-
-            # resolve references, if they're enums
-            sub_model = self.get_model(reference)
-            if sub_model:
-                prop.update(sub_model)
-
-        return prop
-
-    def update_collection(self, prop: dict[str, Any]) -> dict[str, Any]:
-        """Update the collection information."""
-        collection_type = self.model_collection_type(prop)
-        if collection_type:
-            item_model = prop.pop(OasField.ITEMS, {})
-            prop[OasField.X_COLLECT.value] = collection_type
-            prop.update(item_model)
-
-        return prop
-
-    def model_is_complex(self, model: dict[str, Any]) -> bool:
-        """Determine if the model is complex, such that it would not work well with a list.
-
-        Basically, anything with more than one property is considered complex. This logic is
-        not perfect -- it does not expand everything (or wait for "final" answers), but is
-        good enough in most cases.
-        """
-        total_prop_count = 0
-        for prop_data in model.get(OasField.PROPS, {}).values():
-            if prop_data.get(OasField.READ_ONLY):
-                continue
-
-            reference = prop_data.get(OasField.REFS)
-            if not reference:
-                total_prop_count += 1
-            if reference:
-                submodel = self.get_model(reference)
-                if self.model_is_complex(submodel):
-                    return True
-                sub_props = submodel.get(OasField.PROPS, {})
-                total_prop_count += len(sub_props)
-
-            if total_prop_count > 1:
-                return True
-
-        for inherited in model.get(OasField.ALL_OF, []):
-            properties = inherited.get(OasField.PROPS, {})
-            total_prop_count += len(properties)
-            if total_prop_count > 1:
-                return True
-
-            reference = inherited.get(OasField.REFS)
-            submodel = self.get_model(reference)
-            properties = submodel.get(OasField.PROPS, {})
-            total_prop_count += len(properties)
-            if total_prop_count > 1:
-                return True
-
-        return False
-
     def op_url_params(self, path: str) -> str:
         """Parse the X-PATH to list the parameters that go into the URL formation."""
         parts = path.split("/")
@@ -355,25 +284,6 @@ class BaseGenerator:
             body = content.get(ct.value)
             if body:
                 return body
-
-        return None
-
-    def model_collection_type(self, model: str) -> str | None:
-        """Determine the collection type (current just an array)."""
-        model_type = self.simplify_type(model.get(OasField.TYPE))
-        if model_type in COLLECTIONS.keys():
-            return model_type
-
-        for parent in model.get(OasField.ALL_OF) or model.get(OasField.ANY_OF) or []:
-            reference = parent.get(OasField.REFS, "")
-            if not reference:
-                submodel = parent
-            else:
-                submodel = self.get_model(reference)
-            # recursively search through submodels
-            sub_collection = self.model_collection_type(submodel)
-            if sub_collection:
-                return sub_collection
 
         return None
 
@@ -540,82 +450,25 @@ class BaseGenerator:
             params.append(item)
         return params
 
-    def condense_one_of(self, one_of: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Remove "duplicate" collection elements, and adds X_COLLECT to the schema."""
-        condensed = []
-        for outer in one_of:
-            item = deepcopy(outer)
-            found = False
-            for inner in one_of:
-                if item.get(OasField.ITEMS) == inner:
-                    found = True
-                    break
-                if inner.get(OasField.ITEMS) == item:
-                    item[OasField.X_COLLECT.value] = inner.get(OasField.TYPE)
-            if not found:
-                condensed.append(item)
-
-        return condensed
-
-    def update_one_of(self, name: str, prop: dict[str, Any]) -> dict[str, Any]:
-        """Update the property when oneOf is present."""
-        one_of = prop.pop(OasField.ONE_OF, None)
-        if one_of:
-            updated = self.condense_one_of(one_of)
-            if len(updated) != 1:
-                self.logger.info(f"Grabbing oneOf[0] item from {name}")
-                self.logger.debug(f"{name} oneOf selected: {shallow(updated[0])}")
-
-            # just grab the first one... not sure this is the best choice, but need to do something
-            updated = self.update_collection(deepcopy(updated[0]))
-            updated = self.update_reference(updated)
-            prop.update(self.update_enum(updated))
-
-        return prop
-
     def param_to_property(self, param: dict[str, Any]) -> dict[str, Any]:
         """Convert parameter data to property data.
 
         Resolves parameter data to make it easier to digest (e.g. choosing any oneOf,
         collection information, required).
         """
-        prop = deepcopy(param)
-        name = prop.get(OasField.NAME)
-        prop = self.update_one_of(name, prop)
+        expanded = expand_schema(param, self.components)
+        flattened = flatten_schema(expanded)
+        self.update_enum(flattened)
 
-        any_of = prop.pop(OasField.ANY_OF, [])
-        if any_of:
-            # just grab the first one...
-            self.logger.warning(f"Grabbing anyOf[0] item from {shallow(any_of[0])}")
-            prop.update(any_of[0])
+        # flatten the type, too
+        types = flattened.get(OasField.TYPE)
+        if types and isinstance(types, list) and not NULL_TYPES.isdisjoint(types):
+            # if the item is nullable, then remove the null type(s) and set required=False
+            types = [t for t in types if t not in NULL_TYPES]
+            flattened[OasField.TYPE.value] = types[0] if len(types) == 1 else types
+            flattened[OasField.REQUIRED.value] = False
 
-        nullable = False
-        schema_type = prop.get(OasField.TYPE)
-        if isinstance(schema_type, list):
-            nullable = any(nt in schema_type for nt in NULL_TYPES)
-            schema_list = [v for v in schema_type if v not in NULL_TYPES]
-            nullable = schema_type != schema_list
-            if len(schema_list) == 1:
-                schema_type = schema_list[0]
-            else:
-                schema_type = schema_list
-            prop[OasField.TYPE.value] = schema_type
-
-        if isinstance(schema_type, str) and schema_type in COLLECTIONS.keys():
-            items = prop.pop(OasField.ITEMS, {})
-            prop.update(items)
-            prop[OasField.X_COLLECT.value] = schema_type
-            schema_type = items.get(OasField.TYPE)
-
-        self.update_enum(prop)
-
-        schema = self.simplify_type(prop)
-        if schema:
-            prop.update(schema)
-        if nullable:
-            prop[OasField.REQUIRED.value] = False
-
-        return prop
+        return flattened
 
     def params_to_settable_properties(self, parameters: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Get a dictionary of settable parameter properties.

@@ -24,6 +24,7 @@ ANY_OF = "anyOf"
 ONE_OF = "oneOf"
 ITEMS = "items"
 DEF = "default"
+SINGLE = "x-forced-single"
 
 S1 = '\n    '
 S2 = f"{S1}    "
@@ -273,25 +274,6 @@ def test_op_short_help(op, expected):
 def test_op_doc_string(op, expected):
     uut = BaseGenerator(package_name=PKG, oas={}, max_help_length=30)
     assert expected == uut.op_doc_string(op)
-
-
-@pytest.mark.parametrize(
-    ["reference", "expected"],
-    [
-        pytest.param("Species", False, id="enum"),
-        pytest.param("AllOfSpecies", False, id="all-of-enum"),
-        pytest.param("RefToSpecies", False, id="ref-to-enum"),
-        pytest.param("SpeciesProp", False, id="single-enum-prop"),
-        pytest.param("Pet", True, id="obj"),
-        pytest.param("PetInherited", True, id="obj-inherted"),
-        pytest.param("PetReference", True, id="obj-reference"),
-    ]
-)
-def test_model_is_complex(reference, expected):
-    oas = open_oas(asset_filename("misc.yaml"))
-    uut = BaseGenerator(oas=oas, package_name=PKG)
-    model = uut.get_model(f"#/components/schemas/{reference}")
-    assert expected == uut.model_is_complex(model)
 
 
 @pytest.mark.parametrize(
@@ -729,7 +711,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
         pytest.param(SIMPLE_PARAM, SIMPLE_PROP, id="simple"),
         pytest.param(
             {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]},
-            {TYPE: "foo", COLLECT: "array"},
+            {TYPE: "foo"},
             id="oneOf-collect-match"
         ),
         pytest.param(
@@ -744,7 +726,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
         ),
         pytest.param(
             {ANY_OF: [{TYPE: "array", ITEMS: {TYPE: "sna"}}, {TYPE: "foo"}]},
-            {TYPE: "sna", COLLECT: "array"},
+            {TYPE: "sna", SINGLE: True},
             id="anyOf"
         ),
         pytest.param(
