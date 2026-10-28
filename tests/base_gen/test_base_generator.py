@@ -711,7 +711,7 @@ def test_enum_definitions(path_params, query_params, body_params, expected):
         pytest.param(SIMPLE_PARAM, SIMPLE_PROP, id="simple"),
         pytest.param(
             {ONE_OF: [{TYPE: "foo"}, {TYPE: "array", ITEMS: {TYPE: "foo"}}]},
-            {TYPE: "foo"},
+            {TYPE: "foo", SINGLE: True},
             id="oneOf-collect-match"
         ),
         pytest.param(

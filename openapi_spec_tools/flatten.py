@@ -260,7 +260,7 @@ _TYPE_PREFERENCES = [
 def _choose_type(types: list[dict[str, Any]]) -> dict[str, Any]:
     """Chooses the most flexible "simple" type from the provided list.
 
-    If all the sub-types are complex, it chooses the first one.
+    If all the sub-types are complex, it chooses the first one or the list version of it.
     """
     for pref_main, pref_items in _TYPE_PREFERENCES:
         for data in types:
@@ -269,8 +269,21 @@ def _choose_type(types: list[dict[str, Any]]) -> dict[str, Any]:
             if main_type == pref_main and item_type == pref_items:
                 return data
 
-    # if no match found, just return the first item
-    return types[0]
+    # no perferred matches, so look at the complex items starting with the first
+    chosen = types[0]
+    c_type = chosen.get(OasField.TYPE)
+    if c_type == "array":
+        # already a list of complex, so just return
+        return chosen
+
+    for other in types[1:]:
+        o_type = other.get(OasField.ITEMS, {}).get(OasField.TYPE)
+        # if there's a list version of the first one, use that
+        if o_type == c_type and other.get(OasField.TYPE) == "array":
+            chosen = other
+            break
+
+    return chosen
 
 
 def apply_any_of(model: dict[str, Any]) -> bool:

@@ -1563,6 +1563,12 @@ def test_apply_any_of(model: dict[str, Any], updated: dict[str, Any], expected: 
             True,
             id="nested-complex",
         ),
+        pytest.param(
+            {"oneOf": [{"type": "foo"}, {"type": "array", "items": {"type": "foo"}}]},
+            {"type": "array", "items": {"type": "foo"}},
+            True,
+            id="complex-list",
+        ),
     ],
 )
 def test_apply_one_of(model: dict[str, Any], updated: dict[str, Any], expected: bool) -> None:
