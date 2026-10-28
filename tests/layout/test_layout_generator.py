@@ -15,9 +15,15 @@ from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
+from tests.constants import DESC
+from tests.constants import ITEMS
 from tests.constants import NAME
 from tests.constants import OP_ID
+from tests.constants import PROPS
+from tests.constants import REQUIRED
+from tests.constants import TYPE
 from tests.constants import X_METHOD
+from tests.constants import X_REF
 from tests.helpers import asset_filename
 
 PAGE_SIZE = "page_size_params"
@@ -131,52 +137,52 @@ def test_get_model(reference, found):
     assert found == (item is not None)
 
 
-ANIMAL = {'type': 'object', 'properties': {'species': {'type': 'string'}}}
+ANIMAL = {TYPE: 'object', PROPS: {'species': {TYPE: 'string'}}}
 PET = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer', 'x-reference': 'Pet'},
-        'name': {'type': 'string', 'x-reference': 'Pet'},
+    TYPE: 'object',
+    PROPS: {
+        'id': {TYPE: 'integer', X_REF: 'Pet'},
+        'name': {TYPE: 'string', X_REF: 'Pet'},
     },
-    'x-reference': 'Pet',
+    X_REF: 'Pet',
 }
 COMPOSED = {
-    'type': 'object',
-    'description': 'A wrapper',
-    'x-reference': 'Wrapper',
-    'properties': {
+    TYPE: 'object',
+    DESC: 'A wrapper',
+    X_REF: 'Wrapper',
+    PROPS: {
         'data': {
-            'type': 'array',
-            'items': PET,
+            TYPE: 'array',
+            ITEMS: PET,
         },
         'links': {
-            'type': 'object',
-            'properties': {
-                'next': {'type': 'string', 'x-reference': 'LinksPage'},
+            TYPE: 'object',
+            PROPS: {
+                'next': {TYPE: 'string', X_REF: 'LinksPage'},
             },
-            'x-reference': 'LinksPage',
+            X_REF: 'LinksPage',
         },
-        'extra': {'type': 'string'},
+        'extra': {TYPE: 'string'},
     },
 }
 COMPOSED_PET = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer', 'x-reference': 'Pet'},
-        'name': {'type': 'string', 'x-reference': 'Pet'},
-        'tag': {'type': 'string', 'x-reference': 'ComposedPet'},
+    TYPE: 'object',
+    PROPS: {
+        'id': {TYPE: 'integer', X_REF: 'Pet'},
+        'name': {TYPE: 'string', X_REF: 'Pet'},
+        'tag': {TYPE: 'string', X_REF: 'ComposedPet'},
     },
-    'description': 'Custom pet',
-    'required': ['name', 'tag'],
-    'x-reference': 'ComposedPet',
+    DESC: 'Custom pet',
+    REQUIRED: ['name', 'tag'],
+    X_REF: 'ComposedPet',
 }
 COMPOSED_LOOP = {
-    'type': 'object',
-    'properties': {
-        'fromB': {'type': 'integer', 'x-reference': 'LoopB'},
-        'fromA': {'type': 'string', 'x-reference': 'LoopA'},
+    TYPE: 'object',
+    PROPS: {
+        'fromB': {TYPE: 'integer', X_REF: 'LoopB'},
+        'fromA': {TYPE: 'string', X_REF: 'LoopA'},
     },
-    'x-reference': 'LoopA',
+    X_REF: 'LoopA',
 }
 
 @pytest.mark.parametrize(
