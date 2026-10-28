@@ -248,6 +248,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ComplexList'
+  /sna/foo/search:
+    post:
+      operationId: snaFooSearch
+      summary: Search for snafoo's
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                situation:
+                  description: Situation elements to find
+                  type: string
+                deaths:
+                  description: Minimum number of resulting deaths
+                  type: number
+
 components:
   parameters:
     PageSize:

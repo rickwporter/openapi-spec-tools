@@ -496,7 +496,7 @@ def test_op_content_type(op_id, expected):
     assert expected == uut.op_content_header(op)
 
 
-def test_op_body_formation():
+def test_op_body_formation_ref():
     oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
@@ -551,6 +551,19 @@ def test_op_body_formation_none():
     body_params = uut.op_body_settable_properties(op)
     assert {} == body_params
     assert "" == uut.op_body_formation(body_params)
+
+
+def test_op_body_formation_props() -> None:
+    oas = open_oas(asset_filename("misc3.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("snaFooSearch")
+    uut = BaseGenerator(oas=oas, package_name=PKG)
+    body_params = uut.op_body_settable_properties(op)
+    text = uut.op_body_formation(body_params)
+    assert 'if situation is not None:' in text
+    assert 'body["situation"] = situation' in text
+    assert 'if deaths is not None:' in text
+    assert 'body["deaths"] = deaths' in text
 
 
 @pytest.mark.parametrize(
