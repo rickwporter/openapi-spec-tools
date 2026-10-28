@@ -364,11 +364,12 @@ class BaseGenerator:
             reduced = set(schema) - NULL_TYPES
             if len(reduced) == 1:
                 return reduced.pop()
-            # loop through to find the items from the ordered schema
-            for item in schema:
-                if item in reduced:
-                    self.logger.debug(f"Choosing {item} type from {', '.join(schema)}")
-                    return item
+
+            # find first item from schema this is a non-null type
+            item = next((item for item in schema if item in reduced), None)
+            if item is not None:
+                self.logger.debug(f"Choosing {item} type from {', '.join(schema)}")
+                return item
 
         self.logger.warning(f"Unable to simplify type for {schema}")
         return None

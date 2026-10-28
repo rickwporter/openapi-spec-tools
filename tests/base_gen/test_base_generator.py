@@ -381,7 +381,9 @@ def test_schema_to_type(schema, fmt, expected):
         pytest.param("foo", "foo", id="str"),
         pytest.param({"sna": "foo"}, {"sna": "foo"}, id="dict"),
         pytest.param(["sna", "foo"], "sna", id="list-no-null"),
+        pytest.param(["null", "'null'"], None, id="list-multi-null"),
         pytest.param(["null", "sna"], "sna", id="list-null"),
+        pytest.param(["null", "sna", "foo"], "sna", id="list-multi-value"),
         pytest.param(1, None, id="error"),
     ]
 )
