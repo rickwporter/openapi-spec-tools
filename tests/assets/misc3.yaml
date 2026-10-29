@@ -225,6 +225,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /owners/:
+    get:
+      description: List people who may be pet owners
+      operationId: listOwners
+      responses:
+        '200':
+          description: List of owners
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: '#/components/schemas/Owner'
+    post:
+      description: Create a person who may become a pet owner
+      operationId: createOwner
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Owner'
   /sna/foo:
     get:
       operationId: snafooCheck
@@ -248,6 +269,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ComplexList'
+  /sna/foo/search:
+    post:
+      operationId: snaFooSearch
+      summary: Search for snafoo's
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                situation:
+                  description: Situation elements to find
+                  type: string
+                deaths:
+                  description: Minimum number of resulting deaths
+                  type: number
+
 components:
   parameters:
     PageSize:

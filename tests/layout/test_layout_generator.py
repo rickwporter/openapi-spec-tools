@@ -376,7 +376,7 @@ def test_generate_misc():
     assert [] == node.operations()
 
     sub_cmds = node.subcommands()
-    assert 2 == len(sub_cmds)
+    assert 3 == len(sub_cmds)
 
     pets = node.find("pets")
     pet_cmds = pets.operations()

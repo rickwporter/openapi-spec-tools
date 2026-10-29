@@ -364,11 +364,12 @@ class BaseGenerator:
             reduced = set(schema) - NULL_TYPES
             if len(reduced) == 1:
                 return reduced.pop()
-            # loop through to find the items from the ordered schema
-            for item in schema:
-                if item in reduced:
-                    self.logger.debug(f"Choosing {item} type from {', '.join(schema)}")
-                    return item
+
+            # find first item from schema this is a non-null type
+            item = next((item for item in schema if item in reduced), None)
+            if item is not None:
+                self.logger.debug(f"Choosing {item} type from {', '.join(schema)}")
+                return item
 
         self.logger.warning(f"Unable to simplify type for {schema}")
         return None
@@ -562,13 +563,10 @@ class BaseGenerator:
                 dep_msg = f"{option} is deprecated and should not be used"
 
             obj_name = "body"
-            field = prop_name
+            field = prop_data.get(OasField.X_FIELD) or prop_name
             parents = prop_data.get(OasField.X_PARENTS)
             if parents:
                 obj_name = self.variable_name(parents[-1])
-            x_field = prop_data.get(OasField.X_FIELD)
-            if x_field:
-                field = x_field
             if prop_data.get(OasField.REQUIRED):
                 lines.append(f'{obj_name}["{field}"] = {var_name}')
             else:

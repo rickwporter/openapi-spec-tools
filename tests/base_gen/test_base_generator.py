@@ -1,6 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any
 
 import pytest
 
@@ -381,7 +382,9 @@ def test_schema_to_type(schema, fmt, expected):
         pytest.param("foo", "foo", id="str"),
         pytest.param({"sna": "foo"}, {"sna": "foo"}, id="dict"),
         pytest.param(["sna", "foo"], "sna", id="list-no-null"),
+        pytest.param(["null", "'null'"], None, id="list-multi-null"),
         pytest.param(["null", "sna"], "sna", id="list-null"),
+        pytest.param(["null", "sna", "foo"], "sna", id="list-multi-value"),
         pytest.param(1, None, id="error"),
     ]
 )
@@ -496,7 +499,7 @@ def test_op_content_type(op_id, expected):
     assert expected == uut.op_content_header(op)
 
 
-def test_op_body_formation():
+def test_op_body_formation_ref():
     oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))
     op = operations.get("testPathParams")
@@ -553,6 +556,41 @@ def test_op_body_formation_none():
     assert "" == uut.op_body_formation(body_params)
 
 
+def test_op_body_formation_props() -> None:
+    oas = open_oas(asset_filename("misc3.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("snaFooSearch")
+    uut = BaseGenerator(oas=oas, package_name=PKG)
+    body_params = uut.op_body_settable_properties(op)
+    text = uut.op_body_formation(body_params)
+    assert 'if situation is not None:' in text
+    assert 'body["situation"] = situation' in text
+    assert 'if deaths is not None:' in text
+    assert 'body["deaths"] = deaths' in text
+
+
+def test_op_body_formation_depth() -> None:
+    oas = open_oas(asset_filename("misc3.yaml"))
+    operations = map_operations(oas.get(OasField.PATHS))
+    op = operations.get("createOwner")
+    uut = BaseGenerator(oas=oas, package_name=PKG)
+    body_params = uut.op_body_settable_properties(op)
+    text = uut.op_body_formation(body_params)
+    assert 'body = {}' in text
+    assert 'home = {}' in text
+    assert 'body["name"] = name' in text
+    assert 'if ice_cream is not None:' in text
+    assert 'body["iceCream"] = ice_cream' in text
+    # test a couple of the home sub-object fields (no need to test all)
+    assert 'if home_street is not None:' in text
+    assert 'home["street"] = home_street' in text
+    assert 'if home_city is not None:' in text
+    assert 'home["city"] = home_city' in text
+    # and, make sure the home sub-object is added to the main
+    assert 'if home:' in text
+    assert 'body["home"] = home' in text
+
+
 @pytest.mark.parametrize(
     ["enum_type", "values", "expected"],
     [
@@ -562,7 +600,8 @@ def test_op_body_formation_none():
         pytest.param('numeric', [-1, 0, 1, 2, 3.14159], True, id="float-match"),
         pytest.param('numeric', [-1, 0.1, 1, 2, 3, '*'], False, id="float-diff"),
         pytest.param('boolean', [True, False, True, True], True, id='bool-match'),
-        pytest.param('boolean', [False, 0, True], False, id="bool-diff")
+        pytest.param('boolean', [False, 0, True], False, id="bool-diff"),
+        pytest.param('foo', [1], False, id="unsupported"),
     ]
 )
 def test_enum_values_match_type(enum_type, values, expected):
@@ -628,6 +667,31 @@ MIXED_PARAM = {TYPE: "string", ENUM: ["a", 1, True, "b"], NAME: "mixed-values"}
 INT_STR_PARAM = {TYPE: "string", ENUM: ["10", "10.1"], NAME: "int-strings"}
 SIMPLE_PROP = deepcopy(SIMPLE_PARAM)
 SIMPLE_PROP[DEF] = None
+
+@pytest.mark.parametrize(
+    ["prop", "expected"],
+    [
+        pytest.param({}, {}, id="empty"),
+        pytest.param(SIMPLE_PARAM, SIMPLE_PROP, id="strings"),
+        pytest.param(NUMBER_PARAM, NUMBER_PARAM, id="numbers"),
+        pytest.param(
+            MIXED_PARAM,
+            {TYPE: "string", ENUM: ["a", "1", "True", "b"], NAME: "mixed-values", DEF: None},
+            id="mixed",
+        ),
+        pytest.param(
+            # tests special handling for non-list enum value
+            {TYPE: "string", ENUM: "bogus"},
+            {TYPE: "string", ENUM: "bogus", DEF: None},
+            id="bad-enum",
+        )
+    ],
+)
+def test_update_enum(prop: dict[str, Any], expected: dict[str, Any]) -> None:
+    uut = BaseGenerator(oas={}, package_name=PKG)
+    result = uut.update_enum(deepcopy(prop))
+    assert expected == result
+
 
 @pytest.mark.parametrize(
     ["name", "enum_type", "values", "expected"],
