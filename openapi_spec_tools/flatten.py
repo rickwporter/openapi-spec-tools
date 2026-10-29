@@ -1,12 +1,16 @@
 """Collection of utilities for flattening the OAS models."""
-
+import logging
 from copy import deepcopy
 from typing import Any
 
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.constants import NULL_TYPES
 from openapi_spec_tools.constants import SIMPLE_TYPES
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import reference_classname
+from openapi_spec_tools.utils import schema_summary
+
+logger = logging.getLogger(f"{LOG_CLASS}.flatten")
 
 
 def _reference_name(model: dict[str, Any]) -> str | None:
@@ -154,7 +158,12 @@ def _collection_requires_items(model: dict[str, Any], ancestor_required: bool) -
     return isinstance(min_items, int) and min_items > 0
 
 
-def flatten_collection(model: dict[str, Any], ancestor_required: bool = True, force_single: bool = True) -> bool:
+def flatten_collection(
+    model: dict[str, Any],
+    ancestor_required: bool = True,
+    force_single: bool = True,
+    name: str | None = None,
+) -> bool:
     """Treat an array of complex items as one item.
 
     The item schema replaces the array. ``x-forced-single`` is set and ``x-collection`` is omitted.
@@ -170,7 +179,7 @@ def flatten_collection(model: dict[str, Any], ancestor_required: bool = True, fo
     items = model.get(OasField.ITEMS)
     if not isinstance(items, dict) or items is model:
         return False
-    while apply_any_of(items) or apply_one_of(items):
+    while apply_any_of(items, name=name) or apply_one_of(items, name=name):
         pass
     simple = is_simple_type(items)
 
@@ -178,6 +187,7 @@ def flatten_collection(model: dict[str, Any], ancestor_required: bool = True, fo
         items[OasField.REQUIRED.value] = False
 
     parent_read_only = _is_read_only(model)
+    source = f"{name} " if name else ""
     model.pop(OasField.ITEMS.value, None)
     model.pop(OasField.TYPE.value, None)
     model.update(items)
@@ -185,9 +195,12 @@ def flatten_collection(model: dict[str, Any], ancestor_required: bool = True, fo
     if simple or not force_single:
         model.pop(OasField.X_SINGLE.value, None)
         model[OasField.X_COLLECT.value] = collection_type
+        kept = f"{collection_type}[{model.get(OasField.TYPE)}]"
     else:
         model[OasField.X_SINGLE.value] = True
         model.pop(OasField.X_COLLECT.value, None)
+        kept = f"a single {schema_summary(model)}"
+    logger.debug(f"flatten_collection: flattened {source}collection as {kept}")
     return True
 
 
@@ -198,12 +211,16 @@ def _mark_single(prop: Any, forced_single: bool) -> Any:
     return prop
 
 
-def _flatten_value(value: Any, ancestor_read_only: bool = False) -> Any:
+def _flatten_value(value: Any, ancestor_read_only: bool = False, name: str | None = None) -> Any:
     """Flatten schemas contained in a dict or list."""
     if isinstance(value, dict):
-        return _flatten_model(value, ancestor_read_only=ancestor_read_only)
+        return _flatten_model(value, ancestor_read_only=ancestor_read_only, name=name)
     if isinstance(value, list):
-        return [_flatten_value(item, ancestor_read_only) for item in value]
+        base_name = f"{name}." if name else ""
+        return [
+            _flatten_value(item, ancestor_read_only, name=f"{base_name}index[{index}]")
+            for index, item in enumerate(value)
+        ]
     return value
 
 
@@ -214,6 +231,7 @@ def _flatten_properties(
     ancestor_required: bool,
     forced_single: bool,
     ancestor_read_only: bool,
+    parent_name: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, list[str]]]:
     """Return flattened properties and the required-name replacements.
 
@@ -221,10 +239,11 @@ def _flatten_properties(
     """
     flat: dict[str, Any] = {}
     replacements: dict[str, list[str]] = {}
+    source = f"{parent_name}." if parent_name else ""
     for name, raw_prop in properties.items():
         level_required = ancestor_required and name in required_names
         prop = (
-            _flatten_model(raw_prop, level_required, ancestor_read_only)
+            _flatten_model(raw_prop, level_required, ancestor_read_only, name=f"{source}{name}")
             if isinstance(raw_prop, dict)
             else raw_prop
         )
@@ -235,6 +254,8 @@ def _flatten_properties(
                 full_name = f"{name}.{sub_name}"
                 updated = _apply_reference(_add_parent(sub_prop, name), reference)
                 flat[full_name] = _add_x_field(_mark_single(updated, forced_single), full_name)
+            target = schema_summary(raw_prop)
+            logger.debug(f"flatten_properties: {source}{name} flattened with {target} properties")
         else:
             marked = _mark_single(_mark_required(prop, level_required), forced_single)
             flat[name] = _add_x_field(_apply_reference(marked, reference), name)
@@ -257,16 +278,22 @@ _TYPE_PREFERENCES = [
 ]
 
 
-def _choose_type(types: list[dict[str, Any]]) -> dict[str, Any]:
+def _choose_type(log_prefix: str, name: str, types: list[dict[str, Any]]) -> dict[str, Any]:
     """Chooses the most flexible "simple" type from the provided list.
 
     If all the sub-types are complex, it chooses the first one or the list version of it.
     """
+    if len(types) == 1:
+        # no need to jump thru additional hoops (and cause logging)
+        return types[0]
+
+    source = f"{name} " if name else ""
     for pref_main, pref_items in _TYPE_PREFERENCES:
         for data in types:
             main_type = data.get(OasField.TYPE)
             item_type = data.get(OasField.ITEMS, {}).get(OasField.TYPE)
             if main_type == pref_main and item_type == pref_items:
+                logger.debug(f"{log_prefix}chose {source}preferred: {schema_summary(data)}")
                 return data
 
     # no perferred matches, so look at the complex items starting with the first
@@ -274,19 +301,22 @@ def _choose_type(types: list[dict[str, Any]]) -> dict[str, Any]:
     c_type = chosen.get(OasField.TYPE)
     if c_type == "array":
         # already a list of complex, so just return
+        item_type = chosen.get(OasField.ITEMS, {}).get(OasField.TYPE)
+        logger.debug(f"{log_prefix}chose first {source}collection: {schema_summary(chosen)}")
         return chosen
 
     for other in types[1:]:
         o_type = other.get(OasField.ITEMS, {}).get(OasField.TYPE)
         # if there's a list version of the first one, use that
         if o_type == c_type and other.get(OasField.TYPE) == "array":
-            chosen = other
-            break
+            logger.debug(f"{log_prefix}chose {source}collection: {schema_summary(other)}")
+            return other
 
+    logger.debug(f"{log_prefix}chose first {source}item: {schema_summary(chosen)}")
     return chosen
 
 
-def apply_any_of(model: dict[str, Any]) -> bool:
+def apply_any_of(model: dict[str, Any], name: str | None = None) -> bool:
     """Merge the first ``anyOf`` schema onto ``model`` when that item is complex.
 
     Simple scalar alternatives stay as ``anyOf``. Keys already on ``model`` stay when the chosen
@@ -297,6 +327,9 @@ def apply_any_of(model: dict[str, Any]) -> bool:
         return False
 
     chosen = any_of[0]
+    if len(any_of) > 1:
+        source = f"{name} " if name else ""
+        logger.debug(f"apply_any_of: chose {source}first (of {len(any_of)}): {schema_summary(chosen)}")
     parent_read_only = _is_read_only(model)
     model.pop(OasField.ANY_OF.value, None)
     model.update(chosen)
@@ -304,7 +337,7 @@ def apply_any_of(model: dict[str, Any]) -> bool:
     return True
 
 
-def apply_one_of(model: dict[str, Any]) -> bool:
+def apply_one_of(model: dict[str, Any], name: str | None = None) -> bool:
     """Merge the first ``oneOf`` schema onto ``model``.
 
     Keys already on ``model`` stay when the chosen item does not set them.
@@ -314,7 +347,7 @@ def apply_one_of(model: dict[str, Any]) -> bool:
     if not isinstance(one_of, list) or not one_of or not isinstance(one_of[0], dict):
         return False
 
-    chosen = _choose_type(one_of)
+    chosen = _choose_type("apply_any_of: ", name, one_of)
     parent_read_only = _is_read_only(model)
     model.pop(OasField.ONE_OF.value, None)
     model.update(chosen)
@@ -326,19 +359,20 @@ def _flatten_model(
     model: dict[str, Any],
     ancestor_required: bool = True,
     ancestor_read_only: bool = False,
+    name: str | None = None,
 ) -> dict[str, Any]:
     """Flatten one schema, hoisting cascaded properties into the parent map."""
     if ancestor_read_only:
         model[OasField.READ_ONLY.value] = True
 
-    if apply_one_of(model):
-        return _flatten_model(model, ancestor_required, ancestor_read_only)
+    if apply_one_of(model, name=name):
+        return _flatten_model(model, ancestor_required, ancestor_read_only, name=name)
 
-    if apply_any_of(model):
-        return _flatten_model(model, ancestor_required, ancestor_read_only)
+    if apply_any_of(model, name=name):
+        return _flatten_model(model, ancestor_required, ancestor_read_only, name=name)
 
-    if flatten_collection(model, ancestor_required):
-        return _flatten_model(model, ancestor_required, ancestor_read_only)
+    if flatten_collection(model, ancestor_required, name=name):
+        return _flatten_model(model, ancestor_required, ancestor_read_only, name=name)
 
     read_only = _is_read_only(model)
     for key, value in list(model.items()):
@@ -357,6 +391,7 @@ def _flatten_model(
             ancestor_required,
             bool(model.get(OasField.X_SINGLE)),
             read_only,
+            parent_name=name,
         )
         model[OasField.PROPS.value] = flat
         if isinstance(required, list):
@@ -368,7 +403,7 @@ def _flatten_model(
     return model
 
 
-def flatten_schema(schema: dict[str, Any] | None) -> dict[str, Any]:
+def flatten_schema(schema: dict[str, Any] | None, reference: str | None = None) -> dict[str, Any]:
     """Consolidate nested, fully expanded objects into dotted dictionary of property names.
 
     A property that has its own properties is replaced by those properties. Each consolidated
@@ -394,5 +429,7 @@ def flatten_schema(schema: dict[str, Any] | None) -> dict[str, Any]:
     """
     if not schema:
         return {}
-    return _flatten_model(deepcopy(schema))
+
+    name = reference_classname(reference) if reference else ""
+    return _flatten_model(deepcopy(schema), name=name)
 
