@@ -18,6 +18,7 @@ from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
+from openapi_spec_tools.cli.constants import SEP
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_config_from_file
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
@@ -39,8 +40,6 @@ from openapi_spec_tools.layout import subcommand_extra_properties
 from openapi_spec_tools.layout import subcommand_missing_properties
 from openapi_spec_tools.layout import subcommand_order
 from openapi_spec_tools.layout import subcommand_references
-
-SEP = "\n    "
 
 app = typer.Typer(
     name="layout",

@@ -6,8 +6,9 @@ import typer
 from rich_objects import OutputFormat
 from rich_objects import OutputStyle
 
-DIRECTORY = "DIRECTORY"
-FILENAME = "FILENAME"
+from openapi_spec_tools.cli.constants import DIRECTORY
+from openapi_spec_tools.cli.constants import FILENAME
+
 
 class LogLevel(str, Enum):
     """Log levels."""

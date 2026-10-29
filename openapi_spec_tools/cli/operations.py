@@ -9,6 +9,7 @@ from rich_objects import console_factory
 from openapi_spec_tools.cli.arguments import ExpansionOption
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli.constants import INDENT
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
@@ -21,8 +22,6 @@ from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import model_filter
-
-INDENT = "    "
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to operations")
 

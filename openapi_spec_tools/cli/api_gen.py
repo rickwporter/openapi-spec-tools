@@ -25,7 +25,6 @@ from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 
-SEP = "\n    "
 
 class BodyType(str, Enum):
     """Different body types for API generated code."""
