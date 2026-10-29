@@ -235,6 +235,78 @@ def reference_classname(full_name: str) -> str:
     return full_name.rsplit('/', maxsplit=1)[-1]
 
 
+_SUMMARY_TEXT_LIMIT = 60
+
+
+def _summary_type_name(schema_type: Any) -> str:
+    """Return a display name for a schema ``type`` value."""
+    if isinstance(schema_type, list):
+        return "|".join(str(item) for item in schema_type)
+    if schema_type:
+        return str(schema_type)
+    return ""
+
+
+def _summary_type_label(model: dict[str, Any]) -> str:
+    """Return the type portion of a schema label, including array items and format."""
+    schema_type = model.get(OasField.TYPE)
+    if schema_type == "array":
+        items = model.get(OasField.ITEMS)
+        return f"array[{schema_summary(items)}]"
+
+    label = _summary_type_name(schema_type)
+    fmt = model.get(OasField.FORMAT)
+    if label and isinstance(fmt, str) and fmt:
+        return f"{label}({fmt})"
+    return label
+
+
+def _summary_reference(model: dict[str, Any]) -> str:
+    """Return the reference class name recorded on ``model``."""
+    reference = model.get(OasField.X_REF) or model.get(OasField.REFS)
+    if reference:
+        return reference_classname(reference)
+    return ""
+
+
+def _summary_description(model: dict[str, Any]) -> str:
+    """Return a quoted description when it can identify an otherwise blank schema."""
+    description = model.get(OasField.DESCRIPTION)
+    if not isinstance(description, str) or not description.strip():
+        return ""
+    text = " ".join(description.split())
+    if len(text) > _SUMMARY_TEXT_LIMIT:
+        text = f"{text[: _SUMMARY_TEXT_LIMIT - 3]}..."
+    return f'"{text}"'
+
+
+def schema_summary(model: dict[str, Any]) -> str:
+    """Return a short label describing a schema for debug logs.
+
+    The label includes a reference name, type, and property names when those are present.
+    """
+    reference = _summary_reference(model)
+    if reference:
+        return reference
+
+    label = _summary_type_label(model)
+    properties = model.get(OasField.PROPS)
+    if isinstance(properties, dict) and properties:
+        label += "{" + ", ".join(str(name) for name in properties) + "}"
+    if label:
+        return label
+
+    description = _summary_description(model)
+    if description:
+        return description
+
+    for keyword in (OasField.ALL_OF, OasField.ANY_OF, OasField.ONE_OF):
+        nested = model.get(keyword)
+        if isinstance(nested, list):
+            return f"{keyword.value}[{len(nested)}]"
+    return "schema"
+
+
 def find_references(obj: dict[str, Any]) -> set[str]:
     """Walk the 'obj' dictionary to find all the reference values (e.g. "$ref")."""
     refs = find_dict_prop(obj, OasField.REFS)

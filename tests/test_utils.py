@@ -21,9 +21,18 @@ from openapi_spec_tools.utils import reference_classname
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
+from openapi_spec_tools.utils import schema_summary
 from openapi_spec_tools.utils import set_nullable_not_required
 from openapi_spec_tools.utils import short_ref
 from openapi_spec_tools.utils import unroll
+from tests.constants import ALL_OF
+from tests.constants import DESC
+from tests.constants import FORMAT
+from tests.constants import ITEMS
+from tests.constants import PROPS
+from tests.constants import REFS
+from tests.constants import TYPE
+from tests.constants import X_REF
 from tests.helpers import asset_filename
 from tests.helpers import open_test_oas
 
@@ -548,6 +557,31 @@ def test_map_content_types():
     result = map_content_types(schema)
     expected = {'createPets', 'deletePetById', 'showPetById', 'listPets'}
     assert expected == result['application/json']
+
+
+@pytest.mark.parametrize(
+    ["model", "expected"],
+    [
+        pytest.param({}, "schema", id="empty"),
+        pytest.param({REFS: "#/components/schemas/Pet"}, "Pet", id="ref"),
+        pytest.param({X_REF: "Pet", TYPE: "object", PROPS: {"id": {}, "name": {}}}, "Pet", id="x-ref"),
+        pytest.param({TYPE: "array", ITEMS: {TYPE: "string"}}, "array[string]", id="array-simple"),
+        pytest.param({TYPE: "array", ITEMS: {REFS: "#/components/foo/Bar"}}, "array[Bar]", id="array-complex"),
+        pytest.param({TYPE: "string", FORMAT: "date-time"}, "string(date-time)", id="format"),
+        pytest.param({TYPE: ["string", "null"]}, "string|null", id="type-list"),
+        pytest.param({DESC: "A labeled status"}, '"A labeled status"', id="description"),
+        pytest.param({DESC: "a" * 80}, f'"{"a" * 57}..."', id="long-description"),
+        pytest.param({ALL_OF: [{}, {}]}, "allOf[2]", id="all-of"),
+        pytest.param({TYPE: "string", DESC: "labeled"}, "string", id="type-over-description"),
+        pytest.param(
+            {TYPE: "object", PROPS: {"sna": {}, "foo": {TYPE: "number"}, "bar": {}}},
+            "object{sna, foo, bar}",
+            id="properties",
+        ),
+    ],
+)
+def test_schema_summary(model: Any, expected: str) -> None:
+    assert schema_summary(model) == expected
 
 
 def test_remove_property():
