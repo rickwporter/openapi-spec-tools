@@ -74,6 +74,7 @@ LogLevelOption = Annotated[
     typer.Option(
         "--log",
         case_sensitive=False,
+        envvar="LOG_LEVEL",
         help="Log level",
     ),
 ]
