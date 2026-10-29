@@ -20,6 +20,8 @@ from openapi_spec_tools.cli.arguments import PackageNameOption
 from openapi_spec_tools.cli.arguments import PathPrefixOption
 from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
+from openapi_spec_tools.cli.constants import DIRECTORY
+from openapi_spec_tools.cli.constants import SEP
 from openapi_spec_tools.cli.utils import gen_config_from_file
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
@@ -42,10 +44,6 @@ from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
-
-SEP = "\n    "
-FILENAME = "FILENAME"
-DIRECTORY = "DIRECTORY"
 
 #################################################
 # Utilities

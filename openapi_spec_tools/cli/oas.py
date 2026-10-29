@@ -12,6 +12,7 @@ from openapi_spec_tools.cli.analyze import app as analyze_app
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
+from openapi_spec_tools.cli.constants import INDENT
 from openapi_spec_tools.cli.history import app as history_app
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
@@ -26,9 +27,6 @@ from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
-
-INDENT = "    "
-
 
 #################################################
 # Top-level stuff
