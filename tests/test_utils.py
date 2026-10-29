@@ -31,6 +31,7 @@ from tests.constants import FORMAT
 from tests.constants import ITEMS
 from tests.constants import PROPS
 from tests.constants import REFS
+from tests.constants import TITLE
 from tests.constants import TYPE
 from tests.constants import X_REF
 from tests.helpers import asset_filename
@@ -563,7 +564,7 @@ def test_map_content_types():
     ["model", "expected"],
     [
         pytest.param({}, "schema", id="empty"),
-        pytest.param({REFS: "#/components/schemas/Pet"}, "Pet", id="ref"),
+        pytest.param({REFS: "#/components/schemas/Pet", TITLE: "foo"}, "Pet", id="ref"),
         pytest.param({X_REF: "Pet", TYPE: "object", PROPS: {"id": {}, "name": {}}}, "Pet", id="x-ref"),
         pytest.param({TYPE: "array", ITEMS: {TYPE: "string"}}, "array[string]", id="array-simple"),
         pytest.param({TYPE: "array", ITEMS: {REFS: "#/components/foo/Bar"}}, "array[Bar]", id="array-complex"),
@@ -583,6 +584,7 @@ def test_map_content_types():
             "object{mickey, minnie, goofy, +3 more}",
             id="many-props",
         ),
+        pytest.param({TITLE: "SnaFoo", PROPS: {"a": {}}}, "SnaFoo", id="title"),
     ],
 )
 def test_schema_summary(model: Any, expected: str) -> None:

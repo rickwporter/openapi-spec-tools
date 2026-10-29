@@ -267,6 +267,9 @@ def _summary_reference(model: dict[str, Any]) -> str:
     reference = model.get(OasField.X_REF) or model.get(OasField.REFS)
     if reference:
         return reference_classname(reference)
+    title = model.get(OasField.TITLE)
+    if title:
+        return title
     return ""
 
 
