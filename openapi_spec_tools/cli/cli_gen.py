@@ -31,6 +31,7 @@ from openapi_spec_tools.cli_gen import check_for_missing
 from openapi_spec_tools.cli_gen import create_tree_table
 from openapi_spec_tools.cli_gen import find_unreferenced
 from openapi_spec_tools.cli_gen import generate_tree_node
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 from openapi_spec_tools.layout import LayoutNode
@@ -43,7 +44,6 @@ from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
 
 SEP = "\n    "
-LOG_CLASS = "cli-gen"
 FILENAME = "FILENAME"
 DIRECTORY = "DIRECTORY"
 

@@ -17,6 +17,7 @@ from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import short_filename
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
@@ -27,7 +28,6 @@ from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
 
 INDENT = "    "
-LOG_CLASS = "oas"
 
 
 #################################################

@@ -24,6 +24,7 @@ from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import write_layout_tree
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 from openapi_spec_tools.layout import LayoutNode
@@ -40,7 +41,6 @@ from openapi_spec_tools.layout import subcommand_order
 from openapi_spec_tools.layout import subcommand_references
 
 SEP = "\n    "
-LOG_CLASS = "layout"
 
 app = typer.Typer(
     name="layout",

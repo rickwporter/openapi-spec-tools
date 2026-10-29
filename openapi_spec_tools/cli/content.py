@@ -9,9 +9,8 @@ from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.utils import map_content_types
-
-LOG_CLASS = "content"
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to content-types")
 
