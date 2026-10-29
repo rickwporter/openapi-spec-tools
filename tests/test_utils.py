@@ -578,6 +578,11 @@ def test_map_content_types():
             "object{sna, foo, bar}",
             id="properties",
         ),
+        pytest.param(
+            {TYPE: "object", PROPS: {"mickey": {}, "minnie": {}, "goofy": {}, "donald": {}, "pluto": {}, "daisy": {}}},
+            "object{mickey, minnie, goofy, +3 more}",
+            id="many-props",
+        ),
     ],
 )
 def test_schema_summary(model: Any, expected: str) -> None:
