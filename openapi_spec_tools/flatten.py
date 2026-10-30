@@ -195,12 +195,12 @@ def flatten_collection(
     if simple or not force_single:
         model.pop(OasField.X_SINGLE.value, None)
         model[OasField.X_COLLECT.value] = collection_type
-        kept = f"{collection_type}[{model.get(OasField.TYPE)}]"
+        kept = f"a {collection_type}[{model.get(OasField.TYPE)}]"
     else:
         model[OasField.X_SINGLE.value] = True
         model.pop(OasField.X_COLLECT.value, None)
-        kept = f"a single {schema_summary(model)}"
-    logger.debug(f"flatten_collection: flattened {source}collection as {kept}")
+        kept = "a forced-single"
+    logger.debug(f"flattened {source}collection as {kept}")
     return True
 
 
@@ -255,7 +255,7 @@ def _flatten_properties(
                 updated = _apply_reference(_add_parent(sub_prop, name), reference)
                 flat[full_name] = _add_x_field(_mark_single(updated, forced_single), full_name)
             target = schema_summary(raw_prop)
-            logger.debug(f"flatten_properties: {source}{name} flattened with {target} properties")
+            logger.debug(f"flattened {source}{name} property with {target} properties")
         else:
             marked = _mark_single(_mark_required(prop, level_required), forced_single)
             flat[name] = _add_x_field(_apply_reference(marked, reference), name)
@@ -278,7 +278,7 @@ _TYPE_PREFERENCES = [
 ]
 
 
-def _choose_type(log_prefix: str, name: str, types: list[dict[str, Any]]) -> dict[str, Any]:
+def _choose_type(name: str, types: list[dict[str, Any]], field: str) -> dict[str, Any]:
     """Chooses the most flexible "simple" type from the provided list.
 
     If all the sub-types are complex, it chooses the first one or the list version of it.
@@ -287,13 +287,13 @@ def _choose_type(log_prefix: str, name: str, types: list[dict[str, Any]]) -> dic
         # no need to jump thru additional hoops (and cause logging)
         return types[0]
 
-    source = f"{name} " if name else ""
+    source = (f"{name} " if name else "") + field + " "
     for pref_main, pref_items in _TYPE_PREFERENCES:
         for data in types:
             main_type = data.get(OasField.TYPE)
             item_type = data.get(OasField.ITEMS, {}).get(OasField.TYPE)
             if main_type == pref_main and item_type == pref_items:
-                logger.debug(f"{log_prefix}chose {source}preferred: {schema_summary(data)}")
+                logger.debug(f"chose {source}preferred: {schema_summary(data)}")
                 return data
 
     # no perferred matches, so look at the complex items starting with the first
@@ -302,17 +302,17 @@ def _choose_type(log_prefix: str, name: str, types: list[dict[str, Any]]) -> dic
     if c_type == "array":
         # already a list of complex, so just return
         item_type = chosen.get(OasField.ITEMS, {}).get(OasField.TYPE)
-        logger.debug(f"{log_prefix}chose first {source}collection: {schema_summary(chosen)}")
+        logger.debug(f"chose first {source}collection: {schema_summary(chosen)}")
         return chosen
 
     for other in types[1:]:
         o_type = other.get(OasField.ITEMS, {}).get(OasField.TYPE)
         # if there's a list version of the first one, use that
         if o_type == c_type and other.get(OasField.TYPE) == "array":
-            logger.debug(f"{log_prefix}chose {source}collection: {schema_summary(other)}")
+            logger.debug(f"chose {source}collection: {schema_summary(other)}")
             return other
 
-    logger.debug(f"{log_prefix}chose first {source}item: {schema_summary(chosen)}")
+    logger.debug(f"chose first of {len(types)} {source}item: {schema_summary(chosen)}")
     return chosen
 
 
@@ -329,7 +329,7 @@ def apply_any_of(model: dict[str, Any], name: str | None = None) -> bool:
     chosen = any_of[0]
     if len(any_of) > 1:
         source = f"{name} " if name else ""
-        logger.debug(f"apply_any_of: chose {source}first (of {len(any_of)}): {schema_summary(chosen)}")
+        logger.debug(f"chose {source}first of {len(any_of)} anyOf: {schema_summary(chosen)}")
     parent_read_only = _is_read_only(model)
     model.pop(OasField.ANY_OF.value, None)
     model.update(chosen)
@@ -347,7 +347,7 @@ def apply_one_of(model: dict[str, Any], name: str | None = None) -> bool:
     if not isinstance(one_of, list) or not one_of or not isinstance(one_of[0], dict):
         return False
 
-    chosen = _choose_type("apply_any_of: ", name, one_of)
+    chosen = _choose_type(name, one_of, "oneOf")
     parent_read_only = _is_read_only(model)
     model.pop(OasField.ONE_OF.value, None)
     model.update(chosen)
