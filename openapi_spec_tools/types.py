@@ -39,6 +39,7 @@ class OasField(str, Enum):
     SERVERS = "servers"
     SUMMARY = "summary"
     TAGS = "tags"
+    TITLE = "title"
     TYPE = "type"
     URL = "url"
 

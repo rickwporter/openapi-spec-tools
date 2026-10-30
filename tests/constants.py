@@ -40,6 +40,7 @@ SCHEMAS = OasField.SCHEMAS.value
 SERVERS = OasField.SERVERS.value
 SUM = OasField.SUMMARY.value
 TAGS = OasField.TAGS.value
+TITLE = OasField.TITLE.value
 TYPE = OasField.TYPE.value
 URL = OasField.URL.value
 

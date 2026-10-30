@@ -236,6 +236,7 @@ def reference_classname(full_name: str) -> str:
 
 
 _SUMMARY_TEXT_LIMIT = 60
+_MAX_PROP_NAMES = 5
 
 
 def _summary_type_name(schema_type: Any) -> str:
@@ -266,6 +267,9 @@ def _summary_reference(model: dict[str, Any]) -> str:
     reference = model.get(OasField.X_REF) or model.get(OasField.REFS)
     if reference:
         return reference_classname(reference)
+    title = model.get(OasField.TITLE)
+    if title:
+        return title
     return ""
 
 
@@ -292,7 +296,12 @@ def schema_summary(model: dict[str, Any]) -> str:
     label = _summary_type_label(model)
     properties = model.get(OasField.PROPS)
     if isinstance(properties, dict) and properties:
-        label += "{" + ", ".join(str(name) for name in properties) + "}"
+        prop_names = [str(name) for name in properties]
+        if len(prop_names) > _MAX_PROP_NAMES:
+            show_len = _MAX_PROP_NAMES - 2
+            remaining = len(prop_names) - show_len
+            prop_names = prop_names[:show_len] + [f"+{remaining} more"]
+        label += "{" + ", ".join(prop_names) + "}"
     if label:
         return label
 
