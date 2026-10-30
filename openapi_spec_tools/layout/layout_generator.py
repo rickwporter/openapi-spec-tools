@@ -169,7 +169,8 @@ class LayoutGenerator:
                 if not schema:
                     continue
 
-                return expand_schema(schema, self.components)
+                reference = schema.get(OasField.REFS)
+                return expand_schema(schema, self.components, reference)
 
         return None
 

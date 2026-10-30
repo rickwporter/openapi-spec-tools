@@ -290,7 +290,7 @@ class BaseGenerator:
     def model_settable_properties(self, name: str, model: dict[str, Any]) -> dict[str, Any]:
         """Expand the model into a dictionary of properties."""
         expanded = expand_schema(model, self.components, name)
-        flattened = flatten_schema(expanded)
+        flattened = flatten_schema(expanded, name)
 
         # filter out read-only properties, and complex properties that CLI cannot deal with
         settable = {
@@ -457,8 +457,9 @@ class BaseGenerator:
         Resolves parameter data to make it easier to digest (e.g. choosing any oneOf,
         collection information, required).
         """
-        expanded = expand_schema(param, self.components)
-        flattened = flatten_schema(expanded)
+        name = param.get(OasField.NAME) or ""
+        expanded = expand_schema(param, self.components, name)
+        flattened = flatten_schema(expanded, name)
         self.update_enum(flattened)
 
         # flatten the type, too
