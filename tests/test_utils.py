@@ -564,7 +564,7 @@ def test_map_content_types():
     ["model", "expected"],
     [
         pytest.param({}, "schema", id="empty"),
-        pytest.param({REFS: "#/components/schemas/Pet", TITLE: "foo"}, "Pet", id="ref"),
+        pytest.param({REFS: "#/components/schemas/Pet"}, "Pet", id="ref"),
         pytest.param({X_REF: "Pet", TYPE: "object", PROPS: {"id": {}, "name": {}}}, "Pet", id="x-ref"),
         pytest.param({TYPE: "array", ITEMS: {TYPE: "string"}}, "array[string]", id="array-simple"),
         pytest.param({TYPE: "array", ITEMS: {REFS: "#/components/foo/Bar"}}, "array[Bar]", id="array-complex"),
@@ -584,7 +584,7 @@ def test_map_content_types():
             "object{mickey, minnie, goofy, +3 more}",
             id="many-props",
         ),
-        pytest.param({TITLE: "SnaFoo", PROPS: {"a": {}}}, "SnaFoo", id="title"),
+        pytest.param({TITLE: "SnaFoo", X_REF: "Blah", PROPS: {"a": {}}}, "SnaFoo", id="title"),
     ],
 )
 def test_schema_summary(model: Any, expected: str) -> None:

@@ -220,4 +220,4 @@ def perform_expansion(
         return expanded
 
     # this is for ExpansionType.FLATTEN
-    return flatten_schema(expanded)
+    return flatten_schema(expanded, reference=name)

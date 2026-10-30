@@ -264,12 +264,13 @@ def _summary_type_label(model: dict[str, Any]) -> str:
 
 def _summary_reference(model: dict[str, Any]) -> str:
     """Return the reference class name recorded on ``model``."""
-    reference = model.get(OasField.X_REF) or model.get(OasField.REFS)
-    if reference:
-        return reference_classname(reference)
+    # NOTE: 'title' is uncommon, but used in "unnamed" properties
     title = model.get(OasField.TITLE)
     if title:
         return title
+    reference = model.get(OasField.X_REF) or model.get(OasField.REFS)
+    if reference:
+        return reference_classname(reference)
     return ""
 
 
