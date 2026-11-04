@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/rickwporter/openapi-spec-tools/branch/main/graph/badge.svg)](https://codecov.io/gh/rickwporter/openapi-spec-tools)
+
 # openapi-spec-tools
 
 This is a collection of tools for using OpenAPI specifications. The OpenAPI community has a plethora of tools, and this is intended to supplement those. The tools here provide functionality that has not been readily available elsewhere.
