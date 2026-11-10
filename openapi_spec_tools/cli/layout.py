@@ -25,7 +25,6 @@ from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_layout_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import write_layout_tree
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 from openapi_spec_tools.layout import LayoutNode
@@ -66,7 +65,7 @@ def layout_check_format(
     hardcoded: Annotated[bool, typer.Option(help="Check the hardCoded parameters")] = True,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     data = open_layout_with_error_handling(filename)
 
     def _dict_to_str(errors: dict[str, str], sep=SEP) -> str:
@@ -151,7 +150,7 @@ def layout_tree(
     indent: Annotated[int, typer.Option(min=1, max=10, help="Number of characters of indent")] = 2,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     tree = layout_tree_with_error_handling(filename, start=start)
     if style == TreeFormat.JSON:
         print_json(data=tree.as_dict(sparse=True), indent=indent, sort_keys=False)
@@ -200,7 +199,7 @@ def layout_operations(
             ops.update(_operations(sub))
         return ops
 
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     tree = layout_tree_with_error_handling(filename, start=start)
     operations = _operations(tree)
     print('\n'.join(sorted(operations)))
@@ -231,7 +230,7 @@ def layout_suggest(
 
     * May have some small modules (extra layers), such as `deploy list` instead of a desired `deploy`.
     """
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     oas = open_oas_with_error_handling(openapi_file)
     config = layout_config_from_file(config_file)
     generator = LayoutGenerator(oas, config=config, prefix=prefix or None)
@@ -270,7 +269,7 @@ def layout_merge(
     log_level: LogLevelOption = "info",
 ) -> None:
     """Merge properties from the source file into the destination file."""
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     source_node = layout_tree_with_error_handling(source_file, start=start)
     dest_node = layout_tree_with_error_handling(dest_file, start=start)
 

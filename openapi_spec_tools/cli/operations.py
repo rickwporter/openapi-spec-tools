@@ -15,7 +15,6 @@ from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import perform_expansion
 from openapi_spec_tools.cli.utils import remove_dict_prefix
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import find_references
@@ -41,7 +40,7 @@ def operation_list(
     ] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
@@ -68,7 +67,7 @@ def operation_show(
     operation_name: OperationNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
@@ -95,7 +94,7 @@ def operation_models(
     operation_name: OperationNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
@@ -126,7 +125,7 @@ def operations_parameters(
     expansion: ExpansionOption = "none",
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
@@ -162,7 +161,7 @@ def operation_request_body(
     content_type: ContentTypeOption = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))
@@ -218,7 +217,7 @@ def operation_response_body(
     ] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     operations = map_operations(spec.get(OasField.PATHS, {}))

@@ -13,6 +13,7 @@ from rich.console import Console
 
 from openapi_spec_tools.base_gen import GeneratorConfig
 from openapi_spec_tools.cli.arguments import ExpansionType
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.flatten import flatten_schema
 from openapi_spec_tools.layout import LayoutConfig
@@ -42,10 +43,10 @@ class LogLevel(str, Enum):
     DEBUG = "debug"
 
 
-def init_logging(level: LogLevel, name: str) -> logging.Logger:
+def init_logging(level: LogLevel) -> logging.Logger:
     """Initialize logging."""
     logging.basicConfig(format=LOG_FORMAT, datefmt=LOG_DATE_FMT)
-    logger = logging.getLogger(name=name)
+    logger = logging.getLogger(name=LOG_CLASS)
     logger.setLevel(level.upper())
     return logger
 

@@ -33,13 +33,11 @@ from openapi_spec_tools.cli_gen import check_for_missing
 from openapi_spec_tools.cli_gen import create_tree_table
 from openapi_spec_tools.cli_gen import find_unreferenced
 from openapi_spec_tools.cli_gen import generate_tree_node
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.layout import path_to_parts
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _logger_name
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
@@ -92,7 +90,7 @@ def generate_cli(
     Use either `--project-dir` to set both relative code and test directories, or
     set the paths specifically using `--code-dir` and `--test-dir`.
     """
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
 
     oas = open_oas_with_error_handling(openapi_file)
     if layout_file:
@@ -153,7 +151,7 @@ def generate_check_missing(
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
@@ -173,7 +171,7 @@ def generate_unreferenced(
     full_path: Annotated[bool, typer.Option(help="Use full URL path that included variables")] = False,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
@@ -242,7 +240,7 @@ def update_layout(
     indent: IndentOption = 4,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, _logger_name(__name__))
+    logger = init_logging(log_level)
     commands = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
 
@@ -291,7 +289,7 @@ def show_cli_tree(
     ] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     layout = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
     generator = CliGenerator(package_name="", oas=oas)
@@ -342,7 +340,7 @@ def trim_oas(
             ops.update(_operations(sub))
         return ops
 
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     layout = layout_tree_with_error_handling(layout_file, start=start)
     oas = open_oas_with_error_handling(openapi_file)
     updated = deepcopy(oas)

@@ -21,7 +21,6 @@ from openapi_spec_tools.cli.utils import gen_config_from_file
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 
@@ -61,7 +60,7 @@ def generate_api(
     The body-type only applies to functions with a request body. It determines the granularity of
     the function arguments, and the amount of work done to form the body.
     """
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
 
     oas = open_oas_with_error_handling(openapi_file)
     if layout_file:

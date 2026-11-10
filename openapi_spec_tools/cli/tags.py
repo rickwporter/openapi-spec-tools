@@ -11,7 +11,6 @@ from openapi_spec_tools.cli.constants import INDENT
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import OasField
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to tags")
@@ -23,7 +22,7 @@ def tags_list(
     search: Annotated[str | None, typer.Option("--contains", help="Search for this value in the tag names")] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     # NOTE: not all OAS's include a "tags" section, so walk the operations
@@ -60,7 +59,7 @@ def tags_show(
     tag_name: Annotated[str, typer.Argument(help="Name of the tag to show")],
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     operations = {}

@@ -18,7 +18,6 @@ from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import short_filename
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
@@ -45,7 +44,7 @@ def info(
     filename: OpenApiFilenameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
 
     info = spec.get("info", {})
@@ -59,7 +58,7 @@ def summary(
     filename: OpenApiFilenameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
     method_count = {
         'get': 0,
@@ -109,7 +108,7 @@ def diff(
     ],
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     old_spec = open_oas_with_error_handling(original)
     new_spec = open_oas_with_error_handling(updated)
 
@@ -162,7 +161,7 @@ def update(
     ] = len(INDENT),
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     old_spec = open_oas_with_error_handling(original_filename)
     updated = deepcopy(old_spec)
 

@@ -9,7 +9,6 @@ from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.utils import map_content_types
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to content-types")
@@ -22,7 +21,7 @@ def content_type_list(
     content_type: Annotated[str | None, typer.Option(help="Only display for specified content type")] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
     spec = open_oas_with_error_handling(filename)
     content = map_content_types(spec)
 
