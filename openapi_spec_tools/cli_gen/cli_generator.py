@@ -1,4 +1,5 @@
 """Declares the Generator class that is used for most of the CLi generation capability."""
+import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,9 @@ from openapi_spec_tools.base_gen import to_snake_case
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import _logger_name
+
+logger = logging.getLogger(_logger_name(__name__))
 
 
 class CliGenerator(BaseGenerator):
@@ -182,7 +186,7 @@ if __name__ == "__main__":
         py_type = self.get_parameter_pytype(prop)
         if not py_type:
             # log an error and use 'Any'
-            self.logger.error(f"Unable to determine Python type for {prop}")
+            logger.error(f"Unable to determine Python type for {prop}")
             py_type = 'Any'
 
         typer_args = []
@@ -428,7 +432,7 @@ if __name__ == "__main__":
         args_str = SEP1 + f",{SEP1}".join(func_args) + "," + NL
 
         command_args.append(f'short_help="{self.op_short_help(op)}"')
-        self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
+        logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
 
         hardcoded_values = self.initialize_hardcoded(node.hardcoded)
         user_header_init = ""
@@ -528,7 +532,7 @@ def show_commands(
     def generate_node(self, node: LayoutNode, directory: str) -> None:
         """Create a file/module for the current node, and recursively goes through sub-commands."""
         module_name = to_snake_case(node.identifier)
-        self.logger.info(f"Generating {module_name} module")
+        logger.info(f"Generating {module_name} module")
         operations = node.operations()
         text = self.shebang()
         text += self.copyright

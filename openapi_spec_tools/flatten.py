@@ -3,14 +3,14 @@ import logging
 from copy import deepcopy
 from typing import Any
 
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.constants import NULL_TYPES
 from openapi_spec_tools.constants import SIMPLE_TYPES
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import _logger_name
 from openapi_spec_tools.utils import reference_classname
 from openapi_spec_tools.utils import schema_summary
 
-logger = logging.getLogger(f"{LOG_CLASS}.flatten")
+logger = logging.getLogger(_logger_name(__name__))
 
 
 def _reference_name(model: dict[str, Any]) -> str | None:

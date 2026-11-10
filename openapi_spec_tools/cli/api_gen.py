@@ -76,7 +76,7 @@ def generate_api(
         typer.echo("Must specify package_name in arguments or configuration.")
         raise typer.Exit(1)
 
-    kwargs = {"package_name": package_name, "oas": oas, "logger": logger, "config": config}
+    kwargs = {"package_name": package_name, "oas": oas, "config": config}
     if body_type == BodyType.FLAT:
         generator = FlatApiGenerator(**kwargs)
     elif body_type == BodyType.PROPERTY:

@@ -5,7 +5,6 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from openapi_spec_tools.base_gen._logging import init_logging
 from openapi_spec_tools.base_gen.config import GeneratorConfig
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
 from openapi_spec_tools.base_gen.constants import DEFAULT_CONFLICT_SUFFIX
@@ -35,11 +34,12 @@ from openapi_spec_tools.flatten import flatten_schema
 from openapi_spec_tools.flatten import is_simple_type
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import _logger_name
 from openapi_spec_tools.utils import _or
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import reference_classname
 
-LOG_CLASS = "base-gen"
+logger = logging.getLogger(_logger_name(__name__))
 
 
 class BaseGenerator:
@@ -53,7 +53,6 @@ class BaseGenerator:
     def __init__(
         self,
         oas: dict[str, Any],
-        logger: logging.Logger | None = None,
         config: GeneratorConfig | None = None,
         package_name: str | None = None,
         supported_content: list[ContentType] | None = None,
@@ -101,7 +100,6 @@ class BaseGenerator:
         config = config or GeneratorConfig()  # reduce logic by creating a default (if no config provided)
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
         self.components = oas.get(OasField.COMPONENTS, {})
-        self.logger = logger or init_logging("INFO", LOG_CLASS)
 
         self.package_name = _or(package_name, config.package_name, ValueError("Missing package_name"))
         self.default_host = _or(default_host, config.default_host, "")
@@ -368,10 +366,10 @@ class BaseGenerator:
             # find first item from schema this is a non-null type
             item = next((item for item in schema if item in reduced), None)
             if item is not None:
-                self.logger.debug(f"Choosing {item} type from {', '.join(schema)}")
+                logger.debug(f"Choosing {item} type from {', '.join(schema)}")
                 return item
 
-        self.logger.warning(f"Unable to simplify type for {schema}")
+        logger.warning(f"Unable to simplify type for {schema}")
         return None
 
 

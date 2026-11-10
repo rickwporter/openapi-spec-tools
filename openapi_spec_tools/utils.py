@@ -7,6 +7,7 @@ from typing import Any
 
 import yaml
 
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.constants import NULL_TYPES
 from openapi_spec_tools.types import OasField
 
@@ -708,3 +709,12 @@ def remove_property(schema: dict[str, Any], prop_name: str) -> dict[str, Any]:
         result = temp
 
     return result
+
+
+def _logger_name(name: str) -> str:
+    """Remove the package name from the name.
+
+    Used to initialize logging without long package name. For example, `openapi_spec_tools.utils` becomes `utils`.
+    """
+    package = __package__
+    return name.replace(package, LOG_CLASS)

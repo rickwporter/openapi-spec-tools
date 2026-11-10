@@ -111,7 +111,7 @@ def generate_cli(
         typer.echo("Must specify package_name in arguments or configuration.")
         raise typer.Exit(1)
 
-    generator = CliGenerator(package_name=package_name, oas=oas, logger=logger, config=config)
+    generator = CliGenerator(package_name=package_name, oas=oas, config=config)
 
     if project_dir:
         code_dir = code_dir or os.path.join(project_dir, generator.package_name)
@@ -293,7 +293,7 @@ def show_cli_tree(
     logger = init_logging(log_level, LOG_CLASS)
     layout = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
     oas = open_oas_with_error_handling(openapi_file, logger)
-    generator = CliGenerator(package_name="", oas=oas, logger=logger)
+    generator = CliGenerator(package_name="", oas=oas)
 
     tree = generate_tree_node(generator, layout)
     if not tree.children:

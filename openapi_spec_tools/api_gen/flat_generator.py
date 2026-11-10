@@ -3,12 +3,17 @@
 The bodies are "unrolled" to individual parameters (as best as possible), and passed as
 parameters into the functions.
 """
+import logging
+
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.base_gen import NL
 from openapi_spec_tools.base_gen import SEP1
 from openapi_spec_tools.base_gen import quoted
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import _logger_name
+
+logger = logging.getLogger(_logger_name(__name__))
 
 
 class FlatApiGenerator(ApiGenerator):
@@ -59,7 +64,7 @@ class FlatApiGenerator(ApiGenerator):
         func_args.extend(self.command_infra_arguments(node))
         args_str = SEP1 + SEP1.join(func_args) + NL
 
-        self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
+        logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
 
         user_header_init = ""
         user_header_arg = ""
