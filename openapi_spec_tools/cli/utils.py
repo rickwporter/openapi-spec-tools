@@ -20,6 +20,7 @@ from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.layout import file_to_tree
 from openapi_spec_tools.layout import open_layout
 from openapi_spec_tools.layout import write_layout
+from openapi_spec_tools.utils import _logger_name
 from openapi_spec_tools.utils import open_oas
 
 # Common argument definition
@@ -27,6 +28,8 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s %(message)s"
 LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 
 ConfigT = TypeVar("ConfigT", GeneratorConfig, LayoutConfig)
+
+logger = logging.getLogger(_logger_name(__name__))
 
 
 class LogLevel(str, Enum):
@@ -53,7 +56,7 @@ def error_out(message: str, exit_code: int = 1) -> None:
     raise typer.Exit(exit_code)
 
 
-def open_oas_with_error_handling(filename: str, logger: logging.Logger) -> Any:
+def open_oas_with_error_handling(filename: str) -> Any:
     """Perform error handling around opening an OpenAPI spec.
 
     Avoids the standard Typer error handling that is quite verbose.
@@ -74,7 +77,7 @@ def open_oas_with_error_handling(filename: str, logger: logging.Logger) -> Any:
     raise typer.Exit(1)
 
 
-def open_layout_with_error_handling(filename: str, logger: logging.Logger) -> Any:
+def open_layout_with_error_handling(filename: str) -> Any:
     """Perform error handling around opening a layout file.
 
     Avoids the standard Typer error handling that is quite verbose.
@@ -95,7 +98,7 @@ def open_layout_with_error_handling(filename: str, logger: logging.Logger) -> An
     raise typer.Exit(1)
 
 
-def layout_tree_with_error_handling(filename: str, start: str, logger: logging.Logger) -> LayoutNode:
+def layout_tree_with_error_handling(filename: str, start: str) -> LayoutNode:
     """Perform error handling around opening a layout file.
 
     Avoids the standard Typer error handling that is quite verbose.
@@ -152,7 +155,7 @@ def layout_config_from_file(filename: str | None) -> LayoutConfig:
     return _config_from_file(filename, LayoutConfig)
 
 
-def write_layout_tree(filename: str, node: LayoutNode, logger: logging.Logger, indent: int = 4) -> None:
+def write_layout_tree(filename: str, node: LayoutNode, indent: int = 4) -> None:
     """Write the layout node tree to the specified file."""
     start = datetime.now()
     write_layout(filename, node, indent)

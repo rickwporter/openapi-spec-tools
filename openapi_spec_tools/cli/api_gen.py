@@ -61,11 +61,11 @@ def generate_api(
     The body-type only applies to functions with a request body. It determines the granularity of
     the function arguments, and the amount of work done to form the body.
     """
-    logger = init_logging(log_level, LOG_CLASS)
+    init_logging(log_level, LOG_CLASS)
 
-    oas = open_oas_with_error_handling(openapi_file, logger)
+    oas = open_oas_with_error_handling(openapi_file)
     if layout_file:
-        commands = layout_tree_with_error_handling(layout_file, start, logger)
+        commands = layout_tree_with_error_handling(layout_file, start)
     else:
         layout_gen = LayoutGenerator(oas, prefix=prefix or None)
         commands = layout_gen.generate()

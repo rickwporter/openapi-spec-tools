@@ -36,8 +36,8 @@ def paths_list(
     include_subpaths: PathSubpathOption = False,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
 
     paths = find_paths(spec.get(OasField.PATHS, {}), search, include_subpaths)
     names = sorted(paths.keys())
@@ -67,8 +67,8 @@ def paths_show(
     include_models: PathModelsOption = False,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
 
     paths = find_paths(spec.get(OasField.PATHS, {}), path_name, include_subpaths)
     if not paths:
@@ -97,8 +97,8 @@ def paths_operations(
     include_subpaths: PathSubpathOption = False,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
 
     result = {}
     paths = find_paths(spec.get(OasField.PATHS, {}), path_name, include_subpaths)

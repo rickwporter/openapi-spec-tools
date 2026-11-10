@@ -66,8 +66,8 @@ def layout_check_format(
     hardcoded: Annotated[bool, typer.Option(help="Check the hardCoded parameters")] = True,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    data = open_layout_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    data = open_layout_with_error_handling(filename)
 
     def _dict_to_str(errors: dict[str, str], sep=SEP) -> str:
         return f"{sep}{sep.join([f'{k}: {v}' for k, v in errors.items()])}"
@@ -151,8 +151,8 @@ def layout_tree(
     indent: Annotated[int, typer.Option(min=1, max=10, help="Number of characters of indent")] = 2,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    tree = layout_tree_with_error_handling(filename, start=start, logger=logger)
+    init_logging(log_level, LOG_CLASS)
+    tree = layout_tree_with_error_handling(filename, start=start)
     if style == TreeFormat.JSON:
         print_json(data=tree.as_dict(sparse=True), indent=indent, sort_keys=False)
         return
@@ -200,8 +200,8 @@ def layout_operations(
             ops.update(_operations(sub))
         return ops
 
-    logger = init_logging(log_level, LOG_CLASS)
-    tree = layout_tree_with_error_handling(filename, start=start, logger=logger)
+    init_logging(log_level, LOG_CLASS)
+    tree = layout_tree_with_error_handling(filename, start=start)
     operations = _operations(tree)
     print('\n'.join(sorted(operations)))
     return
@@ -231,8 +231,8 @@ def layout_suggest(
 
     * May have some small modules (extra layers), such as `deploy list` instead of a desired `deploy`.
     """
-    logger = init_logging(log_level, LOG_CLASS)
-    oas = open_oas_with_error_handling(openapi_file, logger)
+    init_logging(log_level, LOG_CLASS)
+    oas = open_oas_with_error_handling(openapi_file)
     config = layout_config_from_file(config_file)
     generator = LayoutGenerator(oas, config=config, prefix=prefix or None)
     node = generator.generate()
@@ -241,7 +241,7 @@ def layout_suggest(
         original = file_to_tree(output_file)
         node = merge(original=original, suggested=node)
 
-    write_layout_tree(output_file, node, logger, indent)
+    write_layout_tree(output_file, node, indent)
     print(f"Wrote {output_file}")
     return
 
@@ -270,14 +270,14 @@ def layout_merge(
     log_level: LogLevelOption = "info",
 ) -> None:
     """Merge properties from the source file into the destination file."""
-    logger = init_logging(log_level, LOG_CLASS)
-    source_node = layout_tree_with_error_handling(source_file, start=start, logger=logger)
-    dest_node = layout_tree_with_error_handling(dest_file, start=start, logger=logger)
+    init_logging(log_level, LOG_CLASS)
+    source_node = layout_tree_with_error_handling(source_file, start=start)
+    dest_node = layout_tree_with_error_handling(dest_file, start=start)
 
     result = merge_node_properties(properties, source_node, dest_node)
 
     out_file = out_file or dest_file
-    write_layout_tree(out_file, result, logger, indent)
+    write_layout_tree(out_file, result, indent)
     print(f"Wrote {out_file}")
     return
 

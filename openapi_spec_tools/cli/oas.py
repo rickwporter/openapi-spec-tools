@@ -45,8 +45,8 @@ def info(
     filename: OpenApiFilenameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
 
     info = spec.get("info", {})
     console = console_factory()
@@ -59,8 +59,8 @@ def summary(
     filename: OpenApiFilenameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
     method_count = {
         'get': 0,
         'put': 0,
@@ -109,9 +109,9 @@ def diff(
     ],
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    old_spec = open_oas_with_error_handling(original, logger)
-    new_spec = open_oas_with_error_handling(updated, logger)
+    init_logging(log_level, LOG_CLASS)
+    old_spec = open_oas_with_error_handling(original)
+    new_spec = open_oas_with_error_handling(updated)
 
     console = console_factory()
     diffs = find_diffs(old_spec, new_spec)
@@ -162,8 +162,8 @@ def update(
     ] = len(INDENT),
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    old_spec = open_oas_with_error_handling(original_filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    old_spec = open_oas_with_error_handling(original_filename)
     updated = deepcopy(old_spec)
 
     if allowed_operations and remove_operations:

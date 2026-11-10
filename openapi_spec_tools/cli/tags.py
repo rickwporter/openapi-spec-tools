@@ -23,8 +23,8 @@ def tags_list(
     search: Annotated[str | None, typer.Option("--contains", help="Search for this value in the tag names")] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
 
     # NOTE: not all OAS's include a "tags" section, so walk the operations
 
@@ -60,8 +60,8 @@ def tags_show(
     tag_name: Annotated[str, typer.Argument(help="Name of the tag to show")],
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
 
     operations = {}
     for path, path_data in spec.get(OasField.PATHS, {}).items():

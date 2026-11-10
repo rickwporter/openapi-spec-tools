@@ -22,8 +22,8 @@ def content_type_list(
     content_type: Annotated[str | None, typer.Option(help="Only display for specified content type")] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level, LOG_CLASS)
+    spec = open_oas_with_error_handling(filename)
     content = map_content_types(spec)
 
     if content_type:
