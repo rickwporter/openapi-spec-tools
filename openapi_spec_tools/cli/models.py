@@ -16,7 +16,6 @@ from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.cli.utils import perform_expansion
 from openapi_spec_tools.cli.utils import remove_dict_prefix
 from openapi_spec_tools.cli.utils import remove_list_prefix
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_models
@@ -40,8 +39,8 @@ def models_list(
     ] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     names = sorted(models.keys())
@@ -70,8 +69,8 @@ def models_show(
     expansion: ExpansionOption = "none",
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level)
+    spec = open_oas_with_error_handling(filename)
 
     components = spec.get(OasField.COMPONENTS, {})
     models = map_models(components)
@@ -99,8 +98,8 @@ def models_uses(
     model_name: ModelNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -128,8 +127,8 @@ def models_used_by(
     model_name: ModelNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)
@@ -155,8 +154,8 @@ def models_operations(
     model_name: ModelNameArgument,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    spec = open_oas_with_error_handling(filename, logger)
+    init_logging(log_level)
+    spec = open_oas_with_error_handling(filename)
 
     models = map_models(spec.get(OasField.COMPONENTS, {}))
     full_name = model_full_name(models, model_name)

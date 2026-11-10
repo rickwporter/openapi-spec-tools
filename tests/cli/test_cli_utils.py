@@ -1,4 +1,3 @@
-import logging
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -32,12 +31,11 @@ from tests.helpers import asset_filename
     ]
 )
 def test_open_oas(filename, message) -> None:
-    logger = logging.getLogger("")
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
         pytest.raises(typer.Exit) as err,
     ):
-        open_oas_with_error_handling(asset_filename(filename), logger)
+        open_oas_with_error_handling(asset_filename(filename))
 
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()
@@ -52,12 +50,11 @@ def test_open_oas(filename, message) -> None:
     ]
 )
 def test_open_layout_with_error(filename, message) -> None:
-    logger = logging.getLogger("")
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
         pytest.raises(typer.Exit) as err,
     ):
-        open_layout_with_error_handling(asset_filename(filename), logger)
+        open_layout_with_error_handling(asset_filename(filename))
 
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()
@@ -73,12 +70,11 @@ def test_open_layout_with_error(filename, message) -> None:
     ]
 )
 def test_layout_tree_with_error(filename, message) -> None:
-    logger = logging.getLogger("")
     with (
         mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout,
         pytest.raises(typer.Exit) as err,
     ):
-        layout_tree_with_error_handling(asset_filename(filename), "start", logger)
+        layout_tree_with_error_handling(asset_filename(filename), "start")
 
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()

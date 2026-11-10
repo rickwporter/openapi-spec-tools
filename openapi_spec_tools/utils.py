@@ -1,5 +1,6 @@
 """Utilties for analyzing and manipulating OpenAPI specifications."""
 import json
+import logging
 from copy import deepcopy
 from itertools import zip_longest
 from pathlib import Path
@@ -7,6 +8,7 @@ from typing import Any
 
 import yaml
 
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.constants import NULL_TYPES
 from openapi_spec_tools.types import OasField
 
@@ -708,3 +710,12 @@ def remove_property(schema: dict[str, Any], prop_name: str) -> dict[str, Any]:
         result = temp
 
     return result
+
+
+def get_logger(name: str) -> logging.Logger:
+    """Return a logger with the package prefix shortened.
+
+    For example, `openapi_spec_tools.utils` becomes `oas.utils`.
+    """
+    log_name = name.replace(__package__, LOG_CLASS)
+    return logging.getLogger(log_name)

@@ -11,6 +11,9 @@ from openapi_spec_tools.flatten import apply_one_of
 from openapi_spec_tools.flatten import flatten_collection
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class PropertyApiGenerator(ApiGenerator):
@@ -113,7 +116,7 @@ class PropertyApiGenerator(ApiGenerator):
         func_args.extend(self.command_infra_arguments(node))
         args_str = SEP1 + SEP1.join(func_args) + NL
 
-        self.logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query")
+        logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query")
 
         user_header_init = ""
         user_header_arg = ""

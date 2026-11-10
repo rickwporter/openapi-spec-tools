@@ -33,7 +33,6 @@ from openapi_spec_tools.cli_gen import check_for_missing
 from openapi_spec_tools.cli_gen import create_tree_table
 from openapi_spec_tools.cli_gen import find_unreferenced
 from openapi_spec_tools.cli_gen import generate_tree_node
-from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.layout import DEFAULT_START
 from openapi_spec_tools.layout import LayoutGenerator
 from openapi_spec_tools.layout import LayoutNode
@@ -91,11 +90,11 @@ def generate_cli(
     Use either `--project-dir` to set both relative code and test directories, or
     set the paths specifically using `--code-dir` and `--test-dir`.
     """
-    logger = init_logging(log_level, LOG_CLASS)
+    init_logging(log_level)
 
-    oas = open_oas_with_error_handling(openapi_file, logger)
+    oas = open_oas_with_error_handling(openapi_file)
     if layout_file:
-        commands = layout_tree_with_error_handling(layout_file, start, logger)
+        commands = layout_tree_with_error_handling(layout_file, start)
 
         missing = check_for_missing(commands, oas)
         if missing:
@@ -111,7 +110,7 @@ def generate_cli(
         typer.echo("Must specify package_name in arguments or configuration.")
         raise typer.Exit(1)
 
-    generator = CliGenerator(package_name=package_name, oas=oas, logger=logger, config=config)
+    generator = CliGenerator(package_name=package_name, oas=oas, config=config)
 
     if project_dir:
         code_dir = code_dir or os.path.join(project_dir, generator.package_name)
@@ -152,9 +151,9 @@ def generate_check_missing(
     start: StartPointOption = DEFAULT_START,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
-    oas = open_oas_with_error_handling(openapi_file, logger)
+    init_logging(log_level)
+    commands = layout_tree_with_error_handling(layout_file, start=start)
+    oas = open_oas_with_error_handling(openapi_file)
 
     missing = check_for_missing(commands, oas)
     if missing:
@@ -172,9 +171,9 @@ def generate_unreferenced(
     full_path: Annotated[bool, typer.Option(help="Use full URL path that included variables")] = False,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
-    oas = open_oas_with_error_handling(openapi_file, logger)
+    init_logging(log_level)
+    commands = layout_tree_with_error_handling(layout_file, start=start)
+    oas = open_oas_with_error_handling(openapi_file)
 
     unreferenced = find_unreferenced(commands, oas)
     if not unreferenced:
@@ -241,9 +240,9 @@ def update_layout(
     indent: IndentOption = 4,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    commands = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
-    oas = open_oas_with_error_handling(openapi_file, logger)
+    logger = init_logging(log_level)
+    commands = layout_tree_with_error_handling(layout_file, start=start)
+    oas = open_oas_with_error_handling(openapi_file)
 
     unreferenced = find_unreferenced(commands, oas)
     if not unreferenced:
@@ -270,7 +269,7 @@ def update_layout(
 
         parent.children.append(op_node)
 
-    write_layout_tree(new_file or layout_file, commands, logger, indent)
+    write_layout_tree(new_file or layout_file, commands, indent)
     typer.echo(f"\nAdded {len(unreferenced)} operations")
 
 
@@ -290,10 +289,10 @@ def show_cli_tree(
     ] = None,
     log_level: LogLevelOption = "info",
 ) -> None:
-    logger = init_logging(log_level, LOG_CLASS)
-    layout = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
-    oas = open_oas_with_error_handling(openapi_file, logger)
-    generator = CliGenerator(package_name="", oas=oas, logger=logger)
+    init_logging(log_level)
+    layout = layout_tree_with_error_handling(layout_file, start=start)
+    oas = open_oas_with_error_handling(openapi_file)
+    generator = CliGenerator(package_name="", oas=oas)
 
     tree = generate_tree_node(generator, layout)
     if not tree.children:
@@ -341,9 +340,9 @@ def trim_oas(
             ops.update(_operations(sub))
         return ops
 
-    logger = init_logging(log_level, LOG_CLASS)
-    layout = layout_tree_with_error_handling(layout_file, start=start, logger=logger)
-    oas = open_oas_with_error_handling(openapi_file, logger)
+    init_logging(log_level)
+    layout = layout_tree_with_error_handling(layout_file, start=start)
+    oas = open_oas_with_error_handling(openapi_file)
     updated = deepcopy(oas)
 
     operations = _operations(layout)

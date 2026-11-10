@@ -18,9 +18,12 @@ from openapi_spec_tools.base_gen import simple_escape
 from openapi_spec_tools.base_gen import to_snake_case
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import get_logger
 
 DEFAULT_VAR_LOG_LEVEL = "API_LOG_LEVEL"
 DEFAULT_VALUE_LOG_LEVEL = "info"
+
+logger = get_logger(__name__)
 
 
 class ApiGenerator(BaseGenerator, ABC):
@@ -153,7 +156,7 @@ from {self.package_name} import _requests as _r
         py_type = self.get_parameter_pytype(prop)
         if not py_type:
             # log an error and use 'Any'
-            self.logger.error(f"Unable to determine Python type for {prop}")
+            logger.error(f"Unable to determine Python type for {prop}")
             py_type = 'Any'
 
         if collection:
@@ -201,7 +204,7 @@ from {self.package_name} import _requests as _r
         """Create a module for the current node, and recursively generate sub-commands."""
         if node.operations():
             module_name = to_snake_case(node.identifier)
-            self.logger.info(f"Generating {module_name} module")
+            logger.info(f"Generating {module_name} module")
             text = self.copyright
             text += self.standard_imports()
             for command in node.operations():
