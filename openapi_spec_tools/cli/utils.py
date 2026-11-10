@@ -21,7 +21,7 @@ from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.layout import file_to_tree
 from openapi_spec_tools.layout import open_layout
 from openapi_spec_tools.layout import write_layout
-from openapi_spec_tools.utils import _logger_name
+from openapi_spec_tools.utils import get_logger
 from openapi_spec_tools.utils import open_oas
 
 # Common argument definition
@@ -30,7 +30,7 @@ LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 
 ConfigT = TypeVar("ConfigT", GeneratorConfig, LayoutConfig)
 
-logger = logging.getLogger(_logger_name(__name__))
+logger = get_logger(__name__)
 
 
 class LogLevel(str, Enum):

@@ -3,17 +3,15 @@
 The bodies are "unrolled" to individual parameters (as best as possible), and passed as
 parameters into the functions.
 """
-import logging
-
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
 from openapi_spec_tools.base_gen import NL
 from openapi_spec_tools.base_gen import SEP1
 from openapi_spec_tools.base_gen import quoted
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _logger_name
+from openapi_spec_tools.utils import get_logger
 
-logger = logging.getLogger(_logger_name(__name__))
+logger = get_logger(__name__)
 
 
 class FlatApiGenerator(ApiGenerator):

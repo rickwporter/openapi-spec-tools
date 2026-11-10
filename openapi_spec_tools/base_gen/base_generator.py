@@ -1,5 +1,4 @@
 """Declares the Generator class that is used for most of the CLi generation capability."""
-import logging
 import textwrap
 from copy import deepcopy
 from pathlib import Path
@@ -34,12 +33,12 @@ from openapi_spec_tools.flatten import flatten_schema
 from openapi_spec_tools.flatten import is_simple_type
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _logger_name
 from openapi_spec_tools.utils import _or
+from openapi_spec_tools.utils import get_logger
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import reference_classname
 
-logger = logging.getLogger(_logger_name(__name__))
+logger = get_logger(__name__)
 
 
 class BaseGenerator:

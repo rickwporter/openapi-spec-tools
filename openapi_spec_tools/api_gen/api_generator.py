@@ -3,7 +3,6 @@
 Shared API generation behavior lives here. Subclasses implement function_definition(), which
 generate_files() uses when writing modules.
 """
-import logging
 import os
 from abc import ABC
 from abc import abstractmethod
@@ -19,12 +18,12 @@ from openapi_spec_tools.base_gen import simple_escape
 from openapi_spec_tools.base_gen import to_snake_case
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _logger_name
+from openapi_spec_tools.utils import get_logger
 
 DEFAULT_VAR_LOG_LEVEL = "API_LOG_LEVEL"
 DEFAULT_VALUE_LOG_LEVEL = "info"
 
-logger = logging.getLogger(_logger_name(__name__))
+logger = get_logger(__name__)
 
 
 class ApiGenerator(BaseGenerator, ABC):

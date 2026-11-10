@@ -1,5 +1,4 @@
 """Declares the Generator class that is used for most of the CLi generation capability."""
-import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -19,9 +18,9 @@ from openapi_spec_tools.base_gen import to_snake_case
 from openapi_spec_tools.cli_gen._tree import TreeField
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _logger_name
+from openapi_spec_tools.utils import get_logger
 
-logger = logging.getLogger(_logger_name(__name__))
+logger = get_logger(__name__)
 
 
 class CliGenerator(BaseGenerator):

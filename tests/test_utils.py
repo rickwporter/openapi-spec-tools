@@ -3,12 +3,14 @@ from typing import Any
 
 import pytest
 
+from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import _or
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
 from openapi_spec_tools.utils import find_references
+from openapi_spec_tools.utils import get_logger
 from openapi_spec_tools.utils import map_content_types
 from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import map_operations
@@ -616,3 +618,11 @@ def test_remove_property():
         "h": None,
     }
     assert expected == remove_property(original, "d")
+
+
+def test_get_logger() -> None:
+    log = get_logger("openapi_spec_tools.utils")
+    assert log.name == f"{LOG_CLASS}.utils"
+
+    nested = get_logger("openapi_spec_tools.cli.utils")
+    assert nested.name == f"{LOG_CLASS}.cli.utils"

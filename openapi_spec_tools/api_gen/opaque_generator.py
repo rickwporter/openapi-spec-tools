@@ -1,5 +1,4 @@
 """Declares the OpaqueApiGenerator class."""
-import logging
 from typing import Any
 
 from openapi_spec_tools.api_gen.api_generator import ApiGenerator
@@ -8,9 +7,9 @@ from openapi_spec_tools.base_gen import SEP1
 from openapi_spec_tools.base_gen import quoted
 from openapi_spec_tools.layout import LayoutNode
 from openapi_spec_tools.types import OasField
-from openapi_spec_tools.utils import _logger_name
+from openapi_spec_tools.utils import get_logger
 
-logger = logging.getLogger(_logger_name(__name__))
+logger = get_logger(__name__)
 
 
 class OpaqueApiGenerator(ApiGenerator):
