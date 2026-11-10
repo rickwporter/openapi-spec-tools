@@ -712,19 +712,10 @@ def remove_property(schema: dict[str, Any], prop_name: str) -> dict[str, Any]:
     return result
 
 
-def _logger_name(name: str) -> str:
-    """Remove the package name from the name.
-
-    Used to initialize logging without the long package name. For example, `openapi_spec_tools.utils` becomes
-    `oas.utils`.
-    """
-    package = __package__
-    return name.replace(package, LOG_CLASS)
-
-
 def get_logger(name: str) -> logging.Logger:
     """Return a logger with the package prefix shortened.
 
     For example, `openapi_spec_tools.utils` becomes `oas.utils`.
     """
-    return logging.getLogger(_logger_name(name))
+    log_name = name.replace(__package__, LOG_CLASS)
+    return logging.getLogger(log_name)
