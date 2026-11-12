@@ -16,9 +16,6 @@ def test_get_logger() -> None:
     log = get_logger()
     assert log.name == LOG_CLASS
 
-    req_logger = get_logger("requests")
-    assert req_logger.name == "requests"
-
 
 @pytest.mark.parametrize(
     ["level", "expected"],
