@@ -392,6 +392,20 @@ def model_full_name(models: dict[str, Any], name: str) -> str | None:
     return None
 
 
+def operation_id(op_data: dict[str, Any], method: str, path: str) -> str:
+    """Get the operationId.
+
+    If there's an operationId field, it returns that.
+    Otherwise, it creates a fake operationId from the method and path.
+    """
+    op_id = op_data.get(OasField.OP_ID)
+    if op_id:
+        return op_id
+
+    mod_path = "".join([p[0].upper() + p[1:] for p in path.replace("{", "").replace("}", "").split("/") if p])
+    return f"{method.lower()}{mod_path}"
+
+
 def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
     """Create map of operationId to path data.
 
@@ -448,7 +462,8 @@ def map_operations(paths: dict[str, Any]) -> dict[str, Any]:
         local_path = deepcopy(path_data)
         path_params = local_path.pop(OasField.PARAMS, None)
         for method, op_data in local_path.items():
-            op_id = op_data.get(OasField.OP_ID)
+            op_id = operation_id(op_data, method, path)
+            # op_data[OasField.OP_ID.value] = op_id  # in case it was not set
             op_data[OasField.X_PATH.value] = path
             op_data[OasField.X_PATH_PARAMS.value] = path_params
             op_data[OasField.X_METHOD.value] = method
@@ -665,12 +680,12 @@ def schema_operations_filter(
 def map_content_types(schema: dict[str, Any]) -> dict[str, set]:
     """Get map of content-types to operation-id's."""
     content = {}
-    for path_data in schema.get(OasField.PATHS, {}).values():
+    for path, path_data in schema.get(OasField.PATHS, {}).items():
         for method, op_data in path_data.items():
             if method == OasField.PARAMS:
                 continue
 
-            op_id = op_data.get(OasField.OP_ID)
+            op_id = operation_id(op_data, method, path)
             for resp_data in op_data.get(OasField.RESPONSES, {}).values():
                 for content_type in resp_data.get(OasField.CONTENT, {}).keys():
                     items = content.get(content_type, set())
