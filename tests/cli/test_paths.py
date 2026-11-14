@@ -11,6 +11,7 @@ from tests.helpers import asset_filename
 
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
+MISC3_YAML = asset_filename("misc3.yaml")
 
 @pytest.mark.parametrize(
     ["filename", "search", "subpaths", "expected"],
@@ -236,6 +237,13 @@ def test_paths_show_failure() -> None:
             True,
             "/pets/{petId}:\n- showPetById\n- deletePetById\n\n",
             id="params",
+        ),
+        pytest.param(
+            MISC3_YAML,
+            "/owners",
+            True,
+            "/owners/:\n- listOwners\n- createOwner\n- deleteOwners\n/owners/{ownerId}:\n- getOwnersOwnerId\n\n",
+            id="no-operation-id",
         ),
     ]
 )

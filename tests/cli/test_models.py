@@ -15,6 +15,7 @@ from tests.helpers import asset_filename
 PET_YAML = asset_filename("pet.yaml")
 PET2_YAML = asset_filename("pet2.yaml")
 MISC2_YAML = asset_filename("misc2.yaml")
+MISC3_YAML = asset_filename("misc3.yaml")
 
 @pytest.mark.parametrize(
     ["filename", "search", "expected"],
@@ -194,6 +195,13 @@ def test_models_operations_success(filename: str, model: str, expected: str) -> 
 
         output = mock_stdout.getvalue()
         assert output == expected
+
+
+def test_models_operations_without_operation_id() -> None:
+    with mock.patch('sys.stdout', new_callable=StringIo) as mock_stdout:
+        models_operations(MISC3_YAML, "Error")
+
+    assert "deleteOwners" in mock_stdout.getvalue()
 
 
 def test_models_operations_failures() -> None:
