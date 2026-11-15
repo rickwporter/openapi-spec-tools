@@ -772,6 +772,8 @@ ask_ai_conversations:
         operationId: deleteAsk_aiConversationsId
     -   name: from-chat-search
         operationId: postAsk_aiConversationsFrom_chat_search
+    -   name: list
+        operationId: getAsk_aiConversations
     -   name: messages
         operationId: getAsk_aiConversationsIdMessages
         pagination:
@@ -780,17 +782,15 @@ ask_ai_conversations:
     -   name: resume
         operationId: postAsk_aiConversationsIdResume
     -   name: show
-        operationId: getAsk_aiConversations
-    -   name: show
         operationId: getAsk_aiConversationsId
     -   name: update
         operationId: patchAsk_aiConversationsId
 ask_ai_memory:
     description: Manage ask-ai memory
     operations:
-    -   name: delete
+    -   name: delete-all
         operationId: deleteAsk_aiMemory
-    -   name: delete
+    -   name: delete-fact
         operationId: deleteAsk_aiMemoryId
     -   name: list
         operationId: getAsk_aiMemory
@@ -1102,7 +1102,7 @@ blackout_periods:
     operations:
     -   name: current
         operationId: getBlackout_periodsCurrent
-    -   name: show
+    -   name: list
         operationId: getBlackout_periods
     -   name: show
         operationId: getBlackout_periodsId
@@ -1627,6 +1627,8 @@ chat_rooms_messages:
         operationId: postChatRoomsRoom_idMessagesMessage_idForward
     -   name: link-preview
         operationId: deleteChatRoomsRoom_idMessagesMessage_idLink_preview
+    -   name: list
+        operationId: getChatRoomsRoom_idMessages
     -   name: mark-unread
         operationId: postChatRoomsRoom_idMessagesMessage_idMark_unread
     -   name: pin
@@ -1639,8 +1641,6 @@ chat_rooms_messages:
         operationId: postChatRoomsRoom_idMessagesMessage_idReminder
     -   name: save
         subcommandId: chat_rooms_messages_save
-    -   name: show
-        operationId: getChatRoomsRoom_idMessages
     -   name: show
         operationId: getChatRoomsRoom_idMessagesId
     -   name: thread
@@ -1886,7 +1886,7 @@ comms_hub_approval_requests:
             itemProperty: data
             pageStart: page
             pageSize: per_page
-    -   name: list
+    -   name: show
         operationId: getComms_hubApproval_requestsId
         pagination:
             itemProperty: data
@@ -1899,7 +1899,7 @@ comms_hub_audiences:
             itemProperty: data
             pageStart: page
             pageSize: per_page
-    -   name: list
+    -   name: show
         operationId: getComms_hubAudiencesId
         pagination:
             itemProperty: data
@@ -1912,7 +1912,7 @@ comms_hub_campaigns:
         operationId: getComms_hubCampaigns
         pagination:
             itemProperty: data
-    -   name: list
+    -   name: show
         operationId: getComms_hubCampaignsId
         pagination:
             itemProperty: data
@@ -1938,7 +1938,7 @@ comms_hub_publications:
             itemProperty: data
             pageStart: page
             pageSize: per_page
-    -   name: list
+    -   name: show
         operationId: getComms_hubPublicationsId
         pagination:
             itemProperty: data
@@ -1951,7 +1951,7 @@ comms_hub_publications_issues:
             itemProperty: data
             pageStart: page
             pageSize: per_page
-    -   name: list
+    -   name: show
         operationId: getComms_hubPublicationsPublication_idIssuesId
         pagination:
             itemProperty: data
@@ -2821,7 +2821,7 @@ feeds_media:
         operationId: deleteFeedsFeed_idMediaMedia_id
     -   name: gif
         operationId: postFeedsFeed_idMediaGif
-    -   name: show
+    -   name: list
         operationId: getFeedsFeed_idMedia
     -   name: show
         operationId: getFeedsFeed_idMediaMedia_id
@@ -3115,7 +3115,7 @@ frontline_execution_reviews:
 holidays:
     description: Manage holidays
     operations:
-    -   name: show
+    -   name: list
         operationId: getHolidays
     -   name: show
         operationId: getHolidaysId
@@ -3224,17 +3224,17 @@ ideas_campaigns:
         pagination:
             pageStart: page
             pageSize: per_page
-    -   name: list
-        operationId: getIdeasCampaignsId
-        pagination:
-            pageStart: page
-            pageSize: per_page
     -   name: lite
         operationId: getIdeasCampaignsLite
     -   name: reopen
         operationId: patchIdeasCampaignsIdReopen
     -   name: reviewers
         operationId: getIdeasCampaignsIdReviewers
+        pagination:
+            pageStart: page
+            pageSize: per_page
+    -   name: show
+        operationId: getIdeasCampaignsId
         pagination:
             pageStart: page
             pageSize: per_page
@@ -3429,12 +3429,12 @@ inspections_sweeps:
         operationId: postInspectionsSweepsIdClaim_aisle
     -   name: exceptions
         subcommandId: inspections_sweeps_exceptions
+    -   name: list
+        operationId: getInspectionsSweeps
     -   name: pause
         operationId: postInspectionsSweepsIdPause
     -   name: review
         subcommandId: inspections_sweeps_review
-    -   name: show
-        operationId: getInspectionsSweeps
     -   name: show
         operationId: getInspectionsSweepsId
     -   name: sign-off
@@ -3469,12 +3469,12 @@ inspections_sweeps_exceptions:
         operationId: deleteInspectionsSweepsSweep_idExceptionsId
     -   name: escalate
         operationId: postInspectionsSweepsSweep_idExceptionsIdEscalate
+    -   name: list
+        operationId: getInspectionsSweepsSweep_idExceptions
     -   name: reopen
         operationId: postInspectionsSweepsSweep_idExceptionsIdReopen
     -   name: resolve
         operationId: postInspectionsSweepsSweep_idExceptionsIdResolve
-    -   name: show
-        operationId: getInspectionsSweepsSweep_idExceptions
     -   name: show
         operationId: getInspectionsSweepsSweep_idExceptionsId
     -   name: update
@@ -3641,10 +3641,10 @@ leave_balances:
     operations:
     -   name: show
         operationId: getLeave_balances
-    -   name: show
-        operationId: getLeave_balancesLeave_type_id
     -   name: summary
         operationId: getLeave_balancesSummary
+    -   name: types
+        operationId: getLeave_balancesLeave_type_id
 leave_coverage:
     description: Manage leave-coverage
     operations:
@@ -3688,7 +3688,7 @@ leave_requests:
 leave_types:
     description: Manage leave-types
     operations:
-    -   name: show
+    -   name: list
         operationId: getLeave_types
     -   name: show
         operationId: getLeave_typesId
@@ -3845,7 +3845,7 @@ mango_signal_actions:
     operations:
     -   name: create
         operationId: postMango_signalActions
-    -   name: show
+    -   name: list
         operationId: getMango_signalActions
     -   name: show
         operationId: getMango_signalActionsId
@@ -4444,7 +4444,7 @@ onboarding_steps:
     operations:
     -   name: enhanced
         operationId: getOnboardingStepsStep_nameEnhanced
-    -   name: show
+    -   name: list
         operationId: getOnboardingSteps
     -   name: show
         operationId: getOnboardingStepsStep_name
@@ -4863,6 +4863,8 @@ recorder_recordings:
         operationId: postRecorderRecordings
     -   name: delete
         operationId: deleteRecorderRecordingsId
+    -   name: list
+        operationId: getRecorderRecordings
     -   name: media
         subcommandId: recorder_recordings_media
     -   name: restore
@@ -4873,8 +4875,6 @@ recorder_recordings:
         subcommandId: recorder_recordings_share_links
     -   name: shares
         subcommandId: recorder_recordings_shares
-    -   name: show
-        operationId: getRecorderRecordings
     -   name: show
         operationId: getRecorderRecordingsId
     -   name: status
@@ -6162,7 +6162,7 @@ training_contributions:
         operationId: getTrainingContributions
         pagination:
             pageStart: page
-    -   name: list
+    -   name: show
         operationId: getTrainingContributionsId
         pagination:
             pageStart: page
@@ -6219,7 +6219,7 @@ training_courses_language_variants:
         operationId: getTrainingCoursesCourse_idLanguage_variants
         pagination:
             pageStart: page
-    -   name: list
+    -   name: show
         operationId: getTrainingCoursesCourse_idLanguage_variantsId
         pagination:
             pageStart: page
@@ -6232,7 +6232,7 @@ training_courses_lesson_feedbacks:
         operationId: postTrainingCoursesCourse_idLesson_feedbacks
     -   name: delete
         operationId: deleteTrainingCoursesCourse_idLesson_feedbacksId
-    -   name: show
+    -   name: list
         operationId: getTrainingCoursesCourse_idLesson_feedbacks
     -   name: show
         operationId: getTrainingCoursesCourse_idLesson_feedbacksId
@@ -6590,10 +6590,10 @@ user_availabilities:
         operationId: postUser_availabilities
     -   name: delete
         operationId: deleteUser_availabilitiesId
+    -   name: list
+        operationId: getUser_availabilities
     -   name: mark-available-all-week
         operationId: markAvailableAllWeekUserAvailabilities
-    -   name: show
-        operationId: getUser_availabilities
     -   name: show
         operationId: getUser_availabilitiesId
     -   name: update
