@@ -40,13 +40,13 @@ def show_commands(
 class Direction(str, Enum):  # noqa: F811
     INBOUND = "inbound"
     OUTBOUND = "outbound"
-    NONE = "None"
+    NONE_ = "None"
 
 
 class Source(str, Enum):  # noqa: F811
     CLOSE_IO = "Close.io"
     EXTERNAL = "External"
-    NONE = "None"
+    NONE_ = "None"
 
 
 class Status(str, Enum):  # noqa: F811
@@ -58,7 +58,7 @@ class Status(str, Enum):  # noqa: F811
     BUSY = "busy"
     FAILED = "failed"
     TIMEOUT = "timeout"
-    NONE = "None"
+    NONE_ = "None"
 
 
 @app.command("create", short_help="Log an external Call activity")
@@ -291,7 +291,7 @@ class Status(str, Enum):  # noqa: F811
     BUSY = "busy"
     FAILED = "failed"
     TIMEOUT = "timeout"
-    NONE = "None"
+    NONE_ = "None"
 
 
 @app.command("set", short_help="Update a Call activity")

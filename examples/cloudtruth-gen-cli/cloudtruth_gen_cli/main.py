@@ -183,7 +183,7 @@ class Lang(str, Enum):  # noqa: F811
     ID = "id"
     IG = "ig"
     IO = "io"
-    IS = "is"
+    IS_ = "is"
     IT = "it"
     JA = "ja"
     KA = "ka"

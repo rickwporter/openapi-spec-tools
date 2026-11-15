@@ -627,7 +627,7 @@ class SimpleNumber(int, Enum):  # noqa: F811
 NON_STR_ENUM = """\
 class anyThing_goes(int, Enum):  # noqa: F811
     VALUE_1 = 1
-    VALUE_NONE = None
+    VALUE_NONE_ = None
     VALUE_TRUE = True
 
 """
