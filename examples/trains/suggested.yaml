@@ -22,13 +22,13 @@ bookings:
         operationId: create-booking
     -   name: delete
         operationId: delete-booking
-    -   name: payment
-        operationId: create-booking-payment
-    -   name: show
+    -   name: list
         operationId: get-bookings
         pagination:
             itemProperty: data
             pageStart: page
             pageSize: limit
+    -   name: payment
+        operationId: create-booking-payment
     -   name: show
         operationId: get-booking
