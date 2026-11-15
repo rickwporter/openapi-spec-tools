@@ -83,19 +83,19 @@ class AttachmentsContentType(str, Enum):  # noqa: F811
 class CallerIdMode(str, Enum):  # noqa: F811
     FIXED = "fixed"
     AUTO = "auto"
-    NONE = "None"
+    NONE_ = "None"
 
 
 class Direction(str, Enum):  # noqa: F811
     INBOUND = "inbound"
     OUTBOUND = "outbound"
-    NONE = "None"
+    NONE_ = "None"
 
 
 class Source(str, Enum):  # noqa: F811
     CLOSE_IO = "Close.io"
     EXTERNAL = "External"
-    NONE = "None"
+    NONE_ = "None"
 
 
 class Status(str, Enum):  # noqa: F811
@@ -399,7 +399,7 @@ class AttachmentsContentType(str, Enum):  # noqa: F811
 class CallerIdMode(str, Enum):  # noqa: F811
     FIXED = "fixed"
     AUTO = "auto"
-    NONE = "None"
+    NONE_ = "None"
 
 
 class Status(str, Enum):  # noqa: F811
