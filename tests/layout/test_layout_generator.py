@@ -212,19 +212,25 @@ def test_get_response_body(op_id, expected):
 
 
 @pytest.mark.parametrize(
-    ["op_data", "expected"],
+    ["op_data", "pagination", "expected"],
     [
-        pytest.param({X_METHOD: "PUT", OP_ID: "foo_list"}, "set", id="put"),
-        pytest.param({X_METHOD: "PaTCh", OP_ID: "foo_list"}, "update", id="update"),
-        pytest.param({X_METHOD: "delete", OP_ID: "add_item"}, "create", id="begin"),
-        pytest.param({X_METHOD: "delete", OP_ID: "itemRetrieve"}, "show", id="end"),
-        pytest.param({X_METHOD: "delete", OP_ID: "item"}, "delete", id="method"),
-        pytest.param({X_METHOD: "delete", OP_ID: "itemListGetAll"}, "list", id="segment"),
+        pytest.param({X_METHOD: "PUT", OP_ID: "foo_list"}, None, "set", id="put"),
+        pytest.param({X_METHOD: "PaTCh", OP_ID: "foo_list"}, None, "update", id="update"),
+        pytest.param({X_METHOD: "delete", OP_ID: "add_item"}, None, "create", id="begin"),
+        pytest.param({X_METHOD: "delete", OP_ID: "itemRetrieve"}, None, "show", id="end"),
+        pytest.param({X_METHOD: "delete", OP_ID: "item"}, None, "delete", id="method"),
+        pytest.param({X_METHOD: "delete", OP_ID: "itemListGetAll"}, None, "list", id="segment"),
+        pytest.param(
+            {X_METHOD: "get", OP_ID: "itemRetrieve"},
+            PaginationNames(page_size="foo"),
+            "list",
+            id="pagination",
+        ),
     ]
 )
-def test_suggest_command(op_data, expected):
+def test_suggest_command(op_data, pagination, expected):
     uut = LayoutGenerator({})
-    assert expected == uut.suggest_command(op_data)
+    assert expected == uut.suggest_command(op_data, pagination)
 
 
 @pytest.mark.parametrize(

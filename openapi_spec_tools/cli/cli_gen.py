@@ -255,8 +255,8 @@ def update_layout(
     # walk the list of unreference operations, and try to fit them in
     for op_id, unref in unreferenced.items():
         parts = path_to_parts(unref.get(OasField.X_PATH), prefix)
-        command = generator.suggest_command(unref)
         pagination = generator.get_pagination(unref)
+        command = generator.suggest_command(unref, pagination)
         op_node = LayoutNode(command=command, identifier=op_id, pagination=pagination)
 
         # attempt to find parent based on path

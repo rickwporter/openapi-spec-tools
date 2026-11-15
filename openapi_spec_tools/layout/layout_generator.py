@@ -175,7 +175,7 @@ class LayoutGenerator:
 
         return None
 
-    def suggest_command(self, op_data: dict[str, Any]) -> str:
+    def suggest_command(self, op_data: dict[str, Any], pagination: PaginationNames | None) -> str:
         """Suggest a command based on the method and operationId."""
         # the patch/put methods often have similar operationId's so handle those first
         op_id = op_data.get(OasField.OP_ID)  # was set level above this
@@ -184,6 +184,8 @@ class LayoutGenerator:
             return SET
         if _method == "patch":
             return UPDATE
+        if _method == "get" and pagination:
+            return LIST
 
         operation = [_ for _ in to_snake_case(op_id).split('_') if _]
         begin = operation[0]
@@ -331,8 +333,8 @@ class LayoutGenerator:
                 op_id = operation_id(op_data, method, path_name)
                 op_data.update({OasField.OP_ID.value: op_id})  # set in case it was not
                 op_data.update({OasField.X_METHOD.value: method})
-                command = self.suggest_command(op_data)
                 pagination = self.get_pagination(op_data)
+                command = self.suggest_command(op_data, pagination)
                 path_node.children.append(
                     LayoutNode(command=command, identifier=op_id, pagination=pagination)
                 )
