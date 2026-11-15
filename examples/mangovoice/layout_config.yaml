@@ -1,0 +1,3 @@
+page_start_params: page
+page_size_params: per_page
+items_properties: data
