@@ -610,11 +610,9 @@ class BaseGenerator:
         """Check to see if value can be directly used as a variable name."""
         if not isinstance(value, str):
             return False
-        try:
-            float(value)
+        # Names cannot start with a digit, including values like "1", "1.0", "1st" or "1.2.3".
+        if value[:1].isdigit():
             return False
-        except ValueError:
-            pass
 
         return True
 
