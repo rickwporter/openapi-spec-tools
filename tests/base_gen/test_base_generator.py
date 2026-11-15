@@ -653,6 +653,7 @@ SPECIAL_ENUM = """\
 class Special(str, Enum):  # noqa: F811
     _TIME0 = "-time"
     _TIME1 = "+time"
+    EMPTY = ""
 
 """
 LEADING_NUMBER_ENUM = """\
@@ -660,6 +661,7 @@ class Version(str, Enum):  # noqa: F811
     VALUE_LATEST = "latest"
     VALUE_1ST = "1st"
     VALUE_1_2_3 = "1.2.3"
+    VALUE_EMPTY = ""
 
 """
 
@@ -706,11 +708,11 @@ def test_update_enum(prop: dict[str, Any], expected: dict[str, Any]) -> None:
         pytest.param("Simple", "str", ["aOrB", "b_or_C", "-minus"], SIMPLE_ENUM, id="str"),
         pytest.param("anyThing_goes", "int", [1, None, True], NON_STR_ENUM, id="non-str"),
         pytest.param("Sna", "str", ["foo", "FOO"], CASE_SENSE_ENUM, id="case-sense"),
-        pytest.param("Special", "str", ["-time", "+time"], SPECIAL_ENUM, id="special"),
+        pytest.param("Special", "str", ["-time", "+time", ""], SPECIAL_ENUM, id="special"),
         pytest.param(
             "Version",
             "str",
-            ["latest", "1st", "1.2.3"],
+            ["latest", "1st", "1.2.3", ""],
             LEADING_NUMBER_ENUM,
             id="leading-number",
         ),
