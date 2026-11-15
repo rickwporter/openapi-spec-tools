@@ -684,7 +684,8 @@ class BaseGenerator:
         dup_counts = dict.fromkeys(duplicates, 0)
         declarations = []
         for v in values:
-            base_name = self.variable_name(str(v)).upper()
+            var_name = self.variable_name(str(v)) or "empty"
+            base_name = var_name.upper()
             suffix = ""
             if base_name in dup_counts:
                 suffix = dup_counts[base_name]
