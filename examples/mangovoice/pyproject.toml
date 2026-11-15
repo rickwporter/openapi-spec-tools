@@ -1,0 +1,80 @@
+[project]
+name = "mango-cli"
+version = "0.1.0"
+description = "Generated CLI for Mango Voice service"
+authors = [{ name = "Rick Porter", email = "rickwporter@gmail.com" }]
+requires-python = ">=3.10,<4"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "typer>=0.27.2",
+    "rich>=15.0.0",
+    "requests>=2.34.2",
+    "pyyaml>=6.0.3",
+    "rich-objects>=0.4.0",
+]
+
+[project.scripts]
+# this adds the main CLI function to allow calling directly from a shell
+mango = "mango_cli.main:app"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.10",
+    "pytest>=9.1.1",
+    "coverage>=7.16.2",
+    "openapi-spec-tools",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.sources]
+openapi-spec-tools = { path = "../..", editable = true }
+
+[tool.uv.build-backend]
+module-root = ""
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 150
+
+[tool.ruff.lint.isort]
+force-single-line = true
+split-on-trailing-comma = true
+
+[tool.ruff.lint.pylint]
+max-args = 25
+max-branches = 12
+max-returns = 10
+max-statements = 75
+
+
+[tool.ruff.lint.per-file-ignores]
+"*.py" = [
+    "RUF100", # non-enabled: allow unused noqa values
+]
+
+[tool.coverage.run]
+data_file = ".coverage"
+source = [
+    "mango_cli",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "@overload",
+    'if __name__ == "__main__":',
+]
+
