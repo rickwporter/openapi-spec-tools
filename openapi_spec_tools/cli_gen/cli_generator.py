@@ -93,7 +93,7 @@ from enum import Enum  # noqa: F401
 from pathlib import Path
 """
         if operations:
-            text += "from typing import Annotated" + NL
+            text += "from typing import Annotated  # noqa: F401" + NL
 
         # third party
         text += NL + "import typer" + NL

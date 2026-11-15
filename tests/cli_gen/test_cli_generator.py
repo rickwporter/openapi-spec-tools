@@ -18,7 +18,7 @@ S2 = f"{S1}    "
 
 def test_standard_imports():
     uut = CliGenerator(package_name="cli_package", oas={})
-    annotated = "from typing import Annotated"
+    annotated = "from typing import Annotated  # noqa: F401"
     requests = "from cli_package import _requests as _r"
 
     text = uut.standard_imports(operations=True)
