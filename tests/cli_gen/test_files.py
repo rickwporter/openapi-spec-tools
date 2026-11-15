@@ -28,7 +28,7 @@ def test_generate_node_single():
     text = file.read_text()
     assert "#!/usr/bin/env python3" in text
     assert f"Copyright {datetime.now().year}" in text
-    assert "from typing import Annotated" in text
+    assert "from typing import Annotated  # noqa: F401" in text
     assert 'app = typer.Typer(no_args_is_help=True, help="Manage pets")' in text
     assert 'if __name__ == "__main__":' in text
 
