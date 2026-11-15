@@ -14,6 +14,8 @@ Install uv and create the project.
 
 To get started, the layout file was generated without a configuration using the command captured in `make layout-suggest`. This creates the `suggested.yaml` which was copied to `layout.yaml` before being modified.
 
+With the layout configuration in place and layout generation code improvements, the generated layout is equivalent to the desired layout. The description below is provided for historical purposes and understanding.
+
 The original suggested layout was not quite as streamlined as desired. It had a couple top-level commands (e.g. `stations`, and `trips`) with only a `show` option. So, those operations were moved up into `main`. Analogously, the original `bookings_payment` only had a `create`, so it was moved directly into the `bookings` command as `payment`. In more recent updates, the generated layouts attempt to do this transformation using the `LayoutGenerator.condense()` method.
 
 Initially, `pagination` parameters were manually added to the three items that take list query parameters and provide data back in a list. More recently, a `layout_config.yaml` was added to allow the `layout suggest` step finds the pagination parameters.
