@@ -19,6 +19,7 @@ from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
 from openapi_spec_tools.utils import open_oas
+from openapi_spec_tools.utils import operation_id
 from openapi_spec_tools.utils import reference_classname
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
@@ -376,6 +377,72 @@ def test_map_operations() -> None:
     delta = find_diffs(oas, reread)
     assert not delta
 
+
+@pytest.mark.parametrize(
+    ["op_data", "method", "path", "expected"],
+    [
+        pytest.param({OasField.OP_ID: "listPets"}, "get", "/pets", "listPets", id="present"),
+        pytest.param({OasField.OP_ID: "listPets"}, "GET", "/ignored", "listPets", id="present-ignores-path"),
+        pytest.param({}, "GET", "/pets", "getPets", id="missing"),
+        pytest.param({OasField.OP_ID: ""}, "post", "/pets", "postPets", id="empty"),
+        pytest.param({OasField.OP_ID: None}, "delete", "/pets/{petId}", "deletePetsPetId", id="null"),
+        pytest.param({}, "PUT", "/pet-stores/{store-id}/hours", "putPet-storesStore-idHours", id="hyphen-param"),
+        pytest.param({}, "patch", "/", "patch", id="root"),
+        pytest.param({}, "get", "/{id}", "getId", id="param-only"),
+        pytest.param({}, "Get", "/a/b/", "getAB", id="single-letters"),
+        pytest.param({}, "delete", "//pets//", "deletePets", id="empty-segments"),
+    ],
+)
+def test_operation_id(op_data: dict[str, Any], method: str, path: str, expected: str) -> None:
+    assert operation_id(op_data, method, path) == expected
+
+
+def test_map_operations_without_operation_id() -> None:
+    oas = open_test_oas("misc3.yaml")
+    ops = map_operations(oas.get(OasField.PATHS))
+
+    item = ops["deleteOwners"]
+    assert OasField.OP_ID not in item
+    assert item[OasField.X_PATH] == "/owners/"
+    assert item[OasField.X_METHOD] == "delete"
+    assert item[OasField.X_PATH_PARAMS] is None
+
+    item = ops["getOwnersOwnerId"]
+    assert OasField.OP_ID not in item
+    assert item[OasField.X_PATH] == "/owners/{ownerId}"
+    assert item[OasField.X_METHOD] == "get"
+    assert item[OasField.X_PATH_PARAMS] == [
+        {
+            OasField.NAME: "ownerId",
+            OasField.IN: "path",
+            OasField.REQUIRED: True,
+            OasField.SCHEMA: {OasField.TYPE: "string"},
+        },
+    ]
+
+    # an operationId in the same document is left as the map key
+    assert ops["listOwners"][OasField.OP_ID] == "listOwners"
+
+    # make sure this was non-destructive
+    reread = open_test_oas("misc3.yaml")
+    assert not find_diffs(oas, reread)
+
+
+def test_map_operations_mixed_operation_ids() -> None:
+    paths = {
+        "/widgets": {
+            "get": {"summary": "List"},
+            "post": {OasField.OP_ID: "createWidget", "summary": "Create"},
+            "put": {OasField.OP_ID: "", "summary": "Replace"},
+        },
+    }
+    ops = map_operations(paths)
+    assert set(ops) == {"getWidgets", "createWidget", "putWidgets"}
+    assert OasField.OP_ID not in ops["getWidgets"]
+    assert ops["createWidget"][OasField.OP_ID] == "createWidget"
+    assert ops["putWidgets"][OasField.OP_ID] == ""
+
+
 @pytest.mark.parametrize(
     ["filename", "search", "subpaths", "expected"],
     [
@@ -560,6 +627,21 @@ def test_map_content_types():
     result = map_content_types(schema)
     expected = {'createPets', 'deletePetById', 'showPetById', 'listPets'}
     assert expected == result['application/json']
+
+
+def test_map_content_types_without_operation_id() -> None:
+    schema = open_test_oas("misc3.yaml")
+    result = map_content_types(schema)
+    assert {"deleteOwners", "getOwnersOwnerId"} <= result["application/json"]
+
+
+def test_schema_operations_filter_without_operation_id() -> None:
+    original = open_test_oas("misc3.yaml")
+    updated = schema_operations_filter(original, remove={"deleteOwners"})
+    paths = updated[OasField.PATHS]
+    assert find_diffs(original[OasField.PATHS], paths) == {"/owners/": {"delete": "removed"}}
+    assert OasField.OP_ID not in paths["/owners/{ownerId}"]["get"]
+    assert paths["/owners/"]["get"][OasField.OP_ID] == "listOwners"
 
 
 @pytest.mark.parametrize(

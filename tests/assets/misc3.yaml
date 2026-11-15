@@ -246,6 +246,31 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Owner'
+    delete:
+      description: Remove owners
+      responses:
+        '204':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /owners/{ownerId}:
+    parameters:
+      - name: ownerId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Info for a specific owner
+      responses:
+        '200':
+          description: Owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Owner'
   /sna/foo:
     get:
       operationId: snafooCheck

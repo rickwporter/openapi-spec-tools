@@ -383,6 +383,19 @@ def test_generate_misc():
     assert 2 == len(pet_cmds)
     assert {"show", "delete"} == {cmd.command for cmd in pet_cmds}
 
+    owners = node.find("owners")
+    assert [(op.command, op.identifier) for op in owners.operations()] == [
+        ("create", "createOwner"),
+        ("delete", "deleteOwners"),
+        ("list", "listOwners"),
+        ("show", "getOwnersOwnerId"),
+    ]
+
+    # generated ids are written back so later steps can read operationId
+    paths = oas[OasField.PATHS]
+    assert paths["/owners/"]["delete"][OasField.OP_ID] == "deleteOwners"
+    assert paths["/owners/{ownerId}"]["get"][OasField.OP_ID] == "getOwnersOwnerId"
+
 
 def test_generate_node_file():
     oas = open_oas(asset_filename("pet.yaml"))

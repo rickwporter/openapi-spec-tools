@@ -17,6 +17,7 @@ from openapi_spec_tools.utils import find_paths
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import map_models
 from openapi_spec_tools.utils import model_filter
+from openapi_spec_tools.utils import operation_id
 from openapi_spec_tools.utils import unmap_models
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to paths")
@@ -105,7 +106,7 @@ def paths_operations(
         for method, op_data in path_data.items():
             if method == OasField.PARAMS:
                 continue
-            op_id = op_data.get(OasField.OP_ID)
+            op_id = operation_id(op_data, method, path)
             items = result.get(path, []) + [op_id]
             result[path] = items
 

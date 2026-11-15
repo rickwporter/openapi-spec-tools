@@ -17,6 +17,7 @@ from tests.helpers import asset_filename
 PET2_YAML = asset_filename("pet2.yaml")
 PET3_YAML = asset_filename("pet3.yaml")
 BODY_YAML = asset_filename("bodies.yaml")
+MISC3_YAML = asset_filename("misc3.yaml")
 
 @pytest.mark.parametrize(
     ["filename", "search", "expected"],
@@ -34,6 +35,12 @@ BODY_YAML = asset_filename("bodies.yaml")
             id="search-case",
         ),
         pytest.param(PET2_YAML, "dogs", "No operations found matching 'dogs'\n", id="search-none"),
+        pytest.param(
+            MISC3_YAML,
+            "ownerid",
+            "Found 1 operations matching 'ownerid':\n    getOwnersOwnerId\n",
+            id="no-operation-id",
+        ),
     ]
 )
 def test_operation_list(filename, search, expected) -> None:
@@ -107,11 +114,47 @@ PET2_SHOW_DELETE_OP = """\
 
 """
 
+NO_OP_ID_SHOW_DELETE = """\
+/owners/:
+    delete:
+        description: Remove owners
+        responses:
+            '204':
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Error'
+                description: Removed
+
+"""
+
+NO_OP_ID_SHOW_GET = """\
+/owners/{ownerId}:
+    get:
+        responses:
+            '200':
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Owner'
+                description: Owner
+        summary: Info for a specific owner
+    params:
+    -   in: path
+        name: ownerId
+        required: true
+        schema:
+            type: string
+
+"""
+
 @pytest.mark.parametrize(
     ["filename", "operation", "expected"],
     [
         pytest.param(PET2_YAML, "listPets", PET2_SHOW_LIST_OP, id="found"),
         pytest.param(PET2_YAML, "deletePetById", PET2_SHOW_DELETE_OP, id="params"),
+        pytest.param(MISC3_YAML, "deleteOwners", NO_OP_ID_SHOW_DELETE, id="no-operation-id"),
+        pytest.param(MISC3_YAML, "getOwnersOwnerId", NO_OP_ID_SHOW_GET, id="no-operation-id-params"),
     ]
 )
 def test_operation_show_success(filename, operation, expected) -> None:
@@ -142,6 +185,18 @@ def test_operation_show_failure() -> None:
             id="list",
         ),
         pytest.param(PET3_YAML, "appVersion", "appVersion does not reference any models\n", id="none"),
+        pytest.param(
+            MISC3_YAML,
+            "getOwnersOwnerId",
+            "Found getOwnersOwnerId uses 3 models:\n    Address\n    Owner\n    Person\n",
+            id="no-operation-id",
+        ),
+        pytest.param(
+            MISC3_YAML,
+            "deleteOwners",
+            "Found deleteOwners uses 1 models:\n    Error\n",
+            id="no-operation-id-delete",
+        ),
     ]
 )
 def test_operation_models_success(filename, operation, expected) -> None:
@@ -544,6 +599,16 @@ WITH_PARAMS_EXPANDED = """\
             {},
             printed_schema("Found showPetById parameters:", SHOW_PET_PARAMS),
             id="path",
+        ),
+        pytest.param(
+            MISC3_YAML,
+            "getOwnersOwnerId",
+            {},
+            printed_schema(
+                "Found getOwnersOwnerId parameters:",
+                "-   in: path\n    name: ownerId\n    required: true\n    schema:\n        type: string\n",
+            ),
+            id="no-operation-id",
         ),
         pytest.param(
             BODY_YAML,

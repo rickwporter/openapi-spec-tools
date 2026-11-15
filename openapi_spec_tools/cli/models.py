@@ -23,6 +23,7 @@ from openapi_spec_tools.utils import model_filter
 from openapi_spec_tools.utils import model_full_name
 from openapi_spec_tools.utils import model_references
 from openapi_spec_tools.utils import models_referenced_by
+from openapi_spec_tools.utils import operation_id
 from openapi_spec_tools.utils import unroll
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to models")
@@ -166,13 +167,13 @@ def models_operations(
     model_refs.add(full_name)  # include the direct references, too
 
     matches = []
-    for path_data in spec.get(OasField.PATHS, {}).values():
+    for path, path_data in spec.get(OasField.PATHS, {}).items():
         for method, op_data in path_data.items():
             if method == OasField.PARAMS:
                 continue
             references = find_references(op_data)
             if references.intersection(model_refs):
-                op_id = op_data.get(OasField.OP_ID)
+                op_id = operation_id(op_data, method, path)
                 matches.append(op_id)
 
     matches = remove_list_prefix(matches)

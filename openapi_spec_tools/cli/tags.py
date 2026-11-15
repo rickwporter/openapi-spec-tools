@@ -12,6 +12,7 @@ from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
 from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import operation_id
 
 app = typer.Typer(no_args_is_help=True, short_help="Inspect things related to tags")
 
@@ -70,10 +71,11 @@ def tags_show(
                 continue
 
             if tag_name in operation.get(OasField.TAGS):
-                op_id = operation.get(OasField.OP_ID)
-                operation[OasField.X_PATH] = path
-                operation[OasField.X_METHOD] = method
-                operation[OasField.X_PATH_PARAMS] = params
+                op_id = operation_id(operation, method, path)
+                operation[OasField.OP_ID.value] = op_id  # in case it was not set
+                operation[OasField.X_PATH.value] = path
+                operation[OasField.X_METHOD.value] = method
+                operation[OasField.X_PATH_PARAMS.value] = params
                 operations[op_id] = operation
 
     if not operations:

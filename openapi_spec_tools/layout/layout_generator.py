@@ -13,6 +13,7 @@ from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import _or
+from openapi_spec_tools.utils import operation_id
 
 CREATE = "create"
 DELETE = "delete"
@@ -177,14 +178,14 @@ class LayoutGenerator:
     def suggest_command(self, op_data: dict[str, Any]) -> str:
         """Suggest a command based on the method and operationId."""
         # the patch/put methods often have similar operationId's so handle those first
-        op_id = op_data.get(OasField.OP_ID)
+        op_id = op_data.get(OasField.OP_ID)  # was set level above this
         _method = op_data.get(OasField.X_METHOD).lower()
         if _method == "put":
             return SET
         if _method == "patch":
             return UPDATE
 
-        operation = to_snake_case(op_id).split('_')
+        operation = [_ for _ in to_snake_case(op_id).split('_') if _]
         begin = operation[0]
         if begin in self.common_ops:
             return self.common_ops.get(begin)
@@ -327,7 +328,8 @@ class LayoutGenerator:
                     continue
 
                 path_node = self.get_or_create_node_with_parents(main, commands)
-                op_id = op_data.get(OasField.OP_ID)
+                op_id = operation_id(op_data, method, path_name)
+                op_data.update({OasField.OP_ID.value: op_id})  # set in case it was not
                 op_data.update({OasField.X_METHOD.value: method})
                 command = self.suggest_command(op_data)
                 pagination = self.get_pagination(op_data)
