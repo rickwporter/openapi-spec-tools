@@ -8,7 +8,7 @@ from datetime import date  # noqa: F401
 from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated  # noqa: F401
 
 import typer
 from rich_objects import display
