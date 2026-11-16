@@ -571,7 +571,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.34.2" },
     { name = "rich", specifier = ">=15.0.0" },
     { name = "rich-objects", specifier = ">=0.4.0" },
-    { name = "typer", specifier = "==0.29.1" },
+    { name = "typer", specifier = ">=0.29.1" },
 ]
 
 [package.metadata.requires-dev]
