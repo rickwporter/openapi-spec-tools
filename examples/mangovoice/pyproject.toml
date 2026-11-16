@@ -28,8 +28,6 @@ mango = "mango_cli.main:app"
 [dependency-groups]
 dev = [
     "ruff>=0.16.10",
-    "pytest>=9.1.1",
-    "coverage>=7.16.2",
     "openapi-spec-tools",
 ]
 

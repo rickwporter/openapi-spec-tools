@@ -12,7 +12,6 @@ OPENAPI_SPEC := openapi.yaml
 PROJECT_DIRECTORY := .
 PACKAGE_NAME := mango_cli
 
-TEST_TARGET ?= tests
 uv_run ?= uv run
 
 ###########
@@ -25,7 +24,7 @@ wheel: ## Build the wheel package that is installable
 install: ## Install the package
 	uv sync
 
-all: install gen lint cov ## Perform a full cycle
+all: install gen lint ## Perform a full cycle
 	$(uv_run) mango --help
 
 ###########
@@ -39,13 +38,13 @@ layout-suggest: ## Create suggested layout file
 	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --config $(LAYOUT_CONFIG)
 
 cli-gen: layout-lint ## Generate CLI code
-	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY)
+	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 cli-clean: ## Delete generated CLI code
-	rm -rf $(PACKAGE_NAME) tests/
+	rm -rf $(PACKAGE_NAME)
 
 cli-regen: cli-clean cli-gen ## Regenerate CLI code
 
@@ -56,14 +55,3 @@ lint: ## Check code formatting
 
 delint: ## Fix formatting issues
 	$(uv_run) ruff check --fix
-
-
-###########
-##@ Test
-test: ## Run unit tests
-	$(uv_run) pytest -v $(TEST_TARGET)
-
-cov: ## Run unit tests with code coverage measurments
-	$(uv_run) coverage run -m pytest -v $(TEST_TARGET)
-	$(uv_run) coverage report -m
-	$(uv_run) coverage html

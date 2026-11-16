@@ -11,6 +11,7 @@ The Mango Voice CLI was started to demonstrate CLI generation. The initial attem
 3. Added `bugIds` for a few commands
     * `duplicateIds` when query parameter names conflict with body parameter names
     * `intEnumNonIntValue` when an enum is declared as a `number`, but one of the values is not a number.
+4. Removed test generation due to test infrastructure issues (e.g. specifying width, exceeding size)
 
 ## Future
 
