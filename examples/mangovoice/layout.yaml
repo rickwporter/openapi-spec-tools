@@ -1567,6 +1567,8 @@ chat_rooms_draft:
         operationId: deleteChatRoomsRoom_idDraft
     -   name: set
         operationId: putChatRoomsRoom_idDraft
+        bugIds:
+        -   duplicateIds
     -   name: show
         operationId: getChatRoomsRoom_idDraft
 chat_rooms_group:
@@ -3621,6 +3623,8 @@ leader_rounds_rounds:
         operationId: getLeader-roundsRoundsId
     -   name: skip
         operationId: postLeader-roundsRoundsSkip
+        bugIds:
+        -   duplicateIds
     -   name: subject-search
         operationId: getLeader-roundsRoundsSubject-search
         pagination:
@@ -4325,6 +4329,8 @@ news_feed_user_preferences_read_aloud:
         operationId: getNews-feedUser-preferencesRead-aloud
     -   name: update
         operationId: patchNews-feedUser-preferencesRead-aloud
+        bugIds:
+        -   intEnumNonIntValue
 news_feed_voice:
     description: Manage news-feed voice
     operations:
@@ -4350,6 +4356,8 @@ notifications:
         operationId: patchNotificationsArchive_all
     -   name: dismiss-subject
         operationId: postNotificationsDismiss_subject
+        bugIds:
+        -   duplicateIds
     -   name: home
         operationId: getNotificationsHome
     -   name: list
@@ -6538,6 +6546,8 @@ training_return_reminders:
         operationId: getTrainingReturn_reminders
     -   name: update
         operationId: patchTrainingReturn_reminders
+        bugIds:
+        -   intEnumNonIntValue
 training_series:
     description: Manage training series
     operations:

@@ -6,6 +6,12 @@ This CLI was developed using the OAS tools CLI generation.
 
 The Mango Voice CLI was started to demonstrate CLI generation. The initial attempt includes using a suggested `layout.yaml` generated from the `layout suggest` with configuration for pagination parameters. 
 
+1. Copied `suggested.yaml` to `layout.yaml`
+2. Renamed some of the operations to avoid duplicate names (for example, two `show` commands became a `show` and a `list` command).
+3. Added `bugIds` for a few commands
+    * `duplicateIds` when query parameter names conflict with body parameter names
+    * `intEnumNonIntValue` when an enum is declared as a `number`, but one of the values is not a number.
+
 ## Future
 
 Some things that should be done:
