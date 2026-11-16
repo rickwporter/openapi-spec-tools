@@ -4,19 +4,14 @@ from typer.testing import CliRunner
 
 from tests.assets.arg_test import app as program
 
-MAX_WIDTH = "1000"
-env = {
-    "TERMINAL_WIDTH": MAX_WIDTH,
-    "COLUMNS": MAX_WIDTH,
-    "MAX_WIDTH": MAX_WIDTH,
-}
-runner = CliRunner(charset="ascii", env=env)
+MAX_WIDTH = 1000
+runner = CliRunner(charset="ascii")
 
 
 def test_main_help():
     app = typer.Typer()
     app.add_typer(program)
-    result = runner.invoke(app, ["--help"])
+    result = runner.invoke(app, ["--help"], terminal_width=MAX_WIDTH, max_content_width=MAX_WIDTH)
     assert result.exit_code == 0
     help = to_ascii(result.stdout)
     assert "--install-completion" in help
@@ -28,13 +23,13 @@ def test_main_help():
 def test_main_commands():
     app = typer.Typer()
     app.add_typer(program)
-    result = runner.invoke(app, ["commands", "--help"])
+    result = runner.invoke(app, ["commands", "--help"], terminal_width=MAX_WIDTH, max_content_width=MAX_WIDTH)
     assert result.exit_code == 0
     help = to_ascii(result.stdout)
     assert "Details of the CLI" in help
     assert "--max-depth" in help
 
-    result = runner.invoke(app, ["commands", "--depth", 0])
+    result = runner.invoke(app, ["commands", "--depth", 0], terminal_width=MAX_WIDTH, max_content_width=MAX_WIDTH)
     assert result.exit_code == 0
     text = to_ascii(result.stdout)
     assert "Command Tree" in text
