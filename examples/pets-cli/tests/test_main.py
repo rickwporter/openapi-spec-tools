@@ -8,7 +8,13 @@ from typer.testing import CliRunner
 
 from pets_cli.main import app as program
 
-runner = CliRunner(charset="ascii", env={"TERMINAL_WIDTH": "1000"})
+MAX_WIDTH = "1000"
+env = {
+    "TERMINAL_WIDTH": MAX_WIDTH,
+    "COLUMNS": MAX_WIDTH,
+    "MAX_WIDTH": MAX_WIDTH,
+}
+runner = CliRunner(charset="ascii", env=env)
 
 
 def test_main_help():
