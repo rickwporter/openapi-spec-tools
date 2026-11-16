@@ -278,6 +278,11 @@ def test_op_short_help(op, expected):
             """'''\n    Leading blank lines\n    '''\n    """,
             id='blank-line-start',
         ),
+        pytest.param(
+            {DESC: "This has ''' triple quotes.  "},
+            """'''\n    This has \\''' triple quotes.\n    '''\n    """,
+            id="triple-quotes",
+        ),
     ]
 )
 def test_op_doc_string(op, expected):
