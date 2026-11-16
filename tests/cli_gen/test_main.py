@@ -4,7 +4,7 @@ from typer.testing import CliRunner
 
 from tests.assets.arg_test import app as program
 
-runner = CliRunner(charset="ascii")
+runner = CliRunner(charset="ascii", env={"TERMINAL_WIDTH": "1000"})
 
 
 def test_main_help():
