@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "typer>=0.27.2",
+    "typer>=0.29.1",
     "rich>=15.0.0",
     "rich-objects>=0.4.0",
     "requests>=2.34.2",
