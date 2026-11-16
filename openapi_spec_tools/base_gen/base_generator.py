@@ -220,7 +220,8 @@ class BaseGenerator:
             if not line:
                 result += NL
             else:
-                inner = textwrap.wrap(line, width=self.max_help_length, replace_whitespace=False)
+                _line = line.replace("'''", "\\'''")  # avoid breaking docstring
+                inner = textwrap.wrap(_line, width=self.max_help_length, replace_whitespace=False)
                 result += SEP1 + SEP1.join(inner)
         result += f"{SEP1}'''{SEP1}"
         return result
