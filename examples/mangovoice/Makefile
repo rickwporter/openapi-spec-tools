@@ -44,7 +44,7 @@ missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
 
 cli-clean: ## Delete generated CLI code
-	rm -rf $(PACKAGE_NAME)
+	cd $(PACKAGE_NAME) && find . ! -name '__init__.py' -delete
 
 cli-regen: cli-clean cli-gen ## Regenerate CLI code
 
