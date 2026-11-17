@@ -1,0 +1,1412 @@
+main:
+    description: This documentation describes LaunchDarkly\'s REST API...
+    operations:
+    -   name: api
+        subcommandId: api
+api:
+    description: Manage api
+    operations:
+    -   name: v2
+        subcommandId: api_v2
+api_v2:
+    description: Manage api v2
+    operations:
+    -   name: account
+        subcommandId: api_v2_account
+    -   name: announcements
+        subcommandId: api_v2_announcements
+    -   name: applications
+        subcommandId: api_v2_applications
+    -   name: approval-requests
+        subcommandId: api_v2_approval_requests
+    -   name: auditlog
+        subcommandId: api_v2_auditlog
+    -   name: caller-identity
+        operationId: getCallerIdentity
+    -   name: code-refs
+        subcommandId: api_v2_code_refs
+    -   name: destinations
+        subcommandId: api_v2_destinations
+    -   name: engineering-insights
+        subcommandId: api_v2_engineering_insights
+    -   name: flag-links
+        subcommandId: api_v2_flag_links
+    -   name: flag-status
+        operationId: getFeatureFlagStatusAcrossEnvironments
+    -   name: flag-statuses
+        subcommandId: api_v2_flag_statuses
+    -   name: flags
+        subcommandId: api_v2_flags
+    -   name: integration-capabilities
+        subcommandId: api_v2_integration_capabilities
+    -   name: integration-configurations
+        subcommandId: api_v2_integration_configurations
+    -   name: integrations
+        subcommandId: api_v2_integrations
+    -   name: members
+        subcommandId: api_v2_members
+    -   name: metrics
+        subcommandId: api_v2_metrics
+    -   name: oauth
+        subcommandId: api_v2_oauth
+    -   name: openapi.json
+        operationId: getOpenapiSpec
+    -   name: projects
+        subcommandId: api_v2_projects
+    -   name: public-ip-list
+        operationId: getIps
+    -   name: roles
+        subcommandId: api_v2_roles
+    -   name: segments
+        subcommandId: api_v2_segments
+    -   name: show
+        operationId: getRoot
+    -   name: tags
+        operationId: getTags
+    -   name: teams
+        subcommandId: api_v2_teams
+    -   name: templates
+        subcommandId: api_v2_templates
+    -   name: tokens
+        subcommandId: api_v2_tokens
+    -   name: usage
+        subcommandId: api_v2_usage
+    -   name: user-search
+        operationId: getSearchUsers
+    -   name: users
+        subcommandId: api_v2_users
+    -   name: versions
+        operationId: getVersions
+    -   name: webhooks
+        subcommandId: api_v2_webhooks
+api_v2_account:
+    description: Manage api v2 account
+    operations:
+    -   name: ip-allowlist
+        subcommandId: api_v2_account_ip_allowlist
+    -   name: relay-auto-configs
+        subcommandId: api_v2_account_relay_auto_configs
+api_v2_account_ip_allowlist:
+    description: Manage api v2 account ip-allowlist
+    operations:
+    -   name: create
+        operationId: createIpAllowlistEntry
+    -   name: delete
+        operationId: deleteIpAllowlistEntry
+    -   name: show
+        operationId: getIpAllowlist
+    -   name: update
+        operationId: patchIpAllowlistConfig
+    -   name: update
+        operationId: patchIpAllowlistEntry
+api_v2_account_relay_auto_configs:
+    description: Manage api v2 account relay-auto-configs
+    operations:
+    -   name: create
+        operationId: postRelayAutoConfig
+    -   name: delete
+        operationId: deleteRelayAutoConfig
+    -   name: reset
+        operationId: resetRelayAutoConfig
+    -   name: show
+        operationId: getRelayProxyConfigs
+    -   name: show
+        operationId: getRelayProxyConfig
+    -   name: update
+        operationId: patchRelayAutoConfig
+api_v2_announcements:
+    description: Manage api v2 announcements
+    operations:
+    -   name: create
+        operationId: createAnnouncementPublic
+    -   name: delete
+        operationId: deleteAnnouncementPublic
+    -   name: show
+        operationId: getAnnouncementsPublic
+    -   name: update
+        operationId: updateAnnouncementPublic
+api_v2_applications:
+    description: Manage api v2 applications
+    operations:
+    -   name: delete
+        operationId: deleteApplication
+    -   name: show
+        operationId: getApplications
+    -   name: show
+        operationId: getApplication
+    -   name: update
+        operationId: patchApplication
+    -   name: versions
+        subcommandId: api_v2_applications_versions
+api_v2_applications_versions:
+    description: Manage api v2 applications versions
+    operations:
+    -   name: delete
+        operationId: deleteApplicationVersion
+    -   name: show
+        operationId: getApplicationVersions
+    -   name: update
+        operationId: patchApplicationVersion
+api_v2_approval_requests:
+    description: Manage api v2 approval-requests
+    operations:
+    -   name: apply
+        operationId: postApprovalRequestApply
+    -   name: create
+        operationId: postApprovalRequest
+    -   name: delete
+        operationId: deleteApprovalRequest
+    -   name: projects
+        subcommandId: api_v2_approval_requests_projects
+    -   name: reviews
+        operationId: postApprovalRequestReview
+    -   name: show
+        operationId: getApprovalRequests
+    -   name: show
+        operationId: getApprovalRequest
+    -   name: update
+        operationId: patchApprovalRequest
+api_v2_approval_requests_projects:
+    description: Manage api v2 approval-requests projects
+    operations:
+    -   name: settings
+        subcommandId: api_v2_approval_requests_projects_settings
+api_v2_approval_requests_projects_settings:
+    description: Manage api v2 approval-requests projects settings
+    operations:
+    -   name: show
+        operationId: getApprovalRequestSettings
+    -   name: update
+        operationId: patchApprovalRequestSettings
+api_v2_auditlog:
+    description: Manage api v2 auditlog
+    operations:
+    -   name: counts
+        operationId: postAuditLogEntryCounts
+    -   name: create
+        operationId: postAuditLogEntries
+    -   name: show
+        operationId: getAuditLogEntries
+    -   name: show
+        operationId: getAuditLogEntry
+api_v2_code_refs:
+    description: Manage api v2 code-refs
+    operations:
+    -   name: extinctions
+        operationId: getExtinctions
+    -   name: repositories
+        subcommandId: api_v2_code_refs_repositories
+    -   name: statistics
+        subcommandId: api_v2_code_refs_statistics
+api_v2_code_refs_repositories:
+    description: Manage api v2 code-refs repositories
+    operations:
+    -   name: branch-delete-tasks
+        operationId: deleteBranches
+    -   name: branches
+        subcommandId: api_v2_code_refs_repositories_branches
+    -   name: create
+        operationId: postRepository
+    -   name: delete
+        operationId: deleteRepository
+    -   name: show
+        operationId: getRepositories
+    -   name: show
+        operationId: getRepository
+    -   name: update
+        operationId: patchRepository
+api_v2_code_refs_repositories_branches:
+    description: Manage api v2 code-refs repositories branches
+    operations:
+    -   name: extinction-events
+        operationId: postExtinction
+    -   name: set
+        operationId: putBranch
+    -   name: show
+        operationId: getBranches
+    -   name: show
+        operationId: getBranch
+api_v2_code_refs_statistics:
+    description: Manage api v2 code-refs statistics
+    operations:
+    -   name: show
+        operationId: getRootStatistic
+    -   name: show
+        operationId: getStatistics
+api_v2_destinations:
+    description: Manage api v2 destinations
+    operations:
+    -   name: create
+        operationId: postDestination
+    -   name: delete
+        operationId: deleteDestination
+    -   name: generate-warehouse-destination-key-pair
+        operationId: postGenerateWarehouseDestinationKeyPair
+    -   name: projects
+        subcommandId: api_v2_destinations_projects
+    -   name: show
+        operationId: getDestinations
+    -   name: show
+        operationId: getDestination
+    -   name: update
+        operationId: patchDestination
+api_v2_destinations_projects:
+    description: Manage api v2 destinations projects
+    operations:
+    -   name: environments
+        subcommandId: api_v2_destinations_projects_environments
+api_v2_destinations_projects_environments:
+    description: Manage api v2 destinations projects environments
+    operations:
+    -   name: generate-trust-policy
+        operationId: postGenerateTrustPolicy
+    -   name: generate-warehouse-destination-key-pair
+        operationId: postGenerateProjectEnvWarehouseDestinationKeyPair
+    -   name: kinds
+        subcommandId: api_v2_destinations_projects_environments_kinds
+api_v2_destinations_projects_environments_kinds:
+    description: Manage api v2 destinations projects environments kinds
+    operations:
+    -   name: complete-setup
+        operationId: postCompleteWarehouseDestinationSetup
+    -   name: setup
+        operationId: postGenerateWarehouseDestinationSetupScript
+api_v2_engineering_insights:
+    description: Manage api v2 engineering-insights
+    operations:
+    -   name: charts
+        subcommandId: api_v2_engineering_insights_charts
+    -   name: deployment-events
+        operationId: createDeploymentEvent
+    -   name: deployments
+        subcommandId: api_v2_engineering_insights_deployments
+    -   name: flag-events
+        operationId: getFlagEvents
+    -   name: insights
+        subcommandId: api_v2_engineering_insights_insights
+    -   name: pull-requests
+        operationId: getPullRequests
+    -   name: repositories
+        subcommandId: api_v2_engineering_insights_repositories
+api_v2_engineering_insights_charts:
+    description: Manage api v2 engineering-insights charts
+    operations:
+    -   name: deployments
+        subcommandId: api_v2_engineering_insights_charts_deployments
+    -   name: flags
+        subcommandId: api_v2_engineering_insights_charts_flags
+    -   name: lead-time
+        operationId: getLeadTimeChart
+    -   name: releases
+        subcommandId: api_v2_engineering_insights_charts_releases
+api_v2_engineering_insights_charts_deployments:
+    description: Manage api v2 engineering-insights charts deployments
+    operations:
+    -   name: frequency
+        operationId: getDeploymentFrequencyChart
+api_v2_engineering_insights_charts_flags:
+    description: Manage api v2 engineering-insights charts flags
+    operations:
+    -   name: stale
+        operationId: getStaleFlagsChart
+    -   name: status
+        operationId: getFlagStatusChart
+api_v2_engineering_insights_charts_releases:
+    description: Manage api v2 engineering-insights charts releases
+    operations:
+    -   name: frequency
+        operationId: getReleaseFrequencyChart
+api_v2_engineering_insights_deployments:
+    description: Manage api v2 engineering-insights deployments
+    operations:
+    -   name: show
+        operationId: getDeployments
+    -   name: show
+        operationId: getDeployment
+    -   name: update
+        operationId: updateDeployment
+api_v2_engineering_insights_insights:
+    description: Manage api v2 engineering-insights insights
+    operations:
+    -   name: group
+        operationId: createInsightGroup
+    -   name: groups
+        subcommandId: api_v2_engineering_insights_insights_groups
+    -   name: scores
+        operationId: getInsightsScores
+api_v2_engineering_insights_insights_groups:
+    description: Manage api v2 engineering-insights insights groups
+    operations:
+    -   name: delete
+        operationId: deleteInsightGroup
+    -   name: show
+        operationId: getInsightGroups
+    -   name: show
+        operationId: getInsightGroup
+    -   name: update
+        operationId: patchInsightGroup
+api_v2_engineering_insights_repositories:
+    description: Manage api v2 engineering-insights repositories
+    operations:
+    -   name: projects
+        subcommandId: api_v2_engineering_insights_repositories_projects
+    -   name: show
+        operationId: getInsightsRepositories
+api_v2_engineering_insights_repositories_projects:
+    description: Manage api v2 engineering-insights repositories projects
+    operations:
+    -   name: delete
+        operationId: deleteRepositoryProject
+    -   name: set
+        operationId: associateRepositoriesAndProjects
+api_v2_flag_links:
+    description: Manage api v2 flag-links
+    operations:
+    -   name: projects
+        subcommandId: api_v2_flag_links_projects
+api_v2_flag_links_projects:
+    description: Manage api v2 flag-links projects
+    operations:
+    -   name: flags
+        subcommandId: api_v2_flag_links_projects_flags
+api_v2_flag_links_projects_flags:
+    description: Manage api v2 flag-links projects flags
+    operations:
+    -   name: create
+        operationId: createFlagLink
+    -   name: delete
+        operationId: deleteFlagLink
+    -   name: show
+        operationId: getFlagLinks
+    -   name: update
+        operationId: updateFlagLink
+api_v2_flag_statuses:
+    description: Manage api v2 flag-statuses
+    operations:
+    -   name: show
+        operationId: getFeatureFlagStatuses
+    -   name: show
+        operationId: getFeatureFlagStatus
+api_v2_flags:
+    description: Manage api v2 flags
+    operations:
+    -   name: copy
+        operationId: copyFeatureFlag
+    -   name: create
+        operationId: postFeatureFlag
+    -   name: delete
+        operationId: deleteFeatureFlag
+    -   name: dependent-flags
+        subcommandId: api_v2_flags_dependent_flags
+    -   name: expiring-targets
+        subcommandId: api_v2_flags_expiring_targets
+    -   name: expiring-user-targets
+        subcommandId: api_v2_flags_expiring_user_targets
+    -   name: release
+        subcommandId: api_v2_flags_release
+    -   name: show
+        operationId: getFeatureFlags
+    -   name: show
+        operationId: getFeatureFlag
+    -   name: triggers
+        subcommandId: api_v2_flags_triggers
+    -   name: update
+        operationId: patchFeatureFlag
+api_v2_flags_dependent_flags:
+    description: Manage api v2 flags dependent-flags
+    operations:
+    -   name: show
+        operationId: getDependentFlagsByEnv
+    -   name: show
+        operationId: getDependentFlags
+api_v2_flags_expiring_targets:
+    description: Manage api v2 flags expiring-targets
+    operations:
+    -   name: show
+        operationId: getExpiringContextTargets
+    -   name: update
+        operationId: patchExpiringTargets
+api_v2_flags_expiring_user_targets:
+    description: Manage api v2 flags expiring-user-targets
+    operations:
+    -   name: show
+        operationId: getExpiringUserTargets
+    -   name: update
+        operationId: patchExpiringUserTargets
+api_v2_flags_release:
+    description: Manage api v2 flags release
+    operations:
+    -   name: delete
+        operationId: deleteReleaseByFlagKey
+    -   name: show
+        operationId: getReleaseByFlagKey
+    -   name: update
+        operationId: patchReleaseByFlagKey
+api_v2_flags_triggers:
+    description: Manage api v2 flags triggers
+    operations:
+    -   name: create
+        operationId: createTriggerWorkflow
+    -   name: delete
+        operationId: deleteTriggerWorkflow
+    -   name: show
+        operationId: getTriggerWorkflows
+    -   name: show
+        operationId: getTriggerWorkflowById
+    -   name: update
+        operationId: patchTriggerWorkflow
+api_v2_integration_capabilities:
+    description: Manage api v2 integration-capabilities
+    operations:
+    -   name: big-segment-store
+        subcommandId: api_v2_integration_capabilities_big_segment_store
+    -   name: feature-store
+        subcommandId: api_v2_integration_capabilities_feature_store
+    -   name: flag-import
+        subcommandId: api_v2_integration_capabilities_flag_import
+api_v2_integration_capabilities_big_segment_store:
+    description: Manage api v2 integration-capabilities big-segment-store
+    operations:
+    -   name: create
+        operationId: createBigSegmentStoreIntegration
+    -   name: delete
+        operationId: deleteBigSegmentStoreIntegration
+    -   name: show
+        operationId: getBigSegmentStoreIntegrations
+    -   name: show
+        operationId: getBigSegmentStoreIntegration
+    -   name: update
+        operationId: patchBigSegmentStoreIntegration
+api_v2_integration_capabilities_feature_store:
+    description: Manage api v2 integration-capabilities feature-store
+    operations:
+    -   name: create
+        operationId: createIntegrationDeliveryConfiguration
+    -   name: delete
+        operationId: deleteIntegrationDeliveryConfiguration
+    -   name: show
+        operationId: getIntegrationDeliveryConfigurations
+    -   name: show
+        operationId: getIntegrationDeliveryConfigurationByEnvironment
+    -   name: show
+        operationId: getIntegrationDeliveryConfigurationById
+    -   name: update
+        operationId: patchIntegrationDeliveryConfiguration
+    -   name: validate
+        operationId: validateIntegrationDeliveryConfiguration
+api_v2_integration_capabilities_flag_import:
+    description: Manage api v2 integration-capabilities flag-import
+    operations:
+    -   name: create
+        operationId: createFlagImportConfiguration
+    -   name: delete
+        operationId: deleteFlagImportConfiguration
+    -   name: show
+        operationId: getFlagImportConfigurations
+    -   name: show
+        operationId: getFlagImportConfiguration
+    -   name: trigger
+        operationId: triggerFlagImportJob
+    -   name: update
+        operationId: patchFlagImportConfiguration
+api_v2_integration_configurations:
+    description: Manage api v2 integration-configurations
+    operations:
+    -   name: delete
+        operationId: deleteIntegrationConfiguration
+    -   name: keys
+        subcommandId: api_v2_integration_configurations_keys
+    -   name: show
+        operationId: getIntegrationConfiguration
+    -   name: update
+        operationId: updateIntegrationConfiguration
+api_v2_integration_configurations_keys:
+    description: Manage api v2 integration-configurations keys
+    operations:
+    -   name: create
+        operationId: createIntegrationConfiguration
+    -   name: show
+        operationId: getAllIntegrationConfigurations
+api_v2_integrations:
+    description: Manage api v2 integrations
+    operations:
+    -   name: create
+        operationId: createSubscription
+    -   name: delete
+        operationId: deleteSubscription
+    -   name: show
+        operationId: getSubscriptions
+    -   name: show
+        operationId: getSubscriptionByID
+    -   name: update
+        operationId: updateSubscription
+api_v2_members:
+    description: Manage api v2 members
+    operations:
+    -   name: create
+        operationId: postMembers
+    -   name: delete
+        operationId: deleteMember
+    -   name: show
+        operationId: getMembers
+    -   name: show
+        operationId: getMember
+    -   name: teams
+        operationId: postMemberTeams
+    -   name: update
+        operationId: patchMembers
+    -   name: update
+        operationId: patchMember
+api_v2_metrics:
+    description: Manage api v2 metrics
+    operations:
+    -   name: create
+        operationId: postMetric
+    -   name: delete
+        operationId: deleteMetric
+    -   name: show
+        operationId: getMetrics
+    -   name: show
+        operationId: getMetric
+    -   name: update
+        operationId: patchMetric
+api_v2_oauth:
+    description: Manage api v2 oauth
+    operations:
+    -   name: clients
+        subcommandId: api_v2_oauth_clients
+api_v2_oauth_clients:
+    description: Manage api v2 oauth clients
+    operations:
+    -   name: create
+        operationId: createOAuth2Client
+    -   name: delete
+        operationId: deleteOAuthClient
+    -   name: show
+        operationId: getOAuthClients
+    -   name: show
+        operationId: getOAuthClientById
+    -   name: update
+        operationId: patchOAuthClient
+api_v2_projects:
+    description: Manage api v2 projects
+    operations:
+    -   name: agent-graphs
+        subcommandId: api_v2_projects_agent_graphs
+    -   name: agent-optimizations
+        subcommandId: api_v2_projects_agent_optimizations
+    -   name: ai-configs
+        subcommandId: api_v2_projects_ai_configs
+    -   name: ai-tools
+        subcommandId: api_v2_projects_ai_tools
+    -   name: context-kinds
+        subcommandId: api_v2_projects_context_kinds
+    -   name: create
+        operationId: postProject
+    -   name: delete
+        operationId: deleteProject
+    -   name: environments
+        subcommandId: api_v2_projects_environments
+    -   name: experimentation-settings
+        subcommandId: api_v2_projects_experimentation_settings
+    -   name: experiments
+        operationId: getExperimentsAnyEnv
+    -   name: flag-defaults
+        subcommandId: api_v2_projects_flag_defaults
+    -   name: flag-release-plans
+        subcommandId: api_v2_projects_flag_release_plans
+    -   name: flags
+        subcommandId: api_v2_projects_flags
+    -   name: layers
+        subcommandId: api_v2_projects_layers
+    -   name: metric-groups
+        subcommandId: api_v2_projects_metric_groups
+    -   name: release-pipelines
+        subcommandId: api_v2_projects_release_pipelines
+    -   name: sdk-keys
+        operationId: getProjectSdkKeys
+    -   name: show
+        operationId: getProjects
+    -   name: show
+        operationId: getProject
+    -   name: update
+        operationId: patchProject
+    -   name: view-associations
+        operationId: getLinkedViews
+    -   name: views
+        subcommandId: api_v2_projects_views
+api_v2_projects_agent_graphs:
+    description: Manage api v2 projects agent-graphs
+    operations:
+    -   name: create
+        operationId: postAgentGraph
+    -   name: delete
+        operationId: deleteAgentGraph
+    -   name: list
+        operationId: listAgentGraphs
+    -   name: show
+        operationId: getAgentGraph
+    -   name: update
+        operationId: patchAgentGraph
+api_v2_projects_agent_optimizations:
+    description: Manage api v2 projects agent-optimizations
+    operations:
+    -   name: all-results
+        operationId: listAllAgentOptimizationResults
+    -   name: create
+        operationId: postAgentOptimization
+    -   name: delete
+        operationId: deleteAgentOptimization
+    -   name: list
+        operationId: listAgentOptimizations
+    -   name: results
+        subcommandId: api_v2_projects_agent_optimizations_results
+    -   name: runs
+        subcommandId: api_v2_projects_agent_optimizations_runs
+    -   name: show
+        operationId: getAgentOptimization
+    -   name: update
+        operationId: patchAgentOptimization
+api_v2_projects_agent_optimizations_results:
+    description: Manage api v2 projects agent-optimizations results
+    operations:
+    -   name: create
+        operationId: postAgentOptimizationResult
+    -   name: list
+        operationId: listAgentOptimizationResults
+    -   name: update
+        operationId: patchAgentOptimizationResult
+api_v2_projects_agent_optimizations_runs:
+    description: Manage api v2 projects agent-optimizations runs
+    operations:
+    -   name: delete
+        operationId: deleteAgentOptimizationRun
+    -   name: list
+        operationId: listAgentOptimizationRuns
+    -   name: results
+        operationId: listAgentOptimizationResultsByRunId
+api_v2_projects_ai_configs:
+    description: Manage api v2 projects ai-configs
+    operations:
+    -   name: create
+        operationId: postAIConfig
+    -   name: delete
+        operationId: deleteAIConfig
+    -   name: metrics
+        operationId: getAIConfigMetrics
+    -   name: metrics-by-variation
+        operationId: getAIConfigMetricsByVariation
+    -   name: model-configs
+        subcommandId: api_v2_projects_ai_configs_model_configs
+    -   name: prompt-snippets
+        subcommandId: api_v2_projects_ai_configs_prompt_snippets
+    -   name: quick-stats
+        operationId: getAIConfigQuickStats
+    -   name: show
+        operationId: getAIConfigs
+    -   name: show
+        operationId: getAIConfig
+    -   name: skills
+        subcommandId: api_v2_projects_ai_configs_skills
+    -   name: targeting
+        subcommandId: api_v2_projects_ai_configs_targeting
+    -   name: update
+        operationId: patchAIConfig
+    -   name: variations
+        subcommandId: api_v2_projects_ai_configs_variations
+api_v2_projects_ai_configs_model_configs:
+    description: Manage api v2 projects ai-configs model-configs
+    operations:
+    -   name: create
+        operationId: postModelConfig
+    -   name: delete
+        operationId: deleteModelConfig
+    -   name: list
+        operationId: listModelConfigs
+    -   name: restricted
+        subcommandId: api_v2_projects_ai_configs_model_configs_restricted
+    -   name: show
+        operationId: getModelConfig
+    -   name: update
+        operationId: patchModelConfig
+    -   name: versions
+        operationId: listModelConfigVersions
+api_v2_projects_ai_configs_model_configs_restricted:
+    description: Manage api v2 projects ai-configs model-configs restricted
+    operations:
+    -   name: create
+        operationId: postRestrictedModels
+    -   name: delete
+        operationId: deleteRestrictedModels
+api_v2_projects_ai_configs_prompt_snippets:
+    description: Manage api v2 projects ai-configs prompt-snippets
+    operations:
+    -   name: create
+        operationId: postPromptSnippet
+    -   name: delete
+        operationId: deletePromptSnippet
+    -   name: list
+        operationId: listPromptSnippets
+    -   name: references
+        operationId: listPromptSnippetReferences
+    -   name: show
+        operationId: getPromptSnippet
+    -   name: update
+        operationId: patchPromptSnippet
+    -   name: versions
+        operationId: listPromptSnippetVersions
+api_v2_projects_ai_configs_skills:
+    description: Manage api v2 projects ai-configs skills
+    operations:
+    -   name: create
+        operationId: postAgentSkill
+    -   name: delete
+        operationId: deleteAgentSkill
+    -   name: list
+        operationId: listAgentSkills
+    -   name: references
+        operationId: listAgentSkillReferences
+    -   name: show
+        operationId: getAgentSkill
+    -   name: update
+        operationId: patchAgentSkill
+    -   name: versions
+        operationId: listAgentSkillVersions
+api_v2_projects_ai_configs_targeting:
+    description: Manage api v2 projects ai-configs targeting
+    operations:
+    -   name: show
+        operationId: getAIConfigTargeting
+    -   name: update
+        operationId: patchAIConfigTargeting
+api_v2_projects_ai_configs_variations:
+    description: Manage api v2 projects ai-configs variations
+    operations:
+    -   name: create
+        operationId: postAIConfigVariation
+    -   name: delete
+        operationId: deleteAIConfigVariation
+    -   name: show
+        operationId: getAIConfigVariation
+    -   name: update
+        operationId: patchAIConfigVariation
+api_v2_projects_ai_tools:
+    description: Manage api v2 projects ai-tools
+    operations:
+    -   name: create
+        operationId: postAITool
+    -   name: delete
+        operationId: deleteAITool
+    -   name: list
+        operationId: listAITools
+    -   name: references
+        operationId: listAIToolReferences
+    -   name: show
+        operationId: getAITool
+    -   name: update
+        operationId: patchAITool
+    -   name: versions
+        operationId: listAIToolVersions
+api_v2_projects_context_kinds:
+    description: Manage api v2 projects context-kinds
+    operations:
+    -   name: set
+        operationId: putContextKind
+    -   name: show
+        operationId: getContextKindsByProjectKey
+api_v2_projects_environments:
+    description: Manage api v2 projects environments
+    operations:
+    -   name: adaptive-triggers
+        subcommandId: api_v2_projects_environments_adaptive_triggers
+    -   name: api-key
+        operationId: resetEnvironmentSDKKey
+    -   name: context-attributes
+        subcommandId: api_v2_projects_environments_context_attributes
+    -   name: contexts
+        subcommandId: api_v2_projects_environments_contexts
+    -   name: create
+        operationId: postEnvironment
+    -   name: default-release-plan
+        subcommandId: api_v2_projects_environments_default_release_plan
+    -   name: delete
+        operationId: deleteEnvironment
+    -   name: experiments
+        subcommandId: api_v2_projects_environments_experiments
+    -   name: flags
+        subcommandId: api_v2_projects_environments_flags
+    -   name: followers
+        operationId: getFollowersByProjEnv
+    -   name: holdouts
+        subcommandId: api_v2_projects_environments_holdouts
+    -   name: mobile-key
+        operationId: resetEnvironmentMobileKey
+    -   name: release-plans
+        subcommandId: api_v2_projects_environments_release_plans
+    -   name: sdk-keys
+        subcommandId: api_v2_projects_environments_sdk_keys
+    -   name: segments
+        subcommandId: api_v2_projects_environments_segments
+    -   name: show
+        operationId: getEnvironmentsByProject
+    -   name: show
+        operationId: getEnvironment
+    -   name: update
+        operationId: patchEnvironment
+api_v2_projects_environments_adaptive_triggers:
+    description: Manage api v2 projects environments adaptive-triggers
+    operations:
+    -   name: create
+        operationId: postAdaptiveTrigger
+    -   name: delete
+        operationId: deleteAdaptiveTrigger
+    -   name: disable
+        operationId: postDisableAdaptiveTrigger
+    -   name: enable
+        operationId: postEnableAdaptiveTrigger
+    -   name: list
+        operationId: listAdaptiveTriggers
+    -   name: show
+        operationId: getAdaptiveTrigger
+    -   name: update
+        operationId: patchAdaptiveTrigger
+api_v2_projects_environments_context_attributes:
+    description: Manage api v2 projects environments context-attributes
+    operations:
+    -   name: show
+        operationId: getContextAttributeNames
+    -   name: show
+        operationId: getContextAttributeValues
+api_v2_projects_environments_contexts:
+    description: Manage api v2 projects environments contexts
+    operations:
+    -   name: flags
+        operationId: putContextFlagSetting
+    -   name: search
+        operationId: searchContexts
+    -   name: show
+        operationId: getContexts
+api_v2_projects_environments_default_release_plan:
+    description: Manage api v2 projects environments default-release-plan
+    operations:
+    -   name: delete
+        operationId: DeleteDefaultEnvironmentReleasePlan
+    -   name: set
+        operationId: PutDefaultEnvironmentReleasePlan
+    -   name: show
+        operationId: GetDefaultEnvironmentReleasePlan
+api_v2_projects_environments_experiments:
+    description: Manage api v2 projects environments experiments
+    operations:
+    -   name: create
+        operationId: createExperiment
+    -   name: iterations
+        operationId: createIteration
+    -   name: show
+        operationId: getExperiments
+    -   name: show
+        operationId: getExperiment
+    -   name: update
+        operationId: patchExperiment
+api_v2_projects_environments_flags:
+    description: Manage api v2 projects environments flags
+    operations:
+    -   name: evaluate
+        operationId: evaluateContextInstance
+api_v2_projects_environments_holdouts:
+    description: Manage api v2 projects environments holdouts
+    operations:
+    -   name: create
+        operationId: postHoldout
+    -   name: id
+        operationId: getHoldoutById
+    -   name: show
+        operationId: getAllHoldouts
+    -   name: show
+        operationId: getHoldout
+    -   name: update
+        operationId: patchHoldout
+api_v2_projects_environments_release_plans:
+    description: Manage api v2 projects environments release-plans
+    operations:
+    -   name: create
+        operationId: PostEnvironmentReleasePlan
+    -   name: delete
+        operationId: DeleteEnvironmentReleasePlan
+    -   name: set
+        operationId: PutEnvironmentReleasePlan
+    -   name: show
+        operationId: GetEnvironmentReleasePlans
+    -   name: show
+        operationId: GetEnvironmentReleasePlan
+api_v2_projects_environments_sdk_keys:
+    description: Manage api v2 projects environments sdk-keys
+    operations:
+    -   name: create
+        operationId: postSdkKey
+    -   name: delete
+        operationId: deleteSdkKeyByKey
+    -   name: show
+        operationId: getSdkKeys
+    -   name: show
+        operationId: getSdkKeyByKey
+    -   name: update
+        operationId: patchSdkKeyByKey
+    -   name: views
+        operationId: putSdkKeyViews
+api_v2_projects_environments_segments:
+    description: Manage api v2 projects environments segments
+    operations:
+    -   name: evaluate
+        operationId: getContextInstanceSegmentsMembershipByEnv
+api_v2_projects_experimentation_settings:
+    description: Manage api v2 projects experimentation-settings
+    operations:
+    -   name: set
+        operationId: putExperimentationSettings
+    -   name: show
+        operationId: getExperimentationSettings
+api_v2_projects_flag_defaults:
+    description: Manage api v2 projects flag-defaults
+    operations:
+    -   name: set
+        operationId: putFlagDefaultsByProject
+    -   name: show
+        operationId: getFlagDefaultsByProject
+    -   name: update
+        operationId: patchFlagDefaultsByProject
+api_v2_projects_flag_release_plans:
+    description: Manage api v2 projects flag-release-plans
+    operations:
+    -   name: create
+        operationId: createFlagReleasePlan
+    -   name: delete
+        operationId: deleteFlagReleasePlan
+    -   name: list
+        operationId: listFlagReleasePlans
+    -   name: set
+        operationId: updateFlagReleasePlan
+    -   name: show
+        operationId: getFlagReleasePlan
+api_v2_projects_flags:
+    description: Manage api v2 projects flags
+    operations:
+    -   name: environments
+        subcommandId: api_v2_projects_flags_environments
+    -   name: release
+        subcommandId: api_v2_projects_flags_release
+api_v2_projects_flags_environments:
+    description: Manage api v2 projects flags environments
+    operations:
+    -   name: approval-requests
+        subcommandId: api_v2_projects_flags_environments_approval_requests
+    -   name: approval-requests-flag-copy
+        operationId: postFlagCopyConfigApprovalRequest
+    -   name: followers
+        subcommandId: api_v2_projects_flags_environments_followers
+    -   name: migration-safety-issues
+        operationId: postMigrationSafetyIssues
+    -   name: releases
+        subcommandId: api_v2_projects_flags_environments_releases
+    -   name: scheduled-changes
+        subcommandId: api_v2_projects_flags_environments_scheduled_changes
+    -   name: workflows
+        subcommandId: api_v2_projects_flags_environments_workflows
+api_v2_projects_flags_environments_approval_requests:
+    description: Manage api v2 projects flags environments approval-requests
+    operations:
+    -   name: apply
+        operationId: postApprovalRequestApplyForFlag
+    -   name: create
+        operationId: postApprovalRequestForFlag
+    -   name: delete
+        operationId: deleteApprovalRequestForFlag
+    -   name: reviews
+        operationId: postApprovalRequestReviewForFlag
+    -   name: show
+        operationId: getApprovalsForFlag
+    -   name: show
+        operationId: getApprovalForFlag
+    -   name: update
+        operationId: patchFlagConfigApprovalRequest
+api_v2_projects_flags_environments_followers:
+    description: Manage api v2 projects flags environments followers
+    operations:
+    -   name: delete
+        operationId: deleteFlagFollower
+    -   name: set
+        operationId: putFlagFollower
+    -   name: show
+        operationId: getFlagFollowers
+api_v2_projects_flags_environments_releases:
+    description: Manage api v2 projects flags environments releases
+    operations:
+    -   name: create
+        operationId: startEnvironmentRelease
+    -   name: list
+        operationId: listEnvironmentReleases
+    -   name: show
+        operationId: getEnvironmentRelease
+    -   name: stop
+        operationId: stopEnvironmentRelease
+api_v2_projects_flags_environments_scheduled_changes:
+    description: Manage api v2 projects flags environments scheduled-changes
+    operations:
+    -   name: create
+        operationId: postFlagConfigScheduledChanges
+    -   name: delete
+        operationId: deleteFlagConfigScheduledChanges
+    -   name: show
+        operationId: getFlagConfigScheduledChanges
+    -   name: show
+        operationId: getFeatureFlagScheduledChange
+    -   name: update
+        operationId: patchFlagConfigScheduledChange
+api_v2_projects_flags_environments_workflows:
+    description: Manage api v2 projects flags environments workflows
+    operations:
+    -   name: create
+        operationId: postWorkflow
+    -   name: delete
+        operationId: deleteWorkflow
+    -   name: show
+        operationId: getWorkflows
+    -   name: show
+        operationId: getCustomWorkflow
+api_v2_projects_flags_release:
+    description: Manage api v2 projects flags release
+    operations:
+    -   name: phases
+        operationId: updatePhaseStatus
+    -   name: set
+        operationId: createReleaseForFlag
+api_v2_projects_layers:
+    description: Manage api v2 projects layers
+    operations:
+    -   name: create
+        operationId: createLayer
+    -   name: show
+        operationId: getLayers
+    -   name: update
+        operationId: updateLayer
+api_v2_projects_metric_groups:
+    description: Manage api v2 projects metric-groups
+    operations:
+    -   name: create
+        operationId: createMetricGroup
+    -   name: delete
+        operationId: deleteMetricGroup
+    -   name: show
+        operationId: getMetricGroups
+    -   name: show
+        operationId: getMetricGroup
+    -   name: update
+        operationId: patchMetricGroup
+api_v2_projects_release_pipelines:
+    description: Manage api v2 projects release-pipelines
+    operations:
+    -   name: create
+        operationId: postReleasePipeline
+    -   name: delete
+        operationId: deleteReleasePipeline
+    -   name: releases
+        operationId: getAllReleaseProgressionsForReleasePipeline
+    -   name: set
+        operationId: putReleasePipeline
+    -   name: show
+        operationId: getAllReleasePipelines
+    -   name: show
+        operationId: getReleasePipelineByKey
+api_v2_projects_views:
+    description: Manage api v2 projects views
+    operations:
+    -   name: create
+        operationId: createView
+    -   name: delete
+        operationId: deleteView
+    -   name: link
+        subcommandId: api_v2_projects_views_link
+    -   name: linked
+        operationId: getLinkedResources
+    -   name: show
+        operationId: getViews
+    -   name: show
+        operationId: getView
+    -   name: update
+        operationId: updateView
+api_v2_projects_views_link:
+    description: Manage api v2 projects views link
+    operations:
+    -   name: create
+        operationId: linkResource
+    -   name: delete
+        operationId: unlinkResource
+api_v2_roles:
+    description: Manage api v2 roles
+    operations:
+    -   name: create
+        operationId: postCustomRole
+    -   name: delete
+        operationId: deleteCustomRole
+    -   name: show
+        operationId: getCustomRoles
+    -   name: show
+        operationId: getCustomRole
+    -   name: update
+        operationId: patchCustomRole
+api_v2_segments:
+    description: Manage api v2 segments
+    operations:
+    -   name: contexts
+        subcommandId: api_v2_segments_contexts
+    -   name: create
+        operationId: postSegment
+    -   name: delete
+        operationId: deleteSegment
+    -   name: expiring-targets
+        subcommandId: api_v2_segments_expiring_targets
+    -   name: expiring-user-targets
+        subcommandId: api_v2_segments_expiring_user_targets
+    -   name: exports
+        subcommandId: api_v2_segments_exports
+    -   name: imports
+        subcommandId: api_v2_segments_imports
+    -   name: scheduled-changes
+        subcommandId: api_v2_segments_scheduled_changes
+    -   name: show
+        operationId: getSegments
+    -   name: show
+        operationId: getSegment
+    -   name: update
+        operationId: patchSegment
+    -   name: users
+        subcommandId: api_v2_segments_users
+api_v2_segments_contexts:
+    description: Manage api v2 segments contexts
+    operations:
+    -   name: show
+        operationId: getSegmentMembershipForContext
+    -   name: update
+        operationId: updateBigSegmentContextTargets
+api_v2_segments_expiring_targets:
+    description: Manage api v2 segments expiring-targets
+    operations:
+    -   name: show
+        operationId: getExpiringTargetsForSegment
+    -   name: update
+        operationId: patchExpiringTargetsForSegment
+api_v2_segments_expiring_user_targets:
+    description: Manage api v2 segments expiring-user-targets
+    operations:
+    -   name: show
+        operationId: getExpiringUserTargetsForSegment
+    -   name: update
+        operationId: patchExpiringUserTargetsForSegment
+api_v2_segments_exports:
+    description: Manage api v2 segments exports
+    operations:
+    -   name: create
+        operationId: createBigSegmentExport
+    -   name: show
+        operationId: getBigSegmentExport
+api_v2_segments_imports:
+    description: Manage api v2 segments imports
+    operations:
+    -   name: create
+        operationId: createBigSegmentImport
+    -   name: show
+        operationId: getBigSegmentImport
+api_v2_segments_scheduled_changes:
+    description: Manage api v2 segments scheduled-changes
+    operations:
+    -   name: create
+        operationId: postSegmentScheduledChange
+    -   name: delete
+        operationId: deleteSegmentScheduledChange
+    -   name: show
+        operationId: getSegmentScheduledChanges
+    -   name: show
+        operationId: getSegmentScheduledChange
+    -   name: update
+        operationId: patchSegmentScheduledChange
+api_v2_segments_users:
+    description: Manage api v2 segments users
+    operations:
+    -   name: show
+        operationId: getSegmentMembershipForUser
+    -   name: update
+        operationId: updateBigSegmentTargets
+api_v2_teams:
+    description: Manage api v2 teams
+    operations:
+    -   name: create
+        operationId: postTeam
+    -   name: delete
+        operationId: deleteTeam
+    -   name: maintainers
+        operationId: getTeamMaintainers
+    -   name: members
+        operationId: postTeamMembers
+    -   name: roles
+        operationId: getTeamRoles
+    -   name: show
+        operationId: getTeams
+    -   name: show
+        operationId: getTeam
+    -   name: update
+        operationId: patchTeams
+    -   name: update
+        operationId: patchTeam
+api_v2_templates:
+    description: Manage api v2 templates
+    operations:
+    -   name: create
+        operationId: createWorkflowTemplate
+    -   name: delete
+        operationId: deleteWorkflowTemplate
+    -   name: show
+        operationId: getWorkflowTemplates
+api_v2_tokens:
+    description: Manage api v2 tokens
+    operations:
+    -   name: create
+        operationId: postToken
+    -   name: delete
+        operationId: deleteToken
+    -   name: reset
+        operationId: resetToken
+    -   name: show
+        operationId: getTokens
+    -   name: show
+        operationId: getToken
+    -   name: update
+        operationId: patchToken
+api_v2_usage:
+    description: Manage api v2 usage
+    operations:
+    -   name: ai-runs
+        operationId: getAIRunsUsage
+    -   name: clientside-contexts
+        operationId: getContextsClientsideUsage
+    -   name: clientside-mau
+        operationId: getMAUClientsideUsage
+    -   name: data-export-events
+        subcommandId: api_v2_usage_data_export_events
+    -   name: evaluations
+        operationId: getEvaluationsUsage
+    -   name: events
+        operationId: getEventsUsage
+    -   name: experimentation-events
+        operationId: getExperimentationEventsUsage
+    -   name: experimentation-keys
+        operationId: getExperimentationKeysUsage
+    -   name: mau
+        subcommandId: api_v2_usage_mau
+    -   name: observability
+        subcommandId: api_v2_usage_observability
+    -   name: sdk-versions
+        subcommandId: api_v2_usage_sdk_versions
+    -   name: serverside-contexts
+        operationId: getContextsServersideUsage
+    -   name: service-connections
+        operationId: getServiceConnectionsUsage
+    -   name: streams
+        subcommandId: api_v2_usage_streams
+    -   name: total-contexts
+        operationId: getContextsTotalUsage
+    -   name: total-mau
+        operationId: getMAUTotalUsage
+    -   name: vega-ai
+        operationId: getVegaAIUsage
+    -   name: warehouse-export
+        operationId: getWarehouseExportUsage
+api_v2_usage_data_export_events:
+    description: Manage api v2 usage data-export-events
+    operations:
+    -   name: projects
+        subcommandId: api_v2_usage_data_export_events_projects
+    -   name: show
+        operationId: getDataExportEventsUsage
+api_v2_usage_data_export_events_projects:
+    description: Manage api v2 usage data-export-events projects
+    operations:
+    -   name: ranking
+        operationId: getDataExportProjectRanking
+api_v2_usage_mau:
+    description: Manage api v2 usage mau
+    operations:
+    -   name: bycategory
+        operationId: getMauUsageByCategory
+    -   name: sdks
+        operationId: getMauSdksByType
+    -   name: show
+        operationId: getMauUsage
+api_v2_usage_observability:
+    description: Manage api v2 usage observability
+    operations:
+    -   name: errors
+        operationId: getObservabilityErrorsUsage
+    -   name: logs
+        operationId: getObservabilityLogsUsage
+    -   name: metrics
+        operationId: getObservabilityMetricsUsage
+    -   name: sessions
+        operationId: getObservabilitySessionsUsage
+    -   name: traces
+        operationId: getObservabilityTracesUsage
+api_v2_usage_sdk_versions:
+    description: Manage api v2 usage sdk-versions
+    operations:
+    -   name: all
+        operationId: getSdkAllVersions
+    -   name: details
+        operationId: getSdkVersionsDetails
+api_v2_usage_streams:
+    description: Manage api v2 usage streams
+    operations:
+    -   name: bysdkversion
+        operationId: getStreamUsageBySdkVersion
+    -   name: sdkversions
+        operationId: getStreamUsageSdkversion
+    -   name: show
+        operationId: getStreamUsage
+api_v2_users:
+    description: Manage api v2 users
+    operations:
+    -   name: expiring-user-targets
+        subcommandId: api_v2_users_expiring_user_targets
+    -   name: flags
+        subcommandId: api_v2_users_flags
+    -   name: show
+        operationId: getUsers
+    -   name: show
+        operationId: getUser
+api_v2_users_expiring_user_targets:
+    description: Manage api v2 users expiring-user-targets
+    operations:
+    -   name: show
+        operationId: getExpiringFlagsForUser
+    -   name: update
+        operationId: patchExpiringFlagsForUser
+api_v2_users_flags:
+    description: Manage api v2 users flags
+    operations:
+    -   name: set
+        operationId: putFlagSetting
+    -   name: show
+        operationId: getUserFlagSettings
+    -   name: show
+        operationId: getUserFlagSetting
+api_v2_webhooks:
+    description: Manage api v2 webhooks
+    operations:
+    -   name: create
+        operationId: postWebhook
+    -   name: delete
+        operationId: deleteWebhook
+    -   name: show
+        operationId: getAllWebhooks
+    -   name: show
+        operationId: getWebhook
+    -   name: update
+        operationId: patchWebhook
