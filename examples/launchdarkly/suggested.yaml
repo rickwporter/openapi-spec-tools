@@ -53,6 +53,10 @@ main:
         operationId: getRoot
     -   name: tags
         operationId: getTags
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: teams
         subcommandId: teams
     -   name: templates
@@ -63,6 +67,9 @@ main:
         subcommandId: usage
     -   name: user-search
         operationId: getSearchUsers
+        pagination:
+            itemProperty: items
+            pageSize: limit
     -   name: users
         subcommandId: users
     -   name: versions
@@ -83,8 +90,11 @@ account_ip_allowlist:
         operationId: createIpAllowlistEntry
     -   name: delete
         operationId: deleteIpAllowlistEntry
-    -   name: show
+    -   name: list
         operationId: getIpAllowlist
+        pagination:
+            itemStart: offset
+            pageSize: limit
     -   name: update
         operationId: patchIpAllowlistConfig
     -   name: update
@@ -96,10 +106,12 @@ account_relay_auto_configs:
         operationId: postRelayAutoConfig
     -   name: delete
         operationId: deleteRelayAutoConfig
+    -   name: list
+        operationId: getRelayProxyConfigs
+        pagination:
+            itemProperty: items
     -   name: reset
         operationId: resetRelayAutoConfig
-    -   name: show
-        operationId: getRelayProxyConfigs
     -   name: show
         operationId: getRelayProxyConfig
     -   name: update
@@ -111,8 +123,12 @@ announcements:
         operationId: createAnnouncementPublic
     -   name: delete
         operationId: deleteAnnouncementPublic
-    -   name: show
+    -   name: list
         operationId: getAnnouncementsPublic
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: update
         operationId: updateAnnouncementPublic
 applications:
@@ -120,8 +136,12 @@ applications:
     operations:
     -   name: delete
         operationId: deleteApplication
-    -   name: show
+    -   name: list
         operationId: getApplications
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getApplication
     -   name: update
@@ -133,8 +153,12 @@ applications_versions:
     operations:
     -   name: delete
         operationId: deleteApplicationVersion
-    -   name: show
+    -   name: list
         operationId: getApplicationVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: update
         operationId: patchApplicationVersion
 approval_requests:
@@ -146,12 +170,16 @@ approval_requests:
         operationId: postApprovalRequest
     -   name: delete
         operationId: deleteApprovalRequest
+    -   name: list
+        operationId: getApprovalRequests
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: projects
         subcommandId: approval_requests_projects
     -   name: reviews
         operationId: postApprovalRequestReview
-    -   name: show
-        operationId: getApprovalRequests
     -   name: show
         operationId: getApprovalRequest
     -   name: update
@@ -175,8 +203,14 @@ auditlog:
         operationId: postAuditLogEntryCounts
     -   name: create
         operationId: postAuditLogEntries
-    -   name: show
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: list
         operationId: getAuditLogEntries
+        pagination:
+            itemProperty: items
+            pageSize: limit
     -   name: show
         operationId: getAuditLogEntry
 code_refs:
@@ -184,6 +218,8 @@ code_refs:
     operations:
     -   name: extinctions
         operationId: getExtinctions
+        pagination:
+            itemProperty: items
     -   name: repositories
         subcommandId: code_refs_repositories
     -   name: statistics
@@ -199,8 +235,10 @@ code_refs_repositories:
         operationId: postRepository
     -   name: delete
         operationId: deleteRepository
-    -   name: show
+    -   name: list
         operationId: getRepositories
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getRepository
     -   name: update
@@ -210,10 +248,12 @@ code_refs_repositories_branches:
     operations:
     -   name: extinction-events
         operationId: postExtinction
+    -   name: list
+        operationId: getBranches
+        pagination:
+            itemProperty: items
     -   name: set
         operationId: putBranch
-    -   name: show
-        operationId: getBranches
     -   name: show
         operationId: getBranch
 code_refs_statistics:
@@ -232,10 +272,12 @@ destinations:
         operationId: deleteDestination
     -   name: generate-warehouse-destination-key-pair
         operationId: postGenerateWarehouseDestinationKeyPair
+    -   name: list
+        operationId: getDestinations
+        pagination:
+            itemProperty: items
     -   name: projects
         subcommandId: destinations_projects
-    -   name: show
-        operationId: getDestinations
     -   name: show
         operationId: getDestination
     -   name: update
@@ -272,10 +314,16 @@ engineering_insights:
         subcommandId: engineering_insights_deployments
     -   name: flag-events
         operationId: getFlagEvents
+        pagination:
+            itemProperty: items
+            pageSize: limit
     -   name: insights
         subcommandId: engineering_insights_insights
     -   name: pull-requests
         operationId: getPullRequests
+        pagination:
+            itemProperty: items
+            pageSize: limit
     -   name: repositories
         subcommandId: engineering_insights_repositories
 engineering_insights_charts:
@@ -309,8 +357,11 @@ engineering_insights_charts_releases:
 engineering_insights_deployments:
     description: Manage engineering-insights deployments
     operations:
-    -   name: show
+    -   name: list
         operationId: getDeployments
+        pagination:
+            itemProperty: items
+            pageSize: limit
     -   name: show
         operationId: getDeployment
     -   name: update
@@ -329,8 +380,12 @@ engineering_insights_insights_groups:
     operations:
     -   name: delete
         operationId: deleteInsightGroup
-    -   name: show
+    -   name: list
         operationId: getInsightGroups
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getInsightGroup
     -   name: update
@@ -338,10 +393,12 @@ engineering_insights_insights_groups:
 engineering_insights_repositories:
     description: Manage engineering-insights repositories
     operations:
+    -   name: list
+        operationId: getInsightsRepositories
+        pagination:
+            itemProperty: items
     -   name: projects
         subcommandId: engineering_insights_repositories_projects
-    -   name: show
-        operationId: getInsightsRepositories
 engineering_insights_repositories_projects:
     description: Manage engineering-insights repositories projects
     operations:
@@ -349,6 +406,8 @@ engineering_insights_repositories_projects:
         operationId: deleteRepositoryProject
     -   name: set
         operationId: associateRepositoriesAndProjects
+        pagination:
+            itemProperty: items
 flag_links:
     description: Manage flag-links
     operations:
@@ -366,15 +425,19 @@ flag_links_projects_flags:
         operationId: createFlagLink
     -   name: delete
         operationId: deleteFlagLink
-    -   name: show
+    -   name: list
         operationId: getFlagLinks
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: updateFlagLink
 flag_statuses:
     description: Manage flag-statuses
     operations:
-    -   name: show
+    -   name: list
         operationId: getFeatureFlagStatuses
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getFeatureFlagStatus
 flags:
@@ -392,10 +455,14 @@ flags:
         subcommandId: flags_expiring_targets
     -   name: expiring-user-targets
         subcommandId: flags_expiring_user_targets
+    -   name: list
+        operationId: getFeatureFlags
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: release
         subcommandId: flags_release
-    -   name: show
-        operationId: getFeatureFlags
     -   name: show
         operationId: getFeatureFlag
     -   name: triggers
@@ -405,24 +472,36 @@ flags:
 flags_dependent_flags:
     description: Manage flags dependent-flags
     operations:
-    -   name: show
+    -   name: list
         operationId: getDependentFlagsByEnv
-    -   name: show
+        pagination:
+            itemProperty: items
+    -   name: list
         operationId: getDependentFlags
+        pagination:
+            itemProperty: items
 flags_expiring_targets:
     description: Manage flags expiring-targets
     operations:
-    -   name: show
+    -   name: list
         operationId: getExpiringContextTargets
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: patchExpiringTargets
+        pagination:
+            itemProperty: items
 flags_expiring_user_targets:
     description: Manage flags expiring-user-targets
     operations:
-    -   name: show
+    -   name: list
         operationId: getExpiringUserTargets
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: patchExpiringUserTargets
+        pagination:
+            itemProperty: items
 flags_release:
     description: Manage flags release
     operations:
@@ -439,8 +518,10 @@ flags_triggers:
         operationId: createTriggerWorkflow
     -   name: delete
         operationId: deleteTriggerWorkflow
-    -   name: show
+    -   name: list
         operationId: getTriggerWorkflows
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getTriggerWorkflowById
     -   name: update
@@ -461,8 +542,10 @@ integration_capabilities_big_segment_store:
         operationId: createBigSegmentStoreIntegration
     -   name: delete
         operationId: deleteBigSegmentStoreIntegration
-    -   name: show
+    -   name: list
         operationId: getBigSegmentStoreIntegrations
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getBigSegmentStoreIntegration
     -   name: update
@@ -474,10 +557,14 @@ integration_capabilities_feature_store:
         operationId: createIntegrationDeliveryConfiguration
     -   name: delete
         operationId: deleteIntegrationDeliveryConfiguration
-    -   name: show
+    -   name: list
         operationId: getIntegrationDeliveryConfigurations
-    -   name: show
+        pagination:
+            itemProperty: items
+    -   name: list
         operationId: getIntegrationDeliveryConfigurationByEnvironment
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getIntegrationDeliveryConfigurationById
     -   name: update
@@ -491,8 +578,10 @@ integration_capabilities_flag_import:
         operationId: createFlagImportConfiguration
     -   name: delete
         operationId: deleteFlagImportConfiguration
-    -   name: show
+    -   name: list
         operationId: getFlagImportConfigurations
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getFlagImportConfiguration
     -   name: trigger
@@ -515,8 +604,10 @@ integration_configurations_keys:
     operations:
     -   name: create
         operationId: createIntegrationConfiguration
-    -   name: show
+    -   name: list
         operationId: getAllIntegrationConfigurations
+        pagination:
+            itemProperty: items
 integrations:
     description: Manage integrations
     operations:
@@ -524,8 +615,10 @@ integrations:
         operationId: createSubscription
     -   name: delete
         operationId: deleteSubscription
-    -   name: show
+    -   name: list
         operationId: getSubscriptions
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getSubscriptionByID
     -   name: update
@@ -535,10 +628,16 @@ members:
     operations:
     -   name: create
         operationId: postMembers
+        pagination:
+            itemProperty: items
     -   name: delete
         operationId: deleteMember
-    -   name: show
+    -   name: list
         operationId: getMembers
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getMember
     -   name: teams
@@ -554,8 +653,12 @@ metrics:
         operationId: postMetric
     -   name: delete
         operationId: deleteMetric
-    -   name: show
+    -   name: list
         operationId: getMetrics
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getMetric
     -   name: update
@@ -572,8 +675,10 @@ oauth_clients:
         operationId: createOAuth2Client
     -   name: delete
         operationId: deleteOAuthClient
-    -   name: show
+    -   name: list
         operationId: getOAuthClients
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getOAuthClientById
     -   name: update
@@ -601,6 +706,10 @@ projects:
         subcommandId: projects_experimentation_settings
     -   name: experiments
         operationId: getExperimentsAnyEnv
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: flag-defaults
         subcommandId: projects_flag_defaults
     -   name: flag-release-plans
@@ -609,20 +718,32 @@ projects:
         subcommandId: projects_flags
     -   name: layers
         subcommandId: projects_layers
+    -   name: list
+        operationId: getProjects
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: metric-groups
         subcommandId: projects_metric_groups
     -   name: release-pipelines
         subcommandId: projects_release_pipelines
     -   name: sdk-keys
         operationId: getProjectSdkKeys
-    -   name: show
-        operationId: getProjects
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getProject
     -   name: update
         operationId: patchProject
     -   name: view-associations
         operationId: getLinkedViews
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: views
         subcommandId: projects_views
 projects_agent_graphs:
@@ -634,6 +755,10 @@ projects_agent_graphs:
         operationId: deleteAgentGraph
     -   name: list
         operationId: listAgentGraphs
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getAgentGraph
     -   name: update
@@ -643,12 +768,20 @@ projects_agent_optimizations:
     operations:
     -   name: all-results
         operationId: listAllAgentOptimizationResults
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: create
         operationId: postAgentOptimization
     -   name: delete
         operationId: deleteAgentOptimization
     -   name: list
         operationId: listAgentOptimizations
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: results
         subcommandId: projects_agent_optimizations_results
     -   name: runs
@@ -664,6 +797,10 @@ projects_agent_optimizations_results:
         operationId: postAgentOptimizationResult
     -   name: list
         operationId: listAgentOptimizationResults
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: update
         operationId: patchAgentOptimizationResult
 projects_agent_optimizations_runs:
@@ -673,8 +810,14 @@ projects_agent_optimizations_runs:
         operationId: deleteAgentOptimizationRun
     -   name: list
         operationId: listAgentOptimizationRuns
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: results
         operationId: listAgentOptimizationResultsByRunId
+        pagination:
+            itemProperty: items
 projects_ai_configs:
     description: Manage projects ai-configs
     operations:
@@ -682,6 +825,12 @@ projects_ai_configs:
         operationId: postAIConfig
     -   name: delete
         operationId: deleteAIConfig
+    -   name: list
+        operationId: getAIConfigs
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: metrics
         operationId: getAIConfigMetrics
     -   name: metrics-by-variation
@@ -692,8 +841,6 @@ projects_ai_configs:
         subcommandId: projects_ai_configs_prompt_snippets
     -   name: quick-stats
         operationId: getAIConfigQuickStats
-    -   name: show
-        operationId: getAIConfigs
     -   name: show
         operationId: getAIConfig
     -   name: skills
@@ -721,6 +868,10 @@ projects_ai_configs_model_configs:
         operationId: patchModelConfig
     -   name: versions
         operationId: listModelConfigVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
 projects_ai_configs_model_configs_restricted:
     description: Manage projects ai-configs model-configs restricted
     operations:
@@ -737,14 +888,26 @@ projects_ai_configs_prompt_snippets:
         operationId: deletePromptSnippet
     -   name: list
         operationId: listPromptSnippets
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: references
         operationId: listPromptSnippetReferences
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getPromptSnippet
     -   name: update
         operationId: patchPromptSnippet
     -   name: versions
         operationId: listPromptSnippetVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
 projects_ai_configs_skills:
     description: Manage projects ai-configs skills
     operations:
@@ -754,14 +917,26 @@ projects_ai_configs_skills:
         operationId: deleteAgentSkill
     -   name: list
         operationId: listAgentSkills
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: references
         operationId: listAgentSkillReferences
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getAgentSkill
     -   name: update
         operationId: patchAgentSkill
     -   name: versions
         operationId: listAgentSkillVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
 projects_ai_configs_targeting:
     description: Manage projects ai-configs targeting
     operations:
@@ -776,8 +951,10 @@ projects_ai_configs_variations:
         operationId: postAIConfigVariation
     -   name: delete
         operationId: deleteAIConfigVariation
-    -   name: show
+    -   name: list
         operationId: getAIConfigVariation
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: patchAIConfigVariation
 projects_ai_tools:
@@ -789,21 +966,35 @@ projects_ai_tools:
         operationId: deleteAITool
     -   name: list
         operationId: listAITools
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: references
         operationId: listAIToolReferences
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getAITool
     -   name: update
         operationId: patchAITool
     -   name: versions
         operationId: listAIToolVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
 projects_context_kinds:
     description: Manage projects context-kinds
     operations:
+    -   name: list
+        operationId: getContextKindsByProjectKey
+        pagination:
+            itemProperty: items
     -   name: set
         operationId: putContextKind
-    -   name: show
-        operationId: getContextKindsByProjectKey
 projects_environments:
     description: Manage projects environments
     operations:
@@ -827,8 +1018,16 @@ projects_environments:
         subcommandId: projects_environments_flags
     -   name: followers
         operationId: getFollowersByProjEnv
+        pagination:
+            itemProperty: items
     -   name: holdouts
         subcommandId: projects_environments_holdouts
+    -   name: list
+        operationId: getEnvironmentsByProject
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: mobile-key
         operationId: resetEnvironmentMobileKey
     -   name: release-plans
@@ -837,8 +1036,6 @@ projects_environments:
         subcommandId: projects_environments_sdk_keys
     -   name: segments
         subcommandId: projects_environments_segments
-    -   name: show
-        operationId: getEnvironmentsByProject
     -   name: show
         operationId: getEnvironment
     -   name: update
@@ -856,6 +1053,10 @@ projects_environments_adaptive_triggers:
         operationId: postEnableAdaptiveTrigger
     -   name: list
         operationId: listAdaptiveTriggers
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getAdaptiveTrigger
     -   name: update
@@ -863,19 +1064,31 @@ projects_environments_adaptive_triggers:
 projects_environments_context_attributes:
     description: Manage projects environments context-attributes
     operations:
-    -   name: show
+    -   name: list
         operationId: getContextAttributeNames
-    -   name: show
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: list
         operationId: getContextAttributeValues
+        pagination:
+            itemProperty: items
+            pageSize: limit
 projects_environments_contexts:
     description: Manage projects environments contexts
     operations:
     -   name: flags
         operationId: putContextFlagSetting
+    -   name: list
+        operationId: getContexts
+        pagination:
+            itemProperty: items
+            pageSize: limit
     -   name: search
         operationId: searchContexts
-    -   name: show
-        operationId: getContexts
+        pagination:
+            itemProperty: items
+            pageSize: limit
 projects_environments_default_release_plan:
     description: Manage projects environments default-release-plan
     operations:
@@ -892,8 +1105,12 @@ projects_environments_experiments:
         operationId: createExperiment
     -   name: iterations
         operationId: createIteration
-    -   name: show
+    -   name: list
         operationId: getExperiments
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getExperiment
     -   name: update
@@ -903,6 +1120,10 @@ projects_environments_flags:
     operations:
     -   name: evaluate
         operationId: evaluateContextInstance
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
 projects_environments_holdouts:
     description: Manage projects environments holdouts
     operations:
@@ -910,8 +1131,12 @@ projects_environments_holdouts:
         operationId: postHoldout
     -   name: id
         operationId: getHoldoutById
-    -   name: show
+    -   name: list
         operationId: getAllHoldouts
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getHoldout
     -   name: update
@@ -923,10 +1148,14 @@ projects_environments_release_plans:
         operationId: PostEnvironmentReleasePlan
     -   name: delete
         operationId: DeleteEnvironmentReleasePlan
+    -   name: list
+        operationId: GetEnvironmentReleasePlans
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: set
         operationId: PutEnvironmentReleasePlan
-    -   name: show
-        operationId: GetEnvironmentReleasePlans
     -   name: show
         operationId: GetEnvironmentReleasePlan
 projects_environments_sdk_keys:
@@ -936,8 +1165,12 @@ projects_environments_sdk_keys:
         operationId: postSdkKey
     -   name: delete
         operationId: deleteSdkKeyByKey
-    -   name: show
+    -   name: list
         operationId: getSdkKeys
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getSdkKeyByKey
     -   name: update
@@ -949,6 +1182,8 @@ projects_environments_segments:
     operations:
     -   name: evaluate
         operationId: getContextInstanceSegmentsMembershipByEnv
+        pagination:
+            itemProperty: items
 projects_experimentation_settings:
     description: Manage projects experimentation-settings
     operations:
@@ -974,6 +1209,10 @@ projects_flag_release_plans:
         operationId: deleteFlagReleasePlan
     -   name: list
         operationId: listFlagReleasePlans
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: set
         operationId: updateFlagReleasePlan
     -   name: show
@@ -1011,10 +1250,12 @@ projects_flags_environments_approval_requests:
         operationId: postApprovalRequestForFlag
     -   name: delete
         operationId: deleteApprovalRequestForFlag
+    -   name: list
+        operationId: getApprovalsForFlag
+        pagination:
+            itemProperty: items
     -   name: reviews
         operationId: postApprovalRequestReviewForFlag
-    -   name: show
-        operationId: getApprovalsForFlag
     -   name: show
         operationId: getApprovalForFlag
     -   name: update
@@ -1024,10 +1265,12 @@ projects_flags_environments_followers:
     operations:
     -   name: delete
         operationId: deleteFlagFollower
+    -   name: list
+        operationId: getFlagFollowers
+        pagination:
+            itemProperty: items
     -   name: set
         operationId: putFlagFollower
-    -   name: show
-        operationId: getFlagFollowers
 projects_flags_environments_releases:
     description: Manage projects flags environments releases
     operations:
@@ -1035,6 +1278,10 @@ projects_flags_environments_releases:
         operationId: startEnvironmentRelease
     -   name: list
         operationId: listEnvironmentReleases
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getEnvironmentRelease
     -   name: stop
@@ -1046,8 +1293,10 @@ projects_flags_environments_scheduled_changes:
         operationId: postFlagConfigScheduledChanges
     -   name: delete
         operationId: deleteFlagConfigScheduledChanges
-    -   name: show
+    -   name: list
         operationId: getFlagConfigScheduledChanges
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getFeatureFlagScheduledChange
     -   name: update
@@ -1059,8 +1308,12 @@ projects_flags_environments_workflows:
         operationId: postWorkflow
     -   name: delete
         operationId: deleteWorkflow
-    -   name: show
+    -   name: list
         operationId: getWorkflows
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getCustomWorkflow
 projects_flags_release:
@@ -1075,8 +1328,10 @@ projects_layers:
     operations:
     -   name: create
         operationId: createLayer
-    -   name: show
+    -   name: list
         operationId: getLayers
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: updateLayer
 projects_metric_groups:
@@ -1086,8 +1341,12 @@ projects_metric_groups:
         operationId: createMetricGroup
     -   name: delete
         operationId: deleteMetricGroup
-    -   name: show
+    -   name: list
         operationId: getMetricGroups
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getMetricGroup
     -   name: update
@@ -1099,12 +1358,20 @@ projects_release_pipelines:
         operationId: postReleasePipeline
     -   name: delete
         operationId: deleteReleasePipeline
+    -   name: list
+        operationId: getAllReleasePipelines
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: releases
         operationId: getAllReleaseProgressionsForReleasePipeline
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: set
         operationId: putReleasePipeline
-    -   name: show
-        operationId: getAllReleasePipelines
     -   name: show
         operationId: getReleasePipelineByKey
 projects_views:
@@ -1118,10 +1385,21 @@ projects_views:
         subcommandId: projects_views_link
     -   name: linked
         operationId: getLinkedResources
-    -   name: show
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: list
         operationId: getViews
-    -   name: show
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: list
         operationId: getView
+        pagination:
+            itemStart: offset
+            pageSize: limit
     -   name: update
         operationId: updateView
 projects_views_link:
@@ -1138,8 +1416,12 @@ roles:
         operationId: postCustomRole
     -   name: delete
         operationId: deleteCustomRole
-    -   name: show
+    -   name: list
         operationId: getCustomRoles
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getCustomRole
     -   name: update
@@ -1161,10 +1443,14 @@ segments:
         subcommandId: segments_exports
     -   name: imports
         subcommandId: segments_imports
+    -   name: list
+        operationId: getSegments
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: scheduled-changes
         subcommandId: segments_scheduled_changes
-    -   name: show
-        operationId: getSegments
     -   name: show
         operationId: getSegment
     -   name: update
@@ -1181,17 +1467,25 @@ segments_contexts:
 segments_expiring_targets:
     description: Manage segments expiring-targets
     operations:
-    -   name: show
+    -   name: list
         operationId: getExpiringTargetsForSegment
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: patchExpiringTargetsForSegment
+        pagination:
+            itemProperty: items
 segments_expiring_user_targets:
     description: Manage segments expiring-user-targets
     operations:
-    -   name: show
+    -   name: list
         operationId: getExpiringUserTargetsForSegment
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: patchExpiringUserTargetsForSegment
+        pagination:
+            itemProperty: items
 segments_exports:
     description: Manage segments exports
     operations:
@@ -1213,8 +1507,10 @@ segments_scheduled_changes:
         operationId: postSegmentScheduledChange
     -   name: delete
         operationId: deleteSegmentScheduledChange
-    -   name: show
+    -   name: list
         operationId: getSegmentScheduledChanges
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getSegmentScheduledChange
     -   name: update
@@ -1233,14 +1529,28 @@ teams:
         operationId: postTeam
     -   name: delete
         operationId: deleteTeam
+    -   name: list
+        operationId: getTeams
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: maintainers
         operationId: getTeamMaintainers
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: members
         operationId: postTeamMembers
+        pagination:
+            itemProperty: items
     -   name: roles
         operationId: getTeamRoles
-    -   name: show
-        operationId: getTeams
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: show
         operationId: getTeam
     -   name: update
@@ -1254,8 +1564,10 @@ templates:
         operationId: createWorkflowTemplate
     -   name: delete
         operationId: deleteWorkflowTemplate
-    -   name: show
+    -   name: list
         operationId: getWorkflowTemplates
+        pagination:
+            itemProperty: items
 tokens:
     description: Manage tokens
     operations:
@@ -1263,10 +1575,14 @@ tokens:
         operationId: postToken
     -   name: delete
         operationId: deleteToken
+    -   name: list
+        operationId: getTokens
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
     -   name: reset
         operationId: resetToken
-    -   name: show
-        operationId: getTokens
     -   name: show
         operationId: getToken
     -   name: update
@@ -1322,6 +1638,9 @@ usage_data_export_events_projects:
     operations:
     -   name: ranking
         operationId: getDataExportProjectRanking
+        pagination:
+            itemProperty: items
+            pageSize: limit
 usage_mau:
     description: Manage usage mau
     operations:
@@ -1367,24 +1686,33 @@ users:
         subcommandId: users_expiring_user_targets
     -   name: flags
         subcommandId: users_flags
-    -   name: show
+    -   name: list
         operationId: getUsers
+        pagination:
+            itemProperty: items
+            pageSize: limit
     -   name: show
         operationId: getUser
 users_expiring_user_targets:
     description: Manage users expiring-user-targets
     operations:
-    -   name: show
+    -   name: list
         operationId: getExpiringFlagsForUser
+        pagination:
+            itemProperty: items
     -   name: update
         operationId: patchExpiringFlagsForUser
+        pagination:
+            itemProperty: items
 users_flags:
     description: Manage users flags
     operations:
+    -   name: list
+        operationId: getUserFlagSettings
+        pagination:
+            itemProperty: items
     -   name: set
         operationId: putFlagSetting
-    -   name: show
-        operationId: getUserFlagSettings
     -   name: show
         operationId: getUserFlagSetting
 webhooks:
@@ -1394,8 +1722,10 @@ webhooks:
         operationId: postWebhook
     -   name: delete
         operationId: deleteWebhook
-    -   name: show
+    -   name: list
         operationId: getAllWebhooks
+        pagination:
+            itemProperty: items
     -   name: show
         operationId: getWebhook
     -   name: update

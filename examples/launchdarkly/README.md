@@ -15,3 +15,5 @@ This is a brief summary of the history. It includes steps taken in the initial P
 2. Added `layout_config.yaml` used in `make layout-suggest` with a `prefix` specified.
     * This removes a couple levels of CLI command, and shortens subcommand names and descriptions.
     * Running `uv run layout check suggested.yaml` still reveals issues with duplicates.
+3. Updated `layout_config.yaml` to specify pagination parameters to help distinguish `list` from `show` commands.
+    * This reduces the duplicates to a more managable level, so the `suggested.yaml` was copied to `layout.yaml`
