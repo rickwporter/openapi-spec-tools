@@ -1,1 +1,4 @@
 prefix: /api/v2
+item_start_params: offset
+page_size_params: limit
+items_properties: items

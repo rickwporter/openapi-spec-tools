@@ -1,0 +1,1732 @@
+main:
+    description: This documentation describes LaunchDarkly\'s REST API...
+    operations:
+    -   name: account
+        subcommandId: account
+    -   name: announcements
+        subcommandId: announcements
+    -   name: applications
+        subcommandId: applications
+    -   name: approval-requests
+        subcommandId: approval_requests
+    -   name: auditlog
+        subcommandId: auditlog
+    -   name: caller-identity
+        operationId: getCallerIdentity
+    -   name: code-refs
+        subcommandId: code_refs
+    -   name: destinations
+        subcommandId: destinations
+    -   name: engineering-insights
+        subcommandId: engineering_insights
+    -   name: flag-links
+        subcommandId: flag_links
+    -   name: flag-status
+        operationId: getFeatureFlagStatusAcrossEnvironments
+    -   name: flag-statuses
+        subcommandId: flag_statuses
+    -   name: flags
+        subcommandId: flags
+    -   name: integration-capabilities
+        subcommandId: integration_capabilities
+    -   name: integration-configurations
+        subcommandId: integration_configurations
+    -   name: integrations
+        subcommandId: integrations
+    -   name: members
+        subcommandId: members
+    -   name: metrics
+        subcommandId: metrics
+    -   name: oauth
+        subcommandId: oauth
+    -   name: openapi.json
+        operationId: getOpenapiSpec
+    -   name: projects
+        subcommandId: projects
+    -   name: public-ip-list
+        operationId: getIps
+    -   name: roles
+        subcommandId: roles
+    -   name: segments
+        subcommandId: segments
+    -   name: show
+        operationId: getRoot
+    -   name: tags
+        operationId: getTags
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: teams
+        subcommandId: teams
+    -   name: templates
+        subcommandId: templates
+    -   name: tokens
+        subcommandId: tokens
+    -   name: usage
+        subcommandId: usage
+    -   name: user-search
+        operationId: getSearchUsers
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: users
+        subcommandId: users
+    -   name: versions
+        operationId: getVersions
+    -   name: webhooks
+        subcommandId: webhooks
+account:
+    description: Manage account
+    operations:
+    -   name: ip-allowlist
+        subcommandId: account_ip_allowlist
+    -   name: relay-auto-configs
+        subcommandId: account_relay_auto_configs
+account_ip_allowlist:
+    description: Manage account ip-allowlist
+    operations:
+    -   name: create
+        operationId: createIpAllowlistEntry
+    -   name: delete
+        operationId: deleteIpAllowlistEntry
+    -   name: list
+        operationId: getIpAllowlist
+        pagination:
+            itemStart: offset
+            pageSize: limit
+    -   name: update
+        operationId: patchIpAllowlistConfig
+    -   name: update
+        operationId: patchIpAllowlistEntry
+account_relay_auto_configs:
+    description: Manage account relay-auto-configs
+    operations:
+    -   name: create
+        operationId: postRelayAutoConfig
+    -   name: delete
+        operationId: deleteRelayAutoConfig
+    -   name: list
+        operationId: getRelayProxyConfigs
+        pagination:
+            itemProperty: items
+    -   name: reset
+        operationId: resetRelayAutoConfig
+    -   name: show
+        operationId: getRelayProxyConfig
+    -   name: update
+        operationId: patchRelayAutoConfig
+announcements:
+    description: Manage announcements
+    operations:
+    -   name: create
+        operationId: createAnnouncementPublic
+    -   name: delete
+        operationId: deleteAnnouncementPublic
+    -   name: list
+        operationId: getAnnouncementsPublic
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: update
+        operationId: updateAnnouncementPublic
+applications:
+    description: Manage applications
+    operations:
+    -   name: delete
+        operationId: deleteApplication
+    -   name: list
+        operationId: getApplications
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getApplication
+    -   name: update
+        operationId: patchApplication
+    -   name: versions
+        subcommandId: applications_versions
+applications_versions:
+    description: Manage applications versions
+    operations:
+    -   name: delete
+        operationId: deleteApplicationVersion
+    -   name: list
+        operationId: getApplicationVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: update
+        operationId: patchApplicationVersion
+approval_requests:
+    description: Manage approval-requests
+    operations:
+    -   name: apply
+        operationId: postApprovalRequestApply
+    -   name: create
+        operationId: postApprovalRequest
+    -   name: delete
+        operationId: deleteApprovalRequest
+    -   name: list
+        operationId: getApprovalRequests
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: projects
+        subcommandId: approval_requests_projects
+    -   name: reviews
+        operationId: postApprovalRequestReview
+    -   name: show
+        operationId: getApprovalRequest
+    -   name: update
+        operationId: patchApprovalRequest
+approval_requests_projects:
+    description: Manage approval-requests projects
+    operations:
+    -   name: settings
+        subcommandId: approval_requests_projects_settings
+approval_requests_projects_settings:
+    description: Manage approval-requests projects settings
+    operations:
+    -   name: show
+        operationId: getApprovalRequestSettings
+    -   name: update
+        operationId: patchApprovalRequestSettings
+auditlog:
+    description: Manage auditlog
+    operations:
+    -   name: counts
+        operationId: postAuditLogEntryCounts
+    -   name: create
+        operationId: postAuditLogEntries
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: list
+        operationId: getAuditLogEntries
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: show
+        operationId: getAuditLogEntry
+code_refs:
+    description: Manage code-refs
+    operations:
+    -   name: extinctions
+        operationId: getExtinctions
+        pagination:
+            itemProperty: items
+    -   name: repositories
+        subcommandId: code_refs_repositories
+    -   name: statistics
+        subcommandId: code_refs_statistics
+code_refs_repositories:
+    description: Manage code-refs repositories
+    operations:
+    -   name: branch-delete-tasks
+        operationId: deleteBranches
+    -   name: branches
+        subcommandId: code_refs_repositories_branches
+    -   name: create
+        operationId: postRepository
+    -   name: delete
+        operationId: deleteRepository
+    -   name: list
+        operationId: getRepositories
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getRepository
+    -   name: update
+        operationId: patchRepository
+code_refs_repositories_branches:
+    description: Manage code-refs repositories branches
+    operations:
+    -   name: extinction-events
+        operationId: postExtinction
+    -   name: list
+        operationId: getBranches
+        pagination:
+            itemProperty: items
+    -   name: set
+        operationId: putBranch
+    -   name: show
+        operationId: getBranch
+code_refs_statistics:
+    description: Manage code-refs statistics
+    operations:
+    -   name: show
+        operationId: getRootStatistic
+    -   name: show
+        operationId: getStatistics
+destinations:
+    description: Manage destinations
+    operations:
+    -   name: create
+        operationId: postDestination
+    -   name: delete
+        operationId: deleteDestination
+    -   name: generate-warehouse-destination-key-pair
+        operationId: postGenerateWarehouseDestinationKeyPair
+    -   name: list
+        operationId: getDestinations
+        pagination:
+            itemProperty: items
+    -   name: projects
+        subcommandId: destinations_projects
+    -   name: show
+        operationId: getDestination
+    -   name: update
+        operationId: patchDestination
+destinations_projects:
+    description: Manage destinations projects
+    operations:
+    -   name: environments
+        subcommandId: destinations_projects_environments
+destinations_projects_environments:
+    description: Manage destinations projects environments
+    operations:
+    -   name: generate-trust-policy
+        operationId: postGenerateTrustPolicy
+    -   name: generate-warehouse-destination-key-pair
+        operationId: postGenerateProjectEnvWarehouseDestinationKeyPair
+    -   name: kinds
+        subcommandId: destinations_projects_environments_kinds
+destinations_projects_environments_kinds:
+    description: Manage destinations projects environments kinds
+    operations:
+    -   name: complete-setup
+        operationId: postCompleteWarehouseDestinationSetup
+    -   name: setup
+        operationId: postGenerateWarehouseDestinationSetupScript
+engineering_insights:
+    description: Manage engineering-insights
+    operations:
+    -   name: charts
+        subcommandId: engineering_insights_charts
+    -   name: deployment-events
+        operationId: createDeploymentEvent
+    -   name: deployments
+        subcommandId: engineering_insights_deployments
+    -   name: flag-events
+        operationId: getFlagEvents
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: insights
+        subcommandId: engineering_insights_insights
+    -   name: pull-requests
+        operationId: getPullRequests
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: repositories
+        subcommandId: engineering_insights_repositories
+engineering_insights_charts:
+    description: Manage engineering-insights charts
+    operations:
+    -   name: deployments
+        subcommandId: engineering_insights_charts_deployments
+    -   name: flags
+        subcommandId: engineering_insights_charts_flags
+    -   name: lead-time
+        operationId: getLeadTimeChart
+    -   name: releases
+        subcommandId: engineering_insights_charts_releases
+engineering_insights_charts_deployments:
+    description: Manage engineering-insights charts deployments
+    operations:
+    -   name: frequency
+        operationId: getDeploymentFrequencyChart
+engineering_insights_charts_flags:
+    description: Manage engineering-insights charts flags
+    operations:
+    -   name: stale
+        operationId: getStaleFlagsChart
+    -   name: status
+        operationId: getFlagStatusChart
+engineering_insights_charts_releases:
+    description: Manage engineering-insights charts releases
+    operations:
+    -   name: frequency
+        operationId: getReleaseFrequencyChart
+engineering_insights_deployments:
+    description: Manage engineering-insights deployments
+    operations:
+    -   name: list
+        operationId: getDeployments
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: show
+        operationId: getDeployment
+    -   name: update
+        operationId: updateDeployment
+engineering_insights_insights:
+    description: Manage engineering-insights insights
+    operations:
+    -   name: group
+        operationId: createInsightGroup
+    -   name: groups
+        subcommandId: engineering_insights_insights_groups
+    -   name: scores
+        operationId: getInsightsScores
+engineering_insights_insights_groups:
+    description: Manage engineering-insights insights groups
+    operations:
+    -   name: delete
+        operationId: deleteInsightGroup
+    -   name: list
+        operationId: getInsightGroups
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getInsightGroup
+    -   name: update
+        operationId: patchInsightGroup
+engineering_insights_repositories:
+    description: Manage engineering-insights repositories
+    operations:
+    -   name: list
+        operationId: getInsightsRepositories
+        pagination:
+            itemProperty: items
+    -   name: projects
+        subcommandId: engineering_insights_repositories_projects
+engineering_insights_repositories_projects:
+    description: Manage engineering-insights repositories projects
+    operations:
+    -   name: delete
+        operationId: deleteRepositoryProject
+    -   name: set
+        operationId: associateRepositoriesAndProjects
+        pagination:
+            itemProperty: items
+flag_links:
+    description: Manage flag-links
+    operations:
+    -   name: projects
+        subcommandId: flag_links_projects
+flag_links_projects:
+    description: Manage flag-links projects
+    operations:
+    -   name: flags
+        subcommandId: flag_links_projects_flags
+flag_links_projects_flags:
+    description: Manage flag-links projects flags
+    operations:
+    -   name: create
+        operationId: createFlagLink
+    -   name: delete
+        operationId: deleteFlagLink
+    -   name: list
+        operationId: getFlagLinks
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: updateFlagLink
+flag_statuses:
+    description: Manage flag-statuses
+    operations:
+    -   name: list
+        operationId: getFeatureFlagStatuses
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getFeatureFlagStatus
+flags:
+    description: Manage flags
+    operations:
+    -   name: copy
+        operationId: copyFeatureFlag
+    -   name: create
+        operationId: postFeatureFlag
+    -   name: delete
+        operationId: deleteFeatureFlag
+    -   name: dependent-flags
+        subcommandId: flags_dependent_flags
+    -   name: expiring-targets
+        subcommandId: flags_expiring_targets
+    -   name: expiring-user-targets
+        subcommandId: flags_expiring_user_targets
+    -   name: list
+        operationId: getFeatureFlags
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: release
+        subcommandId: flags_release
+    -   name: show
+        operationId: getFeatureFlag
+    -   name: triggers
+        subcommandId: flags_triggers
+    -   name: update
+        operationId: patchFeatureFlag
+flags_dependent_flags:
+    description: Manage flags dependent-flags
+    operations:
+    -   name: list
+        operationId: getDependentFlagsByEnv
+        pagination:
+            itemProperty: items
+    -   name: list
+        operationId: getDependentFlags
+        pagination:
+            itemProperty: items
+flags_expiring_targets:
+    description: Manage flags expiring-targets
+    operations:
+    -   name: list
+        operationId: getExpiringContextTargets
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: patchExpiringTargets
+        pagination:
+            itemProperty: items
+flags_expiring_user_targets:
+    description: Manage flags expiring-user-targets
+    operations:
+    -   name: list
+        operationId: getExpiringUserTargets
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: patchExpiringUserTargets
+        pagination:
+            itemProperty: items
+flags_release:
+    description: Manage flags release
+    operations:
+    -   name: delete
+        operationId: deleteReleaseByFlagKey
+    -   name: show
+        operationId: getReleaseByFlagKey
+    -   name: update
+        operationId: patchReleaseByFlagKey
+flags_triggers:
+    description: Manage flags triggers
+    operations:
+    -   name: create
+        operationId: createTriggerWorkflow
+    -   name: delete
+        operationId: deleteTriggerWorkflow
+    -   name: list
+        operationId: getTriggerWorkflows
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getTriggerWorkflowById
+    -   name: update
+        operationId: patchTriggerWorkflow
+integration_capabilities:
+    description: Manage integration-capabilities
+    operations:
+    -   name: big-segment-store
+        subcommandId: integration_capabilities_big_segment_store
+    -   name: feature-store
+        subcommandId: integration_capabilities_feature_store
+    -   name: flag-import
+        subcommandId: integration_capabilities_flag_import
+integration_capabilities_big_segment_store:
+    description: Manage integration-capabilities big-segment-store
+    operations:
+    -   name: create
+        operationId: createBigSegmentStoreIntegration
+    -   name: delete
+        operationId: deleteBigSegmentStoreIntegration
+    -   name: list
+        operationId: getBigSegmentStoreIntegrations
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getBigSegmentStoreIntegration
+    -   name: update
+        operationId: patchBigSegmentStoreIntegration
+integration_capabilities_feature_store:
+    description: Manage integration-capabilities feature-store
+    operations:
+    -   name: create
+        operationId: createIntegrationDeliveryConfiguration
+    -   name: delete
+        operationId: deleteIntegrationDeliveryConfiguration
+    -   name: list
+        operationId: getIntegrationDeliveryConfigurations
+        pagination:
+            itemProperty: items
+    -   name: list
+        operationId: getIntegrationDeliveryConfigurationByEnvironment
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getIntegrationDeliveryConfigurationById
+    -   name: update
+        operationId: patchIntegrationDeliveryConfiguration
+    -   name: validate
+        operationId: validateIntegrationDeliveryConfiguration
+integration_capabilities_flag_import:
+    description: Manage integration-capabilities flag-import
+    operations:
+    -   name: create
+        operationId: createFlagImportConfiguration
+    -   name: delete
+        operationId: deleteFlagImportConfiguration
+    -   name: list
+        operationId: getFlagImportConfigurations
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getFlagImportConfiguration
+    -   name: trigger
+        operationId: triggerFlagImportJob
+    -   name: update
+        operationId: patchFlagImportConfiguration
+integration_configurations:
+    description: Manage integration-configurations
+    operations:
+    -   name: delete
+        operationId: deleteIntegrationConfiguration
+    -   name: keys
+        subcommandId: integration_configurations_keys
+    -   name: show
+        operationId: getIntegrationConfiguration
+    -   name: update
+        operationId: updateIntegrationConfiguration
+integration_configurations_keys:
+    description: Manage integration-configurations keys
+    operations:
+    -   name: create
+        operationId: createIntegrationConfiguration
+    -   name: list
+        operationId: getAllIntegrationConfigurations
+        pagination:
+            itemProperty: items
+integrations:
+    description: Manage integrations
+    operations:
+    -   name: create
+        operationId: createSubscription
+    -   name: delete
+        operationId: deleteSubscription
+    -   name: list
+        operationId: getSubscriptions
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getSubscriptionByID
+    -   name: update
+        operationId: updateSubscription
+members:
+    description: Manage members
+    operations:
+    -   name: create
+        operationId: postMembers
+        pagination:
+            itemProperty: items
+    -   name: delete
+        operationId: deleteMember
+    -   name: list
+        operationId: getMembers
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getMember
+    -   name: teams
+        operationId: postMemberTeams
+    -   name: update
+        operationId: patchMembers
+    -   name: update
+        operationId: patchMember
+metrics:
+    description: Manage metrics
+    operations:
+    -   name: create
+        operationId: postMetric
+    -   name: delete
+        operationId: deleteMetric
+    -   name: list
+        operationId: getMetrics
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getMetric
+    -   name: update
+        operationId: patchMetric
+oauth:
+    description: Manage oauth
+    operations:
+    -   name: clients
+        subcommandId: oauth_clients
+oauth_clients:
+    description: Manage oauth clients
+    operations:
+    -   name: create
+        operationId: createOAuth2Client
+    -   name: delete
+        operationId: deleteOAuthClient
+    -   name: list
+        operationId: getOAuthClients
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getOAuthClientById
+    -   name: update
+        operationId: patchOAuthClient
+projects:
+    description: Manage projects
+    operations:
+    -   name: agent-graphs
+        subcommandId: projects_agent_graphs
+    -   name: agent-optimizations
+        subcommandId: projects_agent_optimizations
+    -   name: ai-configs
+        subcommandId: projects_ai_configs
+    -   name: ai-tools
+        subcommandId: projects_ai_tools
+    -   name: context-kinds
+        subcommandId: projects_context_kinds
+    -   name: create
+        operationId: postProject
+    -   name: delete
+        operationId: deleteProject
+    -   name: environments
+        subcommandId: projects_environments
+    -   name: experimentation-settings
+        subcommandId: projects_experimentation_settings
+    -   name: experiments
+        operationId: getExperimentsAnyEnv
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: flag-defaults
+        subcommandId: projects_flag_defaults
+    -   name: flag-release-plans
+        subcommandId: projects_flag_release_plans
+    -   name: flags
+        subcommandId: projects_flags
+    -   name: layers
+        subcommandId: projects_layers
+    -   name: list
+        operationId: getProjects
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: metric-groups
+        subcommandId: projects_metric_groups
+    -   name: release-pipelines
+        subcommandId: projects_release_pipelines
+    -   name: sdk-keys
+        operationId: getProjectSdkKeys
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getProject
+    -   name: update
+        operationId: patchProject
+    -   name: view-associations
+        operationId: getLinkedViews
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: views
+        subcommandId: projects_views
+projects_agent_graphs:
+    description: Manage projects agent-graphs
+    operations:
+    -   name: create
+        operationId: postAgentGraph
+    -   name: delete
+        operationId: deleteAgentGraph
+    -   name: list
+        operationId: listAgentGraphs
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getAgentGraph
+    -   name: update
+        operationId: patchAgentGraph
+projects_agent_optimizations:
+    description: Manage projects agent-optimizations
+    operations:
+    -   name: all-results
+        operationId: listAllAgentOptimizationResults
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: create
+        operationId: postAgentOptimization
+    -   name: delete
+        operationId: deleteAgentOptimization
+    -   name: list
+        operationId: listAgentOptimizations
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: results
+        subcommandId: projects_agent_optimizations_results
+    -   name: runs
+        subcommandId: projects_agent_optimizations_runs
+    -   name: show
+        operationId: getAgentOptimization
+    -   name: update
+        operationId: patchAgentOptimization
+projects_agent_optimizations_results:
+    description: Manage projects agent-optimizations results
+    operations:
+    -   name: create
+        operationId: postAgentOptimizationResult
+    -   name: list
+        operationId: listAgentOptimizationResults
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: update
+        operationId: patchAgentOptimizationResult
+projects_agent_optimizations_runs:
+    description: Manage projects agent-optimizations runs
+    operations:
+    -   name: delete
+        operationId: deleteAgentOptimizationRun
+    -   name: list
+        operationId: listAgentOptimizationRuns
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: results
+        operationId: listAgentOptimizationResultsByRunId
+        pagination:
+            itemProperty: items
+projects_ai_configs:
+    description: Manage projects ai-configs
+    operations:
+    -   name: create
+        operationId: postAIConfig
+    -   name: delete
+        operationId: deleteAIConfig
+    -   name: list
+        operationId: getAIConfigs
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: metrics
+        operationId: getAIConfigMetrics
+    -   name: metrics-by-variation
+        operationId: getAIConfigMetricsByVariation
+    -   name: model-configs
+        subcommandId: projects_ai_configs_model_configs
+    -   name: prompt-snippets
+        subcommandId: projects_ai_configs_prompt_snippets
+    -   name: quick-stats
+        operationId: getAIConfigQuickStats
+    -   name: show
+        operationId: getAIConfig
+    -   name: skills
+        subcommandId: projects_ai_configs_skills
+    -   name: targeting
+        subcommandId: projects_ai_configs_targeting
+    -   name: update
+        operationId: patchAIConfig
+    -   name: variations
+        subcommandId: projects_ai_configs_variations
+projects_ai_configs_model_configs:
+    description: Manage projects ai-configs model-configs
+    operations:
+    -   name: create
+        operationId: postModelConfig
+    -   name: delete
+        operationId: deleteModelConfig
+    -   name: list
+        operationId: listModelConfigs
+    -   name: restricted
+        subcommandId: projects_ai_configs_model_configs_restricted
+    -   name: show
+        operationId: getModelConfig
+    -   name: update
+        operationId: patchModelConfig
+    -   name: versions
+        operationId: listModelConfigVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+projects_ai_configs_model_configs_restricted:
+    description: Manage projects ai-configs model-configs restricted
+    operations:
+    -   name: create
+        operationId: postRestrictedModels
+    -   name: delete
+        operationId: deleteRestrictedModels
+projects_ai_configs_prompt_snippets:
+    description: Manage projects ai-configs prompt-snippets
+    operations:
+    -   name: create
+        operationId: postPromptSnippet
+    -   name: delete
+        operationId: deletePromptSnippet
+    -   name: list
+        operationId: listPromptSnippets
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: references
+        operationId: listPromptSnippetReferences
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getPromptSnippet
+    -   name: update
+        operationId: patchPromptSnippet
+    -   name: versions
+        operationId: listPromptSnippetVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+projects_ai_configs_skills:
+    description: Manage projects ai-configs skills
+    operations:
+    -   name: create
+        operationId: postAgentSkill
+    -   name: delete
+        operationId: deleteAgentSkill
+    -   name: list
+        operationId: listAgentSkills
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: references
+        operationId: listAgentSkillReferences
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getAgentSkill
+    -   name: update
+        operationId: patchAgentSkill
+    -   name: versions
+        operationId: listAgentSkillVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+projects_ai_configs_targeting:
+    description: Manage projects ai-configs targeting
+    operations:
+    -   name: show
+        operationId: getAIConfigTargeting
+    -   name: update
+        operationId: patchAIConfigTargeting
+projects_ai_configs_variations:
+    description: Manage projects ai-configs variations
+    operations:
+    -   name: create
+        operationId: postAIConfigVariation
+    -   name: delete
+        operationId: deleteAIConfigVariation
+    -   name: list
+        operationId: getAIConfigVariation
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: patchAIConfigVariation
+projects_ai_tools:
+    description: Manage projects ai-tools
+    operations:
+    -   name: create
+        operationId: postAITool
+    -   name: delete
+        operationId: deleteAITool
+    -   name: list
+        operationId: listAITools
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: references
+        operationId: listAIToolReferences
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getAITool
+    -   name: update
+        operationId: patchAITool
+    -   name: versions
+        operationId: listAIToolVersions
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+projects_context_kinds:
+    description: Manage projects context-kinds
+    operations:
+    -   name: list
+        operationId: getContextKindsByProjectKey
+        pagination:
+            itemProperty: items
+    -   name: set
+        operationId: putContextKind
+projects_environments:
+    description: Manage projects environments
+    operations:
+    -   name: adaptive-triggers
+        subcommandId: projects_environments_adaptive_triggers
+    -   name: api-key
+        operationId: resetEnvironmentSDKKey
+    -   name: context-attributes
+        subcommandId: projects_environments_context_attributes
+    -   name: contexts
+        subcommandId: projects_environments_contexts
+    -   name: create
+        operationId: postEnvironment
+    -   name: default-release-plan
+        subcommandId: projects_environments_default_release_plan
+    -   name: delete
+        operationId: deleteEnvironment
+    -   name: experiments
+        subcommandId: projects_environments_experiments
+    -   name: flags
+        subcommandId: projects_environments_flags
+    -   name: followers
+        operationId: getFollowersByProjEnv
+        pagination:
+            itemProperty: items
+    -   name: holdouts
+        subcommandId: projects_environments_holdouts
+    -   name: list
+        operationId: getEnvironmentsByProject
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: mobile-key
+        operationId: resetEnvironmentMobileKey
+    -   name: release-plans
+        subcommandId: projects_environments_release_plans
+    -   name: sdk-keys
+        subcommandId: projects_environments_sdk_keys
+    -   name: segments
+        subcommandId: projects_environments_segments
+    -   name: show
+        operationId: getEnvironment
+    -   name: update
+        operationId: patchEnvironment
+projects_environments_adaptive_triggers:
+    description: Manage projects environments adaptive-triggers
+    operations:
+    -   name: create
+        operationId: postAdaptiveTrigger
+    -   name: delete
+        operationId: deleteAdaptiveTrigger
+    -   name: disable
+        operationId: postDisableAdaptiveTrigger
+    -   name: enable
+        operationId: postEnableAdaptiveTrigger
+    -   name: list
+        operationId: listAdaptiveTriggers
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getAdaptiveTrigger
+    -   name: update
+        operationId: patchAdaptiveTrigger
+projects_environments_context_attributes:
+    description: Manage projects environments context-attributes
+    operations:
+    -   name: list
+        operationId: getContextAttributeNames
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: list
+        operationId: getContextAttributeValues
+        pagination:
+            itemProperty: items
+            pageSize: limit
+projects_environments_contexts:
+    description: Manage projects environments contexts
+    operations:
+    -   name: flags
+        operationId: putContextFlagSetting
+    -   name: list
+        operationId: getContexts
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: search
+        operationId: searchContexts
+        pagination:
+            itemProperty: items
+            pageSize: limit
+projects_environments_default_release_plan:
+    description: Manage projects environments default-release-plan
+    operations:
+    -   name: delete
+        operationId: DeleteDefaultEnvironmentReleasePlan
+    -   name: set
+        operationId: PutDefaultEnvironmentReleasePlan
+    -   name: show
+        operationId: GetDefaultEnvironmentReleasePlan
+projects_environments_experiments:
+    description: Manage projects environments experiments
+    operations:
+    -   name: create
+        operationId: createExperiment
+    -   name: iterations
+        operationId: createIteration
+    -   name: list
+        operationId: getExperiments
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getExperiment
+    -   name: update
+        operationId: patchExperiment
+projects_environments_flags:
+    description: Manage projects environments flags
+    operations:
+    -   name: evaluate
+        operationId: evaluateContextInstance
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+projects_environments_holdouts:
+    description: Manage projects environments holdouts
+    operations:
+    -   name: create
+        operationId: postHoldout
+    -   name: id
+        operationId: getHoldoutById
+    -   name: list
+        operationId: getAllHoldouts
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getHoldout
+    -   name: update
+        operationId: patchHoldout
+projects_environments_release_plans:
+    description: Manage projects environments release-plans
+    operations:
+    -   name: create
+        operationId: PostEnvironmentReleasePlan
+    -   name: delete
+        operationId: DeleteEnvironmentReleasePlan
+    -   name: list
+        operationId: GetEnvironmentReleasePlans
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: set
+        operationId: PutEnvironmentReleasePlan
+    -   name: show
+        operationId: GetEnvironmentReleasePlan
+projects_environments_sdk_keys:
+    description: Manage projects environments sdk-keys
+    operations:
+    -   name: create
+        operationId: postSdkKey
+    -   name: delete
+        operationId: deleteSdkKeyByKey
+    -   name: list
+        operationId: getSdkKeys
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getSdkKeyByKey
+    -   name: update
+        operationId: patchSdkKeyByKey
+    -   name: views
+        operationId: putSdkKeyViews
+projects_environments_segments:
+    description: Manage projects environments segments
+    operations:
+    -   name: evaluate
+        operationId: getContextInstanceSegmentsMembershipByEnv
+        pagination:
+            itemProperty: items
+projects_experimentation_settings:
+    description: Manage projects experimentation-settings
+    operations:
+    -   name: set
+        operationId: putExperimentationSettings
+    -   name: show
+        operationId: getExperimentationSettings
+projects_flag_defaults:
+    description: Manage projects flag-defaults
+    operations:
+    -   name: set
+        operationId: putFlagDefaultsByProject
+    -   name: show
+        operationId: getFlagDefaultsByProject
+    -   name: update
+        operationId: patchFlagDefaultsByProject
+projects_flag_release_plans:
+    description: Manage projects flag-release-plans
+    operations:
+    -   name: create
+        operationId: createFlagReleasePlan
+    -   name: delete
+        operationId: deleteFlagReleasePlan
+    -   name: list
+        operationId: listFlagReleasePlans
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: set
+        operationId: updateFlagReleasePlan
+    -   name: show
+        operationId: getFlagReleasePlan
+projects_flags:
+    description: Manage projects flags
+    operations:
+    -   name: environments
+        subcommandId: projects_flags_environments
+    -   name: release
+        subcommandId: projects_flags_release
+projects_flags_environments:
+    description: Manage projects flags environments
+    operations:
+    -   name: approval-requests
+        subcommandId: projects_flags_environments_approval_requests
+    -   name: approval-requests-flag-copy
+        operationId: postFlagCopyConfigApprovalRequest
+    -   name: followers
+        subcommandId: projects_flags_environments_followers
+    -   name: migration-safety-issues
+        operationId: postMigrationSafetyIssues
+    -   name: releases
+        subcommandId: projects_flags_environments_releases
+    -   name: scheduled-changes
+        subcommandId: projects_flags_environments_scheduled_changes
+    -   name: workflows
+        subcommandId: projects_flags_environments_workflows
+projects_flags_environments_approval_requests:
+    description: Manage projects flags environments approval-requests
+    operations:
+    -   name: apply
+        operationId: postApprovalRequestApplyForFlag
+    -   name: create
+        operationId: postApprovalRequestForFlag
+    -   name: delete
+        operationId: deleteApprovalRequestForFlag
+    -   name: list
+        operationId: getApprovalsForFlag
+        pagination:
+            itemProperty: items
+    -   name: reviews
+        operationId: postApprovalRequestReviewForFlag
+    -   name: show
+        operationId: getApprovalForFlag
+    -   name: update
+        operationId: patchFlagConfigApprovalRequest
+projects_flags_environments_followers:
+    description: Manage projects flags environments followers
+    operations:
+    -   name: delete
+        operationId: deleteFlagFollower
+    -   name: list
+        operationId: getFlagFollowers
+        pagination:
+            itemProperty: items
+    -   name: set
+        operationId: putFlagFollower
+projects_flags_environments_releases:
+    description: Manage projects flags environments releases
+    operations:
+    -   name: create
+        operationId: startEnvironmentRelease
+    -   name: list
+        operationId: listEnvironmentReleases
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getEnvironmentRelease
+    -   name: stop
+        operationId: stopEnvironmentRelease
+projects_flags_environments_scheduled_changes:
+    description: Manage projects flags environments scheduled-changes
+    operations:
+    -   name: create
+        operationId: postFlagConfigScheduledChanges
+    -   name: delete
+        operationId: deleteFlagConfigScheduledChanges
+    -   name: list
+        operationId: getFlagConfigScheduledChanges
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getFeatureFlagScheduledChange
+    -   name: update
+        operationId: patchFlagConfigScheduledChange
+projects_flags_environments_workflows:
+    description: Manage projects flags environments workflows
+    operations:
+    -   name: create
+        operationId: postWorkflow
+    -   name: delete
+        operationId: deleteWorkflow
+    -   name: list
+        operationId: getWorkflows
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getCustomWorkflow
+projects_flags_release:
+    description: Manage projects flags release
+    operations:
+    -   name: phases
+        operationId: updatePhaseStatus
+    -   name: set
+        operationId: createReleaseForFlag
+projects_layers:
+    description: Manage projects layers
+    operations:
+    -   name: create
+        operationId: createLayer
+    -   name: list
+        operationId: getLayers
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: updateLayer
+projects_metric_groups:
+    description: Manage projects metric-groups
+    operations:
+    -   name: create
+        operationId: createMetricGroup
+    -   name: delete
+        operationId: deleteMetricGroup
+    -   name: list
+        operationId: getMetricGroups
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getMetricGroup
+    -   name: update
+        operationId: patchMetricGroup
+projects_release_pipelines:
+    description: Manage projects release-pipelines
+    operations:
+    -   name: create
+        operationId: postReleasePipeline
+    -   name: delete
+        operationId: deleteReleasePipeline
+    -   name: list
+        operationId: getAllReleasePipelines
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: releases
+        operationId: getAllReleaseProgressionsForReleasePipeline
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: set
+        operationId: putReleasePipeline
+    -   name: show
+        operationId: getReleasePipelineByKey
+projects_views:
+    description: Manage projects views
+    operations:
+    -   name: create
+        operationId: createView
+    -   name: delete
+        operationId: deleteView
+    -   name: link
+        subcommandId: projects_views_link
+    -   name: linked
+        operationId: getLinkedResources
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: list
+        operationId: getViews
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: list
+        operationId: getView
+        pagination:
+            itemStart: offset
+            pageSize: limit
+    -   name: update
+        operationId: updateView
+projects_views_link:
+    description: Manage projects views link
+    operations:
+    -   name: create
+        operationId: linkResource
+    -   name: delete
+        operationId: unlinkResource
+roles:
+    description: Manage roles
+    operations:
+    -   name: create
+        operationId: postCustomRole
+    -   name: delete
+        operationId: deleteCustomRole
+    -   name: list
+        operationId: getCustomRoles
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getCustomRole
+    -   name: update
+        operationId: patchCustomRole
+segments:
+    description: Manage segments
+    operations:
+    -   name: contexts
+        subcommandId: segments_contexts
+    -   name: create
+        operationId: postSegment
+    -   name: delete
+        operationId: deleteSegment
+    -   name: expiring-targets
+        subcommandId: segments_expiring_targets
+    -   name: expiring-user-targets
+        subcommandId: segments_expiring_user_targets
+    -   name: exports
+        subcommandId: segments_exports
+    -   name: imports
+        subcommandId: segments_imports
+    -   name: list
+        operationId: getSegments
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: scheduled-changes
+        subcommandId: segments_scheduled_changes
+    -   name: show
+        operationId: getSegment
+    -   name: update
+        operationId: patchSegment
+    -   name: users
+        subcommandId: segments_users
+segments_contexts:
+    description: Manage segments contexts
+    operations:
+    -   name: show
+        operationId: getSegmentMembershipForContext
+    -   name: update
+        operationId: updateBigSegmentContextTargets
+segments_expiring_targets:
+    description: Manage segments expiring-targets
+    operations:
+    -   name: list
+        operationId: getExpiringTargetsForSegment
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: patchExpiringTargetsForSegment
+        pagination:
+            itemProperty: items
+segments_expiring_user_targets:
+    description: Manage segments expiring-user-targets
+    operations:
+    -   name: list
+        operationId: getExpiringUserTargetsForSegment
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: patchExpiringUserTargetsForSegment
+        pagination:
+            itemProperty: items
+segments_exports:
+    description: Manage segments exports
+    operations:
+    -   name: create
+        operationId: createBigSegmentExport
+    -   name: show
+        operationId: getBigSegmentExport
+segments_imports:
+    description: Manage segments imports
+    operations:
+    -   name: create
+        operationId: createBigSegmentImport
+    -   name: show
+        operationId: getBigSegmentImport
+segments_scheduled_changes:
+    description: Manage segments scheduled-changes
+    operations:
+    -   name: create
+        operationId: postSegmentScheduledChange
+    -   name: delete
+        operationId: deleteSegmentScheduledChange
+    -   name: list
+        operationId: getSegmentScheduledChanges
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getSegmentScheduledChange
+    -   name: update
+        operationId: patchSegmentScheduledChange
+segments_users:
+    description: Manage segments users
+    operations:
+    -   name: show
+        operationId: getSegmentMembershipForUser
+    -   name: update
+        operationId: updateBigSegmentTargets
+teams:
+    description: Manage teams
+    operations:
+    -   name: create
+        operationId: postTeam
+    -   name: delete
+        operationId: deleteTeam
+    -   name: list
+        operationId: getTeams
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: maintainers
+        operationId: getTeamMaintainers
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: members
+        operationId: postTeamMembers
+        pagination:
+            itemProperty: items
+    -   name: roles
+        operationId: getTeamRoles
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: show
+        operationId: getTeam
+    -   name: update
+        operationId: patchTeams
+    -   name: update
+        operationId: patchTeam
+templates:
+    description: Manage templates
+    operations:
+    -   name: create
+        operationId: createWorkflowTemplate
+    -   name: delete
+        operationId: deleteWorkflowTemplate
+    -   name: list
+        operationId: getWorkflowTemplates
+        pagination:
+            itemProperty: items
+tokens:
+    description: Manage tokens
+    operations:
+    -   name: create
+        operationId: postToken
+    -   name: delete
+        operationId: deleteToken
+    -   name: list
+        operationId: getTokens
+        pagination:
+            itemProperty: items
+            itemStart: offset
+            pageSize: limit
+    -   name: reset
+        operationId: resetToken
+    -   name: show
+        operationId: getToken
+    -   name: update
+        operationId: patchToken
+usage:
+    description: Manage usage
+    operations:
+    -   name: ai-runs
+        operationId: getAIRunsUsage
+    -   name: clientside-contexts
+        operationId: getContextsClientsideUsage
+    -   name: clientside-mau
+        operationId: getMAUClientsideUsage
+    -   name: data-export-events
+        subcommandId: usage_data_export_events
+    -   name: evaluations
+        operationId: getEvaluationsUsage
+    -   name: events
+        operationId: getEventsUsage
+    -   name: experimentation-events
+        operationId: getExperimentationEventsUsage
+    -   name: experimentation-keys
+        operationId: getExperimentationKeysUsage
+    -   name: mau
+        subcommandId: usage_mau
+    -   name: observability
+        subcommandId: usage_observability
+    -   name: sdk-versions
+        subcommandId: usage_sdk_versions
+    -   name: serverside-contexts
+        operationId: getContextsServersideUsage
+    -   name: service-connections
+        operationId: getServiceConnectionsUsage
+    -   name: streams
+        subcommandId: usage_streams
+    -   name: total-contexts
+        operationId: getContextsTotalUsage
+    -   name: total-mau
+        operationId: getMAUTotalUsage
+    -   name: vega-ai
+        operationId: getVegaAIUsage
+    -   name: warehouse-export
+        operationId: getWarehouseExportUsage
+usage_data_export_events:
+    description: Manage usage data-export-events
+    operations:
+    -   name: projects
+        subcommandId: usage_data_export_events_projects
+    -   name: show
+        operationId: getDataExportEventsUsage
+usage_data_export_events_projects:
+    description: Manage usage data-export-events projects
+    operations:
+    -   name: ranking
+        operationId: getDataExportProjectRanking
+        pagination:
+            itemProperty: items
+            pageSize: limit
+usage_mau:
+    description: Manage usage mau
+    operations:
+    -   name: bycategory
+        operationId: getMauUsageByCategory
+    -   name: sdks
+        operationId: getMauSdksByType
+    -   name: show
+        operationId: getMauUsage
+usage_observability:
+    description: Manage usage observability
+    operations:
+    -   name: errors
+        operationId: getObservabilityErrorsUsage
+    -   name: logs
+        operationId: getObservabilityLogsUsage
+    -   name: metrics
+        operationId: getObservabilityMetricsUsage
+    -   name: sessions
+        operationId: getObservabilitySessionsUsage
+    -   name: traces
+        operationId: getObservabilityTracesUsage
+usage_sdk_versions:
+    description: Manage usage sdk-versions
+    operations:
+    -   name: all
+        operationId: getSdkAllVersions
+    -   name: details
+        operationId: getSdkVersionsDetails
+usage_streams:
+    description: Manage usage streams
+    operations:
+    -   name: bysdkversion
+        operationId: getStreamUsageBySdkVersion
+    -   name: sdkversions
+        operationId: getStreamUsageSdkversion
+    -   name: show
+        operationId: getStreamUsage
+users:
+    description: Manage users
+    operations:
+    -   name: expiring-user-targets
+        subcommandId: users_expiring_user_targets
+    -   name: flags
+        subcommandId: users_flags
+    -   name: list
+        operationId: getUsers
+        pagination:
+            itemProperty: items
+            pageSize: limit
+    -   name: show
+        operationId: getUser
+users_expiring_user_targets:
+    description: Manage users expiring-user-targets
+    operations:
+    -   name: list
+        operationId: getExpiringFlagsForUser
+        pagination:
+            itemProperty: items
+    -   name: update
+        operationId: patchExpiringFlagsForUser
+        pagination:
+            itemProperty: items
+users_flags:
+    description: Manage users flags
+    operations:
+    -   name: list
+        operationId: getUserFlagSettings
+        pagination:
+            itemProperty: items
+    -   name: set
+        operationId: putFlagSetting
+    -   name: show
+        operationId: getUserFlagSetting
+webhooks:
+    description: Manage webhooks
+    operations:
+    -   name: create
+        operationId: postWebhook
+    -   name: delete
+        operationId: deleteWebhook
+    -   name: list
+        operationId: getAllWebhooks
+        pagination:
+            itemProperty: items
+    -   name: show
+        operationId: getWebhook
+    -   name: update
+        operationId: patchWebhook
