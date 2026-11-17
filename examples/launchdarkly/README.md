@@ -19,3 +19,5 @@ This is a brief summary of the history. It includes steps taken in the initial P
     * This reduces the duplicates to a more managable level, so the `suggested.yaml` was copied to `layout.yaml`
 4. Manually modify `layout.yaml` to remove duplicates (or add `bugIds`).
     * Inspect the file and remove duplicates by renaming at least one of the duplicates. This did require re-ordering operations to allow `make layout-lint` to succeed.
+5. Iteratively update `layout.yaml` to avoid generating functions with duplicate arguments.
+    * Required running `uv run ld-cli` to detect which function had the issue(s), adding a `bugIds` value to the `layout.yaml`, regenerating the code, and running the command again.

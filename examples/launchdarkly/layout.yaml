@@ -1089,6 +1089,8 @@ projects_environments_contexts:
         pagination:
             itemProperty: items
             pageSize: limit
+        bugIds:
+        - duplicateArguments
 projects_environments_default_release_plan:
     description: Manage projects environments default-release-plan
     operations:
@@ -1306,6 +1308,8 @@ projects_flags_environments_workflows:
     operations:
     -   name: create
         operationId: postWorkflow
+        bugIds:
+        - duplicateArguments
     -   name: delete
         operationId: deleteWorkflow
     -   name: list
