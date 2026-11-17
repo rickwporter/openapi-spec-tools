@@ -17,3 +17,5 @@ This is a brief summary of the history. It includes steps taken in the initial P
     * Running `uv run layout check suggested.yaml` still reveals issues with duplicates.
 3. Updated `layout_config.yaml` to specify pagination parameters to help distinguish `list` from `show` commands.
     * This reduces the duplicates to a more managable level, so the `suggested.yaml` was copied to `layout.yaml`
+4. Manually modify `layout.yaml` to remove duplicates (or add `bugIds`).
+    * Inspect the file and remove duplicates by renaming at least one of the duplicates. This did require re-ordering operations to allow `make layout-lint` to succeed.

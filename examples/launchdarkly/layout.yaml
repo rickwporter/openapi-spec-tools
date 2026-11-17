@@ -95,10 +95,10 @@ account_ip_allowlist:
         pagination:
             itemStart: offset
             pageSize: limit
-    -   name: update
-        operationId: patchIpAllowlistConfig
-    -   name: update
+    -   name: update-entry
         operationId: patchIpAllowlistEntry
+    -   name: update-list
+        operationId: patchIpAllowlistConfig
 account_relay_auto_configs:
     description: Manage account relay-auto-configs
     operations:
@@ -259,7 +259,7 @@ code_refs_repositories_branches:
 code_refs_statistics:
     description: Manage code-refs statistics
     operations:
-    -   name: show
+    -   name: root
         operationId: getRootStatistic
     -   name: show
         operationId: getStatistics
@@ -472,7 +472,7 @@ flags:
 flags_dependent_flags:
     description: Manage flags dependent-flags
     operations:
-    -   name: list
+    -   name: by-env
         operationId: getDependentFlagsByEnv
         pagination:
             itemProperty: items
@@ -553,16 +553,16 @@ integration_capabilities_big_segment_store:
 integration_capabilities_feature_store:
     description: Manage integration-capabilities feature-store
     operations:
+    -   name: by-env
+        operationId: getIntegrationDeliveryConfigurationByEnvironment
+        pagination:
+            itemProperty: items
     -   name: create
         operationId: createIntegrationDeliveryConfiguration
     -   name: delete
         operationId: deleteIntegrationDeliveryConfiguration
     -   name: list
         operationId: getIntegrationDeliveryConfigurations
-        pagination:
-            itemProperty: items
-    -   name: list
-        operationId: getIntegrationDeliveryConfigurationByEnvironment
         pagination:
             itemProperty: items
     -   name: show
@@ -643,9 +643,9 @@ members:
     -   name: teams
         operationId: postMemberTeams
     -   name: update
-        operationId: patchMembers
-    -   name: update
         operationId: patchMember
+    -   name: update-many
+        operationId: patchMembers
 metrics:
     description: Manage metrics
     operations:
@@ -1064,12 +1064,12 @@ projects_environments_adaptive_triggers:
 projects_environments_context_attributes:
     description: Manage projects environments context-attributes
     operations:
-    -   name: list
+    -   name: names
         operationId: getContextAttributeNames
         pagination:
             itemProperty: items
             pageSize: limit
-    -   name: list
+    -   name: values
         operationId: getContextAttributeValues
         pagination:
             itemProperty: items
@@ -1395,7 +1395,7 @@ projects_views:
             itemProperty: items
             itemStart: offset
             pageSize: limit
-    -   name: list
+    -   name: show
         operationId: getView
         pagination:
             itemStart: offset
@@ -1554,9 +1554,9 @@ teams:
     -   name: show
         operationId: getTeam
     -   name: update
-        operationId: patchTeams
-    -   name: update
         operationId: patchTeam
+    -   name: update-many
+        operationId: patchTeams
 templates:
     description: Manage templates
     operations:
