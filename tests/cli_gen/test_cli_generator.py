@@ -503,6 +503,7 @@ def test_function_definition_forced_single():
     assert 'attachments["id"] = attachments_id' in text
     assert 'attachments["edgeColor"] = attachments_edge_color' in text
     assert 'body["attachments"] = [attachments]  # convert to list' in text
+    assert 'body = [body]  # convert to list' not in text
 
     # check the body of the function
     assert "_l.init_logging(_log_level)" in text
