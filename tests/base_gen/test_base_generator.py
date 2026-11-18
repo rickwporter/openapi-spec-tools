@@ -574,6 +574,39 @@ def test_op_body_formation_props() -> None:
     assert 'body["deaths"] = deaths' in text
 
 
+def test_op_body_formation_forced_single_no_parents() -> None:
+    # Body $ref is an array of complex items, same shape as a JSON Patch body.
+    # Flattening marks each field x-forced-single and records no x-parents.
+    oas = open_oas(asset_filename("misc3.yaml"))
+    op = {
+        OasField.REQ_BODY: {
+            OasField.CONTENT: {
+                "application/json": {
+                    OasField.SCHEMA: {OasField.REFS: "#/components/schemas/MultiAttachmentList"},
+                }
+            }
+        }
+    }
+    uut = BaseGenerator(oas=oas, package_name=PKG)
+    body_params = uut.op_body_settable_properties(op)
+    assert body_params
+    assert all(data.get(SINGLE) and not data.get(X_PARENTS) for data in body_params.values())
+
+    text = uut.op_body_formation(body_params)
+    assert "body = {}" in text
+    assert 'if id is not None:' in text
+    assert 'body["id"] = id' in text
+    assert 'if edge_color is not None:' in text
+    assert 'body["edgeColor"] = edge_color' in text
+    assert 'if previews is not None:' in text
+    assert 'body["previews"] = previews' in text
+    assert text.count("= {}") == 1
+    assert "# stitch together the sub-objects" not in text
+    assert text.find('body["id"] = id') < text.find("if body:")
+    assert "if body:" in text
+    assert "body = [body]  # convert to list" in text
+
+
 def test_op_body_formation_depth() -> None:
     oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))

@@ -536,6 +536,8 @@ class BaseGenerator:
         lines = ["body = {}"]
         found = set()
         forced_single = set()
+        # The body schema itself is a list of one complex item.
+        body_forced_single = False
         lineage = []
         for prop_data in body_params.values():
             parents = prop_data.get(OasField.X_PARENTS, [])
@@ -543,7 +545,10 @@ class BaseGenerator:
                 lineage.append(parents)
 
             if prop_data.get(OasField.X_SINGLE):
-                forced_single.add(parents[-1])
+                if parents:
+                    forced_single.add(parents[-1])
+                else:
+                    body_forced_single = True
 
             for parent in parents:
                 if parent not in found:
@@ -604,6 +609,10 @@ class BaseGenerator:
                 # remove items that were processed
                 for r in removal:
                     depends.pop(r)
+
+        if body_forced_single:
+            lines.append("if body:")
+            lines.append("    body = [body]  # convert to list")
 
         return SEP1 + SEP1.join(lines)
 
