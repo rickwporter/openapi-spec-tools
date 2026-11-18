@@ -229,7 +229,9 @@ class BaseGenerator:
             if not line:
                 result += NL
             else:
-                _line = line.replace("'''", "\\'''")  # avoid breaking docstring
+                # NOTE: SIMPLE_TRANSLATIONS would escape all the quotes, and we don't want that
+                translations = str.maketrans({"\\": r"\\"})
+                _line = line.translate(translations).replace("'''", r"\'''")  # avoid closing docstring
                 inner = textwrap.wrap(_line, width=self.max_help_length, replace_whitespace=False)
                 result += SEP1 + SEP1.join(inner)
         result += f"{SEP1}'''{SEP1}"
