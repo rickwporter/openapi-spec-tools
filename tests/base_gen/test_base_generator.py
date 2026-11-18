@@ -44,6 +44,7 @@ PKG = "some_package"
 def test_constants():
     assert "" == DEFAULT_HOST
 
+
 def test_package_name():
     assert "" == BaseGenerator(package_name="", oas={}).package_name
     assert "pets" == BaseGenerator(package_name="pets", oas={}).package_name
