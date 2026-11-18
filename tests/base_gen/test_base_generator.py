@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 
+from openapi_spec_tools.base_gen._constants import DEFAULT_HOST
 from openapi_spec_tools.base_gen.base_generator import DEFAULT_COPYRIGHT
 from openapi_spec_tools.base_gen.base_generator import BaseGenerator
 from openapi_spec_tools.base_gen.config import GeneratorConfig
@@ -39,6 +40,9 @@ S1 = '\n    '
 S2 = f"{S1}    "
 PKG = "some_package"
 
+
+def test_constants():
+    assert "" == DEFAULT_HOST
 
 def test_package_name():
     assert "" == BaseGenerator(package_name="", oas={}).package_name
