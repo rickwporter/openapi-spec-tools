@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from figma_cli import _arguments as _a
+from figma_cli import _constants as _c
 from figma_cli import _display as _d  # noqa: F401
 from figma_cli import _exceptions as _e
 from figma_cli import _logging as _l
@@ -43,7 +44,7 @@ def post_dev_resources(
     dev_resources_url: Annotated[str | None, typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
     dev_resources_file_key: Annotated[str | None, typer.Option(show_default=False, help="The file key where the dev resource belongs.")] = None,
     dev_resources_node_id: Annotated[str | None, typer.Option(show_default=False, help="The target node to attach the dev resource to.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -98,7 +99,7 @@ def put_dev_resources(
     dev_resources_id: Annotated[str | None, typer.Option(show_default=False, help="Unique identifier of the dev resource")] = None,
     dev_resources_name: Annotated[str | None, typer.Option(show_default=False, help="The name of the dev resource.")] = None,
     dev_resources_url: Annotated[str | None, typer.Option(show_default=False, help="The URL of the dev resource.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

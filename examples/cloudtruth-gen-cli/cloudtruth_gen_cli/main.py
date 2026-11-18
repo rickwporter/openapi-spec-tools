@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
+from cloudtruth_gen_cli import _constants as _c
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
@@ -49,7 +50,7 @@ def show_commands(
 
 @app.command("backup", short_help="Get a snapshot of all Projects with parameters")
 def backup_snapshot_create(
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -87,7 +88,7 @@ def utils_generate_password_create(
     require_spaces: Annotated[bool | None, typer.Option("--require-spaces/--no-require-spaces", help="The password must include spaces [ ].  Default: False.")] = False,
     require_symbols: Annotated[bool | None, typer.Option("--require-symbols/--no-require-symbols", help="The password must include symbols [!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~].  Default: False.")] = False,
     require_uppercase: Annotated[bool | None, typer.Option("--require-uppercase/--no-require-uppercase", help="The password must include uppercase letters [A-Z].  Default: True.")] = True,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -240,7 +241,7 @@ class Lang(str, Enum):  # noqa: F811
 def api_schema_retrieve(
     format_: Annotated[Format | None, typer.Option("--format", show_default=False, case_sensitive=False)] = None,
     lang: Annotated[Lang | None, typer.Option(show_default=False, case_sensitive=False)] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

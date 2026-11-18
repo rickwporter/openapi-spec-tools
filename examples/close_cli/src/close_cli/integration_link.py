@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -48,7 +49,7 @@ def integration_links_create(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     type_: Annotated[IntegrationLinkType | None, typer.Option("--type", show_default=False, case_sensitive=False)] = None,
     url: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -90,7 +91,7 @@ def integration_links_create(
 @app.command("delete", short_help="Delete an integration link")
 def integration_links_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -121,7 +122,7 @@ def integration_links_delete(
 
 @app.command("list", short_help="Get all integration links for your organization")
 def integration_links_list(
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -162,7 +163,7 @@ def integration_links_update(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     type_: Annotated[IntegrationLinkType | None, typer.Option("--type", show_default=False, case_sensitive=False)] = None,
     url: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -201,7 +202,7 @@ def integration_links_update(
 @app.command("show", short_help="Get a single integration link")
 def integration_links_get(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -40,7 +41,7 @@ def show_commands(
 @app.command("archive", short_help="Archive a playbook")
 def playbooks_archive(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -76,7 +77,7 @@ def playbooks_create(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     outcome_ids: Annotated[list[str] | None, typer.Option(show_default=False, help="IDs of [Outcomes](/api/resources/outcomes/) that should be associated with this Playbook.")] = None,
     summary_guidance: Annotated[str | None, typer.Option(show_default=False, help="Guidance for AI summaries of calls and meetings associated with this Playbook.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -120,7 +121,7 @@ def playbooks_create(
 @app.command("delete", short_help="Delete a playbook")
 def playbooks_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -156,7 +157,7 @@ def playbooks_list(
     is_archived: Annotated[bool | None, typer.Option("--is-archived/--no-is-archived", show_default=False, help="Filter for archived or not-archived playbooks. When not provided, both archived and not-archived playbooks will be returned.")] = None,
     position_gt: Annotated[int | None, typer.Option(show_default=False, help="Filters for where the playbook\'s `position` is greater than the given value.")] = None,
     created_at_lt: Annotated[datetime | None, typer.Option(show_default=False, help="Filters for where the playbook\'s `created_at` (creation date) is before the given value.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -211,7 +212,7 @@ def playbooks_update(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     outcome_ids: Annotated[list[str] | None, typer.Option(show_default=False, help="IDs of [Outcomes](/api/resources/outcomes/) that should be associated with this Playbook.")] = None,
     summary_guidance: Annotated[str | None, typer.Option(show_default=False, help="Guidance for AI summaries of calls and meetings associated with this Playbook.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -254,7 +255,7 @@ def playbooks_update(
 @app.command("show", short_help="Fetch a single playbook")
 def playbooks_get(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -286,7 +287,7 @@ def playbooks_get(
 @app.command("unarchive", short_help="Unarchive a playbook")
 def playbooks_unarchive(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

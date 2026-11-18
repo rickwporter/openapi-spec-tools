@@ -8,6 +8,7 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
 
+from cloudtruth_api.opaque import _constants as _c
 from cloudtruth_api.opaque import _environment as _e
 from cloudtruth_api.opaque import _logging as _l
 from cloudtruth_api.opaque import _requests as _r
@@ -22,7 +23,7 @@ def environments_copy_create(
     _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_copy_create: POST /api/v1/environments/{id}/copy/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -45,7 +46,7 @@ def environments_create(
     _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_create: POST /api/v1/environments/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -68,7 +69,7 @@ def environments_destroy(
     _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_destroy: DELETE /api/v1/environments/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -96,7 +97,7 @@ def environments_list(
     _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_list: GET /api/v1/environments/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -137,7 +138,7 @@ def environments_pushes_list(
     The push operations that this environment was involved in.
     '''
     # handler for environments_pushes_list: GET /api/v1/environments/{environment_pk}/pushes/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -167,7 +168,7 @@ def environments_update(
     _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_update: PUT /api/v1/environments/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -190,7 +191,7 @@ def environments_retrieve(
     _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_retrieve: GET /api/v1/environments/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -214,7 +215,7 @@ def environments_partial_update(
     _log_level: str | None = None,  # log level, read from API_LOG_LEVEL if not provided, defaults to info
 ) -> Any:
     # handler for environments_partial_update: PATCH /api/v1/environments/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")

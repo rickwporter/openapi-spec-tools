@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -43,7 +44,7 @@ def show_commands(
 def memberships_create(
     email: Annotated[str | None, typer.Option(show_default=False)] = None,
     role_id: Annotated[str | None, typer.Option(show_default=False, help="One of `superuser`, `user`, or `restricteduser` for the corresponding predefined role, or the ID of a custom [Role](https://developer.close.com/api/resources/roles). The role must not grant the `manage_organization` permission.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -91,7 +92,7 @@ def memberships_create(
 @app.command("delete", short_help="Delete a membership")
 def memberships_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -141,7 +142,7 @@ def memberships_update(
     may_workflows_impersonate: Annotated[bool | None, typer.Option("--may-workflows-impersonate/--no-may-workflows-impersonate", show_default=False, help="Whether Workflows may send emails on this member\'s behalf.")] = None,
     role_id: Annotated[str | None, typer.Option(show_default=False, help="One of `admin`, `superuser`, `user`, or `restricteduser` for the corresponding predefined role, or the ID of a custom [Role](https://developer.close.com/api/resources/roles).")] = None,
     track_email_opens: Annotated[bool | None, typer.Option("--track-email-opens/--no-track-email-opens", show_default=False, help="Whether email opens are tracked for emails this member sends.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -205,7 +206,7 @@ def memberships_bulk_update(
     may_workflows_impersonate: Annotated[bool | None, typer.Option("--may-workflows-impersonate/--no-may-workflows-impersonate", show_default=False, help="Whether Workflows may send emails on this member\'s behalf.")] = None,
     role_id: Annotated[str | None, typer.Option(show_default=False, help="One of `admin`, `superuser`, `user`, or `restricteduser` for the corresponding predefined role, or the ID of a custom [Role](https://developer.close.com/api/resources/roles).")] = None,
     track_email_opens: Annotated[bool | None, typer.Option("--track-email-opens/--no-track-email-opens", show_default=False, help="Whether email opens are tracked for emails this member sends.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

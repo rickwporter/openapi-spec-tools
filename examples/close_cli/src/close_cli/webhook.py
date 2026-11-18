@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -43,7 +44,7 @@ def webhooks_create(
     events_object_type: Annotated[str | None, typer.Option(show_default=False)] = None,
     url: Annotated[str | None, typer.Option(show_default=False, help="Destination URL for the webhook subscription")] = None,
     verify_ssl: Annotated[bool | None, typer.Option("--verify-ssl/--no-verify-ssl", help="Verify SSL certificate of destination webhook URL. Set to `false` to disable SSL certificate validation. We recommend using https to protect your data during delivery.")] = True,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -89,7 +90,7 @@ def webhooks_create(
 @app.command("delete", short_help="Delete Webhook subscription")
 def webhooks_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -120,7 +121,7 @@ def webhooks_delete(
 
 @app.command("list", short_help="List Webhook subscriptions")
 def webhooks_list(
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -162,7 +163,7 @@ def webhooks_update(
     status: Annotated[WebhookStatus | None, typer.Option(show_default=False, case_sensitive=False)] = None,
     url: Annotated[str | None, typer.Option(show_default=False, help="Destination URL for the webhook subscription")] = None,
     verify_ssl: Annotated[bool | None, typer.Option("--verify-ssl/--no-verify-ssl", show_default=False, help="Verify SSL certificate of destination webhook URL. Set to `false` to disable SSL certificate validation. We recommend using https to protect your data during delivery.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -209,7 +210,7 @@ def webhooks_update(
 @app.command("show", short_help="Retrieve a single Webhook subscription")
 def webhooks_get(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

@@ -8,6 +8,7 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
 
+from cloudtruth_api.opaque import _constants as _c
 from cloudtruth_api.opaque import _environment as _e
 from cloudtruth_api.opaque import _logging as _l
 from cloudtruth_api.opaque import _requests as _r
@@ -28,7 +29,7 @@ def environments_tags_create(
     option however they are mutually exclusive.
     '''
     # handler for environments_tags_create: POST /api/v1/environments/{environment_pk}/tags/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -58,7 +59,7 @@ def environments_tags_destroy(
     option however they are mutually exclusive.
     '''
     # handler for environments_tags_destroy: DELETE /api/v1/environments/{environment_pk}/tags/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -96,7 +97,7 @@ def environments_tags_list(
     option however they are mutually exclusive.
     '''
     # handler for environments_tags_list: GET /api/v1/environments/{environment_pk}/tags/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -145,7 +146,7 @@ def environments_tags_update(
     option however they are mutually exclusive.
     '''
     # handler for environments_tags_update: PUT /api/v1/environments/{environment_pk}/tags/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -175,7 +176,7 @@ def environments_tags_retrieve(
     option however they are mutually exclusive.
     '''
     # handler for environments_tags_retrieve: GET /api/v1/environments/{environment_pk}/tags/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -206,7 +207,7 @@ def environments_tags_partial_update(
     option however they are mutually exclusive.
     '''
     # handler for environments_tags_partial_update: PATCH /api/v1/environments/{environment_pk}/tags/{id}/
-    _api_host = _api_host or _e.env_string("API_HOST", default="", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")

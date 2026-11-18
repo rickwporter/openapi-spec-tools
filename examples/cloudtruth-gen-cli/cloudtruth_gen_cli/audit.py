@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
+from cloudtruth_gen_cli import _constants as _c
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
@@ -59,7 +60,7 @@ def audit_list(
     parameter_id: Annotated[str | None, typer.Option(show_default=False, help="Returns records for the parameter and associated values.")] = None,
     project_id: Annotated[str | None, typer.Option(show_default=False, help="Returns records for the project, it\'s parameters, and associated values.")] = None,
     user_id: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -125,7 +126,7 @@ def audit_list(
 @app.command("show", short_help="Retrieve one record from the audit log.")
 def audit_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the audit record.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -156,7 +157,7 @@ def audit_retrieve(
 
 @app.command("summary", short_help="Summary information about the organization\'s audit trail.")
 def audit_summary_retrieve(
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

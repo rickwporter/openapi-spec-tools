@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
+from cloudtruth_gen_cli import _constants as _c
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
@@ -48,7 +49,7 @@ class RoleEnum(str, Enum):  # noqa: F811
 def memberships_create(
     user: Annotated[str | None, typer.Option(show_default=False, help="The user of the membership.")] = None,
     role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -84,7 +85,7 @@ def memberships_create(
 @app.command("delete", short_help="")
 def memberships_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the membership.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -124,7 +125,7 @@ def memberships_list(
     page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
     role: Annotated[Role | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
     user: Annotated[str | None, typer.Option(show_default=False, help="The unique identifier of a user.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -183,7 +184,7 @@ def memberships_update(
     user: Annotated[str | None, typer.Option(show_default=False, help="The user of the membership.")] = None,
     organization: Annotated[str | None, typer.Option(show_default=False, help="The organization that the user is a member of.")] = None,
     role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -222,7 +223,7 @@ def memberships_update(
 @app.command("show", short_help="")
 def memberships_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the membership.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -261,7 +262,7 @@ def memberships_partial_update(
     user: Annotated[str | None, typer.Option(show_default=False, help="The user of the membership.")] = None,
     organization: Annotated[str | None, typer.Option(show_default=False, help="The organization that the user is a member of.")] = None,
     role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the user has in the organization.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

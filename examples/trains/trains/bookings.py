@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from trains import _arguments as _a
+from trains import _constants as _c
 from trains import _display as _d  # noqa: F401
 from trains import _exceptions as _e
 from trains import _logging as _l
@@ -43,7 +44,7 @@ def create_booking(
     passenger_name: Annotated[str | None, typer.Option(show_default=False, help="Name of the passenger")] = None,
     has_bicycle: Annotated[bool | None, typer.Option("--has-bicycle/--no-has-bicycle", show_default=False, help="Indicates whether the passenger has a bicycle.")] = None,
     has_dog: Annotated[bool | None, typer.Option("--has-dog/--no-has-dog", show_default=False, help="Indicates whether the passenger has a dog.")] = None,
-    _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -84,7 +85,7 @@ def create_booking(
 @app.command("delete", short_help="Delete a booking")
 def delete_booking(
     booking_id: Annotated[str, typer.Argument(show_default=False, help="The ID of the booking to retrieve.")],
-    _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -117,7 +118,7 @@ def delete_booking(
 def get_bookings(
     page: Annotated[int | None, typer.Option(min=1, help="The page number to return")] = 1,
     limit: Annotated[int | None, typer.Option(min=1, max=100, help="The number of items to return per page")] = 10,
-    _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -186,7 +187,7 @@ def create_booking_payment(
     source_address_city: Annotated[str | None, typer.Option(show_default=False)] = None,
     source_address_country: Annotated[str | None, typer.Option(show_default=False)] = None,
     source_address_post_code: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -250,7 +251,7 @@ def create_booking_payment(
 @app.command("show", short_help="Get a booking")
 def get_booking(
     booking_id: Annotated[str, typer.Argument(show_default=False, help="The ID of the booking to retrieve.")],
-    _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from figma_cli import _arguments as _a
+from figma_cli import _constants as _c
 from figma_cli import _display as _d  # noqa: F401
 from figma_cli import _exceptions as _e
 from figma_cli import _logging as _l
@@ -61,7 +62,7 @@ def get_activity_logs(
     end_time: Annotated[float | None, typer.Option(show_default=False, help="Unix timestamp of the most recent event to include. This param defaults to the current timestamp if unspecified.")] = None,
     limit: Annotated[float | None, typer.Option(show_default=False, help="Maximum number of events to return. This param defaults to 1000 if unspecified.")] = None,
     order: Annotated[Order | None, typer.Option(case_sensitive=False, help="Event order by timestamp. This param can be either \"asc\" (default) or \"desc\".")] = "asc",
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -103,7 +104,7 @@ def get_activity_logs(
 @app.command("component-sets", short_help="Get component set")
 def get_component_set(
     key: Annotated[str, typer.Argument(show_default=False, help="The unique identifier of the component set.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -135,7 +136,7 @@ def get_component_set(
 @app.command("components", short_help="Get component")
 def get_component(
     key: Annotated[str, typer.Argument(show_default=False, help="The unique identifier of the component.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -184,7 +185,7 @@ def get_images(
     svg_simplify_stroke: Annotated[bool | None, typer.Option("--svg-simplify-stroke/--no-svg-simplify-stroke", help="Whether to simplify inside/outside strokes and use stroke attribute if possible instead of `<mask>`.")] = True,
     contents_only: Annotated[bool | None, typer.Option("--contents-only/--no-contents-only", help="Whether content that overlaps the node should be excluded from rendering. Passing false (i.e., rendering overlaps) may increase processing time, since more of the document must be included in rendering.")] = True,
     use_absolute_bounds: Annotated[bool | None, typer.Option("--use-absolute-bounds/--no-use-absolute-bounds", help="Use the full dimensions of the node regardless of whether or not it is cropped or the space around it is empty. Use this to export text nodes without cropping.")] = False,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -251,7 +252,7 @@ def get_images(
 
 @app.command("me", short_help="Get current user")
 def get_me(
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -287,7 +288,7 @@ def get_payments(
     community_file_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the Community file to query a user\'s payment information on. You can get the Community file ID from the file\'s Community page (look for the number after \"file/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
     plugin_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the plugin to query a user\'s payment information on. You can get the plugin ID from the plugin\'s manifest, or from the plugin\'s Community page (look for the number after \"plugin/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
     widget_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the widget to query a user\'s payment information on. You can get the widget ID from the widget\'s manifest, or from the widget\'s Community page (look for the number after \"widget/\" in the URL). Provide exactly one of \"community_file_id\", \"plugin_id\", or \"widget_id\".")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -334,7 +335,7 @@ def get_payments(
 @app.command("styles", short_help="Get style")
 def get_style(
     key: Annotated[str, typer.Argument(show_default=False, help="The unique identifier of the style.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

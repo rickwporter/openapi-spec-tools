@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -41,7 +42,7 @@ def show_commands(
 def comments_create(
     body: Annotated[str | None, typer.Option(show_default=False)] = None,
     object_id: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -81,7 +82,7 @@ def comments_create(
 @app.command("delete", short_help="Remove a comment")
 def comments_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -118,7 +119,7 @@ def comments_delete(
 def comments_list(
     thread_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     object_id: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -158,7 +159,7 @@ def comments_list(
 def comments_update(
     id: Annotated[str, typer.Argument(show_default=False)],
     body: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -194,7 +195,7 @@ def comments_update(
 @app.command("show", short_help="Fetch an individual comment")
 def comments_get(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

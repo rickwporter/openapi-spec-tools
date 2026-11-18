@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from figma_cli import _arguments as _a
+from figma_cli import _constants as _c
 from figma_cli import _display as _d  # noqa: F401
 from figma_cli import _exceptions as _e
 from figma_cli import _logging as _l
@@ -46,7 +47,7 @@ def post_comment(
     comment_id: Annotated[str | None, typer.Option(show_default=False, help="The ID of the comment to reply to, if any. This must be a root comment. You cannot reply to other replies (a comment that has a parent_id).")] = None,
     client_meta_x: Annotated[float | None, typer.Option(show_default=False, help="X coordinate of the vector.")] = None,
     client_meta_y: Annotated[float | None, typer.Option(show_default=False, help="Y coordinate of the vector.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -93,7 +94,7 @@ def post_comment(
 def delete_comment(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to delete comment from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
     comment_id: Annotated[str, typer.Argument(show_default=False, help="Comment id of comment to delete")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -126,7 +127,7 @@ def delete_comment(
 def get_comments(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to get comments from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
     as_md: Annotated[bool | None, typer.Option("--as-md/--no-as-md", show_default=False, help="If enabled, will return comments as their markdown equivalents when applicable.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

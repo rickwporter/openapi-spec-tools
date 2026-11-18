@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -39,7 +40,7 @@ def show_commands(
 
 @app.command("create", short_help="Create a new Opportunity Custom Field")
 def custom_fields_opportunity_create(
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -71,7 +72,7 @@ def custom_fields_opportunity_create(
 @app.command("delete", short_help="Delete an Opportunity Custom Field")
 def custom_fields_opportunity_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -106,7 +107,7 @@ def custom_fields_opportunity_list(
     _limit: Annotated[int | None, typer.Option(help="Number of results to return.")] = 100,
     _skip: Annotated[int | None, typer.Option(help="Number of results to skip before returning, for pagination.")] = 0,
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -152,7 +153,7 @@ def custom_fields_opportunity_list(
 @app.command("set", short_help="Update an Opportunity Custom Field")
 def custom_fields_opportunity_update(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -191,7 +192,7 @@ def custom_fields_opportunity_update(
 def custom_fields_opportunity_get(
     id: Annotated[str, typer.Argument(show_default=False)],
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

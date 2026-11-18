@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -136,7 +137,7 @@ def field_enrichment_create(
     organization_id: Annotated[str | None, typer.Option(show_default=False)] = None,
     overwrite_existing_value: Annotated[bool | None, typer.Option("--overwrite-existing-value/--no-overwrite-existing-value")] = False,
     set_new_value: Annotated[bool | None, typer.Option("--set-new-value/--no-set-new-value")] = True,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -194,7 +195,7 @@ def field_enrichment_create(
 @app.command("me", short_help="Fetch information about yourself")
 def users_get_me(
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
