@@ -142,11 +142,20 @@ class BaseGenerator:
 
     def default_infra_files(self) -> dict[Path, str]:
         """Default map of infrastructure files to copy."""
-        return {}
+        base_gen = Path(__file__).parent
+        return {
+            base_gen / "_constants.py": "_constants.py",
+        }
 
     def default_infra_replacements(self) -> dict[str, str]:
         """Default map of infrastructure file line replacements."""
-        return {}
+        return self._constants_replacements()
+
+    def _constants_replacements(self) -> dict[str, str]:
+        """Assign default_host when copying _constants.py."""
+        return {
+            'DEFAULT_HOST = ""': f'DEFAULT_HOST = {quoted(self.default_host or "")}',
+        }
 
     def default_test_files(self) -> dict[Path, str]:
         """Default map of test files to copy."""
@@ -758,7 +767,10 @@ class BaseGenerator:
         )
         for src, dst in files.items():
             dfile = dpath / dst
-            copy_and_update(src.as_posix(), dfile.as_posix(), replacements, self.copyright)
+            file_replacements = replacements
+            if Path(dst).name == "_constants.py":
+                file_replacements = {**replacements, **self._constants_replacements()}
+            copy_and_update(src.as_posix(), dfile.as_posix(), file_replacements, self.copyright)
 
     def copy_test_files(self, dst_dir: str) -> None:
         """Iterate over the test_files and copy from local to dst."""

@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -52,7 +53,7 @@ def contacts_create(
     title: Annotated[str | None, typer.Option(show_default=False)] = None,
     urls_type: Annotated[str | None, typer.Option(show_default=False)] = None,
     urls_url: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -124,7 +125,7 @@ def contacts_create(
 @app.command("delete", short_help="Delete a contact")
 def contacts_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -159,7 +160,7 @@ def contacts_list(
     _skip: Annotated[int | None, typer.Option(help="Number of results to skip before returning, for pagination.")] = 0,
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
     lead_id: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -218,7 +219,7 @@ def contacts_update(
     title: Annotated[str | None, typer.Option(show_default=False)] = None,
     urls_type: Annotated[str | None, typer.Option(show_default=False)] = None,
     urls_url: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -292,7 +293,7 @@ def contacts_update(
 def contacts_get(
     id: Annotated[str, typer.Argument(show_default=False)],
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from github_gen_cli import _arguments as _a
+from github_gen_cli import _constants as _c
 from github_gen_cli import _display as _d  # noqa: F401
 from github_gen_cli import _exceptions as _e
 from github_gen_cli import _logging as _l
@@ -41,7 +42,7 @@ def show_commands(
 def users_list_blocked_by_authenticated_user(
     per_page: Annotated[int | None, typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
     page: Annotated[int | None, typer.Option(help="The page number of the results to fetch. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 1,
-    _api_host: _a.ApiHostOption = "https://api.github.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

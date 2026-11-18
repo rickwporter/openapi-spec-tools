@@ -77,6 +77,7 @@ def test_cli_generate_success(code_dir, test_dir, include_tests, expected_code, 
     expected = {
         "__init__.py",
         "_arguments.py",
+        "_constants.py",
         "_display.py",
         "_exceptions.py",
         "_logging.py",
@@ -134,6 +135,7 @@ def test_cli_generate_success_copyright(temp_working_dir):
 
     filenames = {
         "_arguments.py",
+        "_constants.py",
         "_display.py",
         "_exceptions.py",
         "_logging.py",
@@ -188,6 +190,7 @@ def test_cli_generate_success_no_layout():
     filenames = {
         "__init__.py",
         "_arguments.py",
+        "_constants.py",
         "_display.py",
         "_exceptions.py",
         "_logging.py",
@@ -537,6 +540,7 @@ def test_cli_generate_success_config():
     # check the copyright in all files
     filenames = {
         "_arguments.py",
+        "_constants.py",
         "_display.py",
         "_exceptions.py",
         "_logging.py",

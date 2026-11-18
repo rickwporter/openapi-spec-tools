@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -48,7 +49,7 @@ def pipelines_create(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     statuses_label: Annotated[str | None, typer.Option(show_default=False)] = None,
     statuses_type: Annotated[OpportunityStatusType | None, typer.Option(case_sensitive=False)] = "active",
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -92,7 +93,7 @@ def pipelines_create(
 @app.command("delete", short_help="Delete a Pipeline")
 def pipelines_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -124,7 +125,7 @@ def pipelines_delete(
 
 @app.command("list", short_help="List Pipelines for your organization")
 def pipelines_list(
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -158,7 +159,7 @@ def pipelines_update(
     id: Annotated[str, typer.Argument(show_default=False)],
     name: Annotated[str | None, typer.Option()] = "",
     statuses_id: Annotated[str | None, typer.Option(show_default=False, help="ID of an existing Opportunity Status. May belong to a different Pipeline, in which case the status is moved into this one.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -204,7 +205,7 @@ def pipelines_update(
 @app.command("show", short_help="Fetch a single Pipeline")
 def pipelines_get(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

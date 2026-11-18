@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from trains import _arguments as _a
+from trains import _constants as _c
 from trains import _display as _d  # noqa: F401
 from trains import _exceptions as _e
 from trains import _logging as _l
@@ -46,7 +47,7 @@ def get_stations(
     coordinates: Annotated[str | None, typer.Option(show_default=False, help="The latitude and longitude of the user\'s location, to narrow down the search results to sites within a proximity of this location.")] = None,
     search: Annotated[str | None, typer.Option(show_default=False, help="A search term to filter the list of stations by name or address.")] = None,
     country: Annotated[str | None, typer.Option(show_default=False, help="Filter stations by country code")] = None,
-    _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -103,7 +104,7 @@ def get_trips(
     date_: Annotated[datetime | None, typer.Option("--date", show_default=False, help="The date and time of the trip in ISO 8601 format in origin station\'s timezone.")] = None,
     bicycles: Annotated[bool | None, typer.Option("--bicycles/--no-bicycles", help="Only return trips where bicycles are known to be allowed")] = False,
     dogs: Annotated[bool | None, typer.Option("--dogs/--no-dogs", help="Only return trips where dogs are known to be allowed")] = False,
-    _api_host: _a.ApiHostOption = "https://try.microcks.io/rest/Train+Travel+API/1.0.0",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

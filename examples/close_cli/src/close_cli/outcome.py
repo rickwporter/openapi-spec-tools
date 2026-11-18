@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -53,7 +54,7 @@ def outcomes_create(
     description: Annotated[str | None, typer.Option(show_default=False, help="Explain what the outcome means and when it should be used.")] = None,
     name: Annotated[str | None, typer.Option(show_default=False, help="Displayed to users wherever outcomes can be selected.")] = None,
     type_: Annotated[OutcomeType | None, typer.Option("--type", case_sensitive=False, help="Set to `vm-dropped` if this outcome should be automatically set on calls whenever a team member performs a Voicemail Drop. Otherwise, leave empty or explicitly set to `custom` (default).")] = "custom",
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -96,7 +97,7 @@ def outcomes_create(
 @app.command("delete", short_help="Delete an outcome")
 def outcomes_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -133,7 +134,7 @@ def outcomes_list(
     _limit: Annotated[int | None, typer.Option(help="Number of results to return.")] = 100,
     _skip: Annotated[int | None, typer.Option(help="Number of results to skip before returning, for pagination.")] = 0,
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -193,7 +194,7 @@ def outcomes_update(
     description: Annotated[str | None, typer.Option(show_default=False, help="Explain what the outcome means and when it should be used.")] = None,
     name: Annotated[str | None, typer.Option(show_default=False, help="Displayed to users wherever outcomes can be selected.")] = None,
     type_: Annotated[OutcomeType | None, typer.Option("--type", show_default=False, case_sensitive=False, help="Set to `vm-dropped` if this outcome should be automatically set on calls whenever a team member performs a Voicemail Drop. Otherwise, leave empty or explicitly set to `custom` (default).")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -236,7 +237,7 @@ def outcomes_update(
 def outcomes_get(
     id: Annotated[str, typer.Argument(show_default=False)],
     _fields: Annotated[str | None, typer.Option(show_default=False, help="Comma-separated list of fields to include in the response.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

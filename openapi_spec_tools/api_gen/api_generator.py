@@ -49,6 +49,7 @@ class ApiGenerator(BaseGenerator, ABC):
         api_gen = Path(__file__).parent
         base_gen = Path(__file__).parent.parent / "base_gen"
         return {
+            **super().default_infra_files(),
             base_gen / "_logging.py": "_logging.py",
             base_gen / "_requests.py": "_requests.py",
             api_gen / "_environment.py": "_environment.py",
@@ -57,6 +58,7 @@ class ApiGenerator(BaseGenerator, ABC):
     def default_infra_replacements(self) -> dict[str, str]:
         """Default infrastructure line replacements."""
         return {
+            **super().default_infra_replacements(),
             "openapi_spec_tools.api_gen": self.package_name,
             "openapi_spec_tools.base_gen": self.package_name,
             __package__: self.package_name,
@@ -104,6 +106,7 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
 
+from {self.package_name} import _constants as _c
 from {self.package_name} import _environment as _e
 from {self.package_name} import _logging as _l
 from {self.package_name} import _requests as _r
@@ -113,7 +116,7 @@ from {self.package_name} import _requests as _r
         """Provide initialization of standard arguments inside body."""
         host_default = (
             f'_e.env_string({maybe_quoted(self.env_host)}, '
-            f'default={quoted(self.default_host)}, except_missing=True)'
+            f'default=_c.DEFAULT_HOST, except_missing=True)'
         )
         key_default = f'_e.env_string({maybe_quoted(self.env_key)}, except_missing=True)'
         timeout_default = f'_e.env_int({maybe_quoted(self.env_timeout)}, default={self.default_timeout})'

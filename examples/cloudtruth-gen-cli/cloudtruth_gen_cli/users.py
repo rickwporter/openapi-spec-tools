@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
+from cloudtruth_gen_cli import _constants as _c
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
@@ -39,7 +40,7 @@ def show_commands(
 
 @app.command("current", short_help="Current user information")
 def users_current_retrieve(
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -71,7 +72,7 @@ def users_current_retrieve(
 @app.command("delete", short_help="Delete the specified user.")
 def users_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="The unique identifier of a user.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -115,7 +116,7 @@ def users_list(
     page: Annotated[int | None, typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
     type_: Annotated[str | None, typer.Option("--type", show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -162,7 +163,7 @@ def users_list(
 @app.command("show", short_help="")
 def users_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="The unique identifier of a user.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

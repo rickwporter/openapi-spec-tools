@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from github_gen_cli import _arguments as _a
+from github_gen_cli import _constants as _c
 from github_gen_cli import _display as _d  # noqa: F401
 from github_gen_cli import _exceptions as _e
 from github_gen_cli import _logging as _l
@@ -47,7 +48,7 @@ def users_list_attestations(
     before: Annotated[str | None, typer.Option(show_default=False, help="A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results before this cursor. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = None,
     after: Annotated[str | None, typer.Option(show_default=False, help="A cursor, as given in the [Link header](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api#using-link-headers). If specified, the query only searches for results after this cursor. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = None,
     predicate_type: Annotated[str | None, typer.Option(show_default=False, help="Optional filter for fetching attestations with a given predicate type.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.github.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -105,7 +106,7 @@ def users_list_attestations(
 
 @app.command("current", short_help="Get the authenticated user")
 def users_get_authenticated(
-    _api_host: _a.ApiHostOption = "https://api.github.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -139,7 +140,7 @@ def users_get_authenticated(
 def users_list(
     since: Annotated[int | None, typer.Option(show_default=False, help="A user ID. Only return users with an ID greater than this ID.")] = None,
     per_page: Annotated[int | None, typer.Option(help="The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"")] = 30,
-    _api_host: _a.ApiHostOption = "https://api.github.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -186,7 +187,7 @@ def users_list(
 @app.command("show-by-id", short_help="Get a user using their ID")
 def users_get_by_id(
     account_id: Annotated[int, typer.Argument(show_default=False, help="account_id parameter")],
-    _api_host: _a.ApiHostOption = "https://api.github.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -234,7 +235,7 @@ def users_get_by_id(
 @app.command("show-by-name", short_help="Get a user")
 def users_get_by_username(
     username: Annotated[str, typer.Argument(show_default=False, help="The handle for the GitHub user account.")],
-    _api_host: _a.ApiHostOption = "https://api.github.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

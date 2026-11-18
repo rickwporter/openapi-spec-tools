@@ -8,6 +8,7 @@ from datetime import datetime  # noqa: F401
 from enum import Enum  # noqa: F401
 from typing import Any
 
+from pets_api import _constants as _c
 from pets_api import _environment as _e
 from pets_api import _logging as _l
 from pets_api import _requests as _r
@@ -27,7 +28,7 @@ def create_pets(
     Create a pet
     '''
     # handler for createPets: POST /pets
-    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -59,7 +60,7 @@ def delete_pet_by_id(
     Delete a pet
     '''
     # handler for deletePetById: DELETE /pets/{petId}
-    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -85,7 +86,7 @@ def list_pets(
     List all pets
     '''
     # handler for listPets: GET /pets
-    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")
@@ -113,7 +114,7 @@ def show_pet_by_id(
     Info for a specific pet
     '''
     # handler for showPetById: GET /pets/{petId}
-    _api_host = _api_host or _e.env_string("API_HOST", default="http://petstore.swagger.io/v1", except_missing=True)
+    _api_host = _api_host or _e.env_string("API_HOST", default=_c.DEFAULT_HOST, except_missing=True)
     _api_key = _api_key or _e.env_string("API_KEY", except_missing=True)
     _api_timeout = _api_timeout or _e.env_int("API_TIMEOUT", default=5)
     _log_level = _log_level or _e.env_string("API_LOG_LEVEL", default="info")

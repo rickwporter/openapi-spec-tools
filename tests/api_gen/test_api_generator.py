@@ -41,6 +41,7 @@ def test_standard_imports():
     text = uut.standard_imports()
     assert 'from typing import Any' in text
     assert 'from datetime import datetime' in text
+    assert 'from api_package import _constants as _c' in text
     assert 'from api_package import _environment as _e' in text
 
 @pytest.mark.parametrize(

@@ -36,6 +36,7 @@ class CliGenerator(BaseGenerator):
         base_gen =  Path(__file__).parent.parent / "base_gen"
         cli_gen = Path(__file__).parent
         return {
+            **super().default_infra_files(),
             base_gen / "_logging.py": "_logging.py",
             base_gen / "_requests.py": "_requests.py",
             cli_gen / "_arguments.py": "_arguments.py",
@@ -47,6 +48,7 @@ class CliGenerator(BaseGenerator):
     def default_infra_replacements(self) -> dict[str, str]:
         """Default infrastructure line replacements."""
         return {
+            **super().default_infra_replacements(),
             "openapi_spec_tools.base_gen": self.package_name,
             __package__: self.package_name,
             # NOTE: these will only really impact _arguments.py -- use same mechanism for simplicity
@@ -101,10 +103,10 @@ from pathlib import Path
             text += "from rich_objects import display" + NL
 
         # local
-        text += f"""
-from {self.package_name} import _arguments as _a
-from {self.package_name} import _display as _d  # noqa: F401
-"""
+        text += f"\nfrom {self.package_name} import _arguments as _a\n"
+        if operations:
+            text += f"from {self.package_name} import _constants as _c\n"
+        text += f"from {self.package_name} import _display as _d  # noqa: F401\n"
         if operations:
             text += f"""\
 from {self.package_name} import _exceptions as _e
@@ -158,7 +160,7 @@ if __name__ == "__main__":
     def command_infra_arguments(self, command: LayoutNode) -> list[str]:
         """Get the standard CLI function arguments to the command."""
         args = [
-            f'_api_host: _a.ApiHostOption = "{self.default_host}"',
+            '_api_host: _a.ApiHostOption = _c.DEFAULT_HOST',
             '_api_key: _a.ApiKeyOption = None',
             f'_api_timeout: _a.ApiTimeoutOption = {self.default_timeout}',
             f'_log_level: _a.LogLevelOption = _a.LogLevel.{self.default_log.upper()}',

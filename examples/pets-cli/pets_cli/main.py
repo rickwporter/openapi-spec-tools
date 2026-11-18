@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from pets_cli import _arguments as _a
+from pets_cli import _constants as _c
 from pets_cli import _display as _d  # noqa: F401
 from pets_cli import _exceptions as _e
 from pets_cli import _logging as _l
@@ -43,7 +44,7 @@ def create_pets(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     tag: Annotated[str | None, typer.Option(show_default=False)] = None,
     owner: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -87,7 +88,7 @@ def create_pets(
 @app.command("delete", short_help="Delete a pet")
 def delete_pet_by_id(
     pet_id: Annotated[str, typer.Argument(show_default=False, help="The id of the pet to retrieve")],
-    _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -119,7 +120,7 @@ def delete_pet_by_id(
 @app.command("list", short_help="List all pets")
 def list_pets(
     limit: Annotated[int | None, typer.Option(max=100, show_default=False, help="How many items to return at one time (max 100)")] = None,
-    _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -160,7 +161,7 @@ def list_pets(
 @app.command("show", short_help="Info for a specific pet")
 def show_pet_by_id(
     pet_id: Annotated[str, typer.Argument(show_default=False, help="The id of the pet to retrieve")],
-    _api_host: _a.ApiHostOption = "http://petstore.swagger.io/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

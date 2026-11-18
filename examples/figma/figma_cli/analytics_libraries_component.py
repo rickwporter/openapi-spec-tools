@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from figma_cli import _arguments as _a
+from figma_cli import _constants as _c
 from figma_cli import _display as _d  # noqa: F401
 from figma_cli import _exceptions as _e
 from figma_cli import _logging as _l
@@ -49,7 +50,7 @@ def get_library_analytics_component_actions(
     group_by: Annotated[GroupBy | None, typer.Option(show_default=False, case_sensitive=False, help="A dimension to group returned analytics data by.")] = None,
     start_date: Annotated[str | None, typer.Option(show_default=False, help="ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior.")] = None,
     end_date: Annotated[str | None, typer.Option(show_default=False, help="ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -97,7 +98,7 @@ def get_library_analytics_component_usages(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File key of the library to fetch analytics data for.")],
     cursor: Annotated[str | None, typer.Option(show_default=False, help="Cursor indicating what page of data to fetch. Obtained from prior API call.")] = None,
     group_by: Annotated[GroupBy | None, typer.Option(show_default=False, case_sensitive=False, help="A dimension to group returned analytics data by.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

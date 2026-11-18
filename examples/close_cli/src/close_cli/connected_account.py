@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -41,7 +42,7 @@ def show_commands(
 def connected_accounts_list(
     _fields: Annotated[list[str] | None, typer.Option()] = ["_type", "available_calendars", "available_features", "calendar_receive_status", "calendly", "date_created", "default_identity", "email", "email_receive_status", "enabled_features", "has_meeting_creation_scopes", "id", "identities", "imap", "is_imap_archive_sync_enabled", "label", "latest_receive_error", "latest_send_error", "lead_suggestions_updated_at", "organization_id", "receive_status", "send_status", "smtp", "sync_all_calendars", "synced_calendars", "user_id", "zoom_account_plan"],
     user_id: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -78,7 +79,7 @@ def connected_accounts_list(
 def connected_accounts_get(
     id: Annotated[str, typer.Argument(show_default=False)],
     _fields: Annotated[list[str] | None, typer.Option()] = ["_type", "available_calendars", "available_features", "calendar_receive_status", "calendly", "date_created", "default_identity", "email", "email_receive_status", "enabled_features", "has_meeting_creation_scopes", "id", "identities", "imap", "is_imap_archive_sync_enabled", "label", "latest_receive_error", "latest_send_error", "lead_suggestions_updated_at", "organization_id", "receive_status", "send_status", "smtp", "sync_all_calendars", "synced_calendars", "user_id", "zoom_account_plan"],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

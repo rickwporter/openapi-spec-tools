@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from figma_cli import _arguments as _a
+from figma_cli import _constants as _c
 from figma_cli import _display as _d  # noqa: F401
 from figma_cli import _exceptions as _e
 from figma_cli import _logging as _l
@@ -62,7 +63,7 @@ def post_webhook(
     passcode: Annotated[str | None, typer.Option(show_default=False, help="String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters.")] = None,
     status: Annotated[WebhookV2Status | None, typer.Option(show_default=False, case_sensitive=False, help="State of the webhook, including any error state it may be in")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="User provided description or name for the webhook. Max length 150 characters.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -119,7 +120,7 @@ def post_webhook(
 @app.command("delete", short_help="Delete a webhook")
 def delete_webhook(
     webhook_id: Annotated[str, typer.Argument(show_default=False, help="ID of webhook to delete")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -154,7 +155,7 @@ def get_webhooks(
     context_id: Annotated[str | None, typer.Option(show_default=False, help="The id of the context that you want to get attached webhooks for. If you\'re using context_id, you cannot use plan_api_id.")] = None,
     plan_api_id: Annotated[str | None, typer.Option(show_default=False, help="The id of your plan. Use this to get all webhooks for all contexts you have access to. If you\'re using plan_api_id, you cannot use context or context_id. When you use plan_api_id, the response is paginated.")] = None,
     cursor: Annotated[str | None, typer.Option(show_default=False, help="If you\'re using plan_api_id, this is the cursor to use for pagination. If you\'re using context or context_id, this parameter is ignored. Provide the next_page or prev_page value from the previous response to get the next or previous page of results.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -195,7 +196,7 @@ def get_webhooks(
 @app.command("requests", short_help="Get webhook requests")
 def get_webhook_requests(
     webhook_id: Annotated[str, typer.Argument(show_default=False, help="The id of the webhook subscription you want to see events from")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -247,7 +248,7 @@ def put_webhook(
     passcode: Annotated[str | None, typer.Option(show_default=False, help="String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters.")] = None,
     status: Annotated[WebhookV2Status | None, typer.Option(show_default=False, case_sensitive=False, help="State of the webhook, including any error state it may be in")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="User provided description or name for the webhook. Max length 150 characters.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -293,7 +294,7 @@ def put_webhook(
 @app.command("show", short_help="Get a webhook")
 def get_webhook(
     webhook_id: Annotated[str, typer.Argument(show_default=False, help="ID of webhook to get")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

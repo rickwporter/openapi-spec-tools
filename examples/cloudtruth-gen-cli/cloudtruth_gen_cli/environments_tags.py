@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
+from cloudtruth_gen_cli import _constants as _c
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
@@ -44,7 +45,7 @@ def environments_tags_create(
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
     timestamp: Annotated[datetime | None, typer.Option(show_default=False, help="The point in time this tag represents. If not specified then the current time will be used.")] = None,
     immutable: Annotated[bool | None, typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -90,7 +91,7 @@ def environments_tags_create(
 def environments_tags_destroy(
     environment_pk: Annotated[str, typer.Argument(show_default=False)],
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -134,7 +135,7 @@ def environments_tags_list(
     timestamp: Annotated[datetime | None, typer.Option(show_default=False)] = None,
     timestamp_gte: Annotated[datetime | None, typer.Option(show_default=False)] = None,
     timestamp_lte: Annotated[datetime | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -202,7 +203,7 @@ def environments_tags_update(
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
     timestamp: Annotated[datetime | None, typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,
     immutable: Annotated[bool | None, typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -248,7 +249,7 @@ def environments_tags_update(
 def environments_tags_retrieve(
     environment_pk: Annotated[str, typer.Argument(show_default=False)],
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the tag.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -288,7 +289,7 @@ def environments_tags_partial_update(
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the tag.  You may find it helpful to document how this tag is used to assist others when they need to maintain software that uses this content.")] = None,
     timestamp: Annotated[datetime | None, typer.Option(show_default=False, help="The point in time this tag represents.  If explicitly set to `null` then the current time will be used.")] = None,
     immutable: Annotated[bool | None, typer.Option("--immutable/--no-immutable", show_default=False, help="If True, this tag cannot be modified once it is created.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from figma_cli import _arguments as _a
+from figma_cli import _constants as _c
 from figma_cli import _display as _d  # noqa: F401
 from figma_cli import _exceptions as _e
 from figma_cli import _logging as _l
@@ -109,7 +110,7 @@ def post_variables(
     variable_mode_values_variable_id: Annotated[str | None, typer.Option(show_default=False, help="The target variable. You can use the temporary id of a variable.")] = None,
     variable_mode_values_mode_id: Annotated[str | None, typer.Option(show_default=False, help="Must correspond to a mode in the variable collection that contains the target variable.")] = None,
     variable_mode_values_value: Annotated[str | None, typer.Option(show_default=False, help="The value for the variable. The value must match the variable\'s type. If setting to a variable alias, the alias must resolve to this type. If overriding a value, the value type must match the variable\'s type. If removing an overridden value, the value must be `null`.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -246,7 +247,7 @@ def post_variables(
 @app.command("local", short_help="Get local variables")
 def get_local_variables(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to get variables from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -288,7 +289,7 @@ def get_local_variables(
 @app.command("published", short_help="Get published variables")
 def get_published_variables(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to get variables from. This must be a main file key, not a branch key, as it is not possible to publish from branches.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

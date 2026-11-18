@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -40,7 +41,7 @@ def show_commands(
 @app.command("set", short_help="Update Blocked Phone Number settings")
 def blocked_phone_numbers_update_settings(
     reject_anonymous_inbound_calls: Annotated[bool | None, typer.Option("--reject-anonymous-inbound-calls/--no-reject-anonymous-inbound-calls", show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -75,7 +76,7 @@ def blocked_phone_numbers_update_settings(
 
 @app.command("show", short_help="Retrieve Blocked Phone Number settings")
 def blocked_phone_numbers_get_settings(
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

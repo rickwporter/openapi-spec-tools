@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -45,7 +46,7 @@ def sms_templates_create(
     is_shared: Annotated[bool | None, typer.Option("--is-shared/--no-is-shared", show_default=False)] = None,
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     text: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -95,7 +96,7 @@ def sms_templates_create(
 @app.command("delete", short_help="Delete an SMS template")
 def sms_templates_delete(
     id: Annotated[str, typer.Argument(show_default=False)],
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -128,7 +129,7 @@ def sms_templates_delete(
 def sms_templates_list(
     _limit: Annotated[int | None, typer.Option(help="Number of results to return.")] = 100,
     _skip: Annotated[int | None, typer.Option(help="Number of results to skip before returning, for pagination.")] = 0,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -184,7 +185,7 @@ def sms_templates_update(
     name: Annotated[str | None, typer.Option(show_default=False)] = None,
     status: Annotated[SMSTemplateStatus | None, typer.Option(show_default=False, case_sensitive=False)] = None,
     text: Annotated[str | None, typer.Option(show_default=False)] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -237,7 +238,7 @@ def sms_templates_get(
     id: Annotated[str, typer.Argument(show_default=False)],
     include_attachments: Annotated[bool | None, typer.Option("--include-attachments/--no-include-attachments", help="Include file attachments in the response.")] = False,
     include_embedded: Annotated[bool | None, typer.Option("--include-embedded/--no-include-embedded", help="Include embedded templates used by Workflows.")] = False,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

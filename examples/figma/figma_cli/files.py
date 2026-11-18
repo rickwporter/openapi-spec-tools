@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from figma_cli import _arguments as _a
+from figma_cli import _constants as _c
 from figma_cli import _display as _d  # noqa: F401
 from figma_cli import _exceptions as _e
 from figma_cli import _logging as _l
@@ -46,7 +47,7 @@ def show_commands(
 @app.command("component-sets", short_help="Get file component sets")
 def get_file_component_sets(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to list component sets from. This must be a main file key, not a branch key, as it is not possible to publish from branches.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -78,7 +79,7 @@ def get_file_component_sets(
 @app.command("components", short_help="Get file components")
 def get_file_components(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to list components from. This must be a main file key, not a branch key, as it is not possible to publish from branches.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -110,7 +111,7 @@ def get_file_components(
 @app.command("images", short_help="Get image fills")
 def get_image_fills(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to get image URLs from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -148,7 +149,7 @@ def get_image_fills(
 @app.command("meta", short_help="Get file metadata")
 def get_file_meta(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to get metadata for. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -185,7 +186,7 @@ def get_file_nodes(
     depth: Annotated[float | None, typer.Option(show_default=False, help="Positive integer representing how deep into the node tree to traverse. For example, setting this to 1 will return only the children directly underneath the desired nodes. Not setting this parameter returns all nodes.")] = None,
     geometry: Annotated[str | None, typer.Option(show_default=False, help="Set to \"paths\" to export vector data.")] = None,
     plugin_data: Annotated[str | None, typer.Option(show_default=False, help="A comma separated list of plugin IDs and/or the string \"shared\". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -258,7 +259,7 @@ def get_file(
     geometry: Annotated[str | None, typer.Option(show_default=False, help="Set to \"paths\" to export vector data.")] = None,
     plugin_data: Annotated[str | None, typer.Option(show_default=False, help="A comma separated list of plugin IDs and/or the string \"shared\". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties.")] = None,
     branch_data: Annotated[bool | None, typer.Option("--branch-data/--no-branch-data", help="Returns branch metadata for the requested file. If the file is a branch, the main file\'s key will be included in the returned response. If the file has branches, their metadata will be included in the returned response. Default: false.")] = False,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -308,7 +309,7 @@ def get_file(
 @app.command("styles", short_help="Get file styles")
 def get_file_styles(
     file_key: Annotated[str, typer.Argument(show_default=False, help="File to list styles from. This must be a main file key, not a branch key, as it is not possible to publish from branches.")],
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -343,7 +344,7 @@ def get_file_versions(
     page_size: Annotated[float | None, typer.Option(max=50, show_default=False, help="The number of items returned in a page of the response. If not included, `page_size` is `30`.")] = None,
     before: Annotated[float | None, typer.Option(show_default=False, help="A version ID for one of the versions in the history. Gets versions before this ID. Used for paginating. If the response is not paginated, this link returns the same data in the current response.")] = None,
     after: Annotated[float | None, typer.Option(show_default=False, help="A version ID for one of the versions in the history. Gets versions after this ID. Used for paginating. If the response is not paginated, this property is not included.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.figma.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

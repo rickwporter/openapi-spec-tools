@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
+from cloudtruth_gen_cli import _constants as _c
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
@@ -49,7 +50,7 @@ def grants_create(
     principal: Annotated[str | None, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
     scope: Annotated[str | None, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
     role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -95,7 +96,7 @@ def grants_create(
 @app.command("delete", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the grant.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -143,7 +144,7 @@ def grants_list(
     principal: Annotated[str | None, typer.Option(show_default=False, help="Filter by principal (User, Group). Returns direct grant assignments, not indirect (user via group).")] = None,
     role: Annotated[Role | None, typer.Option(show_default=False, case_sensitive=False, help="Filter by role.")] = None,
     scope: Annotated[str | None, typer.Option(show_default=False, help="Filter by grant scope (Environment, Project).")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -212,7 +213,7 @@ def grants_update(
     principal: Annotated[str | None, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
     scope: Annotated[str | None, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
     role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -258,7 +259,7 @@ def grants_update(
 @app.command("show", short_help="Grants allow you to enable access control on Environments and Projects.")
 def grants_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the grant.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -304,7 +305,7 @@ def grants_partial_update(
     principal: Annotated[str | None, typer.Option(show_default=False, help="The URI of a principal for the grant; this must reference a user or group.")] = None,
     scope: Annotated[str | None, typer.Option(show_default=False, help="The URI of a scope for the grant; this must reference a project or environment.")] = None,
     role: Annotated[RoleEnum | None, typer.Option(show_default=False, case_sensitive=False, help="The role that the principal has in the given scope.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

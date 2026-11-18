@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from cloudtruth_gen_cli import _arguments as _a
+from cloudtruth_gen_cli import _constants as _c
 from cloudtruth_gen_cli import _display as _d  # noqa: F401
 from cloudtruth_gen_cli import _exceptions as _e
 from cloudtruth_gen_cli import _logging as _l
@@ -44,7 +45,7 @@ def environments_create(
     name: Annotated[str | None, typer.Option(show_default=False, help="The environment name.")] = None,
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the environment.  You may find it helpful to document how this environment is used to assist others when they need to maintain software that uses this content.")] = None,
     parent: Annotated[str | None, typer.Option(show_default=False, help="Environments can inherit from a single parent environment which provides values for parameters when specific environments do not have a value set.  Every organization has one default environment that cannot be removed.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -81,7 +82,7 @@ def environments_create(
 @app.command("delete", short_help="")
 def environments_destroy(
     id: Annotated[str, typer.Argument(show_default=False, help="A unique identifier for the environment.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -115,7 +116,7 @@ def environments_list(
     ordering: Annotated[str | None, typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[int | None, typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -169,7 +170,7 @@ def environments_pushes_list(
     ordering: Annotated[str | None, typer.Option(show_default=False, help="Which field to use when ordering the results.")] = None,
     page: Annotated[int | None, typer.Option(show_default=False, help="A page number within the paginated result set.")] = None,
     page_size: Annotated[int | None, typer.Option(show_default=False, help="Number of results to return per page.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -221,7 +222,7 @@ def environments_update(
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the environment.  You may find it helpful to document how this environment is used to assist others when they need to maintain software that uses this content.")] = None,
     parent: Annotated[str | None, typer.Option(show_default=False, help="Environments can inherit from a single parent environment which provides values for parameters when specific environments do not have a value set.  Every organization has one default environment that cannot be removed.")] = None,
     access_controlled: Annotated[bool | None, typer.Option("--access-controlled/--no-access-controlled", show_default=False, help="Indicates if access control is being enforced through grants.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -260,7 +261,7 @@ def environments_update(
 @app.command("show", short_help="")
 def environments_retrieve(
     id: Annotated[str, typer.Argument(show_default=False, help="A UUID string identifying this environment ledger.")],
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
@@ -293,7 +294,7 @@ def environments_partial_update(
     description: Annotated[str | None, typer.Option(show_default=False, help="A description of the environment.  You may find it helpful to document how this environment is used to assist others when they need to maintain software that uses this content.")] = None,
     parent: Annotated[str | None, typer.Option(show_default=False, help="Environments can inherit from a single parent environment which provides values for parameters when specific environments do not have a value set.  Every organization has one default environment that cannot be removed.")] = None,
     access_controlled: Annotated[bool | None, typer.Option("--access-controlled/--no-access-controlled", show_default=False, help="Indicates if access control is being enforced through grants.")] = None,
-    _api_host: _a.ApiHostOption = "https://app.cloudtruth.com",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 10,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,

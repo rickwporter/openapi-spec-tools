@@ -14,6 +14,7 @@ import typer
 from rich_objects import display
 
 from close_cli import _arguments as _a
+from close_cli import _constants as _c
 from close_cli import _display as _d  # noqa: F401
 from close_cli import _exceptions as _e
 from close_cli import _logging as _l
@@ -59,7 +60,7 @@ def phone_numbers_create(
     sharing: Annotated[PhoneNumberSharing | None, typer.Option(case_sensitive=False, hidden=True, help="Deprecated. `personal` for a number that belongs to an individual user, or `group` for a group number. The distinction between personal and group numbers is being removed, and this field will be removed in a future update. When omitted, defaults to `personal`.")] = "personal",
     with_mms: Annotated[bool | None, typer.Option("--with-mms/--no-with-mms", show_default=False, help="By default, MMS-capable numbers are rented if Close supports MMS for the given country. Renting an MMS-capable number can be forced by setting this flag to `true`. If set to `false`, certain prefixes that don\'t support MMS can be rented in countries where Close supports MMS. In most scenarios, this flag should not be passed. When you request an MMS number, you must set `with_sms` to `true` as well.")] = None,
     with_sms: Annotated[bool | None, typer.Option("--with-sms/--no-with-sms", show_default=False, help="By default, SMS-capable numbers are rented if Close supports SMS for the given country. Renting an SMS-capable number can be forced by setting this flag to `true`. If set to `false`, certain prefixes that don\'t support SMS can be rented in countries where Close supports SMS. In most scenarios, this flag should not be passed unless a `has-voice-only` error status is received.")] = None,
-    _api_host: _a.ApiHostOption = "https://api.close.com/api/v1",
+    _api_host: _a.ApiHostOption = _c.DEFAULT_HOST,
     _api_key: _a.ApiKeyOption = None,
     _api_timeout: _a.ApiTimeoutOption = 5,
     _log_level: _a.LogLevelOption = _a.LogLevel.WARN,
