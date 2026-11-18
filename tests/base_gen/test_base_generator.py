@@ -288,6 +288,11 @@ def test_op_short_help(op, expected):
             """'''\n    This has \\''' triple quotes.\n    '''\n    """,
             id="triple-quotes",
         ),
+        pytest.param(
+            {DESC: 'permission for "member/\\*"'},
+            """'''\n    permission for "member/\\\\*"\n    '''\n    """,
+            id="backslash",
+        ),
     ]
 )
 def test_op_doc_string(op, expected):
