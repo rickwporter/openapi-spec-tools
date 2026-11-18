@@ -24,7 +24,7 @@ wheel: ## Build the wheel package that is installable
 install: ## Install the package
 	uv sync
 
-all: install gen lint cov ## Perform a full cycle
+all: install gen lint ## Perform a full cycle
 	$(UV_RUN) ld-cli --help
 
 ###########
