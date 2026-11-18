@@ -1656,10 +1656,18 @@ def test_copy_infrastructure() -> None:
     with TemporaryDirectory() as temp_dir:
         directory = Path(temp_dir)
 
-        # nothing present for copy/replace
         uut.copy_infrastructure_files(temp_dir)
         files = {_.name for _ in directory.iterdir()}
-        assert not files
+        assert files == {"_constants.py"}
+        content = (directory / "_constants.py").read_text()
+        assert 'DEFAULT_HOST = ""' in content
+
+        # custom replacements still assign default_host on _constants.py
+        uut.default_host = "https://api.example"
+        uut.infra_replacements = {"not-present": "ignored"}
+        uut.copy_infrastructure_files(temp_dir)
+        content = (directory / "_constants.py").read_text()
+        assert 'DEFAULT_HOST = "https://api.example"' in content
 
         # copy and replace "random" file
         dname = "foo.yaml"
@@ -1669,7 +1677,7 @@ def test_copy_infrastructure() -> None:
 
         uut.copy_infrastructure_files(temp_dir)
         files = {_.name for _ in directory.iterdir()}
-        assert files == {dname}
+        assert files == {dname, "_constants.py"}
         content = (directory / dname).read_text()
         assert title in content
 

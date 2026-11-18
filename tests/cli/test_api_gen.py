@@ -47,6 +47,7 @@ def test_api_generate_success_directory(code_dir, expected_dir, temp_working_dir
     filenames = {i.name for i in path.iterdir()}
     expected = {
         "__init__.py",
+        "_constants.py",
         "_environment.py",
         "_logging.py",
         "_requests.py",
@@ -82,6 +83,7 @@ def test_api_generate_success_copyright(temp_working_dir):
         assert "Generated API files\n" == mock_stdout.getvalue()
 
     filenames = {
+        "_constants.py",
         "_environment.py",
         "_logging.py",
         "_requests.py",
@@ -128,6 +130,7 @@ def test_api_generate_success_layout(layout, expected_files, temp_working_dir):
     filenames = {i.name for i in path.iterdir()}
     expected = {
         "__init__.py",
+        "_constants.py",
         "_environment.py",
         "_logging.py",
         "_requests.py",
@@ -203,6 +206,7 @@ def test_api_generate_success_config():
 
     # check copyright onthe file
     filenames = {
+        "_constants.py",
         "_environment.py",
         "_logging.py",
         "_requests.py",
@@ -217,7 +221,12 @@ def test_api_generate_success_config():
     file = code_dir / "pets.py"
     text = read_text(file.as_posix())
     assert '_e.env_string(["MY_API_KEY", "API_TOKEN"], except_missing=True)' in text
-    assert '"API_HOST", default="https://127.0.0.1:8080"' in text
+    assert '"API_HOST", default=_c.DEFAULT_HOST' in text
+    assert 'from my_api_pkg import _constants as _c' in text
+
+    file = code_dir / "_constants.py"
+    text = read_text(file.as_posix())
+    assert 'DEFAULT_HOST = "https://127.0.0.1:8080"' in text
 
 
 def test_api_generate_failure_no_package_name():

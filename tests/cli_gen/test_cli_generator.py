@@ -25,11 +25,13 @@ def test_standard_imports():
     assert "import typer" in text
     assert annotated in text
     assert requests in text
+    assert "from cli_package import _constants as _c" in text
 
     text = uut.standard_imports(operations=False)
     assert "import typer" in text
     assert annotated not in text
     assert requests not in text
+    assert "_constants" not in text
 
 
 def test_subcommand_imports():
@@ -369,8 +371,9 @@ def test_op_infra_arguments(command, has_details):
     else:
         assert details_option not in text
 
-    # check that we got the correct default server
-    assert '= "http://petstore.swagger.io/v1"' in text
+    # the host default comes from the generated constants module
+    assert '= _c.DEFAULT_HOST' in text
+    assert uut.default_host == "http://petstore.swagger.io/v1"
 
 
 def test_op_check_missing():
@@ -780,8 +783,12 @@ def test_env_vars():
         assert 'ENV_API_TIME = "TIMEOUT"' in content
         assert 'ENV_LOG_LEVEL = "LEVEL"' in content
 
+        content = (directory / "_constants.py").read_text()
+        assert 'DEFAULT_HOST = "random-url"' in content
+
         # check default values are updated
         content = (directory / "main.py").read_text()
-        assert '_api_host: _a.ApiHostOption = "random-url"' in content
+        assert "from pets import _constants as _c" in content
+        assert '_api_host: _a.ApiHostOption = _c.DEFAULT_HOST' in content
         assert '_api_timeout: _a.ApiTimeoutOption = 10' in content
         assert '_log_level: _a.LogLevelOption = _a.LogLevel.DEBUG' in content
