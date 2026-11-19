@@ -1,12 +1,21 @@
 """Configuration data used to construct a base generator."""
 from __future__ import annotations
 
+from enum import Enum
 from pathlib import Path
 
 import yaml
 from pydantic import BaseModel
 
 from openapi_spec_tools.types import ContentType
+
+
+class ErrorHandling(str, Enum):
+    """How generation treats errors such as duplicate arguments."""
+
+    IGNORE = "ignore"
+    DEFER = "defer"
+    IMMEDIATE = "immediate"
 
 
 class GeneratorConfig(BaseModel):
@@ -33,6 +42,7 @@ class GeneratorConfig(BaseModel):
     default_host: str | None = None
     default_log_level: str | None = None
     default_timeout: int | None = None
+    error_handling: ErrorHandling | None = None
 
     @classmethod
     def from_yaml(cls, filename: str | Path) -> GeneratorConfig:

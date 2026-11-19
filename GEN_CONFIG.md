@@ -36,6 +36,7 @@ Here are the configuration options, and a general idea of their scope.
 | `default_host` | API host used when the environment variable is unset. The first OpenAPI server URL is used when this is omitted. |
 | `default_log_level` | Log level used when the environment variable is unset. |
 | `default_timeout` | Request timeout, in seconds, used when the environment variable is unset. |
+| `error_handling` | How to handle generation errors such as duplicate arguments. `ignore` logs the error and continues. `defer` records the errors and continues. `immediate` raises when the error is found. Defaults to `defer`. |
 
 ## Example
 
