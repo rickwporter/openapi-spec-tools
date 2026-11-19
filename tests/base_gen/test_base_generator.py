@@ -1760,6 +1760,51 @@ def test_copy_tests() -> None:
         assert url in content
 
 
+DUPLICATE_ARGUMENTS = [
+    "pet_id: int",
+    "  name: Annotated[str, typer.Option(help='a: b')] = None",
+    "name: str | None = None",
+    "pet_id: str",
+    "name: str | None = None",
+]
+DUPLICATE_MESSAGE = "Duplicate arguments for updatePet: name, pet_id"
+
+
+def test_check_duplicates(caplog: pytest.LogCaptureFixture) -> None:
+    uut = BaseGenerator(oas={}, package_name=PKG, error_handling=ErrorHandling.IGNORE)
+    unique = [
+        "pet_id: int",
+        "  name: Annotated[str, typer.Option(help='a: b')] = None",
+    ]
+    with caplog.at_level("ERROR"):
+        uut.check_duplicates("getPet", unique)
+    assert [] == [record.message for record in caplog.records]
+    assert [] == uut.errors
+
+    caplog.clear()
+    with caplog.at_level("ERROR"):
+        uut.check_duplicates("updatePet", DUPLICATE_ARGUMENTS)
+        assert [DUPLICATE_MESSAGE] == [record.message for record in caplog.records]
+        assert [] == uut.errors
+
+    uut.error_handling = ErrorHandling.DEFER
+    caplog.clear()
+    with caplog.at_level("ERROR"):
+        uut.check_duplicates("updatePet", DUPLICATE_ARGUMENTS)
+        assert [DUPLICATE_MESSAGE] == [record.message for record in caplog.records]
+        assert [DUPLICATE_MESSAGE] == uut.errors
+
+    uut.error_handling = ErrorHandling.IMMEDIATE
+    uut.errors.clear()
+    caplog.clear()
+    with (
+        caplog.at_level("ERROR"),
+        pytest.raises(CodeGeneration, match=DUPLICATE_MESSAGE)
+    ):
+        uut.check_duplicates("updatePet", DUPLICATE_ARGUMENTS)
+        assert [DUPLICATE_MESSAGE] == [record.message for record in caplog.records]
+
+
 def test_add_error(caplog: pytest.LogCaptureFixture) -> None:
     message = "Duplicate arguments for updatePet: name"
 

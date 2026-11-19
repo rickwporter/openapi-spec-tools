@@ -816,3 +816,20 @@ class BaseGenerator:
             raise CodeGeneration(message)
 
         self.errors.append(message)
+
+    def check_duplicates(self, op_id: str, arguments: list[str]) -> None:
+        """Record duplicate argument names for one generated function.
+
+        Every mode logs the error. Ignore then continues. Immediate raises
+        CodeGeneration. Defer stores the message for the caller to report.
+        """
+        names = [
+            line.split(":", 1)[0].strip()
+            for line in arguments
+        ]
+        duplicates = sorted({name for name in names if names.count(name) > 1})
+        if not duplicates:
+            return
+
+        message = f"Duplicate arguments for {op_id}: {', '.join(duplicates)}"
+        self.add_error(message)
