@@ -24,6 +24,7 @@ from tests.cli.cli_gen_output import PET_FUNC
 from tests.cli.cli_gen_output import PET_HELP
 from tests.cli.cli_gen_output import PET_OP
 from tests.cli.cli_gen_output import PET_PATH
+from tests.cli.helpers import DUPLICATE_ERRORS
 from tests.cli.helpers import read_text
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
@@ -563,6 +564,35 @@ def test_cli_generate_success_config():
     file = code_dir / "main.py"
     text = read_text(file.as_posix())
     assert '_api_timeout: _a.ApiTimeoutOption = 42' in text
+
+
+def test_cli_generate_defers_duplicate_arguments():
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+    oas_file = asset_filename("pets_duplicate.yaml")
+    layout_file = asset_filename("layout_duplicate.yaml")
+    config_file = base_dir / "config.yaml"
+    config_file.write_text("error_handling: defer\n", encoding="utf-8")
+    code_dir = base_dir / "pkg"
+
+    with (
+        mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        generate_cli(
+            oas_file,
+            "pkg",
+            layout_file=layout_file,
+            code_dir=code_dir.as_posix(),
+            config_file=config_file.as_posix(),
+            include_tests=False,
+        )
+
+    assert 1 == err.value.exit_code
+    assert DUPLICATE_ERRORS == mock_stdout.getvalue()
+    text = (code_dir / "main.py").read_text()
+    assert "def show_pet(" in text
+    assert "def show_vet(" in text
 
 
 def test_cli_generate_failure_no_package_name():

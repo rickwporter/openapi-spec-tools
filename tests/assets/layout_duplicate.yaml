@@ -1,0 +1,7 @@
+main:
+  description: Manage records
+  operations:
+    - name: show-pet
+      operationId: showPet
+    - name: show-vet
+      operationId: showVet

@@ -81,6 +81,7 @@ class OpaqueApiGenerator(ApiGenerator):
         args_str = SEP1 + SEP1.join(func_args) + NL
 
         logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query")
+        self.check_duplicates(node.identifier, func_args)
 
         user_header_init = ""
         user_header_arg = ""

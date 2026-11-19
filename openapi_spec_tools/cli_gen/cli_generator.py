@@ -434,6 +434,7 @@ if __name__ == "__main__":
 
         command_args.append(f'short_help="{self.op_short_help(op)}"')
         logger.debug(f"{func_name}({len(path_params)} path, {len(query_params)} query, {len(body_params)} body)")
+        self.check_duplicates(node.identifier, func_args)
 
         hardcoded_values = self.initialize_hardcoded(node.hardcoded)
         user_header_init = ""

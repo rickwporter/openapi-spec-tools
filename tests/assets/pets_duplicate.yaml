@@ -1,0 +1,39 @@
+openapi: "3.0.0"
+info:
+  title: Duplicates
+  version: "1.0.0"
+paths:
+  /pets/{pet_id}:
+    get:
+      operationId: showPet
+      summary: Show a pet
+      parameters:
+        - name: pet_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: petId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok
+  /vets/{vet_id}:
+    get:
+      operationId: showVet
+      summary: Show a vet
+      parameters:
+        - name: vet_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: vet-id
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok
