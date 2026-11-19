@@ -4,6 +4,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from openapi_spec_tools.base_gen.config import ErrorHandling
 from openapi_spec_tools.base_gen.config import GeneratorConfig
 from openapi_spec_tools.base_gen.constants import COLLECTIONS
 from openapi_spec_tools.base_gen.constants import DEFAULT_CONFLICT_SUFFIX
@@ -20,6 +21,7 @@ from openapi_spec_tools.base_gen.constants import DEFAULT_VAR_TIMEOUT
 from openapi_spec_tools.base_gen.constants import NL
 from openapi_spec_tools.base_gen.constants import SEP1
 from openapi_spec_tools.base_gen.constants import SEP2
+from openapi_spec_tools.base_gen.exceptions import CodeGeneration
 from openapi_spec_tools.base_gen.files import copy_and_update
 from openapi_spec_tools.base_gen.utils import maybe_quoted
 from openapi_spec_tools.base_gen.utils import quoted
@@ -70,6 +72,7 @@ class BaseGenerator:
         default_host: str | None = None,
         default_log_level: str | None = None,
         default_timeout: int | None = None,
+        error_handling: ErrorHandling | None = None,
     ):
         """Initialize with the OpenAPI spec and other data for generating multiple modules.
 
@@ -95,6 +98,7 @@ class BaseGenerator:
         * default_host - empty string
         * default_log_level - DEFAULT_VALUE_LOG_LEVEL
         * default_timeout - DEFAULT_VALUE_TIMEOUT
+        * error_handling - ErrorHandling.DEFER
         """
         config = config or GeneratorConfig()  # reduce logic by creating a default (if no config provided)
         self.operations = map_operations(oas.get(OasField.PATHS, {}))
@@ -117,6 +121,8 @@ class BaseGenerator:
         self.env_log_level = _or(env_log_level, config.env_log_level, DEFAULT_VAR_LOG_LEVEL)
         self.default_log = _or(default_log_level, config.default_log_level, DEFAULT_VALUE_LOG_LEVEL)
         self.default_timeout = _or(default_timeout, config.default_timeout, DEFAULT_VALUE_TIMEOUT)
+        self.error_handling = _or(error_handling, config.error_handling, ErrorHandling.DEFER)
+        self.errors: list[str] = []
 
         if not self.default_host:
             servers = oas.get(OasField.SERVERS)
@@ -798,3 +804,15 @@ class BaseGenerator:
             return
 
         dfile.write_text(content, encoding="utf-8", newline="\n")
+
+    def add_error(self, message: str) -> None:
+        """Log a generation error and apply the configured error handling."""
+        logger.error(message)
+
+        if self.error_handling == ErrorHandling.IGNORE:
+            return
+
+        if self.error_handling == ErrorHandling.IMMEDIATE:
+            raise CodeGeneration(message)
+
+        self.errors.append(message)
