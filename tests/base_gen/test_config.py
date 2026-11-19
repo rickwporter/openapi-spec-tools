@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
+from openapi_spec_tools.base_gen.config import ErrorHandling
 from openapi_spec_tools.base_gen.config import GeneratorConfig
 from openapi_spec_tools.types import ContentType
 
@@ -29,6 +30,7 @@ def test_from_config_defaults():
     assert uut.env_log_level is None
     assert uut.default_log_level is None
     assert uut.default_timeout is None
+    assert uut.error_handling is None
 
 
 def test_from_config_overrides():
@@ -56,6 +58,7 @@ def test_from_config_overrides():
         default_host="https://override.test",
         default_log_level="debug",
         default_timeout=9,
+        error_handling=ErrorHandling.DEFER,
     )
 
     assert "pets" == uut.package_name
@@ -75,6 +78,7 @@ def test_from_config_overrides():
     assert "MY_LOG" == uut.env_log_level
     assert "debug" == uut.default_log_level
     assert 9 == uut.default_timeout
+    assert ErrorHandling.DEFER == uut.error_handling
 
 
 def test_from_yaml_defaults():
@@ -116,6 +120,7 @@ env_log_level: MY_LOG
 default_host: https://override.test
 default_log_level: debug
 default_timeout: 9
+error_handling: immediate
 """
     expected = GeneratorConfig(
         package_name="pets",
@@ -135,12 +140,21 @@ default_timeout: 9
         default_host="https://override.test",
         default_log_level="debug",
         default_timeout=9,
+        error_handling=ErrorHandling.IMMEDIATE,
     )
     with TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "generator.yaml"
         path.write_text(text, encoding="utf-8")
         assert expected == GeneratorConfig.from_yaml(path)
         assert expected == GeneratorConfig.from_yaml(path.as_posix())
+
+
+def test_from_yaml_invalid_error_handling():
+    with TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "generator.yaml"
+        path.write_text("error_handling: halt\n", encoding="utf-8")
+        with pytest.raises(ValueError, match="error_handling"):
+            GeneratorConfig.from_yaml(path)
 
 
 def test_from_yaml_missing():

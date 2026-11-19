@@ -1,10 +1,12 @@
 """Base generator which is the base class for API and CLI generoators."""
 from .base_generator import BaseGenerator
+from .config import ErrorHandling
 from .config import GeneratorConfig
 from .constants import COLLECTIONS
 from .constants import NL
 from .constants import SEP1
 from .constants import SEP2
+from .exceptions import CodeGeneration
 from .utils import is_case_sensitive
 from .utils import maybe_quoted
 from .utils import prepend

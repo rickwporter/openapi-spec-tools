@@ -11,6 +11,7 @@ import typer
 from rich import print
 from rich.console import Console
 
+from openapi_spec_tools.base_gen import BaseGenerator
 from openapi_spec_tools.base_gen import GeneratorConfig
 from openapi_spec_tools.cli.arguments import ExpansionType
 from openapi_spec_tools.constants import LOG_CLASS
@@ -55,6 +56,16 @@ def error_out(message: str, exit_code: int = 1) -> None:
     """Print provided error message (with red ERROR prefix) and exit."""
     print(f"[red]ERROR:[/red] {message}")
     raise typer.Exit(exit_code)
+
+
+def check_errors(generator: BaseGenerator) -> None:
+    """Print collected generation errors and exit when any are present."""
+    if not generator.errors:
+        return
+
+    for message in generator.errors:
+        typer.echo(f"ERROR: {message}")
+    raise typer.Exit(1)
 
 
 def open_oas_with_error_handling(filename: str) -> Any:

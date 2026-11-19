@@ -8,6 +8,7 @@ import typer
 import yaml
 
 from openapi_spec_tools.cli.api_gen import generate_api
+from tests.cli.helpers import DUPLICATE_ERRORS
 from tests.cli.helpers import read_text
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
@@ -227,6 +228,36 @@ def test_api_generate_success_config():
     file = code_dir / "_constants.py"
     text = read_text(file.as_posix())
     assert 'DEFAULT_HOST = "https://127.0.0.1:8080"' in text
+
+
+@pytest.mark.parametrize("body_type", ["flat", "opaque", "property"])
+def test_api_generate_defers_duplicate_arguments(body_type):
+    directory = TemporaryDirectory()
+    base_dir = Path(directory.name)
+    oas_file = asset_filename("pets_duplicate.yaml")
+    layout_file = asset_filename("layout_duplicate.yaml")
+    config_file = base_dir / "config.yaml"
+    config_file.write_text("error_handling: defer\n", encoding="utf-8")
+    code_dir = base_dir / "pkg"
+
+    with (
+        mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        generate_api(
+            oas_file,
+            "pkg",
+            layout_file=layout_file,
+            code_dir=code_dir.as_posix(),
+            config_file=config_file.as_posix(),
+            body_type=body_type,
+        )
+
+    assert 1 == err.value.exit_code
+    assert DUPLICATE_ERRORS == mock_stdout.getvalue()
+    text = (code_dir / "main.py").read_text()
+    assert "def show_pet(" in text
+    assert "def show_vet(" in text
 
 
 def test_api_generate_failure_no_package_name():

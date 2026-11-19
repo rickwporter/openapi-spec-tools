@@ -8,7 +8,9 @@ import pytest
 from openapi_spec_tools.base_gen._constants import DEFAULT_HOST
 from openapi_spec_tools.base_gen.base_generator import DEFAULT_COPYRIGHT
 from openapi_spec_tools.base_gen.base_generator import BaseGenerator
+from openapi_spec_tools.base_gen.config import ErrorHandling
 from openapi_spec_tools.base_gen.config import GeneratorConfig
+from openapi_spec_tools.base_gen.exceptions import CodeGeneration
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import map_operations
 from openapi_spec_tools.utils import open_oas
@@ -81,6 +83,15 @@ def test_config():
     assert uut.max_help_length == 3
     assert uut.default_log == "debug"
     assert uut.default_host == "https://192.168.1.1"
+    assert ErrorHandling.DEFER == uut.error_handling
+    assert [] == uut.errors
+
+    configured = GeneratorConfig(package_name=PKG, error_handling=ErrorHandling.IGNORE)
+    uut = BaseGenerator({}, config=configured)
+    assert ErrorHandling.IGNORE == uut.error_handling
+
+    uut = BaseGenerator({}, config=configured, error_handling=ErrorHandling.IMMEDIATE, package_name=PKG)
+    assert ErrorHandling.IMMEDIATE == uut.error_handling
 
     config = GeneratorConfig()
     with pytest.raises(ValueError, match="Missing package_name"):
@@ -1747,3 +1758,74 @@ def test_copy_tests() -> None:
         assert files == {dname}
         content = (directory / dname).read_text()
         assert url in content
+
+
+DUPLICATE_ARGUMENTS = [
+    "pet_id: int",
+    "  name: Annotated[str, typer.Option(help='a: b')] = None",
+    "name: str | None = None",
+    "pet_id: str",
+    "name: str | None = None",
+]
+DUPLICATE_MESSAGE = "Duplicate arguments for updatePet: name, pet_id"
+
+
+def test_check_duplicates(caplog: pytest.LogCaptureFixture) -> None:
+    uut = BaseGenerator(oas={}, package_name=PKG, error_handling=ErrorHandling.IGNORE)
+    unique = [
+        "pet_id: int",
+        "  name: Annotated[str, typer.Option(help='a: b')] = None",
+    ]
+    with caplog.at_level("ERROR"):
+        uut.check_duplicates("getPet", unique)
+    assert [] == [record.message for record in caplog.records]
+    assert [] == uut.errors
+
+    caplog.clear()
+    with caplog.at_level("ERROR"):
+        uut.check_duplicates("updatePet", DUPLICATE_ARGUMENTS)
+        assert [DUPLICATE_MESSAGE] == [record.message for record in caplog.records]
+        assert [] == uut.errors
+
+    uut.error_handling = ErrorHandling.DEFER
+    caplog.clear()
+    with caplog.at_level("ERROR"):
+        uut.check_duplicates("updatePet", DUPLICATE_ARGUMENTS)
+        assert [DUPLICATE_MESSAGE] == [record.message for record in caplog.records]
+        assert [DUPLICATE_MESSAGE] == uut.errors
+
+    uut.error_handling = ErrorHandling.IMMEDIATE
+    uut.errors.clear()
+    caplog.clear()
+    with (
+        caplog.at_level("ERROR"),
+        pytest.raises(CodeGeneration, match=DUPLICATE_MESSAGE)
+    ):
+        uut.check_duplicates("updatePet", DUPLICATE_ARGUMENTS)
+        assert [DUPLICATE_MESSAGE] == [record.message for record in caplog.records]
+
+
+def test_add_error(caplog: pytest.LogCaptureFixture) -> None:
+    message = "Duplicate arguments for updatePet: name"
+
+    ignored = BaseGenerator(oas={}, package_name=PKG, error_handling=ErrorHandling.IGNORE)
+    with caplog.at_level("ERROR"):
+        ignored.add_error(message)
+    assert [message] == [record.message for record in caplog.records]
+    assert [] == ignored.errors
+
+    caplog.clear()
+    deferred = BaseGenerator(oas={}, package_name=PKG, error_handling=ErrorHandling.DEFER)
+    with caplog.at_level("ERROR"):
+        deferred.add_error(message)
+        deferred.add_error("second")
+    assert [message, "second"] == [record.message for record in caplog.records]
+    assert [message, "second"] == deferred.errors
+
+    caplog.clear()
+    immediate = BaseGenerator(oas={}, package_name=PKG, error_handling=ErrorHandling.IMMEDIATE)
+    with caplog.at_level("ERROR"), pytest.raises(CodeGeneration) as err:
+        immediate.add_error(message)
+    assert message == str(err.value)
+    assert [message] == [record.message for record in caplog.records]
+    assert [] == immediate.errors

@@ -22,6 +22,7 @@ from openapi_spec_tools.cli.arguments import StartPointOption
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
 from openapi_spec_tools.cli.constants import DIRECTORY
 from openapi_spec_tools.cli.constants import SEP
+from openapi_spec_tools.cli.utils import check_errors
 from openapi_spec_tools.cli.utils import gen_config_from_file
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import layout_tree_with_error_handling
@@ -135,6 +136,7 @@ def generate_cli(
     generator.add_init_file(code_dir)
     generator.copy_infrastructure_files(code_dir)
     generator.generate_files(commands, code_dir)
+    check_errors(generator)
 
     if include_tests:
         os.makedirs(test_dir, exist_ok=True)
@@ -295,6 +297,7 @@ def show_cli_tree(
     generator = CliGenerator(package_name="", oas=oas)
 
     tree = generate_tree_node(generator, layout)
+    check_errors(generator)
     if not tree.children:
         typer.echo("No operations or sub-commands found")
         return
