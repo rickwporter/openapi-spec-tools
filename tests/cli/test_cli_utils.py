@@ -6,8 +6,10 @@ from unittest import mock
 import pytest
 import typer
 
+from openapi_spec_tools.base_gen import BaseGenerator
 from openapi_spec_tools.base_gen import GeneratorConfig
 from openapi_spec_tools.cli.arguments import ExpansionType
+from openapi_spec_tools.cli.utils import check_errors
 from openapi_spec_tools.cli.utils import console_factory
 from openapi_spec_tools.cli.utils import gen_config_from_file
 from openapi_spec_tools.cli.utils import layout_config_from_file
@@ -174,6 +176,26 @@ def test_layout_config_from_file_invalid() -> None:
     assert err.value.exit_code == 1
     output = mock_stdout.getvalue()
     assert output.startswith("ERROR: 1 validation error for LayoutConfig")
+
+
+def test_check_errors_none() -> None:
+    generator = BaseGenerator(oas={}, package_name="pkg")
+    check_errors(generator)
+
+
+def test_check_errors_exits() -> None:
+    generator = BaseGenerator(oas={}, package_name="pkg")
+    generator.errors = ["Duplicate arguments for listPets: name", "Duplicate arguments for listVets: name"]
+    with (
+        mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout,
+        pytest.raises(typer.Exit) as err,
+    ):
+        check_errors(generator)
+
+    assert 1 == err.value.exit_code
+    output = mock_stdout.getvalue()
+    assert "ERROR: Duplicate arguments for listPets: name\n" in output
+    assert "ERROR: Duplicate arguments for listVets: name\n" in output
 
 
 def test_console_factory() -> None:
