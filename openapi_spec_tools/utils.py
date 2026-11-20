@@ -320,9 +320,13 @@ def schema_summary(model: dict[str, Any]) -> str:
 
 
 def find_references(obj: dict[str, Any]) -> set[str]:
-    """Walk the 'obj' dictionary to find all the reference values (e.g. "$ref")."""
+    """Walk the 'obj' dictionary to find all the reference values (e.g. "$ref").
+
+    Local references drop the ``#/components`` prefix. External references are returned
+    unchanged so a URL or file path is not rewritten.
+    """
     refs = find_dict_prop(obj, OasField.REFS)
-    return {short_ref(_) for _ in refs}
+    return {short_ref(ref) if ref.startswith("#") else ref for ref in refs}
 
 
 

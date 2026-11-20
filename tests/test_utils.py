@@ -123,6 +123,57 @@ def test_utils_find_path_references(asset, path, references) -> None:
     assert references == found
 
 
+@pytest.mark.parametrize(
+    ["obj", "expected"],
+    [
+        pytest.param(
+            {"schema": {REFS: "#/components/schemas/Pet"}},
+            {"schemas/Pet"},
+            id="local",
+        ),
+        pytest.param(
+            {"schema": {REFS: "https://example.com/api.yaml#/components/schemas/Pet"}},
+            {"https://example.com/api.yaml#/components/schemas/Pet"},
+            id="external-url",
+        ),
+        pytest.param(
+            {"schema": {REFS: "https://example.com/components/common.yaml#/components/schemas/Pet"}},
+            {"https://example.com/components/common.yaml#/components/schemas/Pet"},
+            id="url-path-components",
+        ),
+        pytest.param(
+            {"schema": {REFS: "./common.yaml#/components/schemas/Error"}},
+            {"./common.yaml#/components/schemas/Error"},
+            id="relative-file",
+        ),
+        pytest.param(
+            {"schema": {REFS: "../components/Pet.yaml"}},
+            {"../components/Pet.yaml"},
+            id="relative-components-path",
+        ),
+        pytest.param(
+            {
+                "local": {REFS: "#/components/schemas/Pet"},
+                "remote": {REFS: "other.yaml#/components/schemas/Owner"},
+                "items": [
+                    {REFS: "#/components/parameters/PageSize"},
+                    {REFS: "https://cdn.example/defs.json#/Foo"},
+                ],
+            },
+            {
+                "schemas/Pet",
+                "other.yaml#/components/schemas/Owner",
+                "parameters/PageSize",
+                "https://cdn.example/defs.json#/Foo",
+            },
+            id="mixed",
+        ),
+    ],
+)
+def test_find_references_keeps_external(obj, expected) -> None:
+    assert expected == find_references(obj)
+
+
 def test_find_diffs_pet_forward() -> None:
     orig = open_test_oas("pet.yaml")
     updated = open_test_oas("pet2.yaml")
