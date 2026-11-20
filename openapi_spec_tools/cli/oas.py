@@ -14,6 +14,7 @@ from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
 from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
 from openapi_spec_tools.cli.constants import INDENT
 from openapi_spec_tools.cli.history import app as history_app
+from openapi_spec_tools.cli.references import app as references_app
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
@@ -37,6 +38,7 @@ app = typer.Typer(
 )
 app.add_typer(history_app, name="history")
 app.add_typer(analyze_app, name="analyze")
+app.add_typer(references_app, name="references")
 
 
 @app.command("info", short_help="Display the 'info' from the OpenAPI specification")
