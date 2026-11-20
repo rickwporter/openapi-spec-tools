@@ -39,6 +39,18 @@ def open_oas(filename: str) -> Any:
         return yaml.safe_load(fp)
 
 
+def write_oas(filename: str, spec: dict[str, Any], indent: int = 2) -> None:
+    """Write the specified spec to the specified file name."""
+    with open(filename, "w", encoding="utf-8", newline="\n") as fp:
+        if filename.endswith('json'):
+            json.dump(spec, fp, indent=indent, sort_keys=True)
+            return
+
+        # default to yaml when file extension is not .json
+        yaml.dump(spec, fp, indent=indent, sort_keys=True)
+        return
+
+
 def unroll(full_set: dict[str, set[str]], items: set[str]) -> set[str]:
     """Unroll all the references from items.
 

@@ -224,7 +224,7 @@ def test_update_success_save() -> None:
             PET2_YAML,
             allowed_operations=["deletePetById", "listPets"],
             display_option=DisplayOption.FINAL,
-            updated_filename=temp_file,
+            updated_filename=temp_file.as_posix(),
         )
         output = mock_stdout.getvalue()
         assert temp_file.exists()

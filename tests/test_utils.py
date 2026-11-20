@@ -1,4 +1,5 @@
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -28,6 +29,7 @@ from openapi_spec_tools.utils import schema_summary
 from openapi_spec_tools.utils import set_nullable_not_required
 from openapi_spec_tools.utils import short_ref
 from openapi_spec_tools.utils import unroll
+from openapi_spec_tools.utils import write_oas
 from tests.constants import ALL_OF
 from tests.constants import DESC
 from tests.constants import FORMAT
@@ -73,6 +75,51 @@ def test_open_oas() -> None:
 
     with pytest.raises(FileNotFoundError):
         open_oas("no-such-file")
+
+
+def test_write_oas_round_trip(tmp_path: Path) -> None:
+    spec = open_oas(asset_filename("pet2.yaml"))
+    for name in ("copy.yaml", "copy.yml", "copy.json", "copy"):
+        filename = str(tmp_path / name)
+        write_oas(filename, spec)
+        assert open_oas(filename) == spec
+
+
+@pytest.mark.parametrize(
+    ["filename", "indent", "expected"],
+    [
+        pytest.param(
+            "spec.yaml",
+            4,
+            "info:\n    title: Pets\n    version: 1.0.0\n",
+            id="yaml",
+        ),
+        pytest.param(
+            "spec.yml",
+            2,
+            "info:\n  title: Pets\n  version: 1.0.0\n",
+            id="yml",
+        ),
+        pytest.param(
+            "spec.json",
+            2,
+            '{\n  "info": {\n    "title": "Pets",\n    "version": "1.0.0"\n  }\n}',
+            id="json",
+        ),
+        pytest.param(
+            "spec.json",
+            4,
+            '{\n    "info": {\n        "title": "Pets",\n        "version": "1.0.0"\n    }\n}',
+            id="json-indent",
+        ),
+    ],
+)
+def test_write_oas_indent(tmp_path: Path, filename: str, indent: int, expected: str) -> None:
+    spec = {"info": {"title": "Pets", "version": "1.0.0"}}
+    path = tmp_path / filename
+    write_oas(str(path), spec, indent=indent)
+    assert path.read_text(encoding="utf-8") == expected
+    assert open_oas(str(path)) == spec
 
 
 @pytest.mark.parametrize(
