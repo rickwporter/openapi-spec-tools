@@ -103,7 +103,7 @@ def get_spec_text(url: str, base_dir: Path | None = None) -> str:
             file = base_dir / file
         if not file.exists():
             error_out(f"Local file {url} does not exist!")
-        return file.read_text(encoding="utf-8", errors="ignore", newline="\n")
+        return file.read_text(encoding="utf-8", errors="ignore")
 
     try:
         start = datetime.now(tz=timezone.utc)
