@@ -94,6 +94,8 @@ def test_get_external_references_invalid(reference: str, caplog: pytest.LogCaptu
         pytest.param("./dir/pet.yaml", False, id="relative"),
         pytest.param("../components/Pet.yaml", False, id="parent"),
         pytest.param("/abs/pet.yaml", False, id="absolute"),
+        pytest.param("C:/abs/pet.yaml", False, id="windows-drive"),
+        pytest.param("c:\\foo", False, id="windows-backslash"),
     ],
 )
 def test_is_url(value: str, expected: bool) -> None:
@@ -113,6 +115,8 @@ def test_is_url(value: str, expected: bool) -> None:
         ),
         pytest.param("./dir/pet.yaml", "pet.yaml", id="relative"),
         pytest.param("common.yaml", "common.yaml", id="bare"),
+        pytest.param("C:/abs/dir/pet.yaml", "pet.yaml", id="windows-drive"),
+        pytest.param("c:\\foo\\pet.yaml", "pet.yaml", id="windows-backslash"),
     ],
 )
 def test_extract_filename(url: str, expected: str) -> None:
