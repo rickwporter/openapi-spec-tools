@@ -743,6 +743,35 @@ def remove_property(schema: dict[str, Any], prop_name: str) -> dict[str, Any]:
     return result
 
 
+def add_models(schema: dict[str, Any], models: dict[str, Any]) -> None:
+    """Add models to the components portion of the schema.
+
+    ``models`` is grouped the same way ``unmap_models()`` returns it: component
+    section, then model name. An existing model with the same name is replaced.
+    """
+    components = schema.setdefault(OasField.COMPONENTS.value, {})
+    for component, values in models.items():
+        current = components.setdefault(component, {})
+        current.update(values)
+
+
+def replace_references(schema: dict[str, Any], replacements: dict[str, str]) -> None:
+    """Replace the $ref keys with the values in the specified schema."""
+    def _walk(node: Any) -> None:
+        """Update ``$ref`` values found under ``node``."""
+        if isinstance(node, dict):
+            reference = node.get(OasField.REFS)
+            if isinstance(reference, str) and reference in replacements:
+                node[OasField.REFS.value] = replacements[reference]
+            for value in node.values():
+                _walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                _walk(item)
+
+    _walk(schema)
+
+
 def get_logger(name: str) -> logging.Logger:
     """Return a logger with the package prefix shortened.
 
