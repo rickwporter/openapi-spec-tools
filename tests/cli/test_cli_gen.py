@@ -441,7 +441,7 @@ def test_trim_oas_changes():
     trim_oas(
         asset_filename("layout_cloudtruth.yaml"),
         asset_filename("ct.yaml"),
-        updated_file=updated,
+        updated_file=updated.as_posix(),
         remove_properties=["example"],
     )
     expected = Path(asset_filename("ct_trimmed.yaml")).read_text()
@@ -456,7 +456,7 @@ def test_trim_oas_unchanged():
     trim_oas(
         asset_filename("layout_pets.yaml"),
         oas_file,
-        updated_file=trimmed_file,
+        updated_file=trimmed_file.as_posix(),
         nullable_not_required=False,
         remove_all_tags=False,
     )

@@ -27,6 +27,7 @@ from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
+from openapi_spec_tools.utils import write_oas
 
 #################################################
 # Top-level stuff
@@ -187,8 +188,7 @@ def update(
         updated = schema_operations_filter(updated, allow=set(allowed_operations))
 
     if updated_filename:
-        with open(updated_filename, "w", encoding="utf-8", newline="\n") as fp:
-            yaml.dump(updated, fp, indent=indent)
+        write_oas(updated_filename, updated, indent=indent)
 
     console = console_factory()
     diffs = find_diffs(old_spec, updated)

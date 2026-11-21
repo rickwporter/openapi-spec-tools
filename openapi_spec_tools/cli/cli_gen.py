@@ -6,7 +6,6 @@ from typing import Annotated
 from typing import Any
 
 import typer
-import yaml
 from rich_objects import console_factory
 
 from openapi_spec_tools.cli.arguments import CodeDirectoryOption
@@ -44,6 +43,7 @@ from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import set_nullable_not_required
+from openapi_spec_tools.utils import write_oas
 
 #################################################
 # Utilities
@@ -361,8 +361,7 @@ def trim_oas(
         updated = set_nullable_not_required(updated)
 
     out_file = updated_file or openapi_file
-    with open(out_file, "w", encoding="utf-8", newline="\n") as fp:
-        yaml.dump(updated, fp, indent=indent, sort_keys=True)
+    write_oas(out_file, updated, indent=indent)
 
     typer.echo(f"Wrote to {out_file}")
     return
