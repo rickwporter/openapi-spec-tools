@@ -186,7 +186,7 @@ def download_references(
     dir_path.mkdir(parents=True, exist_ok=True)
     base_dir = Path(filename).parent
     for ext_url in sorted(external):
-        text = get_spec_text(ext_url, base_dir)
+        text = get_spec_text(ext_url, base_dir).replace("\r\n", "\n").replace("\r", "\n")
         file = dir_path / extract_filename(ext_url)
         file.write_text(text, encoding="utf-8", errors="ignore", newline="\n")
         typer.echo(f"Wrote {file} for {ext_url}")

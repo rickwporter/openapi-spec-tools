@@ -261,7 +261,7 @@ def test_download_references_writes_files(tmp_path: Path) -> None:
     out_dir = tmp_path / "nested" / "refs"
     bodies = {
         COMMON_URL: "title: common\ndescription: café\n",
-        ERRORS_URL: '{"title": "errors"}\n',
+        ERRORS_URL: '{"title": "errors"}\r\n',
     }
 
     def fake_get(url: str, timeout: int) -> mock.Mock:
@@ -278,7 +278,7 @@ def test_download_references_writes_files(tmp_path: Path) -> None:
         download_references(str(filename), out_dir=str(out_dir))
 
     assert (out_dir / "common.yaml").read_text(encoding="utf-8") == bodies[COMMON_URL]
-    assert (out_dir / "errors.json").read_text(encoding="utf-8") == bodies[ERRORS_URL]
+    assert (out_dir / "errors.json").read_bytes() == b'{"title": "errors"}\n'
     assert mock_get.call_count == 2
     output = mock_stdout.getvalue().splitlines()
     assert output == [
@@ -288,11 +288,12 @@ def test_download_references_writes_files(tmp_path: Path) -> None:
 
 
 def test_download_references_copies_local_file(tmp_path: Path) -> None:
-    local_file = tmp_path / "common.yaml"
+    local_name = "common.yaml"
+    local_file = tmp_path / local_name
     local_bytes = "title: local\ndescription: café\n".encode()
     local_file.write_bytes(local_bytes)
     spec = _spec_with_refs(
-        f"{local_file}#/components/schemas/Pet",
+        f"{local_name}#/components/schemas/Pet",
         f"{ERRORS_URL}#/components/schemas/Failure",
     )
     filename = _write_spec(tmp_path, spec)
@@ -318,7 +319,7 @@ def test_download_references_copies_local_file(tmp_path: Path) -> None:
     assert (out_dir / "common.yaml").read_text(encoding="utf-8") == "title: local\ndescription: café\n"
     assert (out_dir / "errors.json").read_text(encoding="utf-8") == body
     assert mock_stdout.getvalue().splitlines() == [
-        f"Wrote {out_dir / 'common.yaml'} for {local_file}",
+        f"Wrote {out_dir / 'common.yaml'} for {local_name}",
         f"Wrote {out_dir / 'errors.json'} for {ERRORS_URL}",
     ]
 
@@ -467,7 +468,7 @@ def test_update_references_missing_inner_model(tmp_path: Path, caplog: pytest.Lo
     }
     common_path = tmp_path / "common.yaml"
     common_path.write_text(yaml.dump(common), encoding="utf-8", newline="\n")
-    filename = _write_spec(tmp_path, _spec_with_refs(f"{common_path}#/components/schemas/Pet"))
+    filename = _write_spec(tmp_path, _spec_with_refs("common.yaml#/components/schemas/Pet"))
     with caplog.at_level("WARNING", logger="oas.cli.references"):
         update_references(str(filename))
     assert "Failed to find ref for schemas/Missing" in caplog.text
