@@ -16,6 +16,7 @@ from openapi_spec_tools.cli.references import get_external_references
 from openapi_spec_tools.cli.references import get_spec_data
 from openapi_spec_tools.cli.references import is_url
 from openapi_spec_tools.cli.references import update_references
+from tests.cli.helpers import read_text
 from tests.helpers import StringIo
 from tests.helpers import asset_filename
 from tests.helpers import open_test_oas
@@ -140,7 +141,8 @@ PETS = {"openapi": "3.0.3", "info": {"title": "Pets"}}
 def test_get_spec_data_local(tmp_path: Path, name: str, content: bytes, expected: dict[str, Any]) -> None:
     path = tmp_path / name
     path.write_bytes(content)
-    assert get_spec_data(str(path)) == expected
+    actual = get_spec_data(str(path))
+    assert actual == expected
 
 
 def test_get_spec_data_url(caplog: pytest.LogCaptureFixture) -> None:
@@ -164,7 +166,8 @@ def test_get_spec_data_missing_local_file() -> None:
     ):
         get_spec_data(missing)
     assert err.value.exit_code == 1
-    assert mock_stdout.getvalue() == f"ERROR: Local file {missing} does not exist!\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"ERROR: Local file {missing} does not exist!\n"
 
 
 def test_get_spec_data_download_error() -> None:
@@ -178,7 +181,8 @@ def test_get_spec_data_download_error() -> None:
     ):
         get_spec_data(COMMON_URL)
     assert err.value.exit_code == 1
-    assert mock_stdout.getvalue() == f"ERROR: Failed to download {COMMON_URL}: network down\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"ERROR: Failed to download {COMMON_URL}: network down\n"
 
 
 @pytest.mark.parametrize(
@@ -200,7 +204,8 @@ def test_get_spec_data_parse_errors(tmp_path: Path, name: str, content: bytes, m
     ):
         get_spec_data(str(path))
     assert err.value.exit_code == 1
-    assert message in mock_stdout.getvalue()
+    actual = mock_stdout.getvalue()
+    assert message in actual
 
 
 def test_check_duplicate_file_names_unique() -> None:
@@ -223,13 +228,15 @@ def test_check_duplicate_file_names_conflict() -> None:
     ):
         check_duplicate_file_names(urls)
     assert err.value.exit_code == 1
-    assert mock_stdout.getvalue() == "ERROR: Duplicate filenames for: owner.yaml, pet.yaml\n"
+    actual = mock_stdout.getvalue()
+    assert actual == "ERROR: Duplicate filenames for: owner.yaml, pet.yaml\n"
 
 
 def test_find_external_references_none() -> None:
     with mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout:
         find_external_references(PET_YAML)
-    assert mock_stdout.getvalue() == f"No external references found in {PET_YAML}\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"No external references found in {PET_YAML}\n"
 
 
 def test_find_external_references_found(tmp_path: Path) -> None:
@@ -241,14 +248,16 @@ def test_find_external_references_found(tmp_path: Path) -> None:
     filename = _write_spec(tmp_path, spec)
     with mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout:
         find_external_references(str(filename))
-    assert mock_stdout.getvalue() == FIND_EXTERNAL
+    actual = mock_stdout.getvalue()
+    assert actual == FIND_EXTERNAL
 
 
 def test_download_references_none(tmp_path: Path) -> None:
     out_dir = tmp_path / "unused"
     with mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout:
         download_references(PET_YAML, out_dir=str(out_dir))
-    assert mock_stdout.getvalue() == f"No external references found in {PET_YAML}\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"No external references found in {PET_YAML}\n"
     assert not out_dir.exists()
 
 
@@ -277,11 +286,11 @@ def test_download_references_writes_files(tmp_path: Path) -> None:
     ):
         download_references(str(filename), out_dir=str(out_dir))
 
-    assert (out_dir / "common.yaml").read_text(encoding="utf-8") == bodies[COMMON_URL]
-    assert (out_dir / "errors.json").read_bytes() == b'{"title": "errors"}\n'
+    assert read_text(out_dir / "common.yaml") == bodies[COMMON_URL]
+    assert read_text(out_dir / "errors.json") == '{"title": "errors"}\n'
     assert mock_get.call_count == 2
-    output = mock_stdout.getvalue().splitlines()
-    assert output == [
+    actual = mock_stdout.getvalue()
+    assert actual.splitlines() == [
         f"Wrote {out_dir / 'errors.json'} for {ERRORS_URL}",
         f"Wrote {out_dir / 'common.yaml'} for {COMMON_URL}",
     ]
@@ -315,10 +324,11 @@ def test_download_references_copies_local_file(tmp_path: Path) -> None:
         download_references(str(filename), out_dir=str(out_dir))
 
     assert mock_get.call_count == 1
-    assert local_file.read_bytes() == local_bytes
-    assert (out_dir / "common.yaml").read_text(encoding="utf-8") == "title: local\ndescription: café\n"
-    assert (out_dir / "errors.json").read_text(encoding="utf-8") == body
-    assert mock_stdout.getvalue().splitlines() == [
+    assert read_text(local_file) == "title: local\ndescription: café\n"
+    assert read_text(out_dir / "common.yaml") == "title: local\ndescription: café\n"
+    assert read_text(out_dir / "errors.json") == body
+    actual = mock_stdout.getvalue()
+    assert actual.splitlines() == [
         f"Wrote {out_dir / 'common.yaml'} for {local_name}",
         f"Wrote {out_dir / 'errors.json'} for {ERRORS_URL}",
     ]
@@ -336,7 +346,8 @@ def test_download_references_missing_local_file(tmp_path: Path) -> None:
     ):
         download_references(str(filename), out_dir=str(out_dir))
     assert err.value.exit_code == 1
-    assert mock_stdout.getvalue() == f"ERROR: Local file {local_name} does not exist!\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"ERROR: Local file {local_name} does not exist!\n"
     mock_get.assert_not_called()
     assert not (out_dir / local_name).exists()
 
@@ -355,7 +366,8 @@ def test_download_references_duplicate_names(tmp_path: Path) -> None:
     ):
         download_references(str(filename), out_dir=str(out_dir))
     assert err.value.exit_code == 1
-    assert mock_stdout.getvalue() == "ERROR: Duplicate filenames for: pet.yaml\n"
+    actual = mock_stdout.getvalue()
+    assert actual == "ERROR: Duplicate filenames for: pet.yaml\n"
     mock_get.assert_not_called()
     assert not out_dir.exists()
 
@@ -374,8 +386,8 @@ def test_download_references_request_error(tmp_path: Path) -> None:
     ):
         download_references(str(filename), out_dir=str(out_dir))
     assert err.value.exit_code == 1
-    output = mock_stdout.getvalue()
-    assert output == f"ERROR: Failed to download {COMMON_URL}: network down\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"ERROR: Failed to download {COMMON_URL}: network down\n"
     assert not (out_dir / "common.yaml").exists()
 
 
@@ -392,7 +404,8 @@ def test_download_references_http_error(tmp_path: Path) -> None:
     ):
         download_references(str(filename), out_dir=str(out_dir))
     assert err.value.exit_code == 1
-    assert mock_stdout.getvalue() == f"ERROR: Failed to download {COMMON_URL}: 404 Client Error\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"ERROR: Failed to download {COMMON_URL}: 404 Client Error\n"
     assert not (out_dir / "common.yaml").exists()
 
 
@@ -412,7 +425,8 @@ def test_references_missing_file(command) -> None:
     ):
         command(filename)
     assert err.value.exit_code == 1
-    assert mock_stdout.getvalue() == f"ERROR: failed to find {filename}\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"ERROR: failed to find {filename}\n"
 
 
 def _assert_pet_external_resolved(spec: dict[str, Any]) -> None:
@@ -433,26 +447,28 @@ def test_update_references_none(tmp_path: Path) -> None:
     out_file = tmp_path / "updated.yaml"
     with mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout:
         update_references(PET_YAML, updated_filename=str(out_file))
-    assert mock_stdout.getvalue() == f"No external references found in {PET_YAML}\n"
+    actual = mock_stdout.getvalue()
+    assert actual == f"No external references found in {PET_YAML}\n"
     assert not out_file.exists()
 
 
 def test_update_references_inlines_models(tmp_path: Path) -> None:
     filename = tmp_path / "pet_external.yaml"
-    filename.write_bytes(Path(PET_EXTERNAL).read_bytes())
-    (tmp_path / "pet.yaml").write_bytes(Path(PET_YAML).read_bytes())
+    filename.write_text(read_text(PET_EXTERNAL), encoding="utf-8", newline="\n")
+    (tmp_path / "pet.yaml").write_text(read_text(PET_YAML), encoding="utf-8", newline="\n")
     with mock.patch("sys.stdout", new_callable=StringIo) as mock_stdout:
         update_references(str(filename))
-    assert mock_stdout.getvalue() == ""
-    _assert_pet_external_resolved(yaml.safe_load(filename.read_text(encoding="utf-8")))
+    actual = mock_stdout.getvalue()
+    assert actual == ""
+    _assert_pet_external_resolved(yaml.safe_load(read_text(filename)))
 
 
 def test_update_references_out_file(tmp_path: Path) -> None:
-    original = Path(PET_EXTERNAL).read_bytes()
+    original = read_text(PET_EXTERNAL)
     out_file = tmp_path / "updated.yaml"
     update_references(PET_EXTERNAL, updated_filename=str(out_file))
-    assert Path(PET_EXTERNAL).read_bytes() == original
-    _assert_pet_external_resolved(yaml.safe_load(out_file.read_text(encoding="utf-8")))
+    assert read_text(PET_EXTERNAL) == original
+    _assert_pet_external_resolved(yaml.safe_load(read_text(out_file)))
 
 
 def test_update_references_missing_inner_model(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
@@ -472,7 +488,7 @@ def test_update_references_missing_inner_model(tmp_path: Path, caplog: pytest.Lo
     with caplog.at_level("WARNING", logger="oas.cli.references"):
         update_references(str(filename))
     assert "Failed to find ref for schemas/Missing" in caplog.text
-    schemas = yaml.safe_load(filename.read_text(encoding="utf-8"))["components"]["schemas"]
+    schemas = yaml.safe_load(read_text(filename))["components"]["schemas"]
     assert "Missing" not in schemas
     assert schemas["Pet"]["properties"]["friend"]["$ref"] == "#/components/schemas/Missing"
     assert schemas["Local"]["properties"]["item0"]["$ref"] == "#/components/schemas/Pet"
