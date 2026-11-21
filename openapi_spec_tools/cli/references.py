@@ -91,8 +91,8 @@ def check_duplicate_file_names(urls: Iterable) -> None:
     error_out(f"Duplicate filenames for: {', '.join(duplicates)}")
 
 
-def get_spec_content(url: str, base_dir: Path | None = None) -> bytes:
-    """Read external spec data as bytes.
+def get_spec_text(url: str, base_dir: Path | None = None) -> str:
+    """Read external spec text.
 
     A relative local path is resolved against ``base_dir`` when that is provided.
     """
@@ -103,19 +103,17 @@ def get_spec_content(url: str, base_dir: Path | None = None) -> bytes:
             file = base_dir / file
         if not file.exists():
             error_out(f"Local file {url} does not exist!")
-        raw = file.read_bytes()
-    else:
-        try:
-            start = datetime.now(tz=timezone.utc)
-            result = requests.get(url, timeout=_DOWNLOAD_TIMEOUT_SECONDS)
-            delta = datetime.now(tz=timezone.utc) - start
-            logger.info(f"Download of {url} too {delta.total_seconds()} seconds")
-            result.raise_for_status()
-            raw = result.content
-        except requests.RequestException as error:
-            error_out(f"Failed to download {url}: {error}")
+        return file.read_text()
 
-    return raw
+    try:
+        start = datetime.now(tz=timezone.utc)
+        result = requests.get(url, timeout=_DOWNLOAD_TIMEOUT_SECONDS)
+        delta = datetime.now(tz=timezone.utc) - start
+        logger.info(f"Download of {url} too {delta.total_seconds()} seconds")
+        result.raise_for_status()
+        return result.text
+    except requests.RequestException as error:
+        error_out(f"Failed to download {url}: {error}")
 
 
 def get_spec_data(url: str, base_dir: Path | None = None) -> dict[str, Any]:
@@ -124,7 +122,7 @@ def get_spec_data(url: str, base_dir: Path | None = None) -> dict[str, Any]:
     The file extension selects the parser. ``.json`` is JSON, and ``.yaml`` or ``.yml`` is YAML.
     A relative local path is resolved against ``base_dir`` when that is provided.
     """
-    raw = get_spec_content(url, base_dir)
+    raw = get_spec_text(url, base_dir)
     suffix = Path(extract_filename(url)).suffix.lower()
     try:
         if suffix == ".json":
@@ -188,9 +186,9 @@ def download_references(
     dir_path.mkdir(parents=True, exist_ok=True)
     base_dir = Path(filename).parent
     for ext_url in sorted(external):
-        raw = get_spec_content(ext_url, base_dir)
+        text = get_spec_text(ext_url, base_dir)
         file = dir_path / extract_filename(ext_url)
-        file.write_bytes(raw)
+        file.write_text(text, encoding="utf-8", errors="ignore", newline="\n")
         typer.echo(f"Wrote {file} for {ext_url}")
 
     return

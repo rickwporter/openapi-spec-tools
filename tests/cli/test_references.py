@@ -118,9 +118,9 @@ def test_extract_filename(url: str, expected: str) -> None:
     assert extract_filename(url) == expected
 
 
-def _response_bytes(content: bytes) -> mock.Mock:
+def _response_text(text: str) -> mock.Mock:
     response = mock.Mock()
-    response.content = content
+    response.text = text
     response.raise_for_status.return_value = None
     return response
 
@@ -144,9 +144,9 @@ def test_get_spec_data_local(tmp_path: Path, name: str, content: bytes, expected
 
 
 def test_get_spec_data_url(caplog: pytest.LogCaptureFixture) -> None:
-    content = b'{"openapi": "3.0.3"}\n'
+    content = '{"openapi": "3.0.3"}\n'
     url = "https://example.com/specs/common.YAML"
-    response = _response_bytes(content)
+    response = _response_text(content)
     with (
         caplog.at_level("INFO", logger="oas.cli.references"),
         mock.patch("openapi_spec_tools.cli.references.requests.get", return_value=response) as mock_get,
@@ -260,13 +260,13 @@ def test_download_references_writes_files(tmp_path: Path) -> None:
     filename = _write_spec(tmp_path, spec)
     out_dir = tmp_path / "nested" / "refs"
     bodies = {
-        COMMON_URL: "title: common\ndescription: café\n".encode(),
-        ERRORS_URL: b'{"title": "errors"}\n',
+        COMMON_URL: "title: common\ndescription: café\n",
+        ERRORS_URL: '{"title": "errors"}\n',
     }
 
     def fake_get(url: str, timeout: int) -> mock.Mock:
         response = mock.Mock()
-        response.content = bodies[url]
+        response.text = bodies[url]
         response.raise_for_status.return_value = None
         assert timeout == _DOWNLOAD_TIMEOUT_SECONDS
         return response
@@ -277,8 +277,8 @@ def test_download_references_writes_files(tmp_path: Path) -> None:
     ):
         download_references(str(filename), out_dir=str(out_dir))
 
-    assert (out_dir / "common.yaml").read_bytes() == bodies[COMMON_URL]
-    assert (out_dir / "errors.json").read_bytes() == bodies[ERRORS_URL]
+    assert (out_dir / "common.yaml").read_text(encoding="utf-8") == bodies[COMMON_URL]
+    assert (out_dir / "errors.json").read_text(encoding="utf-8") == bodies[ERRORS_URL]
     assert mock_get.call_count == 2
     output = mock_stdout.getvalue().splitlines()
     assert output == [
@@ -297,13 +297,13 @@ def test_download_references_copies_local_file(tmp_path: Path) -> None:
     )
     filename = _write_spec(tmp_path, spec)
     out_dir = tmp_path / "refs"
-    body = b'{"title": "errors"}\n'
+    body = '{"title": "errors"}\n'
 
     def fake_get(url: str, timeout: int) -> mock.Mock:
         assert url == ERRORS_URL
         assert timeout == _DOWNLOAD_TIMEOUT_SECONDS
         response = mock.Mock()
-        response.content = body
+        response.text = body
         response.raise_for_status.return_value = None
         return response
 
@@ -315,8 +315,8 @@ def test_download_references_copies_local_file(tmp_path: Path) -> None:
 
     assert mock_get.call_count == 1
     assert local_file.read_bytes() == local_bytes
-    assert (out_dir / "common.yaml").read_bytes() == local_bytes
-    assert (out_dir / "errors.json").read_bytes() == body
+    assert (out_dir / "common.yaml").read_text(encoding="utf-8") == "title: local\ndescription: café\n"
+    assert (out_dir / "errors.json").read_text(encoding="utf-8") == body
     assert mock_stdout.getvalue().splitlines() == [
         f"Wrote {out_dir / 'common.yaml'} for {local_file}",
         f"Wrote {out_dir / 'errors.json'} for {ERRORS_URL}",
