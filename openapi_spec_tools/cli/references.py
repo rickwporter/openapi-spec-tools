@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """Implement the 'references' CLI."""
+import json
+from datetime import datetime
+from datetime import timezone
 from pathlib import Path
 from typing import Annotated
 from typing import Any
@@ -13,12 +16,19 @@ from urllib3.util import parse_url
 
 from openapi_spec_tools.cli.arguments import LogLevelOption
 from openapi_spec_tools.cli.arguments import OpenApiFilenameArgument
+from openapi_spec_tools.cli.arguments import UpdatedOpenApiFilenameOption
 from openapi_spec_tools.cli.constants import INDENT
 from openapi_spec_tools.cli.utils import error_out
 from openapi_spec_tools.cli.utils import init_logging
 from openapi_spec_tools.cli.utils import open_oas_with_error_handling
+from openapi_spec_tools.types import OasField
+from openapi_spec_tools.utils import add_models
 from openapi_spec_tools.utils import find_references
 from openapi_spec_tools.utils import get_logger
+from openapi_spec_tools.utils import map_models
+from openapi_spec_tools.utils import replace_references
+from openapi_spec_tools.utils import unmap_models
+from openapi_spec_tools.utils import write_oas
 
 app = typer.Typer(
     name="references",
@@ -54,21 +64,27 @@ def get_external_references(spec: dict[str, Any]) -> dict[str, list[str]]:
 def is_url(value: str) -> bool:
     """Return whether ``value`` is a URL.
 
-    urllib3 records a scheme for a URL. A local filename has no scheme.
+    urllib3 records a scheme for a URL. A local filename has no scheme. A single-letter
+    scheme is a Windows drive letter, such as ``c:/foo``, not a URL.
     """
-    return parse_url(value).scheme is not None
+    scheme = parse_url(value).scheme
+    return scheme is not None and len(scheme) != 1
 
 
 def extract_filename(url: str) -> str:
-    """Extract the filename from the URL.
+    """Extract the filename from the URL or local path.
 
-    The name is the final segment of the path parsed by urllib3. A value with no path, such as
-    ``common.yaml``, is returned as given. Query and fragment are left out.
+    The name is the final path segment. Query and fragment are left out. A value with no
+    path, such as ``common.yaml``, is returned as given. Local paths may use either slash,
+    including a Windows drive path such as ``c:/foo/pet.yaml``.
     """
+    if not is_url(url):
+        return url.replace("\\", "/").rsplit("/", maxsplit=1)[-1] or "local"
+
     parsed = parse_url(url)
-    if parsed.path:
+    if parsed.path and parsed.path != "/":
         return parsed.path.rsplit("/", maxsplit=1)[-1]
-    return parsed.host or ""
+    return parsed.host
 
 
 def check_duplicate_file_names(urls: Iterable) -> None:
@@ -79,6 +95,54 @@ def check_duplicate_file_names(urls: Iterable) -> None:
         return
 
     error_out(f"Duplicate filenames for: {', '.join(duplicates)}")
+
+
+def get_spec_text(url: str, base_dir: Path | None = None) -> str:
+    """Read external spec text.
+
+    A relative local path is resolved against ``base_dir`` when that is provided.
+    """
+    if not is_url(url):
+        # if the local file does NOT exist, this is an error
+        file = Path(url)
+        if base_dir is not None and not file.is_absolute():
+            file = base_dir / file
+        if not file.exists():
+            error_out(f"Local file {url} does not exist!")
+        return file.read_text(encoding="utf-8", errors="ignore")
+
+    try:
+        start = datetime.now(tz=timezone.utc)
+        result = requests.get(url, timeout=_DOWNLOAD_TIMEOUT_SECONDS)
+        delta = datetime.now(tz=timezone.utc) - start
+        logger.info(f"Download of {url} too {delta.total_seconds()} seconds")
+        result.raise_for_status()
+        return result.text
+    except requests.RequestException as error:
+        error_out(f"Failed to download {url}: {error}")
+
+
+def get_spec_data(url: str, base_dir: Path | None = None) -> dict[str, Any]:
+    """Read an external spec and parse it as JSON or YAML.
+
+    The file extension selects the parser. ``.json`` is JSON, and ``.yaml`` or ``.yml`` is YAML.
+    A relative local path is resolved against ``base_dir`` when that is provided.
+    """
+    raw = get_spec_text(url, base_dir)
+    suffix = Path(extract_filename(url)).suffix.lower()
+    try:
+        if suffix == ".json":
+            data = json.loads(raw)
+        elif suffix in {".yaml", ".yml"}:
+            data = yaml.safe_load(raw)
+        else:
+            error_out(f"Unsupported spec file type for {url}")
+    except (json.JSONDecodeError, yaml.YAMLError, UnicodeDecodeError) as error:
+        error_out(f"Failed to parse {url}: {error}")
+
+    if not isinstance(data, dict):
+        error_out(f"Failed to parse {url}: expected an object")
+    return data
 
 
 @app.command(
@@ -126,23 +190,55 @@ def download_references(
 
     dir_path = Path(out_dir)
     dir_path.mkdir(parents=True, exist_ok=True)
+    base_dir = Path(filename).parent
     for ext_url in sorted(external):
-        if not is_url(ext_url):
-            # if the local file does NOT exist, this is an error
-            file = dir_path / ext_url
-            if not file.exists():
-                error_out(f"Local file {ext_url} does not exist!")
-            typer.echo(f"{ext_url} is a filename instead of a URL")
-            continue
+        text = get_spec_text(ext_url, base_dir).replace("\r\n", "\n").replace("\r", "\n")
         file = dir_path / extract_filename(ext_url)
-        try:
-            result = requests.get(ext_url, timeout=_DOWNLOAD_TIMEOUT_SECONDS)
-            result.raise_for_status()
-        except requests.RequestException as error:
-            error_out(f"Failed to download {ext_url}: {error}")
-        file.write_text(result.text, encoding="utf-8", newline="\n")
+        file.write_text(text, encoding="utf-8", errors="ignore", newline="\n")
         typer.echo(f"Wrote {file} for {ext_url}")
 
+    return
+
+
+@app.command(
+    "update",
+    short_help="Resolve external references into one OpenAPI spec"
+)
+def update_references(
+    original_filename: OpenApiFilenameArgument,
+    updated_filename: UpdatedOpenApiFilenameOption = None,
+    log_level: LogLevelOption = "info",
+) -> None:
+    init_logging(log_level)
+    spec = open_oas_with_error_handling(original_filename)
+    out_filename = updated_filename or original_filename  # use current file, if new name not provided
+
+    external_refs = get_external_references(spec)
+    if not external_refs:
+        typer.echo(f"No external references found in {original_filename}")
+        return
+
+    base_dir = Path(original_filename).parent
+    for ext_url, ext_refs in external_refs.items():
+        data = get_spec_data(ext_url, base_dir)
+        components = data.pop(OasField.COMPONENTS, {})
+        models = map_models(components)
+
+        ext_short_refs = [_.replace("/components/", "") for _ in ext_refs]
+        used = {name: data for name, data in models.items() if name in ext_short_refs}
+        inner_refs = find_references(used)
+        for name in inner_refs:
+            extra_ref = models.get(name)
+            if not extra_ref:
+                logger.warning(f"Failed to find ref for {name}")
+                continue
+            used[name] = extra_ref
+
+        replacements = {f"{ext_url}#{name}": f"#{name}" for name in ext_refs}
+        add_models(spec, unmap_models(used))
+        replace_references(spec, replacements)
+
+    write_oas(out_filename, spec)
     return
 
 

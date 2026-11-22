@@ -1,0 +1,29 @@
+openapi: "3.0.3"
+info:
+  title: External Pet references
+  version: 1.0.0
+paths:
+  /catalog:
+    get:
+      summary: List pets from the shared Petstore spec
+      operationId: listCatalog
+      responses:
+        "200":
+          description: A paged array of pets
+          content:
+            application/json:
+              schema:
+                $ref: "pet.yaml#/components/schemas/Pets"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "pet.yaml#/components/schemas/Error"
+components:
+  schemas:
+    Catalog:
+      type: object
+      properties:
+        name:
+          type: string

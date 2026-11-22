@@ -7,6 +7,7 @@ import pytest
 from openapi_spec_tools.constants import LOG_CLASS
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import _or
+from openapi_spec_tools.utils import add_models
 from openapi_spec_tools.utils import count_values
 from openapi_spec_tools.utils import find_diffs
 from openapi_spec_tools.utils import find_paths
@@ -24,6 +25,7 @@ from openapi_spec_tools.utils import operation_id
 from openapi_spec_tools.utils import reference_classname
 from openapi_spec_tools.utils import remove_property
 from openapi_spec_tools.utils import remove_schema_tags
+from openapi_spec_tools.utils import replace_references
 from openapi_spec_tools.utils import schema_operations_filter
 from openapi_spec_tools.utils import schema_summary
 from openapi_spec_tools.utils import set_nullable_not_required
@@ -798,6 +800,85 @@ def test_remove_property():
         "h": None,
     }
     assert expected == remove_property(original, "d")
+
+
+def test_add_models_merges_sections() -> None:
+    schema = {"openapi": "3.0.3", OasField.COMPONENTS: {OasField.SCHEMAS: {"Local": {TYPE: "object"}}}}
+    pet = {TYPE: "object", PROPS: {"id": {TYPE: "integer"}}}
+    page_size = {"name": "pageSize", "in": "query", "schema": {TYPE: "integer"}}
+    add_models(schema, {OasField.SCHEMAS: {"Pet": pet}, OasField.PARAMS: {"PageSize": page_size}})
+
+    components = schema[OasField.COMPONENTS]
+    assert schema["openapi"] == "3.0.3"
+    assert components[OasField.SCHEMAS]["Local"] == {TYPE: "object"}
+    assert components[OasField.SCHEMAS]["Pet"] is pet
+    assert components[OasField.PARAMS]["PageSize"] is page_size
+
+
+def test_add_models_replaces_existing_name() -> None:
+    schema = {OasField.COMPONENTS: {OasField.SCHEMAS: {"Pet": {TYPE: "object"}, "Error": {TYPE: "object"}}}}
+    replacement = {TYPE: "string"}
+    add_models(schema, {OasField.SCHEMAS: {"Pet": replacement}})
+
+    schemas = schema[OasField.COMPONENTS][OasField.SCHEMAS]
+    assert schemas["Pet"] is replacement
+    assert schemas["Error"] == {TYPE: "object"}
+
+
+def test_add_models_creates_components() -> None:
+    schema = {"openapi": "3.0.3"}
+    pet = {TYPE: "object"}
+    add_models(schema, {OasField.SCHEMAS: {"Pet": pet}})
+
+    assert schema[OasField.COMPONENTS][OasField.SCHEMAS]["Pet"] is pet
+
+
+def test_replace_references_updates_nested_refs() -> None:
+    external = "https://example.com/common.yaml#/components/schemas/Pet"
+    local = "#/components/schemas/Pet"
+    untouched = "#/components/parameters/Limit"
+    schema = {
+        "paths": {
+            "/pets": {
+                "get": {
+                    "parameters": [
+                        {"schema": {REFS: external}},
+                        {"schema": {REFS: untouched}},
+                    ],
+                    "responses": {
+                        "200": {
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "allOf": [
+                                            {REFS: external},
+                                            {TYPE: "object", DESC: external},
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+    replace_references(schema, {external: local})
+
+    parameters = schema["paths"]["/pets"]["get"]["parameters"]
+    assert parameters[0]["schema"][REFS] == local
+    assert parameters[1]["schema"][REFS] == untouched
+    composed = schema["paths"]["/pets"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]["allOf"]
+    assert composed[0][REFS] == local
+    assert composed[1] == {TYPE: "object", DESC: external}
+
+
+def test_replace_references_leaves_unmatched_values() -> None:
+    schema = {"schema": {REFS: "#/components/schemas/Pet", X_REF: "Pet"}}
+    replace_references(schema, {})
+    replace_references(schema, {"https://example.com/other.yaml#/components/schemas/Pet": "#/components/schemas/Other"})
+    assert schema == {"schema": {REFS: "#/components/schemas/Pet", X_REF: "Pet"}}
 
 
 def test_get_logger() -> None:
