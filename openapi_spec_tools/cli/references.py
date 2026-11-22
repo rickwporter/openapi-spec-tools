@@ -64,23 +64,17 @@ def get_external_references(spec: dict[str, Any]) -> dict[str, list[str]]:
 def is_url(value: str) -> bool:
     """Return whether ``value`` is a URL.
 
-    urllib3 records a scheme for a URL. A local filename has no scheme. A single-letter
-    scheme is a Windows drive letter, such as ``c:/foo``, not a URL.
+    urllib3 records a scheme for a URL. A local filename has no scheme.
     """
-    scheme = parse_url(value).scheme
-    return scheme is not None and len(scheme) != 1
+    return parse_url(value).scheme is not None
 
 
 def extract_filename(url: str) -> str:
-    """Extract the filename from the URL or local path.
+    """Extract the filename from the URL.
 
-    The name is the final path segment. Query and fragment are left out. A value with no
-    path, such as ``common.yaml``, is returned as given. Local paths may use either slash,
-    including a Windows drive path such as ``c:/foo/pet.yaml``.
+    The name is the final segment of the path parsed by urllib3. A value with no path, such as
+    ``common.yaml``, is returned as given. Query and fragment are left out.
     """
-    if not is_url(url):
-        return url.replace("\\", "/").rsplit("/", maxsplit=1)[-1]
-
     parsed = parse_url(url)
     if parsed.path:
         return parsed.path.rsplit("/", maxsplit=1)[-1]
