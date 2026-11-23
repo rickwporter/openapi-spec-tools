@@ -20,6 +20,7 @@ from openapi_spec_tools.base_gen._requests import request
 from openapi_spec_tools.base_gen._requests import request_headers
 
 APP_JSON = "application/json"
+APP_VJSON = "application/vnd.api+json"
 APP_YAML = "application/yaml"
 TEXT_PLAIN = "text/plain"
 IMAGE_PNG = "image/png"
@@ -106,7 +107,7 @@ def convert_body(data: Any, content_type: str) -> Any:
     if data is None:
         return None
     if isinstance(data, (dict, list)):
-        if content_type == APP_JSON:
+        if content_type.startswith((APP_JSON, APP_VJSON)):
             return bytes(json.dumps(data).encode("utf-8"))
         if content_type == APP_YAML:
             return bytes(yaml.dump(data).encode("utf-8"))
@@ -204,6 +205,22 @@ def test_raise_for_error_success(status_code) -> None:
         pytest.param("GET", APP_JSON, None, {}, None, id="get-no-body"),
         pytest.param("POST", APP_JSON, {}, {}, {}, id="post-empty-body"),
         pytest.param("PATCH", APP_JSON, {"message": "done"}, {}, {"message": "done"}, id="patch-body"),
+        pytest.param(
+            "POST",
+            APP_VJSON,
+            {"data": {"type": "profile"}},
+            {},
+            {"data": {"type": "profile"}},
+            id="vnd-api-json",
+        ),
+        pytest.param(
+            "POST",
+            f"{APP_VJSON}; charset=utf-8",
+            {"data": {"id": "1"}},
+            {},
+            {"data": {"id": "1"}},
+            id="vnd-api-json-charset",
+        ),
         pytest.param("PUT", APP_JSON, "plain-text body", {}, None, id="json-plain"),
         pytest.param("PUT", TEXT_PLAIN, "plain-text body", {}, "plain-text body", id="text-plain"),
         pytest.param("PATCH", APP_YAML, {"message": "done"}, {}, {"message": "done"}, id="good-yaml"),
