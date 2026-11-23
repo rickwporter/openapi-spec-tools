@@ -180,15 +180,15 @@ def request(
         return None
 
     encoding = response.encoding or "utf-8"
-    content_type = response.headers.get("Content-type", "application/json")
-    if content_type == "application/json":
+    content_type = response.headers.get("Content-type", "application/json").lower()
+    if any(content_type.startswith(x) for x in ("application/json", "application/vnd.api+json")):
         try:
             return response.json()
         except json.JSONDecodeError:
             logger.error(f"Failed to decode {method} {pretty_url} response")
             return None
 
-    if content_type == "application/yaml":
+    if content_type.startswith("application/yaml"):
         try:
             content = response.content.decode(encoding=encoding, errors="ignore")
             return yaml.safe_load(content)
@@ -196,7 +196,7 @@ def request(
             logger.error(f"Failed to decode {method} {pretty_url} response: {ex}")
             return None
 
-    if content_type == "text/plain":
+    if content_type.startswith("text/plain"):
         return response.content.decode(encoding=encoding, errors="ignore")
 
     extension = EXTENSION_MAP.get(content_type)

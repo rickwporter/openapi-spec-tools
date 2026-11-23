@@ -33,7 +33,7 @@ Each remaining path segment is converted to kebab-case and becomes a command or 
 | --- | --- |
 | `prefix` | Path prefix removed before the remaining segments become commands. Path parameters such as `{id}` are dropped. Defaults to an empty string, which leaves the path unchanged. |
 | `max_help_length` | Maximum length of a generated description before it is truncated. Defaults to 80. |
-| `supported_content` | Response content types inspected for pagination body properties. The first type on a successful response that appears in this list is used. Accepted values are `application/json`, `application/yaml`, `application/xml`, `application/pdf`, `application/zip`, and `application/octet-stream`. Defaults to `application/json` and `application/yaml`. |
+| `supported_content` | Response content types inspected for pagination body properties. The first type on a successful response that appears in this list is used. Accepted values are `application/json`, `application/vnd.api+json`, `application/yaml`, `application/xml`, `application/pdf`, `application/zip`, and `application/octet-stream`. Defaults to `application/json`, `application/vnd.api+json`, and `application/yaml`. |
 | `common_operations` | Map of `operationId` segments and HTTP methods to command names. Matching order and the default map are below. |
 | `page_size_params` | Query parameter name, or list of names, for the page size. The first name present on the operation is written as `pagination.pageSize`. |
 | `page_start_params` | Query parameter name, or list of names, for the starting page. The first match is written as `pagination.pageStart`. |
