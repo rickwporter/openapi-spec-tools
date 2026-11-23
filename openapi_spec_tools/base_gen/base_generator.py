@@ -11,7 +11,6 @@ from openapi_spec_tools.base_gen.constants import DEFAULT_CONFLICT_SUFFIX
 from openapi_spec_tools.base_gen.constants import DEFAULT_COPYRIGHT
 from openapi_spec_tools.base_gen.constants import DEFAULT_MAX_HELP_LENGTH
 from openapi_spec_tools.base_gen.constants import DEFAULT_RESERVED
-from openapi_spec_tools.base_gen.constants import DEFAULT_SUPPORTED_CONTENT
 from openapi_spec_tools.base_gen.constants import DEFAULT_VALUE_LOG_LEVEL
 from openapi_spec_tools.base_gen.constants import DEFAULT_VALUE_TIMEOUT
 from openapi_spec_tools.base_gen.constants import DEFAULT_VAR_HOST
@@ -29,6 +28,7 @@ from openapi_spec_tools.base_gen.utils import replace_special
 from openapi_spec_tools.base_gen.utils import simple_escape
 from openapi_spec_tools.base_gen.utils import to_camel_case
 from openapi_spec_tools.base_gen.utils import to_snake_case
+from openapi_spec_tools.constants import DEFAULT_SUPPORTED_CONTENT
 from openapi_spec_tools.constants import NULL_TYPES
 from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.flatten import flatten_schema
@@ -84,7 +84,7 @@ class BaseGenerator:
 
         Default values are as follows (see openapi_spec_tools.base_gen.constants for values):
         * package_name - no default, required
-        * supported_content - DEFAULT_SUPPORTED_CONTENT
+        * supported_content - DEFAULT_SUPPORTED_CONTENT in openapi_spec_tools.constants
         * max_help_length - DEFAULT_MAX_HELP_LENGTH
         * reserved - DEFAULT_RESERVED
         * conflict_suffix - DEFAULT_CONFLICT_SUFFIX

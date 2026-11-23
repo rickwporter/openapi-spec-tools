@@ -20,7 +20,7 @@ Here are the configuration options, and a general idea of their scope.
 | Field | Description |
 | --- | --- |
 | `package_name` | Python package name written into generated imports and copied files. |
-| `supported_content` | Content types checked when selecting a request body. The first match is used. |
+| `supported_content` | Content types checked when selecting a request body. The first match is used. Defaults to `application/json`, `application/vnd.api+json`, and `application/yaml`. |
 | `max_help_length` | Maximum length of generated help text before it is truncated. |
 | `reserved` | Names that generated functions and variables must not use. |
 | `conflict_suffix` | Text appended when a generated name is in `reserved`. |

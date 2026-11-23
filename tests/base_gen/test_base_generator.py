@@ -525,6 +525,68 @@ def test_op_content_type(op_id, expected):
     assert expected == uut.op_content_header(op)
 
 
+def _json_body(content_type: str, properties: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "requestBody": {
+            "content": {
+                content_type: {
+                    "schema": {
+                        "type": "object",
+                        "properties": properties,
+                    }
+                }
+            }
+        }
+    }
+
+
+def test_op_content_type_vnd_api_json():
+    operation = _json_body(
+        "application/vnd.api+json",
+        {
+            "data": {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string"},
+                    "attributes": {
+                        "type": "object",
+                        "properties": {"email": {"type": "string"}},
+                    },
+                },
+            },
+        },
+    )
+    uut = BaseGenerator(oas={}, package_name=PKG)
+
+    assert ', content_type="application/vnd.api+json"' == uut.op_content_header(operation)
+    assert {"data.type", "data.attributes.email"} == set(uut.op_body_settable_properties(operation))
+
+
+def test_op_content_type_prefers_json():
+    operation = {
+        "requestBody": {
+            "content": {
+                "application/vnd.api+json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"data": {"type": "string"}},
+                    }
+                },
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"name": {"type": "string"}},
+                    }
+                },
+            }
+        }
+    }
+    uut = BaseGenerator(oas={}, package_name=PKG)
+
+    assert ', content_type="application/json"' == uut.op_content_header(operation)
+    assert "name" in uut.op_body_settable_properties(operation)
+
+
 def test_op_body_formation_ref():
     oas = open_oas(asset_filename("misc3.yaml"))
     operations = map_operations(oas.get(OasField.PATHS))

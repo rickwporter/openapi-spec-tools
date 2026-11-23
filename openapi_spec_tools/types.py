@@ -64,6 +64,7 @@ class ContentType(str, Enum):
     APP_XML = "application/xml"
     APP_YAML = "application/yaml"
     APP_ZIP = "application/zip"
+    APP_VJSON = "application/vnd.api+json"
 
     @classmethod
     def is_value(cls, proposed: str) -> bool:

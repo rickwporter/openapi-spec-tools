@@ -4,6 +4,7 @@ from typing import Any
 
 from openapi_spec_tools.base_gen import simple_escape
 from openapi_spec_tools.base_gen import to_snake_case
+from openapi_spec_tools.constants import DEFAULT_SUPPORTED_CONTENT
 from openapi_spec_tools.expand import expand_schema
 from openapi_spec_tools.layout.config import LayoutConfig
 from openapi_spec_tools.layout.types import LayoutNode
@@ -24,10 +25,6 @@ UPDATE = "update"
 
 DEFAULT_HELP = "CLI to manage your application"
 DEFAULT_MAX_HELP_LENGTH = 80
-DEFAULT_SUPPORTED_CONTENT = [
-    ContentType.APP_JSON,
-    ContentType.APP_YAML,
-]
 DEFAULT_OPERATION_MAP = {
     "add": CREATE,
     "create": CREATE,

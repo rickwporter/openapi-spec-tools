@@ -3,10 +3,10 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
+from openapi_spec_tools.constants import DEFAULT_SUPPORTED_CONTENT
 from openapi_spec_tools.layout.config import LayoutConfig
 from openapi_spec_tools.layout.layout_generator import DEFAULT_MAX_HELP_LENGTH
 from openapi_spec_tools.layout.layout_generator import DEFAULT_OPERATION_MAP
-from openapi_spec_tools.layout.layout_generator import DEFAULT_SUPPORTED_CONTENT
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
@@ -209,6 +209,25 @@ def test_get_response_body(op_id, expected):
     op = operations.get(op_id)
     actual = uut.get_response_body(op)
     assert expected == actual
+
+
+def test_get_response_body_vnd_api_json():
+    schema = {
+        TYPE: "object",
+        PROPS: {"data": {TYPE: "array"}},
+    }
+    op = {
+        "responses": {
+            "200": {
+                "content": {
+                    "application/vnd.api+json": {"schema": schema},
+                }
+            }
+        }
+    }
+    uut = LayoutGenerator({})
+
+    assert schema == uut.get_response_body(op)
 
 
 @pytest.mark.parametrize(
