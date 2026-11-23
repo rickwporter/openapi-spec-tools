@@ -14,6 +14,7 @@ from openapi_spec_tools.layout.utils import path_to_parts
 from openapi_spec_tools.types import ContentType
 from openapi_spec_tools.types import OasField
 from openapi_spec_tools.utils import _or
+from openapi_spec_tools.utils import get_logger
 from openapi_spec_tools.utils import operation_id
 
 CREATE = "create"
@@ -39,6 +40,7 @@ DEFAULT_OPERATION_MAP = {
     "put": SET,
 }
 
+logger = get_logger(__name__)
 
 def _to_list(data: str | list[str] | None) -> list[str]:
     """Convert the data (either a str or list[str]) to a list[str]."""
@@ -317,6 +319,7 @@ class LayoutGenerator:
         """Create a suggested layout for the provided OpenAPI spec."""
         help = self.short_help(description or self.description or DEFAULT_HELP)
         main = LayoutNode(command=DEFAULT_START, identifier=DEFAULT_START, description=help)
+        op_count = 0
 
         for path_name, path_data in self.paths.items():
             path_parts = path_to_parts(path_name, self.prefix)
@@ -328,6 +331,7 @@ class LayoutGenerator:
 
                 path_node = self.get_or_create_node_with_parents(main, commands)
                 op_id = operation_id(op_data, method, path_name)
+                logger.debug(f"Processing operation {op_id}")
                 op_data.update({OasField.OP_ID.value: op_id})  # set in case it was not
                 op_data.update({OasField.X_METHOD.value: method})
                 pagination = self.get_pagination(op_data)
@@ -337,6 +341,10 @@ class LayoutGenerator:
                 )
                 # sort the children to match layout linting
                 path_node.children = sorted(path_node.children, key=lambda x: x.command)
+
+                op_count += 1
+                if op_count % 30 == 0:
+                    logger.info(f"Processed {op_count} operations")
 
         # try to condense
         main = self.condense(main)
