@@ -191,9 +191,7 @@ def generate_unreferenced(
             parts = path.split("/")
             path = "/".join([p for p in parts if p and '{' not in p])
 
-        operations = paths.get(path, [])
-        operations.append(op)
-        paths[path] = operations
+        paths.setdefault(path, []).append(op)
 
     # display each operations below the path
     for path, ops in paths.items():

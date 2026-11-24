@@ -602,10 +602,9 @@ class BaseGenerator:
             for parents in lineage:
                 prev = "body"
                 for curr in parents:
-                    items = depends.get(prev, [])
+                    items = depends.setdefault(prev, [])
                     if curr not in items:
                         items.append(curr)
-                    depends[prev] = items
                     prev = curr
 
             while depends:

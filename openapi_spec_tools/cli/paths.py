@@ -107,8 +107,7 @@ def paths_operations(
             if method == OasField.PARAMS:
                 continue
             op_id = operation_id(op_data, method, path)
-            items = result.get(path, []) + [op_id]
-            result[path] = items
+            result.setdefault(path, []).append(op_id)
 
     if not result:
         error_out(f"failed to find {path_name}")

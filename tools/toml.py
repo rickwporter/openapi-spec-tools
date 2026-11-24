@@ -70,12 +70,8 @@ def pivot(by_file: dict[str, Any]) -> dict[str, Any]:
     dependencies = {}
     for fname, deps in by_file.items():
         for dname, dver_ in deps.items():
-            package = dependencies.get(dname, {})
-            dver = str(dver_)
-            versions = package.get(dver, [])
-            versions.append(fname)
-            package[dver] = versions
-            dependencies[dname] = package
+            package = dependencies.setdefault(dname, {})
+            package.setdefault(str(dver_), []).append(fname)
 
     return dependencies
 
@@ -226,12 +222,11 @@ def update_dependencies(
         # when forcing, add items not added by other means
         for filename in run_deps.keys():
             target = dev_commands if group == "dev" else run_commands
-            items = target.get(filename, [])
+            items = target.setdefault(filename, [])
             already = set(run_commands.get(filename, [])) | set(dev_commands.get(filename, []))
             for update in updates.values():
                 if update not in already:
                     items.append(update)
-            target[filename] = items
 
     filenames = set(run_commands) | set(dev_commands)
     for filename in sorted(filenames):
