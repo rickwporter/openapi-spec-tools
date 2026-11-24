@@ -589,6 +589,124 @@ def test_get_pagination_nested_next_property():
     assert PaginationNames(next_property="links.prev") == preferred.get_pagination(op_data)
 
 
+def test_get_summary_fields_non_dict_properties():
+    op_data = {
+        "responses": {
+            "200": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": ["id", "name"],
+                        },
+                    },
+                },
+            },
+        },
+    }
+    uut = LayoutGenerator({}, summary_fields=["id", "name"])
+    assert [] == uut.get_summary_fields(op_data, PaginationNames(page_size="limit"))
+
+
+def test_get_summary_fields_top_level_object():
+    oas = open_oas(asset_filename("pet.yaml"))
+    show = oas.get(OasField.PATHS).get("/pets/{petId}").get("get")
+    listed = oas.get(OasField.PATHS).get("/pets").get("get")
+    uut = LayoutGenerator(oas, summary_fields=["tag", "missing", "id"])
+
+    assert ["tag", "id"] == uut.get_summary_fields(show, None)
+    assert ["tag", "id"] == uut.get_summary_fields(show, PaginationNames(page_size="limit"))
+    # an array response has no top-level object properties
+    assert [] == uut.get_summary_fields(listed, None)
+    assert [] == uut.get_summary_fields(listed, PaginationNames(page_size="limit"))
+
+    unset = LayoutGenerator(oas)
+    assert [] == unset.get_summary_fields(show, None)
+
+    missing = LayoutGenerator(oas, summary_fields="not-there")
+    assert [] == missing.get_summary_fields(show, None)
+
+
+def test_get_summary_fields_items_property():
+    oas = open_oas(asset_filename("misc3.yaml"))
+    path = "/pets/{numFeet}/{species}/{neutered}/{birthday}"
+    op_data = oas.get(OasField.PATHS).get(path).get("get")
+    uut = LayoutGenerator(oas, summary_fields=["name", "absent", "id"])
+    pagination = PaginationNames(page_size="limit", items_property="items")
+
+    assert ["name", "id"] == uut.get_summary_fields(op_data, pagination)
+    assert [] == uut.get_summary_fields(op_data, PaginationNames(page_size="limit"))
+    assert [] == uut.get_summary_fields(op_data, PaginationNames(items_property="missing"))
+
+    wrapper = LayoutGenerator(oas, summary_fields=["items", "next-url"])
+    assert ["items", "next-url"] == wrapper.get_summary_fields(op_data, None)
+    assert [] == wrapper.get_summary_fields(op_data, pagination)
+
+
+def test_get_summary_fields_nested_items_property():
+    oas = {
+        "components": {
+            "schemas": {
+                "Pet": {
+                    "type": "object",
+                    "properties": {
+                        "id": {"type": "integer"},
+                        "name": {"type": "string"},
+                    },
+                },
+            },
+        },
+    }
+    op_data = {
+        "responses": {
+            "200": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "page": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {"$ref": "#/components/schemas/Pet"},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
+    uut = LayoutGenerator(oas, summary_fields=["name", "missing", "id"])
+    assert ["name", "id"] == uut.get_summary_fields(op_data, PaginationNames(items_property="page.data"))
+    assert [] == uut.get_summary_fields(op_data, None)
+
+
+def test_get_summary_fields_allof_body():
+    oas = open_oas(asset_filename("misc2.yaml"))
+    op_data = map_operations(oas.get(OasField.PATHS, {})).get("getComposed")
+    uut = LayoutGenerator(oas, summary_fields=["id", "name", "extra"])
+    assert ["extra"] == uut.get_summary_fields(op_data, None)
+    pagination = PaginationNames(page_size="limit", items_property="data")
+    assert ["id", "name"] == uut.get_summary_fields(op_data, pagination)
+
+
+def test_generate_summary_fields():
+    oas = open_oas(asset_filename("pet.yaml"))
+    uut = LayoutGenerator(oas, page_size_params="limit", summary_fields=["id", "absent", "name"])
+    node = uut.generate()
+
+    listed = node.find("pets", "list")
+    assert [] == listed.summary_fields
+    assert listed.pagination == PaginationNames(page_size="limit")
+    assert ["id", "name"] == node.find("pets", "show").summary_fields
+    assert [] == node.find("pets", "create").summary_fields
+
+
 def test_get_pagination_allof_body():
     oas = open_oas(asset_filename("misc2.yaml"))
     op = map_operations(oas.get(OasField.PATHS, {})).get("getComposed")
