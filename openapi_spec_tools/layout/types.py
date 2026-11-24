@@ -95,7 +95,7 @@ class PaginationNames(BaseModel):
     # items property specifies the property name to pull out the data from
     items_property: str | None = None
 
-    # locations for next url
+    # locations for the next URL. next_property may be a dotted path such as "links.next"
     next_header: str | None = None
     next_property: str | None = None
 

@@ -1,5 +1,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Any
 
 import pytest
 
@@ -8,6 +9,7 @@ from openapi_spec_tools.layout.config import LayoutConfig
 from openapi_spec_tools.layout.layout_generator import DEFAULT_MAX_HELP_LENGTH
 from openapi_spec_tools.layout.layout_generator import DEFAULT_OPERATION_MAP
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
+from openapi_spec_tools.layout.layout_generator import _has_property_path
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import write_layout
@@ -514,6 +516,60 @@ def test_get_pagination(gen_args, expected):
 
     uut = LayoutGenerator(oas, **gen_args)
     assert expected == uut.get_pagination(op_data)
+
+
+@pytest.mark.parametrize(
+    ["properties", "path", "expected"],
+    [
+        pytest.param({}, "", False, id="no-key"),
+        pytest.param({}, "foo", False, id="empty"),
+        pytest.param({"foo": {}}, "foo", True, id="no-props"),
+        pytest.param({"foo": {PROPS: {}}}, "foo", True, id="simple"),
+        pytest.param({"foo": {PROPS: {"bar": {}}}}, "foo.bar", True, id="nested-simple"),
+        pytest.param({"foo": {PROPS: {"bar": {}}}}, "foo.baz", False, id="nested-missing"),
+        pytest.param({"foo": {PROPS: [{"bar": {}}]}}, "foo.bar", False, id="non-dict"),
+    ],
+)
+def test_has_property_path(properties: dict[str, Any], path: str, expected: bool) -> None:
+    assert expected == _has_property_path(properties, path)
+
+def test_get_pagination_nested_next_property():
+    oas = {
+        "components": {
+            "schemas": {
+                "PageLinks": {
+                    "type": "object",
+                    "properties": {
+                        "next": {"type": "string"},
+                        "prev": {"type": "string"},
+                    },
+                },
+            },
+        },
+    }
+    op_data = {
+        "responses": {
+            "200": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "items": {"type": "array", "items": {"type": "object"}},
+                                "links": {"$ref": "#/components/schemas/PageLinks"},
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
+    uut = LayoutGenerator(oas, items_properties="items", next_properties=["next", "links.next"])
+    expected = PaginationNames(items_property="items", next_property="links.next")
+    assert expected == uut.get_pagination(op_data)
+
+    preferred = LayoutGenerator(oas, next_properties=["links.prev", "links.next"])
+    assert PaginationNames(next_property="links.prev") == preferred.get_pagination(op_data)
 
 
 def test_get_pagination_allof_body():
