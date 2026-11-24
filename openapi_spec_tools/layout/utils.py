@@ -241,8 +241,7 @@ def operation_duplicates(data: dict[str, Any]) -> dict[str, Any]:
             if not name:
                 continue
 
-            indices = values.get(name, [])
-            values[name] = indices + [index]
+            values.setdefault(name, []).append(index)
 
         multiples = []
         for name, indices in values.items():

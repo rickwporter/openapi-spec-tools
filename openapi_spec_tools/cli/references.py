@@ -54,9 +54,7 @@ def get_external_references(spec: dict[str, Any]) -> dict[str, list[str]]:
         if not separator or "#" in item:
             logger.error(f"Invalid reference: {ext}")
             continue
-        items = file_refs.get(file, [])
-        items.append(item)
-        file_refs[file] = items
+        file_refs.setdefault(file, []).append(item)
 
     return {file: sorted(items) for file, items in file_refs.items()}
 
