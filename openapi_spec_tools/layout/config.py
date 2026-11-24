@@ -27,6 +27,8 @@ class LayoutConfig(BaseModel):
     # Top-level names or dotted paths such as "links.next". The first match is used.
     next_properties: str | list[str] | None = None
     next_headers: str | list[str] | None = None
+    # Property names written as summaryFields when present on a non-paginated response.
+    summary_fields: str | list[str] | None = None
 
     @classmethod
     def from_yaml(cls, filename: str | Path) -> LayoutConfig:

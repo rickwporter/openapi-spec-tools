@@ -20,6 +20,7 @@ def test_from_config_defaults():
     assert uut.items_properties is None
     assert uut.next_properties is None
     assert uut.next_headers is None
+    assert uut.summary_fields is None
 
 
 def test_from_config_overrides():
@@ -37,6 +38,7 @@ def test_from_config_overrides():
         items_properties=["results", "items"],
         next_properties="next",
         next_headers=["Link", "X-Next"],
+        summary_fields=["id", "name"],
     )
 
     assert "/api/v1" == uut.prefix
@@ -49,6 +51,7 @@ def test_from_config_overrides():
     assert ["results", "items"] == uut.items_properties
     assert "next" == uut.next_properties
     assert ["Link", "X-Next"] == uut.next_headers
+    assert ["id", "name"] == uut.summary_fields
 
 
 def test_from_yaml_defaults():
@@ -82,6 +85,9 @@ next_properties: next
 next_headers:
   - Link
   - X-Next
+summary_fields:
+  - id
+  - name
 """
     expected = LayoutConfig(
         prefix="/api/v1",
@@ -94,6 +100,7 @@ next_headers:
         items_properties=["results", "items"],
         next_properties="next",
         next_headers=["Link", "X-Next"],
+        summary_fields=["id", "name"],
     )
     with TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "layout.yaml"
