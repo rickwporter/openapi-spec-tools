@@ -13,6 +13,7 @@ from requests import Response
 
 from openapi_spec_tools.base_gen._requests import PageParams
 from openapi_spec_tools.base_gen._requests import _pretty_params
+from openapi_spec_tools.base_gen._requests import _value_at
 from openapi_spec_tools.base_gen._requests import create_url
 from openapi_spec_tools.base_gen._requests import depaginate
 from openapi_spec_tools.base_gen._requests import raise_for_error
@@ -271,6 +272,22 @@ def test_request(method, content_type, body, params, expected):
         assert expected == actual
 
 
+@pytest.mark.parametrize(
+    ["data", "keys", "expected"],
+    [
+        pytest.param({}, [], {}, id="empty"),
+        pytest.param({"a": "B"}, [], {"a": "B"}, id="no-keys"),
+        pytest.param({"a": "B"}, ["a"], "B", id="simple"),
+        pytest.param({"a": "B"}, ["B"], None, id="missing"),
+        pytest.param({"a": {"B": "C", "D": "E"}}, ["a", "B"], "C", id="nested"),
+        pytest.param({"a": {"B": "C", "D": "E"}}, ["B", "a"], None, id="missing-1st"),
+        pytest.param({"a": {"B": "C", "D": "E"}}, ["a", "F"], None, id="missing-2nd"),
+    ]
+)
+def test_value_at(data: dict[str, Any], keys: list[str], expected: Any) -> None:
+    assert expected == _value_at(data, keys)
+
+
 ITEMS = [
     {"a": 1, "b": True, "c": "some str", "d": None},
     {"a": 2, "b": False, "c": "", "d": False},
@@ -418,6 +435,44 @@ def test_depagination_next_property():
         assert f"Got {len(items)} items using" in imsg
 
         # look at debug logging
+        assert 4 == mock_debug.call_count
+        dmsg = mock_debug.call_args_list[0][0][0]
+        assert f"Requesting GET {url}" in dmsg
+        dmsg = mock_debug.call_args_list[2][0][0]
+        assert f"Requesting GET {next_url}" in dmsg
+
+
+def test_depagination_nested_next_property():
+    url = "http://localhost/sna/foo"
+    next_url = "http://localhost/foo/bar/"
+    item_prop = "items"
+    next_prop = "links.next"
+    resp1 = success_response(body={
+        item_prop: ITEMS,
+        "links": {"next": next_url, "prev": "http://localhost/prev"},
+    })
+    resp2 = success_response(body={item_prop: ITEMS, "links": {"prev": "http://localhost/prev"}})
+
+    page_params = PageParams(items_property_name=item_prop, next_property_name=next_prop)
+
+    with (
+        mock.patch("openapi_spec_tools.base_gen._requests.requests.get") as mock_get,
+        mock.patch("openapi_spec_tools.base_gen._requests.logger.info") as mock_info,
+        mock.patch("openapi_spec_tools.base_gen._requests.logger.debug") as mock_debug,
+    ):
+        mock_get.side_effect = [resp1, resp2]
+
+        items = depaginate(page_params, url)
+        assert ITEMS + ITEMS == items
+
+        assert 2 == mock_get.call_count
+        assert url == mock_get.call_args_list[0][0][0]
+        assert next_url == mock_get.call_args_list[1][0][0]
+
+        assert 1 == mock_info.call_count
+        imsg = mock_info.call_args[0][0]
+        assert f"Got {len(items)} items using" in imsg
+
         assert 4 == mock_debug.call_count
         dmsg = mock_debug.call_args_list[0][0][0]
         assert f"Requesting GET {url}" in dmsg

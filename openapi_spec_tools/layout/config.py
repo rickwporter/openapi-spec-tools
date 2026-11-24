@@ -24,6 +24,7 @@ class LayoutConfig(BaseModel):
     page_start_params: str | list[str] | None = None
     item_start_params: str | list[str] | None = None
     items_properties: str | list[str] | None = None
+    # Top-level names or dotted paths such as "links.next". The first match is used.
     next_properties: str | list[str] | None = None
     next_headers: str | list[str] | None = None
 

@@ -49,6 +49,30 @@ def _to_list(data: str | list[str] | None) -> list[str]:
     return [data] if isinstance(data, str) else data
 
 
+def _has_property_path(properties: dict[str, Any], path: str) -> bool:
+    """Return whether ``path`` names a response property.
+
+    A path without a dot is a top-level property. A dotted path such as ``links.next``
+    walks nested object properties. A property whose name contains a dot matches before
+    the path is split.
+    """
+    if not path:
+        return False
+
+    props = properties
+    keys = path.split(".")
+    for k in keys:
+        if not isinstance(props, dict):
+            return False
+        # make sure we have a property with this name (with a definition)
+        item = props.get(k)
+        if not isinstance(item, dict):
+            return False
+        # update for the next round (if any)
+        props = item.get(OasField.PROPS)
+
+    return True
+
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
 
@@ -231,7 +255,11 @@ class LayoutGenerator:
         return path_node
 
     def get_pagination(self, op_data: dict[str, Any]) -> PaginationNames | None:
-        """Determine pagination parameters from the operation data."""
+        """Determine pagination parameters from the operation data.
+
+        ``next_properties`` may name a top-level field or a dotted path such as ``links.next``.
+        The first listed name that exists on the response schema is used.
+        """
         args = {}
         params = op_data.get(OasField.PARAMS, [])
 
@@ -262,7 +290,8 @@ class LayoutGenerator:
 
         def _prop_args(arg_name: str, prop_names: list[str]) -> None:
             for name in prop_names:
-                if name in properties:
+                found = _has_property_path(properties, name)
+                if found:
                     args[arg_name] = name
                     return
             return

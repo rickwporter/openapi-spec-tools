@@ -86,7 +86,7 @@ class PageParams(BaseModel):
     # items property specifies the property name to pull out the data from
     items_property_name: str | None = None
 
-    # locations for next url
+    # locations for the next URL. next_property_name may be a dotted path such as "links.next"
     next_header_name: str | None = None
     next_property_name: str | None = None
 
@@ -150,6 +150,17 @@ def raise_for_error(response: requests.Response) -> None:
         pass
 
     raise requests.HTTPError(message, response=response)
+
+
+def _value_at(data: Any, keys: list[str]) -> Any:
+    """Return the value at a property path identified by keys."""
+    _data = data
+    for k in keys:
+        if not isinstance(_data, dict):
+            return None
+        _data = _data.get(k)
+
+    return _data
 
 
 def _pretty_params(params: dict[str, Any] | None) -> str:
@@ -248,6 +259,7 @@ def depaginate(
         page_params.next_header_name,
         page_params.next_property_name,
     ])
+    next_prop_keys = page_params.next_property_name.split(".") if page_params.next_property_name else None
 
     while _url:
         if next_url:
@@ -268,7 +280,8 @@ def depaginate(
         raise_for_error(response)
 
         # update list with current items from the response
-        current = response.json()
+        body = response.json()
+        current = body
         if page_params.items_property_name:
             current = current.get(page_params.items_property_name)
         items.extend(current)
@@ -277,8 +290,8 @@ def depaginate(
         if page_params.next_header_name:
             _url = response.headers.get(page_params.next_header_name)
             next_url = _url
-        elif page_params.next_property_name:
-            _url = response.json().get(page_params.next_property_name)
+        elif next_prop_keys:
+            _url = _value_at(body, next_prop_keys)
             next_url = _url
 
         # some book-keeping

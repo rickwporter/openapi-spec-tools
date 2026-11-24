@@ -39,7 +39,7 @@ Each remaining path segment is converted to kebab-case and becomes a command or 
 | `page_start_params` | Query parameter name, or list of names, for the starting page. The first match is written as `pagination.pageStart`. |
 | `item_start_params` | Query parameter name, or list of names, for the starting item. The first match is written as `pagination.itemStart`. |
 | `items_properties` | Response body property name, or list of names, that holds the list of items. The first match is written as `pagination.itemProperty`. |
-| `next_properties` | Response body property name, or list of names, that holds the next-page URL. The first match is written as `pagination.nextProperty`. |
+| `next_properties` | Response body property name, or list of names, that holds the next-page URL. You can use a dotted notation for nested properties (e.g. `links.next`). The first match is written as `pagination.nextProperty`. |
 | `next_headers` | Response header name, or list of names, that holds the next-page URL. The first match is written as `pagination.nextHeader`. |
 
 `common_operations` is applied in this order:
