@@ -75,6 +75,7 @@ def _get_property_type(properties: dict[str, Any], path: str) -> str | None:
 
     return _type
 
+
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
 
@@ -92,12 +93,14 @@ class LayoutGenerator:
         items_properties: str | list[str] | None = None,
         next_properties: str | list[str] | None = None,
         next_headers: str | list[str] | None = None,
+        summary_fields: str | list[str] | None = None,
     ):
         """Initialize the generator with internal values.
 
         Constructor arguments take precedence over ``config``, which takes precedence over the built-in defaults.
         The path prefix defaults to an empty string when neither the argument nor the config sets it.
-        Pagination names default to an empty list when neither the argument nor the config sets them.
+        Pagination names and summary fields default to an empty list when neither the argument nor the config
+        sets them.
         """
         config = config or LayoutConfig()
         self.paths = oas.get(OasField.PATHS, {})
@@ -114,6 +117,7 @@ class LayoutGenerator:
         self.items_properties = _to_list(_or(items_properties, config.items_properties))
         self.next_properties = _to_list(_or(next_properties, config.next_properties))
         self.next_headers = _to_list(_or(next_headers, config.next_headers))
+        self.summary_fields = _to_list(_or(summary_fields, config.summary_fields))
 
     @staticmethod
     def parts_to_commands(path_parts: list[str]) -> list[str]:
@@ -314,6 +318,14 @@ class LayoutGenerator:
 
         return PaginationNames(**args)
 
+    def get_summary_fields(self, op_data: dict[str, Any], pagination: PaginationNames | None) -> list[str]:
+        """Return configured summary fields that in the response."""
+        if not self.summary_fields:
+            return []
+
+        # TODO: fill this in
+        return []
+
     def condense(self, node: LayoutNode) -> LayoutNode:
         """Condense child layers.
 
@@ -368,9 +380,10 @@ class LayoutGenerator:
                 op_data.update({OasField.OP_ID.value: op_id})  # set in case it was not
                 op_data.update({OasField.X_METHOD.value: method})
                 pagination = self.get_pagination(op_data)
+                summary_fields = self.get_summary_fields(op_data, pagination)
                 command = self.suggest_command(op_data, pagination)
                 path_node.children.append(
-                    LayoutNode(command=command, identifier=op_id, pagination=pagination)
+                    LayoutNode(command=command, identifier=op_id, pagination=pagination, summary_fields=summary_fields)
                 )
                 # sort the children to match layout linting
                 path_node.children = sorted(path_node.children, key=lambda x: x.command)

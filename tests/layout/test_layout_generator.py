@@ -48,8 +48,16 @@ def test_config():
         items_properties=["results", "items"],
         next_properties="next",
         next_headers=["Link", "X-Next"],
+        summary_fields=["id", "name"],
     )
-    uut = LayoutGenerator({}, config=config, prefix="/pets", max_help_length=12, page_size_params="count")
+    uut = LayoutGenerator(
+        {},
+        config=config,
+        prefix="/pets",
+        max_help_length=12,
+        page_size_params="count",
+        summary_fields="title",
+    )
     assert uut.prefix == "/pets"
     assert uut.max_help_length == 12
     assert uut.supported_response_content == [ContentType.APP_JSON]
@@ -60,9 +68,11 @@ def test_config():
     assert uut.items_properties == ["results", "items"]
     assert uut.next_properties == ["next"]
     assert uut.next_headers == ["Link", "X-Next"]
+    assert uut.summary_fields == ["title"]
 
     uut = LayoutGenerator({}, config=config)
     assert uut.prefix == "/api/v1"
+    assert uut.summary_fields == ["id", "name"]
 
     uut = LayoutGenerator({})
     assert uut.prefix == ""
@@ -75,6 +85,7 @@ def test_config():
     assert uut.items_properties == []
     assert uut.next_properties == []
     assert uut.next_headers == []
+    assert uut.summary_fields == []
 
 
 @pytest.mark.parametrize(
