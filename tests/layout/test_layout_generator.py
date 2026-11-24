@@ -9,7 +9,7 @@ from openapi_spec_tools.layout.config import LayoutConfig
 from openapi_spec_tools.layout.layout_generator import DEFAULT_MAX_HELP_LENGTH
 from openapi_spec_tools.layout.layout_generator import DEFAULT_OPERATION_MAP
 from openapi_spec_tools.layout.layout_generator import LayoutGenerator
-from openapi_spec_tools.layout.layout_generator import _has_property_path
+from openapi_spec_tools.layout.layout_generator import _get_property_type
 from openapi_spec_tools.layout.types import LayoutNode
 from openapi_spec_tools.layout.types import PaginationNames
 from openapi_spec_tools.layout.utils import write_layout
@@ -507,9 +507,15 @@ pets:
             PaginationNames(page_size="page-size"),
             id="ref",
         ),
+        pytest.param({ITEM_PROP: "page-size"}, None, id="items-non-array"),
+        pytest.param(
+            {ITEM_PROP: ["next-url", "items"]},
+            PaginationNames(items_property="items"),
+            id="skip-non-array",
+        ),
     ]
 )
-def test_get_pagination(gen_args, expected):
+def test_get_pagination(gen_args: dict[str, Any], expected: PaginationNames | None) -> None:
     oas = open_oas(asset_filename("misc3.yaml"))
     path = "/pets/{numFeet}/{species}/{neutered}/{birthday}"
     op_data = oas.get(OasField.PATHS).get(path).get("get")
@@ -521,17 +527,17 @@ def test_get_pagination(gen_args, expected):
 @pytest.mark.parametrize(
     ["properties", "path", "expected"],
     [
-        pytest.param({}, "", False, id="no-key"),
-        pytest.param({}, "foo", False, id="empty"),
-        pytest.param({"foo": {}}, "foo", True, id="no-props"),
-        pytest.param({"foo": {PROPS: {}}}, "foo", True, id="simple"),
-        pytest.param({"foo": {PROPS: {"bar": {}}}}, "foo.bar", True, id="nested-simple"),
-        pytest.param({"foo": {PROPS: {"bar": {}}}}, "foo.baz", False, id="nested-missing"),
-        pytest.param({"foo": {PROPS: [{"bar": {}}]}}, "foo.bar", False, id="non-dict"),
+        pytest.param({}, "", None, id="no-key"),
+        pytest.param({}, "foo", None, id="empty"),
+        pytest.param({"foo": {}}, "foo", None, id="no-props"),
+        pytest.param({"foo": {TYPE: "string", PROPS: {}}}, "foo", "string", id="simple"),
+        pytest.param({"foo": {PROPS: {"bar": {TYPE: "number"}}}}, "foo.bar", "number", id="nested-simple"),
+        pytest.param({"foo": {PROPS: {"bar": {TYPE: "number"}}}}, "foo.baz", None, id="nested-missing"),
+        pytest.param({"foo": {PROPS: [{"bar": {TYPE: "number"}}]}}, "foo.bar", None, id="non-dict"),
     ],
 )
-def test_has_property_path(properties: dict[str, Any], path: str, expected: bool) -> None:
-    assert expected == _has_property_path(properties, path)
+def test_get_property_type(properties: dict[str, Any], path: str, expected: str | None) -> None:
+    assert expected == _get_property_type(properties, path)
 
 def test_get_pagination_nested_next_property():
     oas = {

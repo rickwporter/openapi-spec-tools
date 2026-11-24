@@ -49,7 +49,7 @@ def _to_list(data: str | list[str] | None) -> list[str]:
     return [data] if isinstance(data, str) else data
 
 
-def _has_property_path(properties: dict[str, Any], path: str) -> bool:
+def _get_property_type(properties: dict[str, Any], path: str) -> str | None:
     """Return whether ``path`` names a response property.
 
     A path without a dot is a top-level property. A dotted path such as ``links.next``
@@ -57,21 +57,23 @@ def _has_property_path(properties: dict[str, Any], path: str) -> bool:
     the path is split.
     """
     if not path:
-        return False
+        return None
 
     props = properties
+    _type = None
     keys = path.split(".")
     for k in keys:
         if not isinstance(props, dict):
-            return False
+            return None
         # make sure we have a property with this name (with a definition)
         item = props.get(k)
         if not isinstance(item, dict):
-            return False
+            return None
+        _type = item.get(OasField.TYPE)
         # update for the next round (if any)
         props = item.get(OasField.PROPS)
 
-    return True
+    return _type
 
 class LayoutGenerator:
     """Generates a layout from the OpenAPI spec."""
@@ -288,15 +290,17 @@ class LayoutGenerator:
         body = self.get_response_body(op_data) or {}
         properties = body.get(OasField.PROPS, {})
 
-        def _prop_args(arg_name: str, prop_names: list[str]) -> None:
+        def _prop_args(arg_name: str, prop_names: list[str], allowed_types: list[str] | None = None) -> None:
             for name in prop_names:
-                found = _has_property_path(properties, name)
-                if found:
+                found = _get_property_type(properties, name)
+                if not found:
+                    continue
+                if not allowed_types or found in allowed_types:
                     args[arg_name] = name
                     return
             return
 
-        _prop_args('items_property', self.items_properties)
+        _prop_args('items_property', self.items_properties, ["array"])
         _prop_args('next_property', self.next_properties)
 
         headers = self.get_response_headers(op_data) or {}
