@@ -25,7 +25,7 @@ default: help
 all: lint toml-check example-gen lint cov wheel ## Complete cycle: generate/lint/test everything
 
 # NOTE: due to example sub-projects, clean up all occurrances of these files/directories
-clean: ## Remove build/test artifacts
+clean: example-clean ## Remove build/test artifacts
 	rm -rf `find . -name __pycache__`
 	rm -rf `find . -name .pytest_cache`
 	rm -rf `find . -name .ruff_cache`
@@ -83,4 +83,9 @@ example-all: ## Complete cycle on all examples
 example-gen: ## Generate example code (no tests)
 	@for dname in $(EXAMPLE_GEN_DIRS); do \
 		echo "Entering $${dname}" && make -C $${dname} gen || exit 1; \
+	done
+
+example-clean: ## Clean all examples
+	@for dname in $(EXAMPLE_DIRS); do \
+		echo "Entering $${dname}" && make -C $${dname} clean || exit 1; \
 	done
