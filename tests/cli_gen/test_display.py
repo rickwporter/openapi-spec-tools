@@ -18,6 +18,12 @@ from openapi_spec_tools.cli_gen._display import remove
             [{"north": 1}, {"north": 3}, {"north": None}],
             id="list",
         ),
+        pytest.param({"sna": {"foo": "bar"}}, ["sna"], {"foo": "bar"}, id="single-inner"),
+        pytest.param(
+            [{"sna": {"foo": "bar"}}, {"sna": {"bar": "baz"}}, {"sna": "foo"}], ["sna"],
+            [{"foo": "bar"}, {"bar": "baz"}, {"sna": "foo"}],
+            id="list-inner",
+        ),
     ]
 )
 def test_allowed(data, properties, expected):
