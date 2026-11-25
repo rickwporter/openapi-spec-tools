@@ -32,6 +32,11 @@ install: ## Install the package
 
 all: install regen lint ## Perform a full cycle
 
+clean: ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ Code generation
 layout: ## Generate the layout file

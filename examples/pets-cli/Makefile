@@ -27,9 +27,14 @@ install: ## Install the package
 all: install gen lint cov ## Perform a full cycle
 	$(uv_run) pets --help
 
+clean: ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ CLI generation
-gen: layout-suggest cli-regen
+gen: cli-regen ## Regenerate CLI code
 
 layout-lint:  ## Check the layout file format
 	$(uv_run) layout check $(LAYOUT_FILE)
@@ -37,7 +42,7 @@ layout-lint:  ## Check the layout file format
 layout-suggest: ## Create suggested layout file
 	$(uv_run) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --prefix /pets
 
-cli-gen: layout-lint ## Generate CLI code
+cli-gen: layout-suggest layout-lint ## Generate CLI code
 	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY)
 
 missing: ## Print the OAS operations not in the layout

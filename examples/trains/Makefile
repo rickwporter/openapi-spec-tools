@@ -27,6 +27,11 @@ install: ## Install the package
 all: install gen lint ## Perform a full cycle
 	$(uv_run) trains --help
 
+clean: ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ CLI generation
 gen: layout-suggest cli-regen
