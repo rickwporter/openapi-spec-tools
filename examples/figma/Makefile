@@ -28,6 +28,11 @@ install: ## Install the package
 all: install gen lint ## Perform a full cycle
 	$(uv_run) figma --help
 
+clean: cli-clean ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
@@ -39,8 +44,15 @@ suggest: ## Generates the suggested layout for OAS
 layout-update: ## Suggest using updates to the hand tailored spec
 	$(uv_run) layout suggest $(OPENAPI_SPEC) $(LAYOUT_FILE) --update
 
-gen: layout-lint ## Generate CLI code
+gen: cli-regen ## Regenerates CLI code
+
+cli-gen: layout-lint ## Generate CLI code
 	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
+
+cli-clean: ## Remove generated code
+	cd $(PACKAGE_NAME) && find . ! -name '__init__.py' -delete
+
+cli-regen: cli-clean cli-gen ## Regenerate CLI code
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)
