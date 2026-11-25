@@ -41,6 +41,7 @@ Each remaining path segment is converted to kebab-case and becomes a command or 
 | `items_properties` | Response body property name, or list of names, that holds the list of items. The first match is written as `pagination.itemProperty`. |
 | `next_properties` | Response body property name, or list of names, that holds the next-page URL. You can use a dotted notation for nested properties (e.g. `links.next`). The first match is written as `pagination.nextProperty`. |
 | `next_headers` | Response header name, or list of names, that holds the next-page URL. The first match is written as `pagination.nextHeader`. |
+| `summary_fields` | Property name, or list of names, shown unless the user asks for full details. A name is written to `summaryFields` when that property exists. When pagination has an item property, the name is matched against that array's items. Otherwise it is matched against the top-level response object. Names that are not present are omitted. Defaults to empty, so no `summaryFields` are written. |
 
 `common_operations` is applied in this order:
 
@@ -78,6 +79,9 @@ items_properties:
   - items
 next_properties: next
 next_headers: Link
+summary_fields:
+  - id
+  - name
 ```
 
 ## Layout Format
