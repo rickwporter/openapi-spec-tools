@@ -15,6 +15,13 @@ def allowed(obj: Any, properties: list[str]) -> Any:
         # recursively call for each object in list
         return [allowed(item, properties) for item in obj]
 
+    # special handling if there's only one property (e.g. summary-field)
+    if len(properties) == 1:
+        # if the inner object is a dict, return that without the property as a key
+        inner = obj.get(properties[0])
+        if isinstance(inner, dict):
+            return inner
+
     return {prop: obj.get(prop) for prop in properties}
 
 
