@@ -22,16 +22,22 @@ install: ## Install the package
 
 all: install gen lint ## Perform a full cycle
 
+clean: api-clean ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ API generation
 gen: api-regen ## Regenerate API code
-api-regen: rm-gen api-gen ## Regenerate the API code
+
+api-regen: api-clean api-gen ## Regenerate the API code
 
 api-gen: ## Generate ALI code
 	$(uv_run) api-gen $(OPENAPI_SPEC) --package $(PACKAGE_NAME)
 
-rm-gen: ## Remove generated code
-	rm -rf $(PACKAGE_NAME)
+api-clean: ## Remove generated code
+	cd $(PACKAGE_NAME) && find . ! -name '__init__.py' -delete
 
 ###########
 ##@ Linting

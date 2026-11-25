@@ -30,6 +30,11 @@ install: ## Install the package
 all: install gen lint ## Perform a full cycle
 	$(uv_run) close-cli --help
 
+clean: cli-clean ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
@@ -44,10 +49,15 @@ layout-update: ## Suggest using updates to the hand tailored spec
 rm-gen:
 	rm -rf $(CODE_DIR)
 
-gen: layout-lint ## Generate CLI code
+gen: cli-regen ## Regenerates CLI code
+
+cli-gen: layout-lint ## Generate CLI code
 	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --code-dir $(CODE_DIR) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
-regen: rm-gen gen
+cli-clean: ## Remove generated code
+	cd $(CODE_DIR) && find . ! -name '__init__.py' -delete
+
+cli-regen: cli-clean cli-gen ## Regenerate CLI code
 
 missing: ## Print the OAS operations not in the layout
 	$(uv_run) cli-gen unreferenced $(LAYOUT_FILE) $(OPENAPI_SPEC)

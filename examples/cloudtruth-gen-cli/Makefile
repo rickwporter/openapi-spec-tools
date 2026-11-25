@@ -31,12 +31,19 @@ install: ## Install the package
 all: install gen lint ## Perform a full cycle
 	$(uv_run) cloudtruth --help
 
+clean: ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ Code generation
 layout-lint:  ## Check the layout file format
 	$(uv_run) layout check $(LAYOUT_FILE)
 
-gen: layout-lint suggest update ## Generate CLI code
+gen: cli-regen ## Regenerat CLI code
+
+cli-gen: layout-lint suggest update ## Generate CLI code
 	$(uv_run) cli-gen generate $(OPENAPI_SPEC) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests --config $(GEN_CONFIG)
 
 missing: ## Print the OAS operations not in the layout
@@ -48,10 +55,10 @@ suggest: ## Use the local code to suggest a layout
 update: ## Generates a new layout using the old as a guide
 	$(uv_run) cli-gen update $(LAYOUT_FILE) $(OPENAPI_SPEC) --new-file $(UPDATED_FILE) --prefix $(PATH_PREFIX) --indent 2
 
-rm-gen: ## Delete generated CLI code
+cli-clean: ## Delete generated CLI code
 	rm -rf $(PACKAGE_NAME)
 
-regen: rm-gen gen ## Delete and generate CLI code
+cli-regen: cli-clean cli-gen ## Delete and generate CLI code
 
 ###########
 ##@ Linting
