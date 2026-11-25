@@ -27,9 +27,14 @@ install: ## Install the package
 all: install gen lint ## Perform a full cycle
 	$(UV_RUN) ld-cli --help
 
+clean: cli-clean ## Remove build artifacts
+	rm -rf __pycache__
+	rm -rf .ruff_cache
+	rm -rf dist
+
 ###########
 ##@ CLI generation
-gen: layout-suggest cli-regen
+gen: cli-regen
 
 layout-lint:  ## Check the layout file format
 	$(UV_RUN) layout check $(LAYOUT_FILE)
@@ -37,7 +42,7 @@ layout-lint:  ## Check the layout file format
 layout-suggest: ## Create suggested layout file
 	$(UV_RUN) layout suggest $(OPENAPI_SPEC) $(SUGGESTED_FILE) --config $(LAYOUT_CONFIG)
 
-cli-gen: layout-lint ## Generate CLI code
+cli-gen: layout-suggest layout-lint ## Generate CLI code
 	$(UV_RUN) cli-gen generate $(OPENAPI_SPEC) --package $(PACKAGE_NAME) --layout-file $(LAYOUT_FILE) --project-dir $(PROJECT_DIRECTORY) --no-tests
 
 missing: ## Print the OAS operations not in the layout
