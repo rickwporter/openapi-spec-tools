@@ -7,15 +7,19 @@ help: ## This message
 
 TEST_TARGET ?= tests
 uv_run ?= uv run
+
+# EXAMPLE_GEN_DIRS regenerate code each 'make all' (and in CICD pipeliens)
 EXAMPLE_GEN_DIRS := examples/cloudtruth-api
 EXAMPLE_GEN_DIRS += examples/cloudtruth-gen-cli
 EXAMPLE_GEN_DIRS += examples/pets-cli
 EXAMPLE_GEN_DIRS += examples/trains
 
+# EXAMPLE_DIRS are kept updated with Python dependencies, but do NOT generate code by default
 EXAMPLE_DIRS := $(EXAMPLE_GEN_DIRS)
 EXAMPLE_DIRS += examples/close_cli
 EXAMPLE_DIRS += examples/figma
 EXAMPLE_DIRS += examples/github
+EXAMPLE_DIRS += examples/launchdarkly
 EXAMPLE_DIRS += examples/pets-api
 
 default: help
